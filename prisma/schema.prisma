@@ -1,0 +1,247 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model calculation_table {
+  id                  Int       @id @default(autoincrement())
+  day                 Int
+  date                DateTime  @db.Date
+  fish_amount_in_pool Int
+  general_weight      Float
+  fish_weight         Float
+  feed_quantity       Float
+  v_c                 Float
+  total_weight        Float
+  weight_per_fish     Float
+  feed_today          Float
+  feed_per_day        Float
+  feed_per_feeding    Float
+  doc_id              BigInt
+  documents           documents @relation(fields: [doc_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model doctype {
+  id          Int         @id @default(autoincrement())
+  name        String      @unique @db.VarChar
+  description String?
+  documents   documents[]
+}
+
+model documents {
+  id                BigInt              @id @default(autoincrement())
+  location_id       Int?
+  doc_type_id       Int?
+  date_time         DateTime            @default(now()) @db.Timestamp(6)
+  executed_by       Int
+  comments          String?
+  calculation_table calculation_table[]
+  doctype           doctype?            @relation(fields: [doc_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  employees         employees           @relation(fields: [executed_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  locations         locations?          @relation(fields: [location_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  itemtransactions  itemtransactions[]
+  stocking          stocking[]
+}
+
+model employeepositions {
+  id          Int         @id @default(autoincrement())
+  name        String      @unique @db.VarChar
+  description String?
+  employees   employees[]
+}
+
+model employees {
+  id                Int                @id @default(autoincrement())
+  empl_position_id  Int?
+  date_from         DateTime?          @db.Timestamp(6)
+  date_to           DateTime?          @db.Timestamp(6)
+  documents         documents[]
+  employeepositions employeepositions? @relation(fields: [empl_position_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  itembatches       itembatches[]
+}
+
+model feedconnections {
+  id                                   Int   @id @default(autoincrement())
+  fish_id                              Int
+  feed_id                              Int
+  from_fish_weight                     Float
+  to_fish_weight                       Float
+  items_feedconnections_feed_idToitems items @relation("feedconnections_feed_idToitems", fields: [feed_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  items_feedconnections_fish_idToitems items @relation("feedconnections_fish_idToitems", fields: [fish_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model individuals {
+  id          Int     @id @default(autoincrement())
+  name        String  @db.VarChar
+  surname     String  @db.VarChar
+  itn         String? @db.VarChar(10)
+  description String?
+
+  @@unique([name, surname], map: "uq_name_surname")
+}
+
+model itembatches {
+  id               BigInt             @id @default(autoincrement())
+  name             String             @unique @db.VarChar
+  description      String?
+  item_id          Int
+  created          DateTime?           @db.Timestamp(6) @default(now())
+  created_by       Int
+  employees        employees?         @relation(fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  items            items              @relation(fields: [item_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  itemtransactions itemtransactions[]
+  parametersvalues parametersvalues[]
+}
+
+model items {
+  id                                             Int               @id @default(autoincrement())
+  name                                           String            @unique @db.VarChar
+  description                                    String?
+  item_type_id                                   Int?
+  default_unit_id                                Int?
+  parent_item                                    Int?
+  feedconnections_feedconnections_feed_idToitems feedconnections[] @relation("feedconnections_feed_idToitems")
+  feedconnections_feedconnections_fish_idToitems feedconnections[] @relation("feedconnections_fish_idToitems")
+  itembatches                                    itembatches[]
+  units                                          units?            @relation(fields: [default_unit_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  itemtypes                                      itemtypes?        @relation(fields: [item_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  purchaselines                                  purchaselines[]
+}
+
+model itemtransactions {
+  id                 BigInt      @id @default(autoincrement())
+  doc_id             BigInt
+  location_id        Int
+  batch_id           BigInt
+  quantity           Int
+  unit_id            Int
+  parent_transaction BigInt?
+  itembatches        itembatches @relation(fields: [batch_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  documents          documents   @relation(fields: [doc_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  locations          locations   @relation(fields: [location_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  units              units       @relation(fields: [unit_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model itemtypes {
+  id    Int     @id @default(autoincrement())
+  name  String  @unique @db.VarChar
+  items items[]
+}
+
+model locations {
+  id               Int                @id @default(autoincrement())
+  location_type_id Int
+  name             String             @unique @db.VarChar
+  pool_id          Int?
+  documents        documents[]
+  itemtransactions itemtransactions[]
+  locationtypes    locationtypes      @relation(fields: [location_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  pools            pools?             @relation(fields: [pool_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model locationtypes {
+  id          Int         @id @default(autoincrement())
+  name        String      @unique @db.VarChar
+  description String?
+  locations   locations[]
+}
+
+model parameters {
+  id               Int                @id @default(autoincrement())
+  name             String             @unique @db.VarChar
+  description      String?
+  data_type        Int
+  parametersvalues parametersvalues[]
+}
+
+model parametersvalues {
+  id           BigInt      @id @default(autoincrement())
+  parameter_id Int
+  batch_id     BigInt
+  value        String
+  date         DateTime    @db.Timestamp(6)
+  comments     String?
+  itembatches  itembatches @relation(fields: [batch_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  parameters   parameters  @relation(fields: [parameter_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model pools {
+  id                 Int             @id @default(autoincrement())
+  prod_line_id       Int
+  name               String          @unique @db.VarChar
+  description        String?
+  cleaning_frequency Int
+  water_temperature  Float
+  x_location         Float?
+  y_location         Float?
+  pool_height        Float?
+  pool_width         Float?
+  pool_length        Float?
+  locations          locations[]
+  productionlines    productionlines @relation(fields: [prod_line_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model productionareas {
+  id              Int               @id @default(autoincrement())
+  name            String            @unique @db.VarChar
+  description     String?
+  productionlines productionlines[]
+}
+
+model productionlines {
+  id              Int              @id @default(autoincrement())
+  prod_area_id    Int?
+  name            String           @unique @db.VarChar
+  description     String?
+  pools           pools[]
+  productionareas productionareas? @relation(fields: [prod_area_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model purchaselines {
+  id                  Int        @id @default(autoincrement())
+  purchase_id         BigInt
+  item_transaction_id BigInt?
+  item_id             Int
+  quantity            Float
+  unit_id             Int
+  items               items      @relation(fields: [item_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  purchtable          purchtable @relation(fields: [purchase_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  units               units      @relation(fields: [unit_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model purchtable {
+  id                BigInt          @id @default(autoincrement())
+  doc_id            BigInt?
+  date_time         DateTime        @default(now()) @db.Timestamp(6)
+  vendor_id         Int
+  vendor_doc_number String          @db.VarChar
+  purchaselines     purchaselines[]
+  vendors           vendors         @relation(fields: [vendor_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model stocking {
+  id             Int       @id @default(autoincrement())
+  doc_id         BigInt
+  average_weight Float
+  documents      documents @relation(fields: [doc_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model units {
+  id               Int                @id @default(autoincrement())
+  name             String             @unique @db.VarChar
+  items            items[]
+  itemtransactions itemtransactions[]
+  purchaselines    purchaselines[]
+}
+
+model vendors {
+  id          Int          @id @default(autoincrement())
+  name        String       @unique @db.VarChar
+  description String?
+  purchtable  purchtable[]
+}
