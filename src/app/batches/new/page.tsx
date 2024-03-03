@@ -3,12 +3,12 @@
 import { useFormState } from "react-dom";
 import * as actions from '@/actions';
 
-export default function CaviarCreatePage(){
-    const [formState, action] = useFormState(actions.createCaviarBatch, {message: ''});
+export default function BatchCreatePage(){
+    const [formState, action] = useFormState(actions.createItemBatch, {message: ''});
 
     return(
         <form action={action}>
-            <h3 className="font-bold m-3">Create an ItemBatch: Caviar</h3>
+            <h3 className="font-bold m-3">Create an ItemBatch</h3>
             <div className="flex flex-col gap-4">
                 <div className="flex gap-4">
                     <label className="w-24" htmlFor="name">

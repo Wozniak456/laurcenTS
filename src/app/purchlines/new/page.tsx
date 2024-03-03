@@ -3,37 +3,27 @@
 import { useFormState } from "react-dom";
 import * as actions from '@/actions';
 
-export default function CaviarCreatePage(){
-    const [formState, action] = useFormState(actions.createCaviarBatch, {message: ''});
+export default function PurchaseLinesCreatePage(){
+    const [formState, action] = useFormState(actions.createPurchLineRecord, {message: ''});
 
     return(
         <form action={action}>
-            <h3 className="font-bold m-3">Create an ItemBatch: Caviar</h3>
+            <h3 className="font-bold m-3">Create a purchaseline</h3>
             <div className="flex flex-col gap-4">
                 <div className="flex gap-4">
-                    <label className="w-24" htmlFor="name">
-                        Name
+                    <label className="w-24" htmlFor="purchase_id">
+                        PurchaseTableId
                     </label>
                     <input 
-                        name="name"
+                        name="purchase_id"
                         className="border rounded p-2 w-full"
-                        id="name"
+                        id="purchase_id"
                         required
                     />
                 </div>
                 <div className="flex gap-4">
-                    <label className="w-24" htmlFor="description">
-                        Description
-                    </label>
-                    <textarea 
-                        name="description"
-                        className="border rounded p-2 w-full"
-                        id="description"
-                    />
-                </div>
-                <div className="flex gap-4">
                     <label className="w-24" htmlFor="item_id">
-                        item_id
+                        ItemId
                     </label>
                     <input 
                         name="item_id"
@@ -43,28 +33,28 @@ export default function CaviarCreatePage(){
                     />
                 </div>
                 <div className="flex gap-4">
-                    <label className="w-24" htmlFor="created">
-                        created at
+                    <label className="w-24" htmlFor="quantity">
+                        Quantity
                     </label>
                     <input 
-                        name="created"
+                        name="quantity"
                         className="border rounded p-2 w-full"
-                        id="created"
-                    />
-                </div>
-                <div className="flex gap-4">
-                    <label className="w-24" htmlFor="created_by">
-                        created_by
-                    </label>
-                    <input 
-                        name="created_by"
-                        className="border rounded p-2 w-full"
-                        id="created_by"
+                        id="quantity"
                         required
                     />
                 </div>
-                
-
+                <div className="flex gap-4">
+                    <label className="w-24" htmlFor="unit_id">
+                        UnitId
+                    </label>
+                    <input 
+                        name="unit_id"
+                        className="border rounded p-2 w-full"
+                        id="unit_id"
+                        required
+                    />
+                </div>
+                          
                 {
                     formState.message ? <div className="my-2 p-2 bg-red-200 border rounded border-red-400">{formState.message}</div> : null
                 }

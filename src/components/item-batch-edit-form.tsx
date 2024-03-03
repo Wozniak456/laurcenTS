@@ -4,10 +4,11 @@ import { useState } from 'react';
 import * as actions from '@/actions';
 
 interface ItemBatchEditFormProps{
-    itembatch: itembatches
+    itembatch: itembatches,
+    endpoint: string
 }
 
-export default function ItemBatchEditForm({itembatch} : ItemBatchEditFormProps){
+export default function ItemBatchEditForm({itembatch, endpoint} : ItemBatchEditFormProps){
     const [description, setDescription] = useState(itembatch.description)
     const [item_id, setItemId] = useState(itembatch.item_id)
     const [created, setCreated] = useState(itembatch.created)
@@ -29,7 +30,7 @@ export default function ItemBatchEditForm({itembatch} : ItemBatchEditFormProps){
         setCreatedBy(parseInt(event.target.value));
     };
 
-    const editItemBatchAction = actions.editItemBatch.bind(null, itembatch.id, description, item_id, created, created_by)
+    const editItemBatchAction = actions.editItemBatch.bind(null, itembatch.id, description, item_id, created, created_by, endpoint)
     
     return(
         <div className="p-3 border rounded border-gray-200">

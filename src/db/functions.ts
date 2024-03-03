@@ -1,6 +1,6 @@
 import { db } from "@/db";
 
-export default async function caviarRegistering(locationId: number, executedBy: number, purchId: number, comments?: string)
+export async function caviarRegistering(locationId: number, executedBy: number, purchId: number, comments?: string)
 : Promise<bigint | null> {
     console.log('we are in caviarRegistering')
     let batchId: bigint | null = null;

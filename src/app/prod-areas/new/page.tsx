@@ -7,7 +7,7 @@ export default function ProdAreaCreatePage(){
     const [formState, action] = useFormState(actions.createProdArea, {message: ''});
 
     return(
-        <form action={action}>
+        <form className="container mx-auto px-4 m-4 max-w-[800px]" action={action}>
             <h3 className="font-bold m-3">Create a Production Area</h3>
             <div className="flex flex-col gap-4">
                 <div className="flex gap-4">

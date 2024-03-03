@@ -20,7 +20,7 @@ export default async function CaviarEditPage(props: CaviarEditPageProps){
 
     return(
         <div>
-            <CaviarEditForm itembatch={caviar} />    
+            <CaviarEditForm itembatch={caviar} endpoint={'caviar'}/>    
         </div>
     )
 }

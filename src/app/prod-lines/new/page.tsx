@@ -2,27 +2,46 @@
 
 import { useFormState } from "react-dom";
 import * as actions from '@/actions';
+import { useEffect, useState } from "react";
+import type {productionareas} from '@prisma/client'
 
 export default function ProdLineCreatePage(){
     const [formState, action] = useFormState(actions.createProdLine, {message: ''});
+    const [areas, setAreas] = useState<productionareas[]>([]);
 
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const areasData = await actions.getAreas();
+                setAreas(areasData);
+            } catch (error) {
+                console.error('Error fetching areas:', error);
+            }
+        };
+
+        fetchData();
+    }, []);
     return(
-        <form action={action}>
+        <form className="flex flex-col justify-center" action={action}>
             <h3 className="font-bold m-3">Create a Production Line</h3>
             <div className="flex flex-col gap-4">
-            <div className="flex gap-4">
+                <div className="flex gap-4">
                     <label className="w-24" htmlFor="prod_area_id">
-                        areaID
+                        Секція
                     </label>
-                    <input 
-                        name="prod_area_id"
-                        className="border rounded p-2 w-full"
-                        id="prod_area_id"
-                    />
+                    <select
+                    name="prod_area_id"
+                    className="border rounded p-2 w-full"
+                    id="prod_area_id"
+                    >
+                        {areas.map(area => (
+                            <option key={area.id} value={area.id}>{area.name}</option>
+                    ))}
+                    </select>
                 </div>
                 <div className="flex gap-4">
                     <label className="w-24" htmlFor="name">
-                        Name
+                        Назва
                     </label>
                     <input 
                         name="name"
@@ -32,7 +51,7 @@ export default function ProdLineCreatePage(){
                 </div>
                 <div className="flex gap-4">
                     <label className="w-24" htmlFor="description">
-                        Description
+                        Опис
                     </label>
                     <textarea 
                         name="description"
@@ -49,6 +68,6 @@ export default function ProdLineCreatePage(){
                     Create
                 </button>
             </div>
-        </form>
+    </form>
     )
 }

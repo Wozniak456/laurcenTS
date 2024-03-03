@@ -20,6 +20,10 @@ export default async function ProdLineShowPage(props: ProdLineShowPageProps){
 
     const deleteProdLineAction = actions.deleteProdLine.bind(null, line.id)
 
+    const renderedPools = await db.pools.findMany({
+        where: {prod_line_id: Number(props.params.id)}
+    })
+
     return(
         <div>
             <div className="flex m-4 justify-between center">
@@ -43,6 +47,15 @@ export default async function ProdLineShowPage(props: ProdLineShowPageProps){
                 <h2>
                     Description of production line: <b>{line.description}</b>
                 </h2>
+            </div>
+            <div>
+                {renderedPools.map(pool => (
+                    <Link key={pool.id} href={`/pools/${pool.id}`}>
+                        <div className="border p-3 mt-3 rounded block">
+                            <h3 className="text-lg font-semibold">{pool.name}</h3>
+                        </div>
+                    </Link>
+                ))}
             </div>
         </div>
     )

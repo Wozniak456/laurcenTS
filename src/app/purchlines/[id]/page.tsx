@@ -3,67 +3,73 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import * as actions from '@/actions'
 
-interface CaviarShowPageProps {
+interface PurchLineShowPageProps {
     params: {
         id: string
     }
 }
 
-export default async function CaviarShowPage(props: CaviarShowPageProps){
-    let caviar;
+export default async function PurchLineShowPage(props: PurchLineShowPageProps){
+    let purchline;
     try{
-        caviar = await db.itembatches.findFirst({
+        purchline = await db.purchaselines.findFirst({
             where: { id: parseInt(props.params.id) }
         })
 
-        if (!caviar){
+        if (!purchline){
             notFound();
         }
 
-        const deleteCaviarAction = actions.deleteItemBatch.bind(null, caviar.id, 'caviar')
+        const deletePurchLineAction = actions.deletePurchLine.bind(null, purchline.id)
 
         return(
             <div>
                 <div className="flex m-4 justify-between center">
-                    <h1 className="text-xl font-bold">{caviar.name}</h1>
+                    <h1 className="text-xl font-bold">{purchline.id}</h1>
                     <div className="flex gap-4">
-                        <Link href={`/caviar/${caviar.id}/edit`} className="p-2 border rounded">
+                        <Link href={`/purchlines/${purchline.id}/edit`} className="p-2 border rounded">
                             Edit
                         </Link>
-                        <form action={deleteCaviarAction}>
+                        <form action={deletePurchLineAction}>
                             <button className="p-2 border rounded">Delete</button>
                         </form>
                     </div>
                 </div>
+                <div className="p-3 border rounded border-gray-200">
+                    <label><b>Purchase_id:</b></label>
+                    <h2>
+                        {purchline.purchase_id.toString()} 
+                    </h2>
+                </div>
                 <div className="p-3 border rounded bg-gray-200 border-gray-200">
-                    <label><b>Description:</b></label>
+                    <label><b>Item_transaction_id:</b></label>
                     <h2>
-                        {caviar.description} 
+                        {purchline.item_transaction_id?.toString()} 
                     </h2>
                 </div>
                 <div className="p-3 border rounded border-gray-200">
-                    <label><b>item_id:</b></label>
+                    <label><b>ItemId:</b></label>
                     <h2>
-                        {caviar.item_id} 
+                        {purchline.item_id} 
                     </h2>
-                </div>
+                </div> 
                 <div className="p-3 border rounded border-gray-200">
-                    <label><b>created:</b></label>
+                    <label><b>Quantity:</b></label>
                     <h2>
-                        {caviar.created.toLocaleString()} 
+                        {purchline.quantity} 
                     </h2>
-                </div>
+                </div> 
                 <div className="p-3 border rounded border-gray-200">
-                    <label><b>created_by:</b></label>
+                    <label><b>UnitId:</b></label>
                     <h2>
-                        {caviar.created_by} 
+                        {purchline.unit_id} 
                     </h2>
-                </div>
+                </div>        
             </div>
         )
     }
     catch(error){
-        console.error("Error fetching caviar data:", error);
+        console.error("Error fetching purchline data:", error);
     }finally {
         await db.$disconnect()
         .then(() => console.log("Disconnected from the database"))

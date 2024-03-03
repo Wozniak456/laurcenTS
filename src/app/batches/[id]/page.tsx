@@ -3,34 +3,34 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import * as actions from '@/actions'
 
-interface CaviarShowPageProps {
+interface BatchesShowPageProps {
     params: {
         id: string
     }
 }
 
-export default async function CaviarShowPage(props: CaviarShowPageProps){
-    let caviar;
+export default async function BatchesShowPage(props: BatchesShowPageProps){
+    let batch;
     try{
-        caviar = await db.itembatches.findFirst({
+        batch = await db.itembatches.findFirst({
             where: { id: parseInt(props.params.id) }
         })
 
-        if (!caviar){
+        if (!batch){
             notFound();
         }
 
-        const deleteCaviarAction = actions.deleteItemBatch.bind(null, caviar.id, 'caviar')
+        const deleteBatchAction = actions.deleteItemBatch.bind(null, batch.id, 'batches')
 
         return(
             <div>
                 <div className="flex m-4 justify-between center">
-                    <h1 className="text-xl font-bold">{caviar.name}</h1>
+                    <h1 className="text-xl font-bold">{batch.name}</h1>
                     <div className="flex gap-4">
-                        <Link href={`/caviar/${caviar.id}/edit`} className="p-2 border rounded">
+                        <Link href={`/batches/${batch.id}/edit`} className="p-2 border rounded">
                             Edit
                         </Link>
-                        <form action={deleteCaviarAction}>
+                        <form action={deleteBatchAction}>
                             <button className="p-2 border rounded">Delete</button>
                         </form>
                     </div>
@@ -38,32 +38,32 @@ export default async function CaviarShowPage(props: CaviarShowPageProps){
                 <div className="p-3 border rounded bg-gray-200 border-gray-200">
                     <label><b>Description:</b></label>
                     <h2>
-                        {caviar.description} 
+                        {batch.description} 
                     </h2>
                 </div>
                 <div className="p-3 border rounded border-gray-200">
                     <label><b>item_id:</b></label>
                     <h2>
-                        {caviar.item_id} 
+                        {batch.item_id} 
                     </h2>
                 </div>
                 <div className="p-3 border rounded border-gray-200">
                     <label><b>created:</b></label>
                     <h2>
-                        {caviar.created.toLocaleString()} 
+                        {batch.created ? batch.created.toLocaleString() : 'No Date'} 
                     </h2>
                 </div>
                 <div className="p-3 border rounded border-gray-200">
                     <label><b>created_by:</b></label>
                     <h2>
-                        {caviar.created_by} 
+                        {batch.created_by} 
                     </h2>
                 </div>
             </div>
         )
     }
     catch(error){
-        console.error("Error fetching caviar data:", error);
+        console.error("Error fetching batch data:", error);
     }finally {
         await db.$disconnect()
         .then(() => console.log("Disconnected from the database"))

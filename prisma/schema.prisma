@@ -175,8 +175,8 @@ model pools {
   prod_line_id       Int
   name               String          @unique @db.VarChar
   description        String?
-  cleaning_frequency Int
-  water_temperature  Float
+  cleaning_frequency Int?
+  water_temperature  Float?
   x_location         Float?
   y_location         Float?
   pool_height        Float?
@@ -196,7 +196,7 @@ model productionareas {
 model productionlines {
   id              Int              @id @default(autoincrement())
   prod_area_id    Int?
-  name            String           @unique @db.VarChar
+  name            String           
   description     String?
   pools           pools[]
   productionareas productionareas? @relation(fields: [prod_area_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -244,4 +244,13 @@ model vendors {
   name        String       @unique @db.VarChar
   description String?
   purchtable  purchtable[]
+}
+
+model datatable {
+  id               Int      @id @default(autoincrement())
+  day              Int      
+  feedingLevel     Float
+  fc               Float
+  weight           Float
+  voerhoeveelheid  Float
 }
