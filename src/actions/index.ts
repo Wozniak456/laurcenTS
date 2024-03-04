@@ -123,7 +123,6 @@ export async function deletePurchLine(id: number) {
 }
 
 export async function deleteItemBatch(id: bigint, endpoint: string) {
-    console.log("Delete batch!")
     await db.itembatches.delete({
         where: {id}
     });
