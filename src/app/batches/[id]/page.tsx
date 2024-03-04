@@ -11,9 +11,20 @@ interface BatchesShowPageProps {
 
 export default async function BatchesShowPage(props: BatchesShowPageProps){
     let batch;
+    let item
+
     try{
         batch = await db.itembatches.findFirst({
             where: { id: parseInt(props.params.id) }
+        })
+
+        item = await db.items.findFirst({
+            select:{
+                name: true
+            },
+            where:{
+                id: batch?.item_id
+            }
         })
 
         if (!batch){
@@ -42,9 +53,9 @@ export default async function BatchesShowPage(props: BatchesShowPageProps){
                     </h2>
                 </div>
                 <div className="p-3 border rounded border-gray-200">
-                    <label><b>item_id:</b></label>
+                    <label><b>Item:</b></label>
                     <h2>
-                        {batch.item_id} 
+                        {item ? item.name : 'No item found'} 
                     </h2>
                 </div>
                 <div className="p-3 border rounded border-gray-200">

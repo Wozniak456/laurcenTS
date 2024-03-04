@@ -337,6 +337,8 @@ export async function createItemBatch(
             const createdString = formData.get('created') as string;
             const created_by: number = parseInt(formData.get('created_by') as string);
 
+            console.log(formData)
+
             let created = new Date();
 
             if (createdString){
@@ -363,6 +365,9 @@ export async function createItemBatch(
                     created_by
                 }
             })
+            return {
+                message: 'Item batch created successfully'
+            };
         }
         catch(err: unknown){
             if(err instanceof Error){
@@ -381,7 +386,6 @@ export async function createItemBatch(
                 return{message :'Something went wrong!'}
             }
         }
-    redirect('/batches/view');
 }
 
 export async function createCaviarBatch(
@@ -835,4 +839,30 @@ export async function fetchAccordionData(): Promise<AccordionData> {
             })),
         })),
     };
+}
+
+export async function addingFishBatch(batch_id: number, quantity: number, unit_id: number ){
+    try{
+        const document = await db.documents.create({
+            data:{
+                location_id: 87, // Початковий склад
+                doc_type_id: 8, // Реєстрація партії
+                executed_by: 1
+            }
+        })
+        if (document && document.id !== null) {
+            await db.itemtransactions.create({
+                data: {
+                    doc_id: document.id,
+                    location_id: document.location_id || 0, // Встановлюємо значення за замовчуванням, якщо document.location_id === null
+                    batch_id: batch_id,
+                    quantity: quantity,
+                    unit_id: unit_id
+                }
+            });
+        } 
+    }
+    catch{
+
+    }
 }

@@ -85,9 +85,14 @@ export const Accordion: React.FC<AccordionProps> = ({ sections }) => {
                                                 {line.pools.map((pool, poolIndex) => (
                                                     <div
                                                         key={pool.id}
-                                                        className={`w-full bg-white hover:bg-gray-100 border border-gray-300 p-4 cursor-pointer`}
+                                                        className={`flex justify-between w-full bg-white hover:bg-gray-100 border border-gray-300 p-4 `}
                                                     >
-                                                        {pool.name}
+                                                        <div>{pool.name}</div>
+                                                        <button 
+                                                            className='cursor-pointer border p-1 rounded'
+                                                        >
+                                                            Зарибити
+                                                        </button>
                                                     </div>
                                                 ))}
                                             </div>
