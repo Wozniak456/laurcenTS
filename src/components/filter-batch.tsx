@@ -15,10 +15,14 @@ interface TabsProps {
   items:{
     id: number,
     name: string
+  }[],
+  units: {
+    id: number,
+    name: string
   }[]
 }
 
-const Tabs: React.FC<TabsProps> = ({ tabContents, items }) => {
+const Tabs: React.FC<TabsProps> = ({ tabContents, items, units }) => {
   const [isCreateFormVisible, setCreateFormVisible] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
 
@@ -50,7 +54,7 @@ const Tabs: React.FC<TabsProps> = ({ tabContents, items }) => {
           Додати партію
         </button>
       </div>
-      {isCreateFormVisible && <BatchCreateForm items={items}/>}
+      {isCreateFormVisible && <BatchCreateForm items={items} units={units}/>}
       <div className="p-6">
         {tabContents.map((content, index) => (
           <div

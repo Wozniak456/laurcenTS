@@ -7,10 +7,14 @@ interface BatchCreatePageProps {
     items: { 
         id: number, 
         name: string 
+    }[],
+    units:{
+        id: number,
+        name: string
     }[]
 }
 
-export default function BatchCreatePage({items: items} : BatchCreatePageProps){
+export default function BatchCreatePage({items, units} : BatchCreatePageProps){
     const [formState, action] = useFormState(actions.createItemBatch, {message: ''});
     return(
         <form action={action} className="container mx-auto bg-gray-200 p-4 rounded w-1/2 shadow-lg">
@@ -61,6 +65,31 @@ export default function BatchCreatePage({items: items} : BatchCreatePageProps){
                         className="border rounded p-2 w-full"
                         id="created"
                     />
+                </div>
+                <div className="flex gap-4">
+                    <label className="w-24" htmlFor="quantity">
+                        quantity
+                    </label>
+                    <input 
+                        name="quantity"
+                        className="border rounded p-2 w-full"
+                        id="quantity"
+                    />
+                </div>
+                <div className="flex gap-4">
+                    <label className="w-24" htmlFor="unit_id">
+                        unit
+                    </label>
+                    <select
+                        name="unit_id"
+                        className="border rounded p-2 w-full"
+                        id="unit_id"
+                        required
+                    >
+                        {units.map(unit => (
+                            <option key={unit.id} value={unit.id}>{unit.name}</option>
+                        ))}
+                    </select>
                 </div>
                 <div className="flex gap-4">
                     <label className="w-24" htmlFor="created_by">

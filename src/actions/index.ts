@@ -334,10 +334,12 @@ export async function createItemBatch(
             const name = formData.get('name') ;
             const description = formData.get('description') as string;
             const item_id: number = parseInt(formData.get('item_id') as string);
+
             const createdString = formData.get('created') as string;
             const created_by: number = parseInt(formData.get('created_by') as string);
 
-            console.log(formData)
+            const quantity: number = parseInt(formData.get('quantity') as string);
+            const unit_id: number = parseInt(formData.get('unit_id') as string);
 
             let created = new Date();
 
@@ -356,7 +358,7 @@ export async function createItemBatch(
                 };
             }
             
-            await db.itembatches.create({
+            const batch = await db.itembatches.create({
                 data:{
                     name,
                     description,
@@ -364,7 +366,10 @@ export async function createItemBatch(
                     created,
                     created_by
                 }
+            
             })
+            await addingFishBatch(batch.id, quantity, unit_id, created_by )
+
             return {
                 message: 'Item batch created successfully'
             };
@@ -841,13 +846,13 @@ export async function fetchAccordionData(): Promise<AccordionData> {
     };
 }
 
-export async function addingFishBatch(batch_id: number, quantity: number, unit_id: number ){
+export async function addingFishBatch(batch_id: bigint, quantity: number, unit_id: number, created_by: number ){
     try{
         const document = await db.documents.create({
             data:{
                 location_id: 87, // Початковий склад
                 doc_type_id: 8, // Реєстрація партії
-                executed_by: 1
+                executed_by: created_by
             }
         })
         if (document && document.id !== null) {
@@ -864,5 +869,86 @@ export async function addingFishBatch(batch_id: number, quantity: number, unit_i
     }
     catch{
 
+    }
+}
+
+export async function stockPool(
+    formState: { message: string } | undefined,
+    formData: FormData
+): Promise<{ message: string } | undefined> {
+    console.log(formData);
+    try {
+        const location_id_from: number = parseInt(formData.get('location_id_from') as string);
+        const pool_id_to: number = parseInt(formData.get('location_id_to') as string);
+        const batch_id: number = parseInt(formData.get('batch_id') as string);
+        const quantity: number = parseInt(formData.get('quantity') as string);
+        const unit_id: number = parseInt(formData.get('unit_id') as string);
+        const average_weight: number = parseInt(formData.get('average_weight') as string);
+        const executed_by: number = parseInt(formData.get('executed_by') as string);
+        const comments: string = formData.get('comments') as string;
+
+        const location_id_to = await db.locations.findFirst({
+            select: {
+                id: true
+            },
+            where: {
+                pool_id: pool_id_to
+            }
+        });
+
+        if (location_id_to) {
+            const doc = await db.documents.create({
+                data: {
+                    location_id: location_id_to.id, // Отримуємо id локації
+                    doc_type_id: 1,
+                    date_time: new Date(),
+                    executed_by: executed_by,
+                    comments: comments
+                }
+            });
+
+            const pTransaction = await db.itemtransactions.create({
+                data: {
+                    doc_id: doc.id,
+                    location_id: location_id_from,
+                    batch_id: batch_id,
+                    quantity: -quantity,
+                    unit_id: unit_id
+                }
+            });
+
+            await db.itemtransactions.create({
+                data: {
+                    doc_id: doc.id,
+                    location_id: location_id_to.id,
+                    batch_id: batch_id,
+                    quantity: quantity,
+                    unit_id: unit_id,
+                    parent_transaction: pTransaction.id
+                }
+            });
+
+            await db.stocking.create({
+                data: {
+                    doc_id: doc.id,
+                    average_weight: average_weight
+                }
+            });
+            return { message: 'Success!' };
+        }
+    } catch (err: unknown) {
+        if (err instanceof Error) {
+            if (err.message.includes('Foreign key constraint failed')) {
+                return {
+                    message: 'There is no any item or purchaseTitle with such id.'
+                };
+            } else {
+                return {
+                    message: err.message
+                };
+            }
+        } else {
+            return { message: 'Something went wrong!' };
+        }
     }
 }

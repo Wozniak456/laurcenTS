@@ -10,6 +10,7 @@ interface GeneralType{
 async function App() {
     let itemTypes : GeneralType[] = []
     let items : GeneralType[] = []
+    let units : GeneralType[] = []
     let tabContents : any[] = []
     const allItemBatches = await db.itembatches.findMany({ select: { id: true, name: true } });
         tabContents.push({
@@ -24,6 +25,7 @@ async function App() {
                 name: true
             }
         })
+        units = await db.units.findMany();
 
         for (const itemType of itemTypes) {
             const itemTypeName = itemType.name;
@@ -58,7 +60,7 @@ async function App() {
           New
         </Link>
       </div>
-      <Tabs tabContents={tabContents} items={items} />
+      <Tabs tabContents={tabContents} items={items} units={units}/>
     </div>
   );
 }
