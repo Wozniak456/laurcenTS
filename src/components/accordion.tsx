@@ -1,19 +1,45 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PoolCreateForm from '@/components/create-pool-form';
 import PoolStockForm from '@/components/stocking-form'
+import {getFeedForFish} from '@/actions'
 
-interface ItemBatch{
+interface FeedConnection{
+    id: number;
+    fish_id: number;
+    feed_id: number;
+    from_fish_weight: number;
+    to_fish_weight: number;
+}
+
+interface Item{
+    id: number,
+    name: string,
+    feedconnections: FeedConnection[]
+}
+
+interface Stocking{
+    id: number,
+    average_weight: number
+}
+
+interface Document{
+    id: bigint,
+    stocking: Stocking[]
+}
+
+export interface ItemBatch{
     id: bigint,
     name: string
 }
 interface Transaction{
     id: bigint,
     itembatches: ItemBatch,
+    documents: Document,
     quantity: number
 }
 
-interface Location {
+export interface Location {
     id: number;
     name: string;
     itemtransactions: Transaction[]
@@ -39,23 +65,10 @@ export interface Area {
 }
 interface AccordionProps {
     sections: Area[];
-    locations: {
-        id: number;
-        name: string;
-        itemtransactions: {
-            itembatches: {
-                id: bigint;
-                name: string;
-            }[];
-        }[];
-    }[];
-    batches: {
-        id: bigint;
-        name: string;
-    }[];
+    feedConnections: FeedConnection[];
 }
 
-export const Accordion: React.FC<AccordionProps> = ({ sections, locations, batches }) => {
+export const Accordion: React.FC<AccordionProps> = ({ sections, feedConnections}) => {
     const [activeSection, setActiveSection] = useState<number | null>(null);
     const [activeLine, setActiveLine] = useState<number | null>(null);
     const [isCreatePoolFormVisible, setCreatePoolFormVisible] = useState(false);
@@ -63,6 +76,7 @@ export const Accordion: React.FC<AccordionProps> = ({ sections, locations, batch
     const [selectedLineId, setSelectedLineId] = useState<number | null>(null);
     const [selectedPoolId, setSelectedPoolId] = useState<number | null>(null);
 
+  
     const handleSectionClick = (sectionIndex: number) => {
         setActiveSection(prevActiveSection =>
             prevActiveSection === sectionIndex ? null : sectionIndex
@@ -100,8 +114,58 @@ export const Accordion: React.FC<AccordionProps> = ({ sections, locations, batch
         setSelectedPoolId(prevPoolId => (prevPoolId === poolId ? null : poolId));
         setStockPoolFormVisible(false);
     };
-    
 
+    let locations: Location[] = [];
+    let batches: ItemBatch[] = [];
+    let allStockingWeights: number[] = [];
+
+    sections.forEach(area => {
+        area.lines.forEach(line => {
+            line.pools.forEach(pool => {
+                pool.locations.forEach(location => {
+                    location.itemtransactions.forEach(transaction => {
+                        transaction.documents.stocking.forEach(stocking => {
+                            allStockingWeights.push(stocking.average_weight);
+                        });
+                    });
+                });
+            });
+        });
+    });
+    console.log(allStockingWeights)
+    
+    let dictionary = new Map<number, number>(); 
+
+    allStockingWeights.forEach(stockingWeight => {
+        const connection = feedConnections.find(connection => {
+            return stockingWeight >= connection.from_fish_weight && stockingWeight <= connection.to_fish_weight;
+        });
+
+        if (connection) {
+            dictionary.set(stockingWeight, connection.feed_id);
+        }
+    });
+
+    console.log(dictionary)
+
+    sections.forEach(section => {
+        section.lines.forEach(line => {
+            line.pools.forEach(pool => {
+                pool.locations.forEach(location => {
+                    if (location.itemtransactions) {
+                        location.itemtransactions.forEach(transaction => {
+                            if (transaction.itembatches) {
+                                batches.push(transaction.itembatches);
+                            }
+                        });
+                        locations.push(location);
+                    }
+                })
+            });
+        });
+    });
+    
+    
     return (
         <div>
             {sections.map((section, sectionIndex) => (
@@ -144,7 +208,9 @@ export const Accordion: React.FC<AccordionProps> = ({ sections, locations, batch
                                                 <div
                                                     key={pool.id}
                                                     className={`flex flex-col w-full bg-white border border-gray-300 p-4 `}
-                                                    onClick={() => handlePoolClick(pool.id)}
+                                                    onClick={() => 
+                                                        handlePoolClick(pool.id)
+                                                    }
                                                 >
                                                     <div className='cursor-pointer'>{pool.name}</div>
                                                     
@@ -153,7 +219,20 @@ export const Accordion: React.FC<AccordionProps> = ({ sections, locations, batch
                                                             <div>
                                                                 {pool.locations.map((location) => (
                                                                     <div>{location.itemtransactions.map((transaction) => (
-                                                                        transaction.itembatches.name
+                                                                        <div className='flex flex-col gap-2 border mt-2 mb-2 p-1 bg-blue-100 rounded'>
+                                                                            <div>Назва партії: {transaction.itembatches.name}</div>
+                                                                            <div>DocID: {Number(transaction.documents.id)}</div>
+                                                                            <div>Кількість: {transaction.quantity}</div>
+                                                                            <div>{transaction.documents.stocking.map(stocking => {
+                                                                                return (
+                                                                                    <div key={stocking.id}>
+                                                                                        Вага: {stocking.average_weight} г, 
+                                                                                        FeedId: {dictionary.get(stocking.average_weight)}
+                                                                                    </div>
+                                                                                );
+                                                                            })}
+                                                                            </div>
+                                                                        </div>
                                                                     ))}</div>
                                                                 ))}
                                                             </div>

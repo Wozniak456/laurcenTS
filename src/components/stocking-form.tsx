@@ -4,28 +4,18 @@ import { useFormState } from "react-dom";
 import * as actions from '@/actions';
 import { productionlines } from "@prisma/client";
 import { useEffect, useState } from "react";
+import {Location, ItemBatch} from '@/components/accordion'
 
 interface StockPoolProps {
     poolId: number,
-    locations: {
-        id: number;
-        name: string;
-        itemtransactions: {
-            itembatches: {
-                id: bigint;
-                name: string;
-            }[];
-        }[];
-    }[];
-    batches:{
-        id: bigint,
-        name: string
-    }[]
+    locations: Location[],
+    batches: ItemBatch[]
 }
 
 export default function StockPoolPage({poolId, locations, batches }: StockPoolProps){
     const [formState, action] = useFormState(actions.stockPool, {message: ''});
     const [locationIdFrom, setLocationIdFrom] = useState<number | undefined>(undefined);
+
     return(
         <form className="container mx-auto px-4 m-4 max-w-[800px]" action={action}>
             <h3 className="font-bold m-3">Зариблення</h3>
@@ -141,7 +131,10 @@ export default function StockPoolPage({poolId, locations, batches }: StockPoolPr
                     ) : null
                 }
 
-                <button type="submit" className="rounded p-2 bg-blue-200">
+                <button 
+                    type="submit" 
+                    className="rounded p-2 bg-blue-200"
+                    >
                     Зарибити
                 </button>
                 

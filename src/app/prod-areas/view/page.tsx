@@ -2,35 +2,15 @@ import { db } from "@/db";
 import Link from "next/link";
 import {Accordion, Area, Line} from "@/components/accordion";
 
+interface FeedConnection{
+  id: number,
+  from_fish_weight: number,
+  to_fish_weight: number
+}
+
 export default async function AreasHome() {
-  const locationsAndBatches = await db.locations.findMany({
-    select: {
-      id: true,
-      name: true,
-      itemtransactions: {
-        select: {
-          itembatches: {
-            select: {
-              id: true,
-              name: true
-            }
-          },
-          documents:{
-            select:{
-              stocking: true
-            }
-          }
-        }
-      }
-    },
-  });
+  const feedConnections = await db.feedconnections.findMany()
   
-  const batches = await db.itembatches.findMany({
-    select:{
-      id : true,
-      name : true
-    }
-  })
   const sectionsWithLinesAndPools = await db.productionareas.findMany({
     include: {
       productionlines: {
@@ -41,7 +21,12 @@ export default async function AreasHome() {
                 include: {
                   itemtransactions: {
                     include: {
-                      itembatches: true 
+                      itembatches: true,
+                      documents: {
+                        include:{
+                          stocking : true
+                        }
+                      }
                     }
                   }
                 }
@@ -72,14 +57,15 @@ export default async function AreasHome() {
             itembatches: {
               id: transaction.itembatches.id,
               name: transaction.itembatches.name
-          }
+            },
+            documents: transaction.documents,
+            averageWeight: transaction.documents.stocking.map(stocking => stocking.average_weight)
           }))
         }))
       })),
     }))
   }))
-  
-    
+ 
   return (
     <div className="container mx-auto px-4 m-4 max-w-[800px]">
       <div className="flex m-2 justify-between items-center">
@@ -88,7 +74,7 @@ export default async function AreasHome() {
         </Link>
       </div>
        <h1 className="text-2xl font-bold mb-4">Виробничі секції</h1>
-      <Accordion sections={areas} locations={locationsAndBatches} batches={batches}/>
+      <Accordion sections={areas} feedConnections={feedConnections}/>
       <div>
       </div>
     </div>

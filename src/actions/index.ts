@@ -883,7 +883,7 @@ export async function stockPool(
         const batch_id: number = parseInt(formData.get('batch_id') as string);
         const quantity: number = parseInt(formData.get('quantity') as string);
         const unit_id: number = parseInt(formData.get('unit_id') as string);
-        const average_weight: number = parseInt(formData.get('average_weight') as string);
+        const average_weight: number = parseFloat(formData.get('average_weight') as string);
         const executed_by: number = parseInt(formData.get('executed_by') as string);
         const comments: string = formData.get('comments') as string;
 
@@ -934,8 +934,10 @@ export async function stockPool(
                     average_weight: average_weight
                 }
             });
-            return { message: 'Success!' };
+            
+            //return { message: 'Success!' };
         }
+        
     } catch (err: unknown) {
         if (err instanceof Error) {
             if (err.message.includes('Foreign key constraint failed')) {
@@ -951,4 +953,21 @@ export async function stockPool(
             return { message: 'Something went wrong!' };
         }
     }
+    redirect('/prod-areas/view')
+}
+
+interface FeedConnection{
+    id: number;
+    fish_id: number;
+    feed_id: number;
+    from_fish_weight: number;
+    to_fish_weight: number;
+}
+
+export async function getFeedForFish(feedconnections: FeedConnection[], fish_weight: number): Promise<number> {
+    console.log('fish_weight: ', fish_weight);
+    const connection = feedconnections.find(connection => {
+        return fish_weight >= connection.from_fish_weight && fish_weight <= connection.to_fish_weight;
+    });
+    return connection ? connection.feed_id : 0;
 }
