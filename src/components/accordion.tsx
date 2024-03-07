@@ -2,20 +2,21 @@
 import React, { useEffect, useState } from 'react';
 import PoolCreateForm from '@/components/create-pool-form';
 import PoolStockForm from '@/components/stocking-form'
+import {CalculationShowPage} from '@/components/stock-pool-table'
 import {getFeedForFish} from '@/actions'
+import { redirect } from 'next/navigation';
 
-interface FeedConnection{
+export interface FeedConnection{
     id: number;
-    fish_id: number;
     feed_id: number;
     from_fish_weight: number;
     to_fish_weight: number;
+    item: Item
 }
 
 interface Item{
     id: number,
-    name: string,
-    feedconnections: FeedConnection[]
+    name: string
 }
 
 interface Stocking{
@@ -64,17 +65,36 @@ export interface Area {
     lines: Line[];
 }
 interface AccordionProps {
-    sections: Area[];
-    feedConnections: FeedConnection[];
+    sections: Area[],
+    feedConnections: FeedConnection[],
+    locations: {
+        id: number,
+        name: string,
+        pool_id: number | null
+    }[],
+    itembatches: {
+        id: bigint,
+        name: string
+    }[],
+    calculation: {
+        id: number,
+        day: number,
+        date: Date,
+        feed_per_day: number,
+        feed_per_feeding: number,
+        doc_id: bigint
+    }[]
 }
 
-export const Accordion: React.FC<AccordionProps> = ({ sections, feedConnections}) => {
+export const Accordion: React.FC<AccordionProps> = ({ sections, feedConnections, locations, itembatches, calculation}) => {
     const [activeSection, setActiveSection] = useState<number | null>(null);
     const [activeLine, setActiveLine] = useState<number | null>(null);
     const [isCreatePoolFormVisible, setCreatePoolFormVisible] = useState(false);
     const [isStockPoolFormVisible, setStockPoolFormVisible] = useState(false);
     const [selectedLineId, setSelectedLineId] = useState<number | null>(null);
     const [selectedPoolId, setSelectedPoolId] = useState<number | null>(null);
+    const [isStockPoolTableVisible, setStockPoolTableVisible] = useState(false);
+    const [locationId, setlocationId] = useState<number | null>(null);
 
   
     const handleSectionClick = (sectionIndex: number) => {
@@ -104,6 +124,10 @@ export const Accordion: React.FC<AccordionProps> = ({ sections, feedConnections}
         setSelectedPoolId(poolId); // Встановлюємо вибраний басейн
         setStockPoolFormVisible(prevState => !prevState); // Змінюємо стан на протилежний
     };
+
+    const handleCalculationButtonClick = () => {
+        setStockPoolTableVisible(prevState => !prevState);
+    }
     
     const closeStockPoolForm = () => {
         setStockPoolFormVisible(false); // Ховаємо форму для зариблення
@@ -113,10 +137,17 @@ export const Accordion: React.FC<AccordionProps> = ({ sections, feedConnections}
     const handlePoolClick = (poolId: number) => {
         setSelectedPoolId(prevPoolId => (prevPoolId === poolId ? null : poolId));
         setStockPoolFormVisible(false);
+        
+        const locId = locations.find(location => location.pool_id === poolId);
+        
+        if (locId) {
+            setlocationId(locId.id)
+        } else {
+            setlocationId(null)
+        }
     };
 
-    let locations: Location[] = [];
-    let batches: ItemBatch[] = [];
+    
     let allStockingWeights: number[] = [];
 
     sections.forEach(area => {
@@ -132,9 +163,8 @@ export const Accordion: React.FC<AccordionProps> = ({ sections, feedConnections}
             });
         });
     });
-    console.log(allStockingWeights)
     
-    let dictionary = new Map<number, number>(); 
+    let dictionary = new Map<number, string>(); 
 
     allStockingWeights.forEach(stockingWeight => {
         const connection = feedConnections.find(connection => {
@@ -142,29 +172,13 @@ export const Accordion: React.FC<AccordionProps> = ({ sections, feedConnections}
         });
 
         if (connection) {
-            dictionary.set(stockingWeight, connection.feed_id);
+            dictionary.set(stockingWeight, connection.item.name);
         }
     });
-
-    console.log(dictionary)
-
-    sections.forEach(section => {
-        section.lines.forEach(line => {
-            line.pools.forEach(pool => {
-                pool.locations.forEach(location => {
-                    if (location.itemtransactions) {
-                        location.itemtransactions.forEach(transaction => {
-                            if (transaction.itembatches) {
-                                batches.push(transaction.itembatches);
-                            }
-                        });
-                        locations.push(location);
-                    }
-                })
-            });
-        });
-    });
-    
+    useEffect(() => {
+        console.log('selectedPoolId = ', selectedPoolId);
+        console.log('locationId = ', locationId);
+    }, [selectedPoolId, locationId]);
     
     return (
         <div>
@@ -218,16 +232,16 @@ export const Accordion: React.FC<AccordionProps> = ({ sections, feedConnections}
                                                         <div onClick={(e) => e.stopPropagation()}>
                                                             <div>
                                                                 {pool.locations.map((location) => (
-                                                                    <div>{location.itemtransactions.map((transaction) => (
-                                                                        <div className='flex flex-col gap-2 border mt-2 mb-2 p-1 bg-blue-100 rounded'>
-                                                                            <div>Назва партії: {transaction.itembatches.name}</div>
+                                                                    <div key={location.id}>{location.itemtransactions.map((transaction) => (
+                                                                        <div key={transaction.id} className='flex flex-col gap-2 border mt-2 mb-2 p-1 bg-blue-100 rounded'>
+                                                                            <div>Назва партії: <b>{transaction.itembatches.name}</b></div>
                                                                             <div>DocID: {Number(transaction.documents.id)}</div>
-                                                                            <div>Кількість: {transaction.quantity}</div>
+                                                                            <div>Кількість: <b>{transaction.quantity}</b></div>
                                                                             <div>{transaction.documents.stocking.map(stocking => {
                                                                                 return (
-                                                                                    <div key={stocking.id}>
-                                                                                        Вага: {stocking.average_weight} г, 
-                                                                                        FeedId: {dictionary.get(stocking.average_weight)}
+                                                                                    <div key={stocking.id} className='flex flex-col gap-2'>
+                                                                                        <div>Вага: <b>{stocking.average_weight}</b> г</div>
+                                                                                        <div>Назва корму: <b>{dictionary.get(stocking.average_weight)}</b></div>
                                                                                     </div>
                                                                                 );
                                                                             })}
@@ -236,7 +250,16 @@ export const Accordion: React.FC<AccordionProps> = ({ sections, feedConnections}
                                                                     ))}</div>
                                                                 ))}
                                                             </div>
-                                                            <div className='flex justify-end'>
+                                                            <div className='flex justify-end gap-2'>
+                                                                <button 
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        handleCalculationButtonClick();
+                                                                    }}
+                                                                    className='cursor-pointer border p-1 rounded hover:bg-gray-100 '
+                                                                >
+                                                                    Розрахунок
+                                                                </button>
                                                                 <button 
                                                                     onClick={(e) => {
                                                                         e.stopPropagation();
@@ -248,7 +271,11 @@ export const Accordion: React.FC<AccordionProps> = ({ sections, feedConnections}
                                                                 </button>
                                                             </div>
                                                             {selectedPoolId === pool.id && isStockPoolFormVisible && (
-                                                                <PoolStockForm poolId={selectedPoolId} locations={locations} batches={batches}/>
+                                                                <PoolStockForm poolId={selectedPoolId} locations={locations} batches={itembatches}/>
+                                                            )}
+                                                            {selectedPoolId === pool.id && isStockPoolTableVisible && (
+                                                                //redirect("/calculation/221")
+                                                                <CalculationShowPage records={calculation} doc_id={BigInt(1)}/>
                                                             )}
 
                                                         </div>

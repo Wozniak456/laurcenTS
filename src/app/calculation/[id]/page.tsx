@@ -70,7 +70,7 @@ export default async function CalculationShowPage(props: CalculationPageProps){
                             <tr key={record.id} className="bg-gray-100">
                             <td className="border border-blue-500 px-4 py-2">{record.day}</td>
                             <td className="border border-blue-500 px-4 py-2" style={{ width: 'auto', whiteSpace: 'nowrap' }}>{record.date.toISOString().split("T")[0]}</td>
-                            <td className="border border-blue-500 px-4 py-2">{record.fish_amount_in_pool.toFixed(3)}</td>
+                            <td className="border border-blue-500 px-4 py-2">{record.fish_amount_in_pool}</td>
                             <td className="border border-blue-500 px-4 py-2">{record.general_weight.toFixed(3)}</td>
                             <td className="border border-blue-500 px-4 py-2">{record.fish_weight.toFixed(3)}</td>
                             <td className="border border-blue-500 px-4 py-2">{record.feed_quantity.toFixed(3)}</td>

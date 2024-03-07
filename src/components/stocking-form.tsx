@@ -8,7 +8,10 @@ import {Location, ItemBatch} from '@/components/accordion'
 
 interface StockPoolProps {
     poolId: number,
-    locations: Location[],
+    locations: {
+        id: number,
+        name: string
+    }[],
     batches: ItemBatch[]
 }
 
@@ -33,6 +36,7 @@ export default function StockPoolPage({poolId, locations, batches }: StockPoolPr
                             const selectedLocationId = parseInt(e.target.value);
                             setLocationIdFrom(selectedLocationId);
                         }}
+                        defaultValue={87}
                     >
                         {locations.map(location => (
                             <option key={location.id} value={location.id}>{location.name}</option>
@@ -67,13 +71,13 @@ export default function StockPoolPage({poolId, locations, batches }: StockPoolPr
                     </select>
                 </div>
                 <div className="flex gap-4">
-                    <label className="w-auto" htmlFor="quantity">
+                    <label className="w-auto" htmlFor="fish_amount">
                         Кількість
                     </label>
                     <input 
-                        name="quantity"
+                        name="fish_amount"
                         className="border rounded p-2 w-full"
-                        id="quantity"
+                        id="fish_amount"
                         required
                     />
                 </div>
@@ -90,13 +94,25 @@ export default function StockPoolPage({poolId, locations, batches }: StockPoolPr
                     />
                 </div>
                 <div className="flex gap-4">
-                    <label className="w-auto" htmlFor="average_weight">
+                    <label className="w-auto" htmlFor="average_fish_mass">
                         Середня вага, г
                     </label>
                     <input 
-                        name="average_weight"
+                        name="average_fish_mass"
                         className="border rounded p-2 w-full"
-                        id="average_weight"
+                        id="average_fish_mass"
+                        required
+                    />
+                </div>
+                <div className="flex gap-4">
+                    <label className="w-auto" htmlFor="percentage">
+                        Відсоток (для розрахунку):
+                    </label>
+                    <input 
+                        name="percentage"
+                        className="border rounded p-2 w-full"
+                        id="percentage"
+                        defaultValue={0}
                         required
                     />
                 </div>

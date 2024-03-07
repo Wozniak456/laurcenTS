@@ -197,13 +197,13 @@ export async function createProdArea(
 }
 
 export async function createCalcTable(
-    formState: {message: string}, 
+    formState: {message: string} | undefined, 
     formData: FormData){
         let calculationId
         try{
             const fish_amount: number = parseInt(formData.get('fish_amount') as string);
             const average_fish_mass: number = parseInt(formData.get('average_fish_mass') as string);
-            const percentage: number = parseInt(formData.get('percentage') as string);
+            const percentage: number = parseFloat(formData.get('percentage') as string);
             if(typeof(fish_amount) !== 'number'){
                 return {
                     message: 'Поле "Кількість особин" це число.'
@@ -224,7 +224,7 @@ export async function createCalcTable(
         catch(err: unknown){
             return{message :'Усі поля мають бути заповнені числами!'}
         }
-        redirect(`/calculation/${calculationId}`);
+        //redirect(`/calculation/${calculationId}`);
 }
 
 export async function createProdLine(
@@ -881,9 +881,9 @@ export async function stockPool(
         const location_id_from: number = parseInt(formData.get('location_id_from') as string);
         const pool_id_to: number = parseInt(formData.get('location_id_to') as string);
         const batch_id: number = parseInt(formData.get('batch_id') as string);
-        const quantity: number = parseInt(formData.get('quantity') as string);
+        const quantity: number = parseInt(formData.get('fish_amount') as string);
         const unit_id: number = parseInt(formData.get('unit_id') as string);
-        const average_weight: number = parseFloat(formData.get('average_weight') as string);
+        const average_weight: number = parseFloat(formData.get('average_fish_mass') as string);
         const executed_by: number = parseInt(formData.get('executed_by') as string);
         const comments: string = formData.get('comments') as string;
 
@@ -938,6 +938,7 @@ export async function stockPool(
             //return { message: 'Success!' };
         }
         
+        await createCalcTable(formState, formData)
     } catch (err: unknown) {
         if (err instanceof Error) {
             if (err.message.includes('Foreign key constraint failed')) {
@@ -953,6 +954,7 @@ export async function stockPool(
             return { message: 'Something went wrong!' };
         }
     }
+    
     redirect('/prod-areas/view')
 }
 
