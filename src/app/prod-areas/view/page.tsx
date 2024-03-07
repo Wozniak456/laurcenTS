@@ -64,8 +64,8 @@ export default async function AreasHome() {
                       itembatches: true,
                       documents: {
                         include:{
-                          stocking : true
-                        }
+                          stocking : true,
+                        },
                       }
                     }
                   }
@@ -98,7 +98,11 @@ export default async function AreasHome() {
               id: transaction.itembatches.id,
               name: transaction.itembatches.name
             },
-            documents: transaction.documents,
+            documents: {
+              id: transaction.documents.id,
+              doc_type_id: transaction.documents.doc_type_id, // Отримання doc_type_id
+              stocking: transaction.documents.stocking
+            },
             averageWeight: transaction.documents.stocking.map(stocking => stocking.average_weight)
           }))
         }))
@@ -107,7 +111,7 @@ export default async function AreasHome() {
   }))
  
   return (
-    <div className="container mx-auto px-4 m-4 max-w-[800px]">
+    <div className="container mx-auto px-4 m-4 w-70">
       <div className="flex m-2 justify-between items-center">
         <Link href="/prod-areas/new" className="border p-2 rounded ml-auto">
           New

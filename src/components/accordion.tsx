@@ -26,6 +26,7 @@ interface Stocking{
 
 interface Document{
     id: bigint,
+    doc_type_id: number | null,
     stocking: Stocking[]
 }
 
@@ -95,6 +96,7 @@ export const Accordion: React.FC<AccordionProps> = ({ sections, feedConnections,
     const [selectedPoolId, setSelectedPoolId] = useState<number | null>(null);
     const [isStockPoolTableVisible, setStockPoolTableVisible] = useState(false);
     const [locationId, setlocationId] = useState<number | null>(null);
+    const [docId, setdocId] = useState<bigint | null>(null);
 
   
     const handleSectionClick = (sectionIndex: number) => {
@@ -104,6 +106,7 @@ export const Accordion: React.FC<AccordionProps> = ({ sections, feedConnections,
         
         setCreatePoolFormVisible(false);
         setStockPoolFormVisible(false);
+        setStockPoolTableVisible(false)
         setSelectedPoolId(null)
     };
     
@@ -118,25 +121,28 @@ export const Accordion: React.FC<AccordionProps> = ({ sections, feedConnections,
         setSelectedPoolId(null)
         setStockPoolFormVisible(false);
         setCreatePoolFormVisible(false)
+        setStockPoolTableVisible(false)
     };
 
     const handleStockButtonClick = (poolId : number) => {
         setSelectedPoolId(poolId); // Встановлюємо вибраний басейн
         setStockPoolFormVisible(prevState => !prevState); // Змінюємо стан на протилежний
+        setStockPoolTableVisible(false)
     };
 
     const handleCalculationButtonClick = () => {
         setStockPoolTableVisible(prevState => !prevState);
     }
     
-    const closeStockPoolForm = () => {
-        setStockPoolFormVisible(false); // Ховаємо форму для зариблення
-        setSelectedPoolId(null); // Скидаємо вибраний басейн
-    };
+    // const closeStockPoolForm = () => {
+    //     setStockPoolFormVisible(false); // Ховаємо форму для зариблення
+    //     setSelectedPoolId(null); // Скидаємо вибраний басейн
+    // };
 
     const handlePoolClick = (poolId: number) => {
         setSelectedPoolId(prevPoolId => (prevPoolId === poolId ? null : poolId));
         setStockPoolFormVisible(false);
+        setStockPoolTableVisible(false)
         
         const locId = locations.find(location => location.pool_id === poolId);
         
@@ -145,7 +151,34 @@ export const Accordion: React.FC<AccordionProps> = ({ sections, feedConnections,
         } else {
             setlocationId(null)
         }
+
+        let document: Document | undefined;
+
+        sections.forEach(section => {
+            section.lines.forEach(line => {
+                const pool = line.pools.find(pool => pool.id === poolId);
+                if (pool) {
+                    pool.locations.forEach(location => {
+                        location.itemtransactions.forEach(transaction => {
+                            if (transaction.documents.doc_type_id === 1) {
+                                document = transaction.documents;
+                            } else {
+                                console.log('Документ з doc_type_id === 1 не знайдено для транзакції', transaction.id);
+                            }
+                        });
+                    });
+                }
+            });
+        });
+        if (document?.id !== BigInt(-1) && document) {
+            setdocId(document.id)
+            console.log('Останній документ з doc_type_id === 1 знайдено:', document);
+        } else {
+            setdocId(null)
+            console.log('Документ з doc_type_id === 1 не знайдено');
+        }
     };
+    
 
     
     let allStockingWeights: number[] = [];
@@ -178,7 +211,8 @@ export const Accordion: React.FC<AccordionProps> = ({ sections, feedConnections,
     useEffect(() => {
         console.log('selectedPoolId = ', selectedPoolId);
         console.log('locationId = ', locationId);
-    }, [selectedPoolId, locationId]);
+        console.log('docId', docId)
+    }, [selectedPoolId, locationId, docId]);
     
     return (
         <div>
@@ -274,8 +308,7 @@ export const Accordion: React.FC<AccordionProps> = ({ sections, feedConnections,
                                                                 <PoolStockForm poolId={selectedPoolId} locations={locations} batches={itembatches}/>
                                                             )}
                                                             {selectedPoolId === pool.id && isStockPoolTableVisible && (
-                                                                //redirect("/calculation/221")
-                                                                <CalculationShowPage records={calculation} doc_id={BigInt(1)}/>
+                                                                <CalculationShowPage records={calculation} doc_id={docId ? docId + BigInt(1) : null} />
                                                             )}
 
                                                         </div>

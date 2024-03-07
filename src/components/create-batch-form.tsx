@@ -49,6 +49,7 @@ export default function BatchCreatePage({items, units} : BatchCreatePageProps){
                         name="item_id"
                         className="border rounded p-2 w-full"
                         id="item_id"
+                        defaultValue={13}
                         required
                     >
                         {items.map(type => (

@@ -202,8 +202,9 @@ export async function createCalcTable(
         let calculationId
         try{
             const fish_amount: number = parseInt(formData.get('fish_amount') as string);
-            const average_fish_mass: number = parseInt(formData.get('average_fish_mass') as string);
+            const average_fish_mass: number = parseFloat(formData.get('average_fish_mass') as string);
             const percentage: number = parseFloat(formData.get('percentage') as string);
+            const location_id: number = parseInt(formData.get('location_id') as string);
             if(typeof(fish_amount) !== 'number'){
                 return {
                     message: 'Поле "Кількість особин" це число.'
@@ -652,6 +653,7 @@ export async function showCalcTable(){
 }
 
 export async function getTableByValues(fishAmount: number, averageFishMass: number, percentage: number, docId: bigint) {
+    console.log('fishAmount:',fishAmount,' averageFishMass:', averageFishMass, ' percentage: ', percentage, ' docId: ', docId)
     const numberOfRecords = 10;
     const day = Array.from({ length: numberOfRecords }, (_, i) => i + 1);
 
