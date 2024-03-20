@@ -3,8 +3,6 @@ import React, { useEffect, useState } from 'react';
 import PoolCreateForm from '@/components/create-pool-form';
 import PoolStockForm from '@/components/stocking-form'
 import {CalculationShowPage} from '@/components/stock-pool-table'
-import {getFeedForFish} from '@/actions'
-import { redirect } from 'next/navigation';
 
 export interface FeedConnection{
     id: number;
@@ -133,11 +131,6 @@ export const Accordion: React.FC<AccordionProps> = ({ sections, feedConnections,
     const handleCalculationButtonClick = () => {
         setStockPoolTableVisible(prevState => !prevState);
     }
-    
-    // const closeStockPoolForm = () => {
-    //     setStockPoolFormVisible(false); // Ховаємо форму для зариблення
-    //     setSelectedPoolId(null); // Скидаємо вибраний басейн
-    // };
 
     const handlePoolClick = (poolId: number) => {
         setSelectedPoolId(prevPoolId => (prevPoolId === poolId ? null : poolId));
@@ -178,9 +171,7 @@ export const Accordion: React.FC<AccordionProps> = ({ sections, feedConnections,
             console.log('Документ з doc_type_id === 1 не знайдено');
         }
     };
-    
 
-    
     let allStockingWeights: number[] = [];
 
     sections.forEach(area => {
@@ -266,7 +257,10 @@ export const Accordion: React.FC<AccordionProps> = ({ sections, feedConnections,
                                                         <div onClick={(e) => e.stopPropagation()}>
                                                             <div>
                                                                 {pool.locations.map((location) => (
-                                                                    <div key={location.id}>{location.itemtransactions.map((transaction) => (
+                                                                    <div key={location.id}>
+                                                                        {location.itemtransactions
+                                                                        .filter(transaction => transaction.documents.doc_type_id === 1)
+                                                                        .map((transaction) => (
                                                                         <div key={transaction.id} className='flex flex-col gap-2 border mt-2 mb-2 p-1 bg-blue-100 rounded'>
                                                                             <div>Назва партії: <b>{transaction.itembatches.name}</b></div>
                                                                             <div>DocID: {Number(transaction.documents.id)}</div>
@@ -281,7 +275,8 @@ export const Accordion: React.FC<AccordionProps> = ({ sections, feedConnections,
                                                                             })}
                                                                             </div>
                                                                         </div>
-                                                                    ))}</div>
+                                                                    ))}
+                                                                    </div>
                                                                 ))}
                                                             </div>
                                                             <div className='flex justify-end gap-2'>

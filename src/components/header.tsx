@@ -11,6 +11,8 @@ export default function Header() {
                 <Link href="/batches/view" className="text-sm">Партії</Link>
                 <Link href="/datatable/view" className="text-sm">Datatable</Link>
                 <Link href="/calculation/view" className="text-sm">Розрахунок годування</Link>
+                <Link href="/summary-feeding-table/week" className="text-sm">Годування на тиждень</Link>
+                <Link href="/summary-feeding-table/day" className="text-sm">Годування на день</Link>
             </div>
         </div>
     );

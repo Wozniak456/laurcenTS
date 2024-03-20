@@ -254,3 +254,8 @@ model datatable {
   weight           Float
   voerhoeveelheid  Float
 }
+
+model time_table {
+  id               Int      @id @default(autoincrement())
+  time             String
+}

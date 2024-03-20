@@ -40,8 +40,8 @@ export const CalculationShowPage: React.FC<CalculationFor_10_days> = ({ records,
                             <tr  key={record.id}>
                             <td className="border border-blue-500 px-4 py-2">{record.day}</td>
                             <td className="border border-blue-500 px-4 py-2" style={{ width: 'auto', whiteSpace: 'nowrap' }}>{(record.date).toISOString().split("T")[0]}</td>
-                            <td className="border border-blue-500 px-4 py-2">{(record.feed_per_day).toFixed(3)}</td>
-                            <td className="border border-blue-500 px-4 py-2">{(record.feed_per_feeding).toFixed(3)}</td>
+                            <td className="border border-blue-500 px-4 py-2">{(record.feed_per_day).toFixed(0)}</td>
+                            <td className="border border-blue-500 px-4 py-2">{(record.feed_per_feeding).toFixed(0)}</td>
                             {/* <td className="border border-blue-500 px-4 py-2">{(record.doc_id).toString()}</td> */}
                             </tr>
                         ))}
