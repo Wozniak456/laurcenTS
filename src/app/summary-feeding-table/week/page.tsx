@@ -1,6 +1,4 @@
 import { db } from "@/db";
-import { select } from "@nextui-org/react";
-import { Accordion } from "@/components/accordion";
 import * as actions from "@/actions"
 
 export default async function WeekSummary() {
@@ -25,14 +23,6 @@ export default async function WeekSummary() {
       }
   });
       
-    //console.log(calc_table)
-
-  // const lines = await db.productionlines.findMany({
-  //     include:{
-  //         pools: true
-  //     }
-  // })
-
   const lines = await db.productionlines.findMany({
     include:{
         pools: {
@@ -62,18 +52,24 @@ export default async function WeekSummary() {
 
   const groupedCalcTable: { [date: string]: { [poolId: string]: string } } = {};
 
+  const now = new Date();
+  now.setDate(now.getDate() - 1);
+  const next9Days = new Date(now);
+  next9Days.setDate(now.getDate() + 10);
+
   calc_table.forEach(record => {
-    const date = record.date.toISOString().split("T")[0];
-    if (!groupedCalcTable[date]) {
-      groupedCalcTable[date] = {};
-    }
-    const poolId = record.documents.locations?.pool_id;
-    if (poolId !== null && poolId !== undefined) {
-      groupedCalcTable[date][poolId] = record.feed_per_feeding.toFixed(0);
+    const recordDate = record.date;
+    if (recordDate >= now && recordDate <= next9Days) {
+      const date = recordDate.toISOString().split("T")[0];
+      if (!groupedCalcTable[date]) {
+        groupedCalcTable[date] = {};
+      }
+      const poolId = record.documents.locations?.pool_id;
+      if (poolId !== null && poolId !== undefined) {
+        groupedCalcTable[date][poolId] = record.feed_per_feeding.toFixed(0);
+      }
     }
   });
-
-  //console.log(groupedCalcTable)
 
   const feedDictionary: { [averageWeight: number]: string } = {};
 
@@ -105,8 +101,6 @@ export default async function WeekSummary() {
       }
   }
 
-  //console.log(feedDictionary)
-
   return (
     <div className="p-4">
       <h2 className="text-lg font-bold mb-4">Week Summary</h2>
@@ -125,7 +119,7 @@ export default async function WeekSummary() {
                         loc.itemtransactions.map( tran => (tran.documents.stocking.map(stock => (
                           <th key={pool.id} className="px-4 py-2 border border-gray-400 text-center bg-blue-100 text-sm">
                           {
-                            (getFeedName(stock.average_weight)?.match(/\b(\d+(\.\d+)?)\s*mm\b/g) || []).map((match, index) => (
+                            (getFeedName(stock.average_weight)?.match(/\b\d*[,\.]?\d+\s*mm\b/) || []).map((match, index) => (
                               <span key={index}>{match}</span>
                             ))
                           }

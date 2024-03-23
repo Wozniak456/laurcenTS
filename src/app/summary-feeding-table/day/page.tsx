@@ -5,29 +5,6 @@ import DaySummaryContent from "@/components/day-summary"
 import { Line, CalcTable } from "@/components/day-summary";
 
 export default async function DaySummary() {   
-    // const calc_tabledb = await db.calculation_table.findMany({
-    //     select: {
-    //         id: true,
-    //         date: true,
-    //         fish_weight: true,
-    //         feed_per_feeding: true,
-    //         doc_id: true,
-    //         documents: {
-    //             include: {
-    //             locations: {
-    //                 select: {
-    //                 id: true,
-    //                 name: true,
-    //                 pool_id: true
-    //                 }
-    //             },
-    //             },
-    //         },
-    //     }
-    //   });
-    
-
-    
 
     const calc_tabledb = await db.calculation_table.findMany({
       include: {
@@ -85,6 +62,7 @@ export default async function DaySummary() {
       pools: line.pools.map(pool => ({
         id: pool.id,
         name: pool.name,
+        prod_line_id: pool.prod_line_id,
         locations: pool.locations.map(location => ({
           id: location.id,
           itemtransactions: location.itemtransactions.map(transaction => ({
@@ -109,38 +87,7 @@ export default async function DaySummary() {
     const times = await db.time_table.findMany();
     const items = await db.items.findMany();
 
-    const feedDictionary: { [averageWeight: number]: string } = {};
-
-    function getFeedName(average_weight: number){
-      const connection = feed_connections.find(connection => {
-        return average_weight >= connection.from_fish_weight && average_weight <= connection.to_fish_weight;
-      });
-      let feed_item
-      if (connection){
-        feed_item = items.find(item => (
-          connection.feed_id === item.id
-        ))
-      }
-      return feed_item ? feed_item.name : "";
-    }
-
-    for (const line of lines) {
-        for (const pool of line.pools) {
-            for (const location of pool.locations) {
-                for (const transaction of location.itemtransactions) {
-                    for (const stock of transaction.documents.stocking) {
-                        const averageWeight = stock.average_weight;
-                        if (!(averageWeight in feedDictionary)) {
-                            feedDictionary[averageWeight] = getFeedName(averageWeight);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-      
     return (
-        <DaySummaryContent lines={lines_new} times={times} feed_dict={feedDictionary} calc_table={calc_table} />
+        <DaySummaryContent lines={lines_new} times={times} feed_connections={feed_connections} calc_table={calc_table} items={items} />
       );
 }
