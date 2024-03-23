@@ -51,7 +51,7 @@ export default function StockPoolPage({poolId, locations, batches }: StockPoolPr
                         name="location_id_to"
                         className="border rounded p-2 w-full"
                         id="location_id_to"
-                        value={poolId}
+                        defaultValue={poolId}
                         readOnly>
                     </input>
                 </div>
@@ -66,7 +66,7 @@ export default function StockPoolPage({poolId, locations, batches }: StockPoolPr
                         required
                     >
                         {batches.map(batch => (
-                            <option key={batch.id} value={Number(batch.id)}>{batch.name}</option>
+                            <option key={batch.id} defaultValue={Number(batch.id)}>{batch.name}</option>
                         ))}
                     </select>
                 </div>
@@ -89,7 +89,7 @@ export default function StockPoolPage({poolId, locations, batches }: StockPoolPr
                         name="unit_id"
                         className="border rounded p-2 w-full"
                         id="unit_id"
-                        value={1}
+                        defaultValue={1}
                         readOnly
                     />
                 </div>
@@ -124,7 +124,7 @@ export default function StockPoolPage({poolId, locations, batches }: StockPoolPr
                         name="executed_by"
                         className="border rounded p-2 w-full"
                         id="executed_by"
-                        value={1}
+                        defaultValue={1}
                         required
                     />
                 </div>

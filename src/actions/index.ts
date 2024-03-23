@@ -67,8 +67,8 @@ export async function editItemBatch(
 export async function editPool(
     id: number,
     description: string | null,
-    cleaning_frequency: number,
-    water_temperature: number,
+    cleaning_frequency: number | null,
+    water_temperature: number | null,
     x_location: number | null,
     y_location: number | null,
     pool_height: number | null,
@@ -199,15 +199,15 @@ export async function createProdArea(
 export async function createCalcTable(
     formState: {message: string} | undefined, 
     formData: FormData){
-        //console.log(formData);
+        console.log(formData);
         let calculationId
         try{
-            const fish_amount: number = parseInt(formData.get('fish_amount') as string);
-            const average_fish_mass: number = parseFloat(formData.get('average_fish_mass') as string);
-            const percentage: number = parseFloat(formData.get('percentage') as string);
+                const fish_amount: number = parseInt(formData.get('fish_amount') as string);
+                const average_fish_mass: number = parseFloat(formData.get('average_fish_mass') as string);
+            const percentage = 0;//number = parseFloat(formData.get('percentage') as string);
             const pool_id: number = parseInt(formData.get('location_id_to') as string);
-            const batch_id: number = parseInt(formData.get('batch_id') as string);
-            const unit_id: number = parseInt(formData.get('unit_id') as string);
+                const batch_id: number = parseInt(formData.get('batch_id') as string);
+            const unit_id = 1// number = parseInt(formData.get('unit_id') as string);
 
             if(typeof(fish_amount) !== 'number'){
                 return {
@@ -904,15 +904,16 @@ export async function stockPool(
     formState: { message: string } | undefined,
     formData: FormData
 ): Promise<{ message: string } | undefined> {
-    //console.log(formData);
+    console.log(formData);
     try {
-        const location_id_from: number = parseInt(formData.get('location_id_from') as string);
+        const location_id_from = 87 //number = parseInt(formData.get('location_id_from') as string);
         const pool_id_to: number = parseInt(formData.get('location_id_to') as string);
+        //const poolIdElement = document.getElementById("location_id_to");
         const batch_id: number = parseInt(formData.get('batch_id') as string);
         const quantity: number = parseInt(formData.get('fish_amount') as string);
-        const unit_id: number = parseInt(formData.get('unit_id') as string);
+        //const unit_id: number = parseInt(formData.get('unit_id') as string);
         const average_weight: number = parseFloat(formData.get('average_fish_mass') as string);
-        const executed_by: number = parseInt(formData.get('executed_by') as string);
+        const executed_by = 1 //number = parseInt(formData.get('executed_by') as string);
         const comments: string = formData.get('comments') as string;
 
         const location_id_to = await db.locations.findFirst({
@@ -942,7 +943,7 @@ export async function stockPool(
                     location_id: location_id_from,
                     batch_id: batch_id,
                     quantity: -quantity,
-                    unit_id: unit_id
+                    unit_id: 1
                 }
             });
 
@@ -952,7 +953,7 @@ export async function stockPool(
                     location_id: location_id_to.id,
                     batch_id: batch_id,
                     quantity: quantity,
-                    unit_id: unit_id,
+                    unit_id: 1,
                     parent_transaction: pTransaction.id
                 }
             });
@@ -984,7 +985,7 @@ export async function stockPool(
         }
     }
     
-    redirect('/prod-areas/view')
+    redirect('/feeding/view')
 }
 
 interface FeedConnection{
