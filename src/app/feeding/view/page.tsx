@@ -80,14 +80,21 @@ export default async function StockingHome() {
   return (
     <div>
       {areas.map(area => (
-        <div key={area.id} className="border border-black mb-4 p-4">
-          <div className="bg-blue-100 text-2xl font-bold">{area.name}</div>
+        <div key={area.id} className="mb-4 p-4">
+          <div className="text-3xl font-bold">{area.name}</div>
           {area.lines.map(line => (
-            <div key={line.id} className="border border-black mb-4 p-4">
-              <div className="font-bold">{line.name}</div>
-              {line.pools.map(pool => {
+            <div key={line.id} className=" mb-4 p-4">
+              <div className="text-xl font-bold">{line.name}</div>
+              {line.pools
+              .slice()
+              .sort((a, b) => {
+                const numA = parseInt(a.name.split('/')[0].slice(1)); // відкидаємо перший символ "Б" і перетворюємо на число
+                const numB = parseInt(b.name.split('/')[0].slice(1)); // відкидаємо перший символ "Б" і перетворюємо на число
+                return numA - numB; // порівнюємо числа
+              })
+              .map(pool => {
                 return (
-                  <div key={pool.id} className="border border-black mb-4 p-4 bg-blue-100">
+                  <div key={pool.id} className="shadow-xl mb-4 p-4 bg-blue-100">
                     <StockingComponent pool={pool} locations={locations} batches={batches} areas={areas} />
                   </div>
                 );

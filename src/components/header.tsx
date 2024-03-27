@@ -14,6 +14,7 @@ export default function Header() {
                 <Link href="/summary-feeding-table/week" className="text-sm">Годування на тиждень</Link>
                 <Link href="/summary-feeding-table/day" className="text-sm">Годування на день</Link>
                 <Link href="/feeding/view" className="text-sm">Зариблення</Link>
+                <Link href="/general-summary/view" className="text-sm">Зведена 111</Link>
             </div>
         </div>
     );
