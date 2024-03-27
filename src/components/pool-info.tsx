@@ -23,14 +23,14 @@ export default function PoolInfo({areas, poolItem} : PoolInfoProps){
                                 <div key={filteredPool.id}>
                                     {filteredPool.locations.map(loc => (
                                         <div key={loc.id}>
-                                            {loc.itemtransactions[0] && (
+                                            {loc.itemtransactions.length > 0 && (
                                                 <>
-                                                    <p>Партія: {loc.itemtransactions[0].itembatches.name}</p>
-                                                    <p>Кількість: {loc.itemtransactions[0].quantity}</p>
-                                                    {loc.itemtransactions[0].documents.stocking.map((stock, index) => (
-                                                        <div key={index}>
+                                                    <p>Партія: {loc.itemtransactions[loc.itemtransactions.length - 1].itembatches.name}</p>
+                                                    <p>Кількість: {loc.itemtransactions[loc.itemtransactions.length - 1].quantity}</p>
+                                                    {loc.itemtransactions[loc.itemtransactions.length - 2].documents.stocking.map((stock, index) => (
+                                                        <div key={index}> 
                                                             {index === 0 && (
-                                                                <p>Середня вага, г: {stock.average_weight}</p>
+                                                                <p>Середня вага, г: {stock.average_weight.toFixed(3)}</p>
                                                             )}
                                                         </div>
                                                     ))}

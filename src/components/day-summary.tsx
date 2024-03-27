@@ -88,21 +88,31 @@ export default function DaySummaryContent({
   calc_table,
   items
 }: DaySummaryProps) {
-  const [selectedDay, setSelectedDay] = useState<number | null>(1);
+  const [selectedDay, setSelectedDay] = useState<number>(1);
 
   const dateDictionary: { [dayNumber: number]: Date } = {};
 
-  calc_table.forEach((item) => {
-    if (!(item.day in dateDictionary)) {
-      dateDictionary[item.day] = item.date;
-    }
-  });
+  // calc_table.forEach((item) => {
+  //   if (!(item.day in dateDictionary)) {
+  //     dateDictionary[item.day] = item.date;
+  //   }
+  // });
+
+  const today = new Date();
+  const endDate = new Date(today);
+  endDate.setDate(endDate.getDate() + 9);
+  for (let i = 1; i <= 10; i++) {
+    const currentDate = new Date(today);
+    currentDate.setDate(currentDate.getDate() + i - 1);
+    dateDictionary[i] = new Date(currentDate);
+  }
+
+  console.log(dateDictionary)
 
   const handleDaySelect = (dateNum: number) => {
     setSelectedDay(dateNum);
   };
 
-  // const feedDictionary: { [averageWeight: number]: string } = {};
 
   function getFeedName(average_weight: number){
     const connection = feed_connections.find(connection => {
@@ -117,6 +127,26 @@ export default function DaySummaryContent({
     return feed_item ? feed_item.name : "";
   }
 
+  type StockingDictionary = Record<string, any[]>;
+  const stockingDictionary: StockingDictionary = {};
+  
+  lines.forEach(line => {
+    line.pools.forEach(pool => {
+      const poolName = pool.name;
+      pool.locations.forEach(location => {
+        location.itemtransactions.forEach(transaction => {
+          transaction.documents.stocking.forEach(stock => {
+              if (stockingDictionary.hasOwnProperty(poolName)) {
+                stockingDictionary[poolName].push(stock.average_weight);
+              } else {
+                stockingDictionary[poolName] = [stock.average_weight];
+              }
+          });
+        });
+      });
+    });
+  });
+  console.log(stockingDictionary)
   return (
     <div className="p-4">
       <h2 className="text-lg font-bold mb-4">Day Summary</h2>
@@ -136,8 +166,10 @@ export default function DaySummaryContent({
             </button>
           ))}
         </div>
-        {selectedDay !== null && calc_table.some((record) => record.date === dateDictionary[selectedDay]) && (
+        
+        {selectedDay !== null && calc_table.some((record) => record.date.getDate() === dateDictionary[selectedDay].getDate()) && (
           <div>
+            
             <h3 className="text-lg mb-4 p-1 font-bold text-blue-500">
               Date: {dateDictionary[selectedDay].toISOString().split("T")[0]}
             </h3>
@@ -182,26 +214,32 @@ export default function DaySummaryContent({
                               <td className="px-4 py-2 border border-gray-400">
                                   {pool.name}
                               </td>
-                              {calc_table.filter(table => table.date.getTime() === dateDictionary[selectedDay].getTime() && table.documents.locations?.pool_id === pool.id).map(table => (
+                              {calc_table
+                              .filter(table => table.date.getDate() === dateDictionary[selectedDay].getDate() && 
+                                table.documents.locations?.pool_id === pool.id)
+                                .slice(-1).map(table => (
                                   <td key={table.id} className="px-4 py-2 border border-gray-400">
                                       {getFeedName(table.fish_weight)
                                       ?.match(/\b\d*[,\.]?\d+\s*mm\b/)
                                       ?.map((match, index) => (
-                                        <span key={index}>{match}</span>
+                                        <span key={index}>{match}</span> 
                                       ))}
                                   </td>
                               ))}
-                              {calc_table.filter(table => table.date.getTime() === dateDictionary[selectedDay].getTime() && table.documents.locations?.pool_id === pool.id).length === 0 && (
+                              {calc_table.filter(table => table.date.getDate() === dateDictionary[selectedDay].getDate() && table.documents.locations?.pool_id === pool.id).length === 0 && (
                                 <td className="px-4 py-2 border border-gray-400"></td>
                               )}
                               {times.map((time, index) => (
                                 <React.Fragment key={index}>
-                                {calc_table.filter(table => table.date.getTime() === dateDictionary[selectedDay].getTime() && table.documents.locations?.pool_id === pool.id).map(table => (
-                                  <td key={table.id} className="px-4 py-2 border border-gray-400">
-                                      {table.feed_per_feeding.toFixed(0)}
-                                  </td>
-                              ))}
-                              {calc_table.filter(table => table.date.getTime() === dateDictionary[selectedDay].getTime() && table.documents.locations?.pool_id === pool.id).length === 0 && (
+                                {calc_table.filter(table => 
+                                    table.date.getDate() === dateDictionary[selectedDay].getDate() && 
+                                    table.documents.locations?.pool_id === pool.id
+                                ).slice(-1).map(table => (
+                                    <td key={table.id} className="px-4 py-2 border border-gray-400">
+                                        {table.feed_per_feeding.toFixed(0)}
+                                    </td>
+                                ))}
+                              {calc_table.filter(table => table.date.getDate() === dateDictionary[selectedDay].getDate() && table.documents.locations?.pool_id === pool.id).length === 0 && (
                                   <td className="px-4 py-2 border border-gray-400"></td>
                               )}
                                 <td className="px-4 py-2 border border-gray-400"></td>

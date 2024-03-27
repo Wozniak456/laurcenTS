@@ -101,6 +101,26 @@ export default async function WeekSummary() {
       }
   }
 
+type StockingDictionary = Record<string, any[]>;
+const stockingDictionary: StockingDictionary = {};
+  
+  lines.forEach(line => {
+    line.pools.forEach(pool => {
+      const poolName = pool.name;
+      pool.locations.forEach(location => {
+        location.itemtransactions.forEach(transaction => {
+          transaction.documents.stocking.forEach(stock => {
+              if (stockingDictionary.hasOwnProperty(poolName)) {
+                stockingDictionary[poolName].push(stock.average_weight);
+              } else {
+                stockingDictionary[poolName] = [stock.average_weight];
+              }
+          });
+        });
+      });
+    });
+  });
+  
   return (
     <div className="p-4">
       <h2 className="text-lg font-bold mb-4">Week Summary</h2>
@@ -115,17 +135,14 @@ export default async function WeekSummary() {
                   <tr>
                     <th className="px-4 py-2 border border-gray-400 text-center bg-blue-100 text-sm">Корм &rarr;</th>
                     {line.pools.filter(pool => pool.prod_line_id === line.id).map(pool => (
-                      pool.locations.map( loc => (
-                        loc.itemtransactions.map( tran => (tran.documents.stocking.map(stock => (
                           <th key={pool.id} className="px-4 py-2 border border-gray-400 text-center bg-blue-100 text-sm">
                           {
-                            (getFeedName(stock.average_weight)?.match(/\b\d*[,\.]?\d+\s*mm\b/) || []).map((match, index) => (
+                            
+                            (getFeedName(stockingDictionary[pool.name]?.slice(-1)[0])?.match(/\b\d*[,\.]?\d+\s*mm\b/) || []).map((match, index) => (
                               <span key={index}>{match}</span>
                             ))
                           }
                         </th>
-                        ))))
-                      ))
                     ))}
                   </tr>
                   <tr>

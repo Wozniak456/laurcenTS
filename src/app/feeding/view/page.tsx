@@ -64,16 +64,6 @@ export default async function StockingHome() {
   }))
 
   const locations = await db.locations.findMany()
-  
-  // const areas_with_content = await db.productionareas.findMany({
-  //   include:{
-  //     productionlines:{
-  //       include:{
-  //         pools: true
-  //       }
-  //     }
-  //   }
-  // })
 
   const batches = await db.itembatches.findMany()
 

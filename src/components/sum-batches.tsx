@@ -16,7 +16,7 @@ interface Pool {
 }
 
 export default function SummaryBatches({ dataDictionary, date }: SummaryBatchesProps) {
-    const pools = dataDictionary[date] || {}; // Отримуємо басейни для визначеного дня
+    const pools = dataDictionary[date] || {}; 
 
     const dailySummary: Record<string, number> = {};
 

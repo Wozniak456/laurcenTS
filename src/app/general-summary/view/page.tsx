@@ -1,9 +1,6 @@
 import { db } from "@/db";
-import Link from "next/link";
-import StockingComponent from "@/components/stockin111"
 import { Area } from "@/components/accordion"
 import React from "react";
-import { table } from "console";
 import SummaryBatches from "@/components/sum-batches"
 
 export default async function GeneralSummary() {
@@ -155,12 +152,14 @@ export default async function GeneralSummary() {
                                       table.documents && table.documents.location_id === loc.id)
                                   .map(table => table.fish_weight.toFixed(2));
   
-                              if (!dataDictionary[dateString]) {
-                                  dataDictionary[dateString] = {};
-                              }
-                              if (!dataDictionary[dateString][poolName]) {
-                                  dataDictionary[dateString][poolName] = [];
-                              }
+                                if (!dataDictionary[dateString]) {
+                                    dataDictionary[dateString] = {};
+                                }
+                                if (!dataDictionary[dateString][poolName]) {
+                                    dataDictionary[dateString][poolName] = [];
+                                } else {
+                                    dataDictionary[dateString][poolName] = [];
+                                }
                               dataDictionary[dateString][poolName].push({ batchName, quantity, fishWeight });
                           });
                       });
@@ -169,6 +168,8 @@ export default async function GeneralSummary() {
           });
       });
   });
+  console.log(dataDictionary)
+
   const feed_connections = await db.feedconnections.findMany()
   const items = await db.items.findMany()
 
@@ -230,7 +231,7 @@ export default async function GeneralSummary() {
                         return stockingData && stockingData.length > 0;
                       });
   
-                      return transactionsForLocation.map(tran => (
+                      return transactionsForLocation.slice(-1).map(tran => (
                         <tr key={tran.id} className="text-sm">
                           
                           <td className="px-4 py-2 border border-gray-400 text-center">{pool.name}</td>
@@ -238,6 +239,7 @@ export default async function GeneralSummary() {
                           <td className="px-4 py-2 border border-gray-400 text-center">{tran.quantity}</td>
                           {calc_table
                             .filter(table => table.date.toISOString().split("T")[0] === date.toISOString().split("T")[0] && table.documents && table.documents.location_id === loc.id)
+                            .slice(-1)
                             .map((table, index) => (
                               <React.Fragment key={index}>
                                 <td key={index} className="px-4 py-2 border border-gray-400 text-center">{table.fish_weight.toFixed(2)}</td>
@@ -246,7 +248,6 @@ export default async function GeneralSummary() {
                                       ?.map((match, index) => (
                                         <td key={index} className="px-4 py-2 border border-gray-400 text-center">{match}</td>
                                       ))}
-                                
                               </React.Fragment>
                             ))}
                             
