@@ -47,6 +47,7 @@ export default async function StockingHome() {
           itemtransactions: location.itemtransactions.map(transaction =>({
             id: transaction.id,
             quantity: transaction.quantity,
+            doc_id: transaction.doc_id,
             itembatches: {
               id: transaction.itembatches.id,
               name: transaction.itembatches.name

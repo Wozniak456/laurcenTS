@@ -1,6 +1,10 @@
 'use client'
 
 import React, { useState } from "react";
+import { useFormState } from "react-dom";
+import * as actions from '@/actions';
+import { calculation_table } from "@prisma/client";
+import { Cabin_Sketch } from "next/font/google";
 
 interface Stocking{
     id: number,
@@ -17,8 +21,9 @@ interface ItemBatch{
     name: string,
 }
 
-interface Transaction{
+export interface Transaction{
     id: bigint,
+    doc_id: BigInt,
     itembatches: ItemBatch,
     documents: Document
 }
@@ -41,21 +46,7 @@ export interface Line{
   pools: Pool[]
 }
 export interface CalcTable{
-  id: number,
-  day: number,
-  date: Date,
-  fish_weight: number,
-  feed_per_feeding: number,
-  documents: {
-    id: bigint,
-    date_time: Date,
-    executed_by: number,
-    locations: {
-      id: number,
-      name: string,
-      pool_id: number
-    } | null
-  }
+  [poolId: number]: calculation_table[]
 }
 
 interface DaySummaryProps{
@@ -70,7 +61,9 @@ interface DaySummaryProps{
       from_fish_weight: number;
       to_fish_weight: number;
     }[],
-    calc_table: CalcTable[],
+    calc_table: {
+      [poolId: number]: calculation_table[]
+    },
     items:{
       id: number;
       name: string;
@@ -78,7 +71,7 @@ interface DaySummaryProps{
       item_type_id: number | null;
       default_unit_id: number | null;
       parent_item: number | null;
-    }[]
+    }[],
 }
 
 export default function DaySummaryContent({
@@ -88,172 +81,245 @@ export default function DaySummaryContent({
   calc_table,
   items
 }: DaySummaryProps) {
-  const [selectedDay, setSelectedDay] = useState<number>(1);
 
-  const dateDictionary: { [dayNumber: number]: Date } = {};
+  //console.log('calc_table', calc_table)
 
-  // calc_table.forEach((item) => {
-  //   if (!(item.day in dateDictionary)) {
-  //     dateDictionary[item.day] = item.date;
-  //   }
-  // });
+  const datesArray = Array.from({ length: 10 }, (_, i) => {
+    const date = new Date();
+    date.setDate(date.getDate() + i);
+    return date.toISOString().split("T")[0];
+  });
 
-  const today = new Date();
-  const endDate = new Date(today);
-  endDate.setDate(endDate.getDate() + 9);
-  for (let i = 1; i <= 10; i++) {
-    const currentDate = new Date(today);
-    currentDate.setDate(currentDate.getDate() + i - 1);
-    dateDictionary[i] = new Date(currentDate);
-  }
+  const [selectedDay, setSelectedDay] = useState<string>(datesArray[0]);
+  const [formState, action] = useFormState(actions.feedBatch, { message: '' });
+  const [tableId, setTableId] = useState<number | null>(null); 
 
-  console.log(dateDictionary)
-
-  const handleDaySelect = (dateNum: number) => {
-    setSelectedDay(dateNum);
+  // Функція для встановлення id таблиці при її рендерингу
+  const handleTableRender = (id: number) => {
+    setTableId(id);
   };
 
+  const handleDaySelect = (dateNum: number) => {
+    setSelectedDay(datesArray[dateNum]);
+  };
 
-  function getFeedName(average_weight: number){
+  function getFeed(average_weight: number): { id: number, name: string } | null {
     const connection = feed_connections.find(connection => {
-      return average_weight >= connection.from_fish_weight && average_weight <= connection.to_fish_weight;
+        return average_weight >= connection.from_fish_weight && average_weight <= connection.to_fish_weight;
     });
-    let feed_item
-    if (connection){
-      feed_item = items.find(item => (
-        connection.feed_id === item.id
-      ))
+
+    if (connection) {
+        const feed_item = items.find(item => connection.feed_id === item.id);
+        if (feed_item) {
+            const nameMatch = feed_item.name?.match(/\b\d*[,\.]?\d+\s*mm\b/);
+            const name = nameMatch ? nameMatch[0] : ""; // Extracting feed name
+            return { id: feed_item.id, name: name };
+        }
     }
-    return feed_item ? feed_item.name : "";
+    return null;
+} 
+function findTransitionDay(poolId: number, currDay: string) {
+  let transitionDay: string | null = null;
+  
+  for (const table of Object.values(calc_table)) {
+    if (table[poolId] && table[poolId].is_transition_start) {
+      transitionDay = table[poolId].date.toISOString().split('T')[0]; // Запам'ятовуємо дату переходу
+      break;
+    }
   }
 
-  type StockingDictionary = Record<string, any[]>;
-  const stockingDictionary: StockingDictionary = {};
+  // Перевірка, чи було знайдено transitionDay
+  if (!transitionDay) {
+    return null;
+  }
+
+  let dayOfTransition = null;
+  const currDate = new Date(currDay);
+  const transitionDate = new Date(transitionDay);
+  const timeDifference = currDate.getTime() - transitionDate.getTime();
+  const dayDifference = Math.ceil(timeDifference / (1000 * 3600 * 24)); // Різниця в днях
+  dayOfTransition = dayDifference;
+
+  if (dayOfTransition !== null && 0 <= dayOfTransition && dayOfTransition <= 3) {
+    //console.log(poolId, dayOfTransition)
+    return dayOfTransition;
+  } else {
+    return null;
+  }
+}
   
-  lines.forEach(line => {
-    line.pools.forEach(pool => {
-      const poolName = pool.name;
-      pool.locations.forEach(location => {
-        location.itemtransactions.forEach(transaction => {
-          transaction.documents.stocking.forEach(stock => {
-              if (stockingDictionary.hasOwnProperty(poolName)) {
-                stockingDictionary[poolName].push(stock.average_weight);
-              } else {
-                stockingDictionary[poolName] = [stock.average_weight];
-              }
-          });
-        });
-      });
-    });
-  });
-  console.log(stockingDictionary)
   return (
     <div className="p-4">
-      <h2 className="text-lg font-bold mb-4">Day Summary</h2>
-      <div>
-        <div className="flex gap-2 mb-4">
-          {Object.entries(dateDictionary).map(([dateNum, date]) => (
-            <button
-              key={dateNum}
-              onClick={() => handleDaySelect(parseInt(dateNum))}
-              className={`px-3 py-1 rounded-md ${
-                selectedDay === parseInt(dateNum)
-                  ? "bg-blue-600 text-white"
-                  : "bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
-              }`}
-            >
-              {date.toISOString().split("T")[0]}
-            </button>
+      {datesArray.map((day, index) => (
+        <button 
+          key={index} 
+          onClick={() => handleDaySelect(index)}
+          className={`py-2 px-4 mr-2 mb-2 rounded-lg 
+                      ${selectedDay === day ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}
+                      hover:bg-blue-600 hover:text-white focus:outline-none`}
+        >
+          {day}
+        </button>
+      ))}
+      {selectedDay && <p className="mt-4">Обрана дата: {selectedDay}</p>}
+      {lines.map( line => (
+        <table key={line.id} className="border-collapse border w-full mb-4" id={line.id.toString()} onLoad={() => handleTableRender(line.id)}> 
+          <thead>
+            <tr>
+              <th
+                colSpan={2 + 3 * times.length}
+                className="px-4 py-2 bg-blue-100">
+                {line.name}
+              </th>
+              {/* <th className="px-4 py-2 bg-blue-100">{selectedDay}</th> */}
+            </tr>
+            <tr>
+              <th className="border p-2">№ басейну</th>
+              <th className="border p-2">Вид корму</th>
+              {times.map((time, index) => (
+                <React.Fragment key={index}>
+                  <th className="border p-2">{time.time}</th>
+                  <th className="border p-2">Коригування</th>
+                </React.Fragment>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+  {line.pools.map(pool => {
+    const poolId = pool.id;
+    const record = calc_table[poolId]?.find(record => record.date.toISOString().split("T")[0] === selectedDay);
+    //console.log(pool.id, selectedDay)
+    const transitionDay = findTransitionDay(poolId, selectedDay)
+    //console.log(pool.id, transitionDay)
+    let prevRecord : calculation_table | undefined
+    if (transitionDay !== null){
+      const prevDate = new Date(selectedDay);
+      prevDate.setDate(prevDate.getDate() - transitionDay - 1);
+      const prevDay = prevDate.toISOString().split("T")[0];
+      prevRecord = calc_table[pool.id]?.find(record => record.date.toISOString().split("T")[0] === prevDay);
+    }
+    
+    return (
+      <React.Fragment key={pool.id}>
+        <tr>
+        <td rowSpan={transitionDay !== null ? 2 : 1} className="px-4 py-2 border border-gray-400">{pool.name}</td>
+          
+        {transitionDay !== null ? (
+        <td className="px-4 py-2 border border-gray-400">{prevRecord ? getFeed(prevRecord.fish_weight ?? 0)?.name : ''}</td>
+      ) : (
+        <td className="px-4 py-2 border border-gray-400">{record ? getFeed(record.fish_weight)?.name : ''}</td>
+      )}
+          {times.map((time, index) => (
+            <React.Fragment key={`${index}`}>
+              {/* <td className="px-4 py-2 border border-gray-400">{findTransitionDay(pool.id, selectedDay)}</td> */}
+              {transitionDay !== null ? (
+                <td className="px-4 py-2 border border-gray-400">
+                {record ? 
+                    (record.feed_per_feeding * ((100 - (transitionDay + 1) * 20) / 100)).toFixed(0) 
+                    : 
+                    ''}
+                </td>
+             
+              ) : (
+                <td className="px-4 py-2 border border-gray-400">{record ? record.feed_per_feeding.toFixed(0) : ''}</td> 
+              )}
+              
+              <td className="px-4 py-2 border border-gray-400">
+                {record && (
+                  <form action={action}>
+                    <input type="hidden" name="pool_id" value={pool.id} />
+                    <input type="hidden" name="executed_by" value={1} />
+                    <input type="hidden" name="fish_batch_id" value={(() => {
+                      const fish_batch_id = pool.locations.flatMap(loc => (
+                        loc.itemtransactions.flatMap(tran => {
+                          if (!tran.itembatches.name.includes('mm')) {
+                            return tran.itembatches.id;
+                          } else {
+                            return [];
+                          }
+                        })
+                      ));
+                      return Number(fish_batch_id[fish_batch_id.length - 1]);
+                    })()} />
+                    {transitionDay !== null ? <input type="hidden" name="feed_item_id" value={prevRecord ? getFeed(prevRecord.fish_weight)?.id : ''} /> 
+                    : 
+                    <input type="hidden" name="feed_item_id" value={record ? getFeed(record.fish_weight)?.id : ''} />}
+                    
+                    <div className="flex justify-between">
+                      <input
+                        name="feed_given"
+                        className="border w-2/5"
+                        id="feed_given"
+                      />
+                      <button
+                        type="submit"
+                        className="bg-blue-200 w-3/5 text-sm"
+                      >
+                        Годувати
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </td>
+            </React.Fragment>
           ))}
-        </div>
-        
-        {selectedDay !== null && calc_table.some((record) => record.date.getDate() === dateDictionary[selectedDay].getDate()) && (
-          <div>
-            
-            <h3 className="text-lg mb-4 p-1 font-bold text-blue-500">
-              Date: {dateDictionary[selectedDay].toISOString().split("T")[0]}
-            </h3>
-            {lines.map(line => (
-            <div key={line.id}>
-              <table className="table-auto border border-gray-400 mb-4 w-full">
-                <thead>
-                  <tr>
-                    <th
-                    colSpan={1 + 2 * times.length}
-                    className="px-4 py-2 border border-gray-400 bg-blue-100">
-                      {line.name}
-                    </th>
-                    <th className="px-4 py-2 bg-blue-100 text-white">
-                      {dateDictionary[selectedDay].toISOString().split("T")[0]}
-                    </th>
-                  </tr>
-                  <tr>
-                    <th className="px-4 py-2 border border-gray-400">
-                      № Басейну
-                    </th>
-                    <th className="px-4 py-2 border border-gray-400">
-                      Вид корму
-                    </th>
-                    {times.map((time, index) => (
-                      <React.Fragment key={index}>
-                        <th className="px-4 py-2 border border-gray-400">
-                          {time.time}
-                        </th>
-                        <th className="px-4 py-2 border border-gray-400">
-                          Коригування
-                        </th>
-                      </React.Fragment>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {line.pools
-                      .filter(pool => pool.prod_line_id === line.id)
-                      .map(pool => (
-                          <tr key={pool.id}>
-                              <td className="px-4 py-2 border border-gray-400">
-                                  {pool.name}
-                              </td>
-                              {calc_table
-                              .filter(table => table.date.getDate() === dateDictionary[selectedDay].getDate() && 
-                                table.documents.locations?.pool_id === pool.id)
-                                .slice(-1).map(table => (
-                                  <td key={table.id} className="px-4 py-2 border border-gray-400">
-                                      {getFeedName(table.fish_weight)
-                                      ?.match(/\b\d*[,\.]?\d+\s*mm\b/)
-                                      ?.map((match, index) => (
-                                        <span key={index}>{match}</span> 
-                                      ))}
-                                  </td>
-                              ))}
-                              {calc_table.filter(table => table.date.getDate() === dateDictionary[selectedDay].getDate() && table.documents.locations?.pool_id === pool.id).length === 0 && (
-                                <td className="px-4 py-2 border border-gray-400"></td>
-                              )}
-                              {times.map((time, index) => (
-                                <React.Fragment key={index}>
-                                {calc_table.filter(table => 
-                                    table.date.getDate() === dateDictionary[selectedDay].getDate() && 
-                                    table.documents.locations?.pool_id === pool.id
-                                ).slice(-1).map(table => (
-                                    <td key={table.id} className="px-4 py-2 border border-gray-400">
-                                        {table.feed_per_feeding.toFixed(0)}
-                                    </td>
-                                ))}
-                              {calc_table.filter(table => table.date.getDate() === dateDictionary[selectedDay].getDate() && table.documents.locations?.pool_id === pool.id).length === 0 && (
-                                  <td className="px-4 py-2 border border-gray-400"></td>
-                              )}
-                                <td className="px-4 py-2 border border-gray-400"></td>
-                              </React.Fragment>
-                              ))}
-                          </tr>
-                      ))}
-                </tbody>
-              </table>
-            </div>
-            ))}
-          </div>
+        </tr>
+        {transitionDay !== null && (
+          <tr>
+          <td className="px-4 py-2 border border-gray-400">{record ? getFeed(record.fish_weight)?.name : ''}</td>
+          {times.map((time, index) => (
+            <React.Fragment key={`${index}`}>
+              <td className="px-4 py-2 border border-gray-400">
+                {record ? 
+                    (record.feed_per_feeding * (((transitionDay + 1) * 20) / 100)).toFixed(0) 
+                    : 
+                    ''}
+                </td>
+              <td className="px-4 py-2 border border-gray-400">
+                {record && (
+                  <form action={action}>
+                    <input type="hidden" name="pool_id" value={pool.id} />
+                    <input type="hidden" name="executed_by" value={1} />
+                    <input type="hidden" name="fish_batch_id" value={(() => {
+                      const fish_batch_id = pool.locations.flatMap(loc => (
+                        loc.itemtransactions.flatMap(tran => {
+                          if (!tran.itembatches.name.includes('mm')) {
+                            return tran.itembatches.id;
+                          } else {
+                            return [];
+                          }
+                        })
+                      ));
+                      return Number(fish_batch_id[fish_batch_id.length - 1]);
+                    })()} />
+                    <input type="hidden" name="feed_item_id" value={record ? getFeed(record.fish_weight)?.id : ''} />
+                    <div className="flex justify-between">
+                      <input
+                        name="feed_given"
+                        className="border w-2/5"
+                        id="feed_given"
+                      />
+                      <button
+                        type="submit"
+                        className="bg-blue-200 w-3/5 text-sm"
+                      >
+                        Годувати
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </td>
+            </React.Fragment>
+          ))}
+          </tr>
         )}
-      </div>
+      </React.Fragment>
+    );
+  })}
+</tbody>
+
+        </table>
+      ))}
     </div>
   );
 }

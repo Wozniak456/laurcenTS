@@ -19,6 +19,7 @@ interface Item{
 
 interface Stocking{
     id: number,
+    doc_id: bigint,
     average_weight: number
 }
 
@@ -36,7 +37,8 @@ interface Transaction{
     id: bigint,
     itembatches: ItemBatch,
     documents: Document,
-    quantity: number
+    quantity: number,
+    doc_id : bigint
 }
 
 export interface Location {

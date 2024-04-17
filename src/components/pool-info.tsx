@@ -1,6 +1,7 @@
 'use client'
 
 import { Area } from "@/components/accordion"
+import { empty } from "@prisma/client/runtime/library";
 
 interface Pool{
     id: number,
@@ -21,23 +22,32 @@ export default function PoolInfo({areas, poolItem} : PoolInfoProps){
                         <div key={line.id}>
                             {line.pools.filter(pool => pool.id === poolItem.id).map(filteredPool => (
                                 <div key={filteredPool.id}>
-                                    {filteredPool.locations.map(loc => (
-                                        <div key={loc.id}>
+                                    {filteredPool.locations.map(loc => {
+                                        return(
+                                            <div key={loc.id}>
                                             {loc.itemtransactions.length > 0 && (
                                                 <>
-                                                    <p>Партія: {loc.itemtransactions[loc.itemtransactions.length - 1].itembatches.name}</p>
-                                                    <p>Кількість: {loc.itemtransactions[loc.itemtransactions.length - 1].quantity}</p>
-                                                    {loc.itemtransactions[loc.itemtransactions.length - 2].documents.stocking.map((stock, index) => (
-                                                        <div key={index}> 
-                                                            {index === 0 && (
-                                                                <p>Середня вага, г: {stock.average_weight.toFixed(3)}</p>
-                                                            )}
-                                                        </div>
-                                                    ))}
+                                                    {loc.itemtransactions
+                                                        .filter(tran => tran.documents.stocking.find(stock => stock.doc_id === tran.doc_id))
+                                                        .sort((a, b) => Number(b.id) - Number(a.id))
+                                                        .slice(0, 1)
+                                                        .map(tran => {
+                                                            return(
+                                                                <>
+                                                                    <p>Партія: {tran.itembatches.name}</p>
+                                                                    <p>Кількість: {tran.quantity}</p>
+                                                                    <p key={tran.id}>Сер. вага: {tran.documents.stocking[0].average_weight}</p>
+                                                                </>
+                                                            )
+                                                        })}
+                                                    
+                                                    
                                                 </>
                                             )}
                                         </div>
-                                    ))}
+                                        )
+                                        
+})}
                                 </div>
                             ))}
                         </div>

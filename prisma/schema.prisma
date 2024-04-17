@@ -16,13 +16,14 @@ model calculation_table {
   general_weight      Float
   fish_weight         Float
   feed_quantity       Float
-  v_c                 Float
-  total_weight        Float
-  weight_per_fish     Float
-  feed_today          Float
+  v_c                 Float?
+  total_weight        Float?
+  weight_per_fish     Float?
+  feed_today          Float?
   feed_per_day        Float
   feed_per_feeding    Float
   doc_id              BigInt
+  is_transition_start Boolean   @default(false)
   documents           documents @relation(fields: [doc_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
@@ -118,7 +119,7 @@ model itemtransactions {
   doc_id             BigInt
   location_id        Int
   batch_id           BigInt
-  quantity           Int
+  quantity           Float
   unit_id            Int
   parent_transaction BigInt?
   itembatches        itembatches @relation(fields: [batch_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -246,13 +247,23 @@ model vendors {
   purchtable  purchtable[]
 }
 
-model datatable {
+model datatable_below25 {
   id               Int      @id @default(autoincrement())
   day              Int      
   feedingLevel     Float
   fc               Float
   weight           Float
   voerhoeveelheid  Float
+}
+
+model datatable_over25 {
+  id               Int      @id @default(autoincrement())
+  day              Int  
+  av_weight        Float
+  weight           Float
+  uitval           Float
+  voederniveau     Float
+  voederconversie  Float
 }
 
 model time_table {
