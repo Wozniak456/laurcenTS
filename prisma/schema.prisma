@@ -93,6 +93,7 @@ model itembatches {
   item_id          Int
   created          DateTime?           @db.Timestamp(6) @default(now())
   created_by       Int
+  expiration_date  DateTime?
   employees        employees?         @relation(fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
   items            items              @relation(fields: [item_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   itemtransactions itemtransactions[]

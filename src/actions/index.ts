@@ -2,6 +2,7 @@
 import { db } from "@/db";
 import { caviarRegistering } from "@/db/functions"
 import { Prisma, calculation_table } from "@prisma/client";
+import { group } from "console";
 import { RedirectType, redirect } from "next/navigation";
 
 export async function editProdArea(id: number, description: string | null ) {
@@ -1047,91 +1048,108 @@ export async function addingFishBatch(batch_id: bigint, quantity: number, unit_i
     }
 }
 
+type BatchType = {
+    batch_id: bigint;
+    _sum: {
+        quantity: number | null;
+    };
+};
+
 
 export async function feedBatch(
     formState: {message: string}, 
     formData: FormData) {
-        let fish_batch
         try{
             const feed_given: number = parseInt(formData.get('feed_given') as string);
             const pool_id: number = parseInt(formData.get('pool_id') as string);
-            const fish_batch_id: number = parseInt(formData.get('fish_batch_id') as string);
-            const feed_item_id: number = parseInt(formData.get('feed_item_id') as string);
+            const fish_weight: number = parseInt(formData.get('fish_weight') as string);
             const executed_by: number = parseInt(formData.get('executed_by') as string);
             const comments = formData.get('comments') as string
 
-            fish_batch = await db.itembatches.findFirst({
-                where:{
-                    id: fish_batch_id
-                }
-            })
+            const feedID = await getFeedId(fish_weight)
+            const feed_batch_id = await getBatchByItemId(feedID, feed_given)
 
-            const feed_batch_id = await db.itembatches.findFirst({
-                where:{
-                    item_id: feed_item_id
-                }
-            })
-
-            const result = await db.itemtransactions.groupBy({
-            by: ['batch_id'],
-            _sum: {
-                quantity: true,
-                },
-            where: {
-                itembatches: {
-                items: { item_type_id: 3 }
-                },
-                locations: { location_type_id: 1 }
-            }
-            });
-              
-            console.log(result)
-
-            const location_id = await db.locations.findFirst({
-                select: {
-                    id: true
-                },
-                where: {
-                    pool_id: pool_id
-                }
-            });
-
-            const doc = await db.documents.create({
-                data: {
-                    location_id: location_id?.id, // Отримуємо id локації
-                    doc_type_id: 9, // годування
-                    date_time: new Date(),
-                    executed_by: executed_by,
-                    comments: comments
-                }
-            });
-
-            if (location_id && feed_batch_id) {
-                const pTransaction = await db.itemtransactions.create({
-                    data: {
-                        doc_id: doc.id,
-                        location_id: 87, // склад
-                        batch_id: feed_batch_id.id,
-                        quantity: -feed_given/1000,
-                        unit_id: 1
+            if(feed_batch_id.length > 0){
+                const location_id = await db.locations.findFirst({
+                    select: {
+                        id: true
+                    },
+                    where: {
+                        pool_id: pool_id
                     }
                 });
 
-                await db.itemtransactions.create({
-                data: {
-                    doc_id: doc.id,
-                    location_id: location_id?.id,
-                    batch_id: feed_batch_id.id,
-                    quantity: feed_given/1000,
-                    unit_id: 1,
-                    parent_transaction: pTransaction.id
-                }
-            });
-            } else {
-                console.error("Feed batch not found."); 
-            }
+                if (location_id) {
+                    if (feed_batch_id.length > 0) {
+                        const doc = await db.documents.create({
+                            data: {
+                                location_id: location_id.id, // Отримуємо id локації
+                                doc_type_id: 9, // годування
+                                date_time: new Date(),
+                                executed_by: executed_by,
+                                comments: comments
+                            }
+                        });
 
-            console.log('pool_id: ', pool_id, 'location_id: ', location_id?.id, 'fish_batch_id: ', fish_batch_id, 'feed_batch_id: ', feed_batch_id?.id, 'feed_given: ', feed_given)
+                        // Створюємо функцію для створення транзакцій
+                        const createTransactions = async (batch: BatchType, feed_amount: number) => {
+                            if (batch._sum.quantity !== null){
+                                const pTransaction = await db.itemtransactions.create({
+                                    data: {
+                                        doc_id: doc.id,
+                                        location_id: 87, // Склад
+                                        batch_id: batch.batch_id,
+                                        quantity: - feed_amount/1000,
+                                        unit_id: 1
+                                    }
+                                });
+                    
+                                await db.itemtransactions.create({
+                                    data: {
+                                        doc_id: doc.id,
+                                        location_id: location_id.id,
+                                        batch_id: batch.batch_id,
+                                        quantity: feed_amount/1000,
+                                        unit_id: 1,
+                                        parent_transaction: pTransaction.id
+                                    }
+                                });
+                            }
+                        };
+                
+                        if (feed_batch_id.length === 1) {
+                            await createTransactions(feed_batch_id[0], feed_given);
+                        } else {
+                            let feed_already_given = 0;
+                            const sortedBatches = feed_batch_id.sort((a, b) => Number(a.batch_id) - Number(b.batch_id)); // Сортуємо масив
+                        
+                            for (let i = 0; i < sortedBatches.length - 1; i++) {
+                                const batch = sortedBatches[i];
+                                console.log(batch.batch_id, 'batch._sum.quantity', batch._sum.quantity)
+                                if (batch._sum.quantity !== null) { // Перевіряємо, чи не є quantity null
+                                    await createTransactions(batch, batch._sum.quantity * 1000);
+                                    feed_already_given += batch._sum.quantity; // Додаємо кількість корму, яку відняли
+                                }
+                            }
+                
+                            // Остання партія
+                            const lastBatch = sortedBatches[sortedBatches.length - 1];
+
+                            if (lastBatch._sum.quantity !== null) {
+                                const remainingQuantity = feed_given - feed_already_given * 1000; // Вираховуємо залишкову кількість корму
+                                if (remainingQuantity > 0) {
+                                    await createTransactions(lastBatch, remainingQuantity);
+                                }
+                            } else {
+                                console.log('Error! Quantity is null for batch', lastBatch.batch_id);
+                            }
+                        }
+                    } 
+                }
+            }
+            else{
+                throw new Error('Недостатньо корму')
+            }
         }
         catch(err: unknown){
             if(err instanceof Error){
@@ -1143,7 +1161,7 @@ export async function feedBatch(
                 return{message :'Something went wrong!'}
             }
         }
-    return { message: `Партія ${fish_batch?.name} поїла` };
+    return { message: `Успішно` };
 
     //redirect('/summary-feeding-table/day');
     }
@@ -1248,5 +1266,64 @@ export async function getFeedForFish(feedconnections: FeedConnection[], fish_wei
         return fish_weight >= connection.from_fish_weight && fish_weight <= connection.to_fish_weight;
     });
     return connection ? connection.feed_id : 0;
+}
+
+export async function getFeedId(fish_weight: number) {
+    const connections = await db.feedconnections.findMany()
+    //const items = await db.items.fin
+    const connection = connections.find(connection => {
+        return fish_weight >= connection.from_fish_weight && fish_weight <= connection.to_fish_weight;
+    });
+    return connection ? connection.feed_id : -1;
+}
+
+export async function getBatchByItemId(itemId: number, quantity: number) {
+    const batches = await db.itembatches.findMany({
+        select:{
+            id: true
+        },
+        where: {
+            item_id: itemId            
+        },
+    })
+
+    const numIds = batches.map(batch => batch.id)
+
+    const firstBatch = await db.itemtransactions.groupBy({
+        by: ['batch_id'],
+        where: {
+            batch_id: {
+                in: numIds
+            },
+            location_id: 87
+        },
+        _sum: {
+            quantity: true // Сумуємо кількість по групам batch_id
+        }
+    });
+
+    const array = []; // Масив для зберігання партій
+    let totalQuantity = 0; // Змінна для зберігання загальної кількості корму
+    quantity = quantity / 1000
+    while (totalQuantity < quantity && firstBatch.length > 0) {
+        const minBatch = firstBatch.reduce((min, current) => min.batch_id < current.batch_id ? min : current);
+        array.push(minBatch);
+        if (minBatch._sum?.quantity !== null) {
+            totalQuantity += minBatch._sum.quantity;
+        }
+        if (totalQuantity >= quantity) {
+            break;
+        }
+    
+        const minIndex = firstBatch.indexOf(minBatch); // Знаходимо індекс поточної партії
+        firstBatch.splice(minIndex, 1); // Видаляємо поточну партію з масиву
+    }
+    
+    // Перевірка, чи було знайдено необхідну кількість корму
+    if (totalQuantity < quantity) {
+        return []
+    }
+    
+    return array;
 }
 
