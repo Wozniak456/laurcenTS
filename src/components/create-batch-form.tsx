@@ -11,39 +11,31 @@ interface BatchCreatePageProps {
     units:{
         id: number,
         name: string
+    }[],
+    individuals: {
+        id: number;
+        individual_id: number;
+        empl_position_id: number | null;
+        date_from: Date | null;
+        date_to: Date | null;
+        individual: {
+            id: number;
+            name: string;
+            surname: string;
+        };
     }[]
 }
 
-export default function BatchCreatePage({items, units} : BatchCreatePageProps){
+export default function BatchCreatePage({items, units, individuals} : BatchCreatePageProps){
     const [formState, action] = useFormState(actions.createItemBatch, {message: ''});
     return(
         <form action={action} className="container mx-auto bg-gray-200 p-4 rounded w-1/2 shadow-lg">
-            <h3 className="font-bold m-3">Create an ItemBatch</h3>
+            <h3 className="font-bold m-3">Створити партію</h3>
             <div className="flex flex-col gap-4">
-                <div className="flex gap-4">
-                    <label className="w-24" htmlFor="name">
-                        Name
-                    </label>
-                    <input 
-                        name="name"
-                        className="border rounded p-2 w-full"
-                        id="name"
-                        required
-                    />
-                </div>
-                <div className="flex gap-4">
-                    <label className="w-24" htmlFor="description">
-                        Description
-                    </label>
-                    <textarea 
-                        name="description"
-                        className="border rounded p-2 w-full"
-                        id="description"
-                    />
-                </div>
+                                
                 <div className="flex gap-4">
                     <label className="w-24" htmlFor="item_id">
-                        Item
+                        Призначення партії
                     </label>
                     <select
                         name="item_id"
@@ -59,17 +51,19 @@ export default function BatchCreatePage({items, units} : BatchCreatePageProps){
                 </div>
                 <div className="flex gap-4">
                     <label className="w-24" htmlFor="created">
-                        created at
+                        Дата створення
                     </label>
                     <input 
                         name="created"
                         className="border rounded p-2 w-full"
+                        type="date"
                         id="created"
+                        
                     />
                 </div>
                 <div className="flex gap-4">
                     <label className="w-24" htmlFor="quantity">
-                        quantity
+                        Кількість
                     </label>
                     <input 
                         name="quantity"
@@ -79,7 +73,7 @@ export default function BatchCreatePage({items, units} : BatchCreatePageProps){
                 </div>
                 <div className="flex gap-4">
                     <label className="w-24" htmlFor="unit_id">
-                        unit
+                        Одиниця виміру
                     </label>
                     <select
                         name="unit_id"
@@ -94,24 +88,37 @@ export default function BatchCreatePage({items, units} : BatchCreatePageProps){
                 </div>
                 <div className="flex gap-4">
                     <label className="w-24" htmlFor="created_by">
-                        created_by
+                        Ким створено 
                     </label>
-                    <input 
+                    <select
                         name="created_by"
                         className="border rounded p-2 w-full"
                         id="created_by"
-                        value={1}
                         required
+                    >
+                        {individuals.map(employee => (
+                            <option key={employee.id} value={employee.id}>{employee.individual.name} {employee.individual.surname}</option>
+                        ))}
+                    </select>
+                </div>
+                <div className="flex gap-4">
+                    <label className="w-24" htmlFor="description">
+                        Опис
+                    </label>
+                    <textarea 
+                        name="description"
+                        className="border rounded p-2 w-full"
+                        id="description"
                     />
                 </div>
                 
-                {
+                {/* {
                     formState.message ? (
                         <div className={`my-2 p-2 border rounded ${formState.message.startsWith('Item batch created successfully') ? 'bg-green-200 border-green-400' : 'bg-red-200 border-red-400'}`}>
                             {formState.message}
                         </div>
                     ) : null
-                }
+                } */}
 
                 <button type="submit" className="rounded p-2 bg-blue-200">
                     Create

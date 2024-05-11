@@ -47,8 +47,7 @@ export default async function WeekSummary() {
 })
     
   const feed_connections = await db.feedconnections.findMany();
-  const feed_id = actions.getFeedForFish(feed_connections, 0.8)
-  const items = await db.items.findMany();
+  const feed_types = await db.feedtypes.findMany();
 
   const groupedCalcTable: { [date: string]: { [poolId: string]: string } } = {};
 
@@ -71,19 +70,22 @@ export default async function WeekSummary() {
     }
   });
 
-  const feedDictionary: { [averageWeight: number]: string } = {};
+  const feedDictionary: { [averageWeight: number]: string | undefined } = {};
 
-  function getFeedName(average_weight: number){
-    const connection = feed_connections.find(connection => {
-      return average_weight >= connection.from_fish_weight && average_weight <= connection.to_fish_weight;
-    });
-    let feed_item
-    if (connection){
-      feed_item = items.find(item => (
-        connection.feed_id === item.id
-      ))
+  function getFeed(average_weight: number | undefined): { id: number, name: string} | null {
+    if (average_weight !== undefined){
+      const connection = feed_connections.find(connection => {
+        average_weight >= connection.from_fish_weight && average_weight <= connection.to_fish_weight;
+      });
+  
+      if (connection) {
+          const feed_item = feed_types.find(type => connection.feed_type_id === type.id);
+          if (feed_item) {
+              return { id: feed_item.id, name: feed_item.name };
+          }
+      }
     }
-    return feed_item ? feed_item.name : "";
+    return null; 
   }
 
   for (const line of lines) {
@@ -93,7 +95,7 @@ export default async function WeekSummary() {
                   for (const stock of transaction.documents.stocking) {
                       const averageWeight = stock.average_weight;
                       if (!(averageWeight in feedDictionary)) {
-                          feedDictionary[averageWeight] = getFeedName(averageWeight);
+                          feedDictionary[averageWeight] = getFeed(averageWeight)?.name;
                       }
                   }
               }
@@ -136,12 +138,9 @@ const stockingDictionary: StockingDictionary = {};
                     <th className="px-4 py-2 border border-gray-400 text-center bg-blue-100 text-sm">Корм &rarr;</th>
                     {line.pools.filter(pool => pool.prod_line_id === line.id).map(pool => (
                           <th key={pool.id} className="px-4 py-2 border border-gray-400 text-center bg-blue-100 text-sm">
-                          {
+                          
+                            {/* <span>{getFeed(stockingDictionary[pool.name])?.name}</span> */}
                             
-                            (getFeedName(stockingDictionary[pool.name]?.slice(-1)[0])?.match(/\b\d*[,\.]?\d+\s*mm\b/) || []).map((match, index) => (
-                              <span key={index}>{match}</span>
-                            ))
-                          }
                         </th>
                     ))}
                   </tr>

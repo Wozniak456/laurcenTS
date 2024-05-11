@@ -2,7 +2,7 @@
 
 import { useFormState } from "react-dom";
 import * as actions from '@/actions';
-import { productionlines } from "@prisma/client";
+import PartitionForm from "@/components/batch-partition";
 import { useEffect, useState } from "react";
 import {Location, ItemBatch} from '@/components/accordion'
 import { Area } from "@/components/accordion"
@@ -25,11 +25,14 @@ interface StockPoolProps {
 
 export default function StockPoolPage({ pool, locations, batches, areas }: StockPoolProps) {
     const [showMoreFields, setShowMoreFields] = useState(false);
+    const [showPartitionForm, setShowPartitionForm] = useState(false);
+    
     const [formState, action] = useFormState(actions.stockPool, { message: '' });
     const [locationIdFrom, setLocationIdFrom] = useState<number | undefined>(undefined);
 
     return (
-        <form className="container mx-auto px-4 m-4 " action={action}>
+        <div>
+            <form className="container mx-auto px-4 m-4 " action={action}>
             <div className="flex justify-end">
                 <button
                     type="button"
@@ -132,13 +135,28 @@ export default function StockPoolPage({ pool, locations, batches, areas }: Stock
                     >
                         Зарибити
                     </button>
+                    <button
+                        type="button"
+                        className="rounded p-2 bg-blue-200"
+                        onClick={() => setShowPartitionForm(!showPartitionForm)}
+                    >
+                        Розділити
+                    </button>
+                    
                 </div>
+                
                 {formState && formState.message && (
                     <div className="my-2 p-2 bg-red-200 border rounded border-red-400">
                         {formState.message}
                     </div>
                 )}
             </div>
+            <div>
+             
+            </div>
+            
         </form>
+        {showPartitionForm ? <PartitionForm areas={areas} pool={pool}/>: 'no hello'}
+        </div>
     );
 }

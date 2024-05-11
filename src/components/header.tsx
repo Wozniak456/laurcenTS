@@ -9,12 +9,13 @@ export default function Header() {
                 {/* <Link href="/prod-lines/view" className="text-sm">Виробничі лінії</Link> */}
                 {/* <Link href="/pools/view" className="text-sm">Басейни</Link> */}
                 <Link href="/batches/view" className="text-sm">Партії</Link>
-                {/* <Link href="/datatable/view" className="text-sm">Datatable</Link> */}
+                
                 <Link href="/calculation/view" className="text-sm">Розрахунок годування</Link>
                 <Link href="/summary-feeding-table/week" className="text-sm">Годування на тиждень</Link>
                 <Link href="/summary-feeding-table/day" className="text-sm">Годування на день</Link>
                 <Link href="/feeding/view" className="text-sm">Зариблення</Link>
                 <Link href="/general-summary/view" className="text-sm">Зведена 111</Link>
+                <Link href="/purchtable/view" className="text-sm">Накладні</Link>
             </div>
         </div>
     );

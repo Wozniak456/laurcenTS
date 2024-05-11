@@ -1,33 +1,49 @@
 import { db } from "@/db";
 import Link from "next/link";
 
-export default async function PurchtableHome() {
-  const purchtable = await db.purchtable.findMany();
+import PurchTableComponent from "@/components/PurchHeaders/purchtable-table"
 
-    const renderedtable  = purchtable.map((purchRecord) => {
-        return(
-        <Link 
-            key={purchRecord.id} 
-            href={`/purchtable/${purchRecord.id}`}
-            className="flex justify-between items-center p-2 border rounded"
-        > 
-            <div>{purchRecord.id.toString()}</div>
-            <div>View</div>
-        </Link>
-        )
+export default async function PurchtableHome() {
+  const purchtables = await db.purchtable.findMany({
+    select:{
+      id: true,
+      doc_id: true,
+      date_time: true,
+      vendor_doc_number: true,
+      vendor_id: true,
+      vendors: true,
+      purchaselines: {
+        select:{
+          id: true,
+          item_id: true,
+          units: true,
+          quantity: true,
+          items: {
+            select:{
+              id: true,
+              name: true,
+              feed_type_id: true
+            }
+          }
+        }
+      }
+    }
+  });
+
+  const vendors = await db.vendors.findMany()
+
+  const items = await db.items.findMany({
+    select:{
+      id: true,
+      name: true,
+      units: true
+    }
   })
+
 
   return (
     <div>
-      <div className="flex m-2 justify-between items-center">
-        <h1 className="text-xl font-bold">Records of purchtable</h1>
-        <Link href="/purchtable/new" className="border p-2 rounded">
-          New
-        </Link>
-      </div>
-      <div className="flex flex-col gap-2">
-        {renderedtable}
-      </div>
+      <PurchTableComponent purchtables={purchtables} vendors={vendors} items={items}/>
     </div>
   );
 }

@@ -15,14 +15,20 @@ export default async function AreasHome() {
     doc_id : record.doc_id
   }))
   
-  const batchesbd = await db.itembatches.findMany()
+  const batchesbd = await db.itembatches.findMany({
+    include:{
+      items: true
+    }
+  })
   
   const batches = batchesbd.map(batch => (
     {
       id: batch.id,
-      name: batch.name
+      name: batch.name,
+      items: batch.items
     }
   ))
+
 
   const feedConnectionsWithItemsbd = await db.feedconnections.findMany({
     include:{
@@ -47,7 +53,11 @@ export default async function AreasHome() {
     to_fish_weight: connection.to_fish_weight,
     item: {
       id: connection.items_feedconnections_feed_idToitems.id,
-      name: connection.items_feedconnections_feed_idToitems.name
+      name: connection.items_feedconnections_feed_idToitems.name,
+      item_type_id: connection.items_feedconnections_feed_idToitems.item_type_id,
+      description : connection.items_feedconnections_feed_idToitems.description, 
+      default_unit_id: connection.items_feedconnections_feed_idToitems.default_unit_id, 
+      parent_item: connection.items_feedconnections_feed_idToitems.parent_item
     }  
   }))
 
@@ -61,7 +71,11 @@ export default async function AreasHome() {
                 include: {
                   itemtransactions: {
                     include: {
-                      itembatches: true,
+                      itembatches: {
+                        include:{
+                          items: true,
+                        }
+                      },
                       documents: {
                         include:{
                           stocking : true,
@@ -77,6 +91,19 @@ export default async function AreasHome() {
       }
     }
   });
+
+  // console.log('sectionsWithLinesAndPools')
+  // sectionsWithLinesAndPools.map(item => (
+  //   item.productionlines.map(line => (
+  //     line.pools.map(pool => (
+  //       pool.locations.map(loc => (
+  //         loc.itemtransactions.map(tran => (
+  //           console.log(tran.itembatches.items.name)
+  //         ))
+  //       ))
+  //     ))
+  //   ))
+  // ))
   
   const areas: Area[] = sectionsWithLinesAndPools.map(area =>({
     id: area.id,
@@ -91,12 +118,15 @@ export default async function AreasHome() {
         locations: pool.locations.map(location => ({
           id: location.id,
           name: location.name,
+          pool_id: location?.pool_id,
           itemtransactions: location.itemtransactions.map(transaction =>({
             id: transaction.id,
             quantity: transaction.quantity,
+            doc_id: transaction.doc_id,
             itembatches: {
               id: transaction.itembatches.id,
-              name: transaction.itembatches.name
+              name: transaction.itembatches.name,
+              items: transaction.itembatches.items
             },
             documents: {
               id: transaction.documents.id,
@@ -109,6 +139,8 @@ export default async function AreasHome() {
       })),
     }))
   }))
+
+  
  
   return (
     <div className="container mx-auto px-4 m-4 w-70">

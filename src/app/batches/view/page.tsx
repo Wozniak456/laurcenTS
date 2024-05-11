@@ -1,5 +1,6 @@
 import Tabs from '@/components/filter-batch'
 import { db } from '@/db';
+import { UNABLE_TO_FIND_POSTINSTALL_TRIGGER_JSON_SCHEMA_ERROR } from '@prisma/client/scripts/postinstall.js';
 import Link from 'next/link';
 
 interface GeneralType{
@@ -12,36 +13,61 @@ async function App() {
     let items : GeneralType[] = []
     let units : GeneralType[] = []
     let tabContents : any[] = []
-    const allItemBatches = await db.itembatches.findMany({ select: { id: true, name: true } });
-        tabContents.push({
-            title: 'Усі партії',
-            content: allItemBatches.map(itemBatch => ({ id: itemBatch.id, contentLine: itemBatch.name })) 
-        });
+
+    const individuals = await db.employees.findMany({
+        include:{
+            individual: {
+                select:{
+                    id: true,
+                    name: true,
+                    surname: true
+                }
+            }
+        }
+    })
+
+
+    const allItemBatches = await db.itembatches.findMany({ 
+        select: { 
+            id: true, 
+            name: true 
+        } 
+    });
+    tabContents.push({
+        title: 'Усі партії',
+        content: allItemBatches.map(itemBatch => ({ 
+            id: itemBatch.id, 
+            contentLine: itemBatch.name })) 
+    });
+
     try {
         itemTypes = await db.itemtypes.findMany();
+
         items = await db.items.findMany({
             select: {
                 id: true,
                 name: true
             }
         })
+
         units = await db.units.findMany();
 
         for (const itemType of itemTypes) {
             const itemTypeName = itemType.name;
     
             const itemBatches = await db.itembatches.findMany({
-                select: { id: true, name: true }, 
-                where: {
-                    items: {
-                        itemtypes: { name: itemTypeName }
-                    }
-                }
+                select: { 
+                    id: true, 
+                    name: true 
+                }, 
             });
     
             const tabContent = {
                 title: itemTypeName,
-                content: itemBatches.map(itemBatch => ({ id: itemBatch.id, contentLine: itemBatch.name })) // Змінено структуру об'єкта content
+                content: itemBatches.map(itemBatch => ({ 
+                    id: itemBatch.id, 
+                    contentLine: itemBatch.name 
+                })) // Змінено структуру об'єкта content
             };
     
             tabContents.push(tabContent);
@@ -60,7 +86,7 @@ async function App() {
           New
         </Link>
       </div>
-      <Tabs tabContents={tabContents} items={items} units={units}/>
+      <Tabs tabContents={tabContents} items={items} units={units} individuals={individuals}/>
     </div>
   );
 }

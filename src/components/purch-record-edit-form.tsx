@@ -19,7 +19,7 @@ export default function PurchRecordEditForm({purchtableRecord: purchtableRecord}
         setVendorDocNumber(event.target.value);
     };
 
-    const editPurchRecordAction = actions.editPurchtableRecord.bind(null, Number(purchtableRecord.id), vendorId, vendorDocNumber)
+    const editPurchRecordAction = actions.editPurchtable.bind(null, Number(purchtableRecord.id), vendorId, vendorDocNumber)
     
     return(
         <div className="p-3 border rounded border-gray-200">

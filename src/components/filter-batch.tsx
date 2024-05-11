@@ -19,10 +19,22 @@ interface TabsProps {
   units: {
     id: number,
     name: string
-  }[]
+  }[],
+  individuals: {
+    id: number;
+    individual_id: number;
+    empl_position_id: number | null;
+    date_from: Date | null;
+    date_to: Date | null;
+    individual: {
+        id: number;
+        name: string;
+        surname: string;
+    };
+}[]
 }
 
-const Tabs: React.FC<TabsProps> = ({ tabContents, items, units }) => {
+const Tabs: React.FC<TabsProps> = ({ tabContents, items, units, individuals }) => {
   const [isCreateFormVisible, setCreateFormVisible] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
 
@@ -54,7 +66,7 @@ const Tabs: React.FC<TabsProps> = ({ tabContents, items, units }) => {
           Додати партію
         </button>
       </div>
-      {isCreateFormVisible && <BatchCreateForm items={items} units={units}/>}
+      {isCreateFormVisible && <BatchCreateForm items={items} units={units} individuals={individuals}/>}
       <div className="p-6">
         {tabContents.map((content, index) => (
           <div

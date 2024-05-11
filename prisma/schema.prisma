@@ -42,6 +42,7 @@ model documents {
   executed_by       Int
   comments          String?
   calculation_table calculation_table[]
+  parent_document   BigInt?
   doctype           doctype?            @relation(fields: [doc_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   employees         employees           @relation(fields: [executed_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
   locations         locations?          @relation(fields: [location_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -58,22 +59,24 @@ model employeepositions {
 
 model employees {
   id                Int                @id @default(autoincrement())
+  individual_id     Int
   empl_position_id  Int?
   date_from         DateTime?          @db.Timestamp(6)
   date_to           DateTime?          @db.Timestamp(6)
   documents         documents[]
   employeepositions employeepositions? @relation(fields: [empl_position_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  individual        individuals        @relation(fields: [individual_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   itembatches       itembatches[]
 }
 
 model feedconnections {
   id                                   Int   @id @default(autoincrement())
   fish_id                              Int
-  feed_id                              Int
+  feed_type_id                         Int   @unique
   from_fish_weight                     Float
   to_fish_weight                       Float
-  items_feedconnections_feed_idToitems items @relation("feedconnections_feed_idToitems", fields: [feed_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  items_feedconnections_fish_idToitems items @relation("feedconnections_fish_idToitems", fields: [fish_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  feedtypes                            feedtypes? @relation("feed_type_id_feedconnections", fields: [feed_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  items                                items @relation("feedconnections_fish_idToitems", fields: [fish_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model individuals {
@@ -82,6 +85,7 @@ model individuals {
   surname     String  @db.VarChar
   itn         String? @db.VarChar(10)
   description String?
+  employees   employees[] 
 
   @@unique([name, surname], map: "uq_name_surname")
 }
@@ -105,13 +109,14 @@ model items {
   name                                           String            @unique @db.VarChar
   description                                    String?
   item_type_id                                   Int?
+  feed_type_id                                   Int?
   default_unit_id                                Int?
   parent_item                                    Int?
-  feedconnections_feedconnections_feed_idToitems feedconnections[] @relation("feedconnections_feed_idToitems")
   feedconnections_feedconnections_fish_idToitems feedconnections[] @relation("feedconnections_fish_idToitems")
   itembatches                                    itembatches[]
   units                                          units?            @relation(fields: [default_unit_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   itemtypes                                      itemtypes?        @relation(fields: [item_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  feedtypes                                      feedtypes?        @relation(fields: [feed_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   purchaselines                                  purchaselines[]
 }
 
@@ -122,17 +127,32 @@ model itemtransactions {
   batch_id           BigInt
   quantity           Float
   unit_id            Int
+  status_id          Int         @default(3)
   parent_transaction BigInt?
   itembatches        itembatches @relation(fields: [batch_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   documents          documents   @relation(fields: [doc_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   locations          locations   @relation(fields: [location_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   units              units       @relation(fields: [unit_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  transactionsstate  transactionsstate @relation(fields: [status_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model transactionsstate {
+  id               Int      @id @default(autoincrement())
+  status           String
+  itemtransactions itemtransactions[]
 }
 
 model itemtypes {
   id    Int     @id @default(autoincrement())
   name  String  @unique @db.VarChar
   items items[]
+}
+
+model feedtypes {
+  id          Int             @id @default(autoincrement())
+  name        String          @unique @db.VarChar
+  items       items[]
+  connection  feedconnections? @relation("feed_type_id_feedconnections")
 }
 
 model locations {

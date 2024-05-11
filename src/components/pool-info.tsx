@@ -14,6 +14,8 @@ interface PoolInfoProps{
 }
 
 export default function PoolInfo({areas, poolItem} : PoolInfoProps){
+    // const lines = areas.flatMap(area => (area.lines))
+    // console.log('lines', lines)
     return (
         <div className='bg-blue-200'>
             {areas.map(area => (
@@ -23,31 +25,28 @@ export default function PoolInfo({areas, poolItem} : PoolInfoProps){
                             {line.pools.filter(pool => pool.id === poolItem.id).map(filteredPool => (
                                 <div key={filteredPool.id}>
                                     {filteredPool.locations.map(loc => {
-                                        return(
-                                            <div key={loc.id}>
-                                            {loc.itemtransactions.length > 0 && (
-                                                <>
-                                                    {loc.itemtransactions
-                                                        .filter(tran => tran.documents.stocking.find(stock => stock.doc_id === tran.doc_id))
-                                                        .sort((a, b) => Number(b.id) - Number(a.id))
-                                                        .slice(0, 1)
-                                                        .map(tran => {
-                                                            return(
-                                                                <>
-                                                                    <p>Партія: {tran.itembatches.name}</p>
-                                                                    <p>Кількість: {tran.quantity}</p>
-                                                                    <p key={tran.id}>Сер. вага: {tran.documents.stocking[0].average_weight}</p>
-                                                                </>
-                                                            )
-                                                        })}
-                                                    
-                                                    
-                                                </>
-                                            )}
-                                        </div>
-                                        )
-                                        
-})}
+                                        const transactions = loc.itemtransactions
+                                        .filter(tran =>(
+                                            tran.itembatches.items.item_type_id === 1
+                                        ))
+                                        .sort((a, b) => Number(b.id) - Number(a.id));
+                                        const totalQuantity = transactions.reduce((total, tran) => total + tran.quantity, 0);
+
+                                        //console.log(transactions[0])
+                                        //console.log(transactions[0].documents.stocking[0].average_weight)
+
+                                        if(transactions.length > 0){
+                                            return(
+                                                <div key={loc.id}>
+                                                    <p>Партія: {transactions[0].itembatches.name}</p>
+                                                    <p>Кількість: {totalQuantity}</p>
+                                                    {/* <p>Сер. вага: {transactions[0].documents}</p>        */}
+                                                    <p>Сер. вага: {transactions[0].documents.stocking[0].average_weight}</p>       
+                                                </div>
+                                            )   
+                                        }  
+                                                                  
+                                        })}
                                 </div>
                             ))}
                         </div>

@@ -14,7 +14,11 @@ export default async function StockingHome() {
                 include: {
                   itemtransactions: {
                     include: {
-                      itembatches: true,
+                      itembatches: {
+                        include:{
+                          items: true
+                        }
+                      },
                       documents: {
                         include:{
                           stocking : true,
@@ -44,13 +48,15 @@ export default async function StockingHome() {
         locations: pool.locations.map(location => ({
           id: location.id,
           name: location.name,
+          pool_id: location.pool_id,
           itemtransactions: location.itemtransactions.map(transaction =>({
             id: transaction.id,
             quantity: transaction.quantity,
             doc_id: transaction.doc_id,
             itembatches: {
               id: transaction.itembatches.id,
-              name: transaction.itembatches.name
+              name: transaction.itembatches.name,
+              items: transaction.itembatches.items
             },
             documents: {
               id: transaction.documents.id,
@@ -66,7 +72,11 @@ export default async function StockingHome() {
 
   const locations = await db.locations.findMany()
 
-  const batches = await db.itembatches.findMany()
+  const batches = await db.itembatches.findMany({
+    include:{
+      items: true
+    }
+  })
 
   return (
     <div>

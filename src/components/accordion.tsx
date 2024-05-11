@@ -13,9 +13,13 @@ export interface FeedConnection{
 }
 
 interface Item{
-    id: number,
-    name: string
-}
+    id: number;
+    name: string;
+    description: string | null;
+    item_type_id: number | null;
+    default_unit_id: number | null;
+    parent_item: number | null;
+};
 
 interface Stocking{
     id: number,
@@ -31,7 +35,8 @@ interface Document{
 
 export interface ItemBatch{
     id: bigint,
-    name: string
+    name: string,
+    items: Item
 }
 interface Transaction{
     id: bigint,
@@ -44,6 +49,7 @@ interface Transaction{
 export interface Location {
     id: number;
     name: string;
+    pool_id: number | null,
     itemtransactions: Transaction[]
 }
 
@@ -75,7 +81,8 @@ interface AccordionProps {
     }[],
     itembatches: {
         id: bigint,
-        name: string
+        name: string,
+        items: Item
     }[],
     calculation: {
         id: number,
@@ -97,8 +104,7 @@ export const Accordion: React.FC<AccordionProps> = ({ sections, feedConnections,
     const [isStockPoolTableVisible, setStockPoolTableVisible] = useState(false);
     const [locationId, setlocationId] = useState<number | null>(null);
     const [docId, setdocId] = useState<bigint | null>(null);
-
-  
+     
     const handleSectionClick = (sectionIndex: number) => {
         setActiveSection(prevActiveSection =>
             prevActiveSection === sectionIndex ? null : sectionIndex
