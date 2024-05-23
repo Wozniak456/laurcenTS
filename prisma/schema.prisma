@@ -98,10 +98,13 @@ model itembatches {
   created          DateTime?           @db.Timestamp(6) @default(now())
   created_by       Int
   expiration_date  DateTime?
+  packing          Float?
+  price            Float?
   employees        employees?         @relation(fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
   items            items              @relation(fields: [item_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   itemtransactions itemtransactions[]
   parametersvalues parametersvalues[]
+  priorities       priorities[]
 }
 
 model items {
@@ -118,6 +121,18 @@ model items {
   itemtypes                                      itemtypes?        @relation(fields: [item_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   feedtypes                                      feedtypes?        @relation(fields: [feed_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   purchaselines                                  purchaselines[]
+  priorities                                     priorities[]
+}
+
+model priorities{
+  id                                             Int               @id @default(autoincrement())
+  item_id                                        Int
+  batch_id                                       BigInt
+  location_id                                    Int
+  priority                                       Int
+  items                                          items?            @relation(fields: [item_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  itembatches                                    itembatches?      @relation(fields: [batch_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  locations                                      locations?        @relation(fields: [location_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model itemtransactions {
@@ -164,6 +179,7 @@ model locations {
   itemtransactions itemtransactions[]
   locationtypes    locationtypes      @relation(fields: [location_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   pools            pools?             @relation(fields: [pool_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  priorities       priorities[]
 }
 
 model locationtypes {

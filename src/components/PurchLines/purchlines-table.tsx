@@ -64,26 +64,11 @@ interface PurchLinesComponentProps {
 export default function PurchLinesList( {lines, purchHeader, items} : PurchLinesComponentProps){
     const [showModal, setShowModal] = useState<boolean>(false);
 
-    const [selectedItem, setSelectedItem] = useState<number | undefined>(undefined);
     const [selectedLine, setSelectedLine] = useState<number | undefined>(undefined);
-
-    // const [selectedItem, setSelectedItem] = useState<string | undefined>('');
-
-    // const [formState, action] = useFormState(actions.createPurchLineRecord, { message: '' });
 
     const handleCreateNewPurchLine = () => {
         setShowModal(true);
     };
-
-    // const handleCloseModal = () => {
-    //     setShowModal(false);
-    //     setSelectedItem('')
-    // };
-
-    // const handleSelectedItem = (item_id: number) => {
-    //     const name = items.find(item => item.id === item_id)?.name
-    //     setSelectedItem(name)
-    // };
 
     return(
         <div>
@@ -114,7 +99,6 @@ export default function PurchLinesList( {lines, purchHeader, items} : PurchLines
                         <th className="px-4 py-2 text-center border border-gray-400">Qty</th>  
                         <th className="px-4 py-2 text-center border border-gray-400">Edit</th> 
                     </tr>
-                    
                 </thead>
                 <tbody>
                 {lines
@@ -140,7 +124,6 @@ export default function PurchLinesList( {lines, purchHeader, items} : PurchLines
                 purchId={purchHeader?.id} 
                 items={items} 
                 setShowModal={setShowModal} 
-                // setSelectedLine={setSelectedLine}
                 />
             )}
             

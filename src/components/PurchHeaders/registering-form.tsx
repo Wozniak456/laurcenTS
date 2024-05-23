@@ -46,33 +46,42 @@ export default function RegisteringGoods({
     const [formState, action] = useFormState(actions.registerGoodsInProduction, { message: '' });
 
     return(
-        <div className="fixed top-0 left-0 w-full h-full bg-gray-800 bg-opacity-75 flex justify-center items-center">
+        <div className="fixed top-0 left-0 w-full h-full bg-gray-800 bg-opacity-75 flex justify-center items-center cursor-default">
             <div className="bg-white p-8 rounded shadow-lg w-2/3">
             <h2 className="text-lg font-semibold mb-4">Реєстрація приходу товару</h2>
             
             <form className="mb-4" action={action} onSubmit={handleCloseModal}>
 
-                <table className="min-w-full divide-y divide-gray-200">
+                <table className="min-w-full divide-y divide-gray-200 ">
                     <thead>
-                        <tr className="bg-green-100">
+                        <tr className="bg-green-100 ">
                             <th scope="col" className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Item name
+                                Назва товару
                             </th>
                             <th scope="col" className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Qty
+                                К-сть
                             </th>
                             <th scope="col" className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Unit
+                                Од. Виміру
                             </th>
                             <th scope="col" className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Batch name
+                                Назва партії
+                            </th>
+                            <th scope="col" className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Дата придатності
+                            </th>
+                            <th scope="col" className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Пакування, кг
+                            </th>
+                            <th scope="col" className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Ціна, грн
                             </th>
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                         {header?.purchaselines.map((line, index) => (
                         <tr key={index}>
-                            <td className="px-6 py-4 whitespace-nowrap">
+                            <td className="py-4">
                                 <div className="text-sm text-gray-900">{line.items.name}</div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
@@ -87,6 +96,37 @@ export default function RegisteringGoods({
                                         name={`batch_name_${line.id}`}
                                         className="border rounded p-2 w-full"
                                         id={`batch_name_${line.id}`}
+                                        required
+                                    />
+                                </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="text-sm text-gray-900">
+                                <input
+                                        name={`expire_date_${line.id}`}
+                                        type="date"
+                                        className="border rounded p-2 w-full"
+                                        id={`expire_date_${line.id}`}
+                                        required
+                                    />
+                                </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="text-sm text-gray-900">
+                                <input
+                                        name={`packing_${line.id}`}
+                                        className="border rounded p-2 w-full"
+                                        id={`packing_${line.id}`}
+                                        required
+                                    />
+                                </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="text-sm text-gray-900">
+                                <input
+                                        name={`price_${line.id}`}
+                                        className="border rounded p-2 w-full"
+                                        id={`price_${line.id}`}
                                         required
                                     />
                                 </div>

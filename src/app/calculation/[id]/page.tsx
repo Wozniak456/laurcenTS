@@ -11,7 +11,6 @@ interface CalculationPageProps {
 }
 
 export default async function CalculationShowPage(props: CalculationPageProps){
-    console.log('Sofiia', props.params.id)
     let calc_10_records: calculation_table[] = [];
     try{
         const docId = await db.calculation_table.findUnique({
@@ -75,9 +74,9 @@ export default async function CalculationShowPage(props: CalculationPageProps){
                             <td className="border border-blue-500 px-4 py-2">{record.fish_weight.toFixed(3)}</td>
                             <td className="border border-blue-500 px-4 py-2">{record.feed_quantity.toFixed(3)}</td>
                             <td className="border border-blue-500 px-4 py-2">{record.v_c}</td>
-                            <td className="border border-blue-500 px-4 py-2">{record.total_weight.toFixed(3)}</td>
-                            <td className="border border-blue-500 px-4 py-2">{record.weight_per_fish.toFixed(3)}</td>
-                            <td className="border border-blue-500 px-4 py-2">{record.feed_today.toFixed(3)}</td>
+                            <td className="border border-blue-500 px-4 py-2">{record.total_weight?.toFixed(3)}</td>
+                            <td className="border border-blue-500 px-4 py-2">{record.weight_per_fish?.toFixed(3)}</td>
+                            <td className="border border-blue-500 px-4 py-2">{record.feed_today?.toFixed(3)}</td>
                             <td className="border border-blue-500 px-4 py-2">{record.feed_per_day.toFixed(3)}</td>
                             <td className="border border-blue-500 px-4 py-2">{record.feed_per_feeding.toFixed(3)}</td>
                             <td className="border border-blue-500 px-4 py-2">{record.doc_id.toString()}</td>

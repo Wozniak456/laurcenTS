@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useFormState } from "react-dom";
 import * as actions from '@/actions';
 import { calculation_table } from "@prisma/client";
@@ -50,38 +50,59 @@ export default function DaySummaryContent({
   items
 }
   : DaySummaryProps) {
+ 
+
   const [formState, action] = useFormState(actions.feedBatch, { message: '' });
-  const [selectedPools, setSelectedPools] = useState<(number | null)[]>([]);
-  console.log(todayCalculation)
+  const initialSelectedItem = items.find(item => item.feed_type_id === todayCalculation?.feed?.id)?.id;
+  const [selectedItem, setSelectedItem] = useState(initialSelectedItem);
+  
+  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedItem(Number(event.target.value));
+  };
+
+  // useEffect(() => {
+  //   // Тут ви можете робити що завгодно з новим значенням selectedItem
+  //   console.log('Змінено selectedItem:', selectedItem);
+  // }, [selectedItem]); // Вказати selectedItem як залежність
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault(); // Щоб уникнути стандартної поведінки відправки форми
+    // Виконати логіку для відправки даних форми
+  };
 
   return (
     <tr key={pool.id}>
-        <td className="px-4 py-2 border border-gray-400">{pool.name}</td>
+      <td className="px-4 py-2 border border-gray-400">{pool.name}</td>
+      {todayCalculation?.calculation ? 
+        <React.Fragment>
+          <td className="px-4 py-2 border border-gray-400">
+          <div>
+            <select
+                name='feed_item_id'
+                className="border rounded p-2 max-w-24 text-sm"
+                id='feed_item_id'
+                value={selectedItem || ''}
+                onChange={handleSelectChange}
+            >
+              {items
+              .filter(item => item.feed_type_id === todayCalculation?.feed?.id)
+              .map(item => {
+                return(<option 
+                  key={item.id} 
+                  value={item.id}
+                  className="max-w-24"
+                  >{item.name}</option>)
+              })}   
+            </select>
+
+          </div>
+        </td>
         <td className="px-4 py-2 border border-gray-400">{todayCalculation?.feed?.name}</td>
-        {todayCalculation?.calculation ? 
-        <td className="px-4 py-2 border border-gray-400">
-        <div>
-          <select
-              name='item'
-              className="border rounded p-2 max-w-24 text-sm"
-              id='item'
-              required
-              
-          >
-            {items
-            .filter(item => item.feed_type_id === todayCalculation?.feed?.id)
-            .map(item => (
-              <option 
-              key={item.id} 
-              value={item.id}
-              className="max-w-24"
-              >{item.name}</option>
-            ))}
-          </select>
-      </div>
-      </td> : 
+        </React.Fragment>
+         : 
       <td className="px-4 py-2 border border-gray-400"></td>
         }
+        
       {times.map(time => {
         if(todayCalculation?.calculation){
           return(
@@ -91,6 +112,7 @@ export default function DaySummaryContent({
             <form action={action}>
               <input type="hidden" name="pool_id" value={pool.id} />
               <input type="hidden" name="executed_by" value={3} />
+              <input type="hidden" name="feed_item_id" value={selectedItem} />
               
               <div className="flex justify-between">
                 <input
@@ -119,10 +141,10 @@ export default function DaySummaryContent({
             </>
           )
         }
-       
+      
       })}
-        
-       
     </tr>
-    );
+  );
 }
+
+

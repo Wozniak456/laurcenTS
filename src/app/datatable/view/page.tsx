@@ -8,20 +8,20 @@ export default function Datatable() {
   const [dataBelow25, setDataBelow25] = useState<datatable_below25[]>([]);
   const [dataOver25, setDataOver25] = useState<datatable_over25[]>([]);
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const dataTableDataBelow25 = await actions.showDatatableBelow25(); 
-        const dataTableDataOver25 = await actions.showDatatableOver25(); 
-        setDataBelow25(dataTableDataBelow25);
-        setDataOver25(dataTableDataOver25);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    }
+  // useEffect(() => {
+  //   async function fetchData() {
+  //     try {
+  //       const dataTableDataBelow25 = await actions.showDatatableBelow25(); 
+  //       const dataTableDataOver25 = await actions.showDatatableOver25(); 
+  //       setDataBelow25(dataTableDataBelow25);
+  //       setDataOver25(dataTableDataOver25);
+  //     } catch (error) {
+  //       console.error('Error fetching data:', error);
+  //     }
+  //   }
 
-    fetchData();
-  }, []);
+  //   fetchData();
+  // }, []);
 
 
   const handleClickBelow25 = async () => {
@@ -32,6 +32,7 @@ export default function Datatable() {
       console.error('Error creating record:', error);
     }
   };
+  
   const handleClickOver25 = async () => {
     try {
       const newData = await actions.fillDatatableOver25(); 

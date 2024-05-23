@@ -66,7 +66,7 @@ export default function ItemBatchEditForm({itembatch, endpoint} : ItemBatchEditF
                     <input 
                     id="created" 
                     name="created"
-                    defaultValue={created.toISOString()}
+                    defaultValue={created != null ? created.toISOString() : ''}
                     onChange={handleCreatedChange}
                     className='p-3 border border-gray-200'
                     />

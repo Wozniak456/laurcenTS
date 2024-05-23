@@ -14,21 +14,38 @@ interface Pool{
 }
 
 interface StockPoolProps {
-    pool: Pool,
     locations: {
         id: number,
-        name: string
+        name: string,
+        location_type_id: number
     }[],
     batches: ItemBatch[],
-    areas: Area[]
+    poolInfo: {
+        batch: batchInfo | null;
+        calc: {
+            fish_weight: number;
+        } | null;
+        feed_type_id: string | null | undefined,
+        location_id: number;
+    }
 }
 
-export default function StockPoolPage({ pool, locations, batches, areas }: StockPoolProps) {
+type batchInfo = {
+    batch_name: string | undefined,
+    batch_id: bigint | undefined,
+    qty: number
+  }
+
+export default function StockPoolPage({locations, batches, poolInfo}: StockPoolProps) {
     const [showMoreFields, setShowMoreFields] = useState(false);
     const [showPartitionForm, setShowPartitionForm] = useState(false);
     
     const [formState, action] = useFormState(actions.stockPool, { message: '' });
     const [locationIdFrom, setLocationIdFrom] = useState<number | undefined>(undefined);
+
+    // useEffect(() => {
+    //     console.log('Areas have changed:', areas);
+    //   }, [areas]);
 
     return (
         <div>
@@ -43,8 +60,9 @@ export default function StockPoolPage({ pool, locations, batches, areas }: Stock
                 </button>
             </div>
             <div className="flex justify-center flex-col gap-4 ">
-                <h2 className="font-bold">Локація: {pool.name}</h2>
-                <PoolInfo areas={areas} poolItem={pool}/>
+                <h2 className="font-bold">Локація: {locations.find(loc => loc.id === poolInfo.location_id)?.name}</h2>
+                {poolInfo.batch && <PoolInfo poolInfo={poolInfo}/>}
+                
                 <div className={`flex gap-4 ${showMoreFields ? "" : "hidden"}`}>
                     <label className="w-auto" htmlFor="location_id_from">
                         Звідки:
@@ -73,7 +91,7 @@ export default function StockPoolPage({ pool, locations, batches, areas }: Stock
                         name="location_id_to"
                         className="border rounded p-2 w-full"
                         id="location_id_to"
-                        defaultValue={pool.id}
+                        defaultValue={poolInfo.location_id}
                         readOnly
                     />
                 </div>
@@ -156,7 +174,7 @@ export default function StockPoolPage({ pool, locations, batches, areas }: Stock
             </div>
             
         </form>
-        {showPartitionForm ? <PartitionForm areas={areas} pool={pool}/>: 'no hello'}
+        {showPartitionForm ? <PartitionForm poolInfo={poolInfo} locations={locations}/>: 'no hello'}
         </div>
     );
 }

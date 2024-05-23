@@ -9,50 +9,27 @@ interface Pool{
 }
 
 interface PoolInfoProps{
-    areas: Area[],
-    poolItem: Pool
+    poolInfo: {
+        batch: batch_qty | null;
+        calc: {
+            fish_weight: number;
+        } | null;
+        feed_type_id: string | null | undefined;
+    }
 }
 
-export default function PoolInfo({areas, poolItem} : PoolInfoProps){
-    // const lines = areas.flatMap(area => (area.lines))
-    // console.log('lines', lines)
+type batch_qty = {
+    batch_name: string | undefined,
+    qty: number
+  }
+
+
+export default function PoolInfo({poolInfo} : PoolInfoProps){
     return (
         <div className='bg-blue-200'>
-            {areas.map(area => (
-                <div key={area.id}>
-                    {area.lines.map(line => (
-                        <div key={line.id}>
-                            {line.pools.filter(pool => pool.id === poolItem.id).map(filteredPool => (
-                                <div key={filteredPool.id}>
-                                    {filteredPool.locations.map(loc => {
-                                        const transactions = loc.itemtransactions
-                                        .filter(tran =>(
-                                            tran.itembatches.items.item_type_id === 1
-                                        ))
-                                        .sort((a, b) => Number(b.id) - Number(a.id));
-                                        const totalQuantity = transactions.reduce((total, tran) => total + tran.quantity, 0);
-
-                                        //console.log(transactions[0])
-                                        //console.log(transactions[0].documents.stocking[0].average_weight)
-
-                                        if(transactions.length > 0){
-                                            return(
-                                                <div key={loc.id}>
-                                                    <p>Партія: {transactions[0].itembatches.name}</p>
-                                                    <p>Кількість: {totalQuantity}</p>
-                                                    {/* <p>Сер. вага: {transactions[0].documents}</p>        */}
-                                                    <p>Сер. вага: {transactions[0].documents.stocking[0].average_weight}</p>       
-                                                </div>
-                                            )   
-                                        }  
-                                                                  
-                                        })}
-                                </div>
-                            ))}
-                        </div>
-                    ))}
-                </div>
-            ))}
+            <p>Партія: {poolInfo.batch?.batch_name}</p>
+            <p>Кількість: {poolInfo.batch?.qty}</p>
+            <p>Сер. вага: {poolInfo.calc?.fish_weight}</p>       
         </div>
     );
 }

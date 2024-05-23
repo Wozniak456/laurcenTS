@@ -61,7 +61,7 @@ export default function CalculationTable() {
           >Отримати розрахунок
           </button>
         </div>
-        {formState.message ? <div className="my-2 p-2 bg-red-200 border rounded border-red-400">{formState.message}</div> : null}
+        {/* {formState.message ? <div className="my-2 p-2 bg-red-200 border rounded border-red-400">{formState.message}</div> : null} */}
       </form>
       <table className="border-collapse border border-gray-300 mt-4 mb-4">
         <thead className="bg-gray-200">
@@ -90,9 +90,9 @@ export default function CalculationTable() {
               <td className="border border-gray-300 px-4 py-2">{record.fish_weight.toFixed(3)}</td>
               <td className="border border-gray-300 px-4 py-2">{record.feed_quantity.toFixed(3)}</td>
               <td className="border border-gray-300 px-4 py-2">{record.v_c}</td>
-              <td className="border border-gray-300 px-4 py-2">{record.total_weight.toFixed(3)}</td>
-              <td className="border border-gray-300 px-4 py-2">{record.weight_per_fish.toFixed(3)}</td>
-              <td className="border border-gray-300 px-4 py-2">{record.feed_today.toFixed(3)}</td>
+              <td className="border border-gray-300 px-4 py-2">{record.total_weight?.toFixed(3)}</td>
+              <td className="border border-gray-300 px-4 py-2">{record.weight_per_fish?.toFixed(3)}</td>
+              <td className="border border-gray-300 px-4 py-2">{record.feed_today?.toFixed(3)}</td>
               <td className="border border-gray-300 px-4 py-2">{record.feed_per_day.toFixed(3)}</td>
               <td className="border border-gray-300 px-4 py-2">{record.feed_per_feeding.toFixed(3)}</td>
             </tr>

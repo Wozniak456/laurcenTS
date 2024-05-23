@@ -76,25 +76,20 @@ export default function PurchTableComponent({ purchtables, vendors, items }: Pur
 
     function handleEditPurchHeader(){
         setShowEditModal(true)
-        // setSelectedLine(line.id)
     }
 
     function handleDeletePurchHeader(){
         setShowDeleteModal(true)
-        // setSelectedLine(line.id)
     }
 
     function handleRegisterGoodsInProduction() {
         setShowRegisterModal(true)
     }
 
-    useEffect(() => {
-        console.log("selectedRow changed:", selectedRow);
-    }, [selectedRow]); 
-    
     // useEffect(() => {
-    //     console.log("showEditModal changed:", showEditModal);
-    // }, [showEditModal]);
+    //     console.log("selectedRow changed:", selectedRow);
+    // }, [selectedRow]); 
+    
 
     return(
         <div className="flex flex-col gap-4 my-4">

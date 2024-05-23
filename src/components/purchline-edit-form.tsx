@@ -29,11 +29,13 @@ export default function PurchlineEditForm({purchline: purchline} : PurchlineEdit
         setItem_id(parseInt(event.target.value));
     };
 
-    const editPurchlineAction = actions.editPurchline.bind(null, purchline.id, purchase_id, item_id, quantity, unit_id)
+    // const editPurchlineAction = actions.editPurchline.bind(null, purchline.id, purchase_id, item_id, quantity, unit_id)
     
     return(
         <div className="p-3 border rounded border-gray-200">
-            <form action={editPurchlineAction} className='flex flex-col'>
+            <form 
+            // action={editPurchlineAction} 
+            className='flex flex-col'>
                 <div className="flex gap-4">
                     <label className="w-24" htmlFor="purchase_id">
                         PurchaseId

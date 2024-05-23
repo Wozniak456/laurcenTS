@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/header";
-import { GlobalContextProvider } from "@/app/context/page";
+// import { GlobalContextProvider } from "@/app/context/page";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,9 +21,9 @@ export default function RootLayout({
       <body className={inter.className}>
         <Header />
         <div className="container mx-auto px-12">
-          <GlobalContextProvider>
+          {/* <GlobalContextProvider> */}
             {children}
-          </GlobalContextProvider>
+          {/* </GlobalContextProvider> */}
         </div>
       </body>
     </html>

@@ -73,7 +73,7 @@ export default function PoolEditForm({pool: pool} : PoolEditFormProps){
                     <input 
                     id="cleaning_frequency" 
                     name="cleaning_frequency"
-                    defaultValue={cleaning_frequency} 
+                    defaultValue={cleaning_frequency != null ? cleaning_frequency : 0} 
                     onChange={handleClFrequencyChange}
                     className='p-3 border border-gray-200'
                     />
@@ -86,7 +86,7 @@ export default function PoolEditForm({pool: pool} : PoolEditFormProps){
                     <input 
                     id="water_temperature" 
                     name="water_temperature"
-                    defaultValue={water_temperature} 
+                    defaultValue={water_temperature != null? water_temperature : 0} 
                     onChange={handleWatTemperatureChange}
                     className='p-3 border border-gray-200'
                 />

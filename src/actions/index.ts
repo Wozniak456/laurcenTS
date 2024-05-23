@@ -4,6 +4,7 @@ import { caviarRegistering } from "@/db/functions"
 import { select } from "@nextui-org/react";
 import { Prisma, calculation_table } from "@prisma/client";
 import { group, table } from "console";
+import { revalidatePath } from "next/cache";
 import { RedirectType, redirect } from "next/navigation";
 
 export async function editProdArea(id: number, description: string | null ) {
@@ -97,7 +98,7 @@ export async function editItemBatch(
     id: bigint,
     description: string | null,
     item_id: number,
-    created: Date,
+    created: Date | null,
     created_by: number,
     endpoint: string
   ) {
@@ -217,8 +218,8 @@ export async function deletePurchRecord(id: bigint) {
 export async function registerGoodsInProduction(
     formState: {message: string}, 
     formData: FormData){
-    try{
         console.log('registerGoodsInProduction', formData)
+    try{
         const header_id : number = parseInt(formData.get('header_id') as string);
         
         const document = await db.documents.create({
@@ -252,14 +253,24 @@ export async function registerGoodsInProduction(
         })
 
         lines.map(async line => {
-            const key = `batch_name_${line.id}`;
-            const batch_name = formData.get(key) as string
+            const batch_name_key = `batch_name_${line.id}`;
+            const expire_date_key = `expire_date_${line.id}`;
+            const packing_key = `packing_${line.id}`;
+            const price_key = `price_${line.id}`;
+
+            const batch_name = formData.get(batch_name_key) as string
+            const expire_date = formData.get(expire_date_key) as string
+            const packing : number = parseFloat(formData.get(packing_key) as string);
+            const price : number = parseFloat(formData.get(price_key) as string);
 
             const batch = await db.itembatches.create({
                 data:{
                     name: batch_name,
                     item_id: line.item_id,
-                    created_by: 3
+                    created_by: 3,
+                    expiration_date: new Date(expire_date),
+                    packing: packing,
+                    price: price
                 }
             })
 
@@ -342,7 +353,8 @@ export async function createCalcTable(
             const fish_amount: number = parseInt(formData.get('fish_amount') as string);
             const average_fish_mass: number = parseFloat(formData.get('average_fish_mass') as string);
             const percentage = 0;//number = parseFloat(formData.get('percentage') as string);
-            const pool_id: number = parseInt(formData.get('location_id_to') as string); 
+            const location_id_to: number = parseInt(formData.get('location_id_to') as string); 
+            const parent_doc: number = parseInt(formData.get('parent_doc') as string)
 
             if(typeof(fish_amount) !== 'number'){
                 return {
@@ -350,22 +362,17 @@ export async function createCalcTable(
                 };
             }
 
-            const location_to = await db.locations.findFirst({
-                select: {
-                    id: true
-                },
-                where: {
-                    pool_id: pool_id
-                }
-            });
-            
+                        
             const document = await db.documents.create({
                 data:{
                     doc_type_id: 7, //просто виклик калькуляції
-                    location_id: location_to?.id,
-                    executed_by: 3
+                    location_id: location_id_to,
+                    executed_by: 3,
+                    parent_document: parent_doc
                 }
             })
+            console.log('створено документ з doc_type_id: 7')
+
             const doc_id = document.id
 
             if (average_fish_mass < 25){
@@ -1155,13 +1162,9 @@ export async function feedBatch(
             const executed_by: number = parseInt(formData.get('executed_by') as string);
             const comments = formData.get('comments') as string
 
-            //const feedTypeID = await getFeedTypeId(fish_weight)
-
-            //console.log('feedTypeID', feedTypeID)
-
             const feed_batch_id = await getFeedBatchByFeedTypeId(feed_id, feed_given)
 
-            //console.log('feed_batch_id', feed_batch_id)
+            console.log('feed_batch_id', feed_batch_id)
 
             if(feed_batch_id.length > 0){
                 const location_id = await db.locations.findFirst({
@@ -1272,7 +1275,7 @@ export async function batchDivision(
             data:{
                 location_id: location_from,
                 doc_type_id: 2, // розділ партії
-                executed_by: 1,                    
+                executed_by: 3,                    
             }
         })
         console.log('1 doc: ', pDocument.id)
@@ -1310,17 +1313,9 @@ export async function batchDivision(
             const transaction = transactions.find(tran => (
                 tran.documents.doc_type_id === 1 //зариблення
             ))
+                    
             
-            const pool_id = await db.locations.findFirst({
-                select:{
-                    pool_id: true
-                },
-                where: {
-                    id: Number(id)
-                }
-            })           
-            
-            formData.append('location_id_to', String(pool_id?.pool_id));
+            formData.append('location_id_to', String(id));
             formData.append('fish_amount', String(quantity));
             formData.append('batch_id_to', String(transaction?.batch_id));
 
@@ -1340,6 +1335,7 @@ export async function batchDivision(
                 formData.set('batch_id', String(batch_id_from));
                 formData.set('fish_amount', String(quantity));
             }
+            
             formData.delete('fish_amount_in_location_to');
             formData.delete('location_id_to');
             formData.delete('fish_amount');
@@ -1427,7 +1423,7 @@ export async function stockPool(
         if (!location_id_from){
             location_id_from = 87
         }
-        const pool_id_to: number = parseInt(formData.get('location_id_to') as string);
+        const location_id_to: number = parseInt(formData.get('location_id_to') as string);
         const batch_id_from: number = parseInt(formData.get('batch_id') as string);
         let batch_id_to: number = parseInt(formData.get('batch_id_to') as string);
         const stocking_quantity: number = parseInt(formData.get('fish_amount') as string);
@@ -1441,20 +1437,11 @@ export async function stockPool(
         const p_doc: number = parseInt(formData.get('p_doc') as string);
         const p_tran: number = parseInt(formData.get('p_tran') as string);
         
-        const location_id_to = await db.locations.findFirst({
-            select: {
-                id: true
-            },
-            where: {
-                pool_id: pool_id_to
-            }
-        });
-   
 
         if (location_id_to) {
             const doc = await db.documents.create({
                 data: {
-                    location_id: location_id_to.id, // Отримуємо id локації
+                    location_id: location_id_to, // Отримуємо id локації
                     doc_type_id: 1,
                     date_time: new Date(),
                     executed_by: executed_by,
@@ -1463,6 +1450,8 @@ export async function stockPool(
                 }
             });
 
+            formData.append('parent_doc', String(doc.id));
+            
             console.log('Зариблення. Док: ', doc.id)
             if (!batch_id_to){
                 batch_id_to = batch_id_from
@@ -1493,7 +1482,7 @@ export async function stockPool(
             const newTran = await db.itemtransactions.create({
                 data: {
                     doc_id: doc.id,
-                    location_id: location_id_to.id,
+                    location_id: location_id_to,
                     batch_id: batch_id_to,
                     quantity: count_to_stock,
                     unit_id: 2,
@@ -1515,6 +1504,7 @@ export async function stockPool(
         formData.set('fish_amount', String(stocking_quantity + quantity_in_location_to));
         await createCalcTable(formState, formData)
         console.log('Створюємо calc table: ')
+        formData.delete('parent_doc');
 
     } catch (err: unknown) {
         if (err instanceof Error) {
@@ -1531,7 +1521,7 @@ export async function stockPool(
             return { message: 'Something went wrong!' };
         }
     }
-    
+    revalidatePath('/feeding/view')
     //redirect('/feeding/view')
 }
 
@@ -1625,4 +1615,49 @@ export async function getFeedBatchByFeedTypeId(feed_id: number, quantity: number
 }
 
 
+interface FilterSpecifier {
+    gt?: number;
+    lt?: number;
+    gte?: number;
+    lte?: number;
+}
+interface Saldos {
+    [batchId: string]: number;
+}
 
+export async function calculateSaldo (startDate: Date | undefined, endDate: Date | undefined, quantityFilter: FilterSpecifier | undefined)
+: Promise<Saldos> {
+    const result = await db.itemtransactions.groupBy({
+        by: ['batch_id'],
+        where: {
+            locations: {
+                location_type_id: 1
+            },
+            documents: {
+                date_time: {
+                    gte: startDate,
+                    lt: endDate
+                }
+            },
+            quantity: quantityFilter,
+            NOT: {
+                itembatches: {
+                    items: {
+                        feed_type_id: null
+                    }
+                }
+            }
+        },
+        _sum: {
+            quantity: true
+        },
+    });
+
+    const saldoData: Saldos = {};
+    result.forEach((item: any) => {
+        saldoData[item.batch_id.toString()] = item._sum.quantity;
+    });
+
+    return saldoData;
+    
+};

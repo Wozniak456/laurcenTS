@@ -51,9 +51,11 @@ export default async function DaySummary() {
         const tables = await get14CalculationForPool(pool.id);
         const todayTable = tables.find(table => table.date.toISOString().split("T")[0] === currentDate.toISOString().split("T")[0]);
         const feed = await getFeedType(todayTable?.fish_weight);
+
+       
+
         const transitionDay = await findTransitionDay(tables)
         
-  
         const calculation: calculationAndFeedName = 
           { calculation: todayTable, feed: {id: feed?.feedtypes?.id, name: feed?.feedtypes?.name} }
         
@@ -197,7 +199,8 @@ async function setTransitionDay(calc_table14: calculation_table[]){
  }
 
 async function getFeedType(fish_weight : number | undefined) {
-  if(fish_weight){
+  if(fish_weight !== undefined){
+    
     const startFeedType = await db.feedconnections.findFirst({
       select:{
         feedtypes: {
@@ -212,13 +215,13 @@ async function getFeedType(fish_weight : number | undefined) {
           lte: fish_weight
         },
         to_fish_weight:{
-          gt: fish_weight
+          gte: fish_weight
         }
       }
     })
     return startFeedType
   }
-  return null
+  // return null
   
 }
 

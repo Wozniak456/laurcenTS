@@ -50,7 +50,7 @@ export default async function CaviarShowPage(props: CaviarShowPageProps){
                 <div className="p-3 border rounded border-gray-200">
                     <label><b>created:</b></label>
                     <h2>
-                        {caviar.created.toLocaleString()} 
+                        {caviar.created?.toLocaleString()} 
                     </h2>
                 </div>
                 <div className="p-3 border rounded border-gray-200">
