@@ -127,7 +127,7 @@ model items {
 model priorities{
   id                                             Int               @id @default(autoincrement())
   item_id                                        Int
-  batch_id                                       BigInt
+  batch_id                                       BigInt?
   location_id                                    Int
   priority                                       Int
   items                                          items?            @relation(fields: [item_id], references: [id], onDelete: NoAction, onUpdate: NoAction)

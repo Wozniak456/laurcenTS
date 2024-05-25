@@ -1,60 +1,58 @@
-import React from 'react';
-import {Feed, Prio} from '@/types/app_types'
+'use client'
+import React, { useState } from 'react';
+import {Feed, LocationComponentType, Prio} from '@/types/app_types'
+import PriorityForm from '@/components/DailyFeedWeight/priority-form'
 
-export type LocationComponentType = {
-    locationInfo:{
-        location: {
-            id: number | undefined;
-            name: string | undefined;
-        };
-        calculation: {
-            feed_per_feeding: number | undefined;
-            fish_weight: number | undefined;
-        };
-        feed: {
-            feed_type_id: number | undefined;
-            feed_type_name: string | undefined;
-            feed_list: {
-                item_id: number;
-                feed_name: string
-            }[] | undefined;
-        };
-    }  | undefined
-   
+export type LocationComponentProps = {
+    locationInfo: LocationComponentType
+    priorities: {
+        item_id: number;
+        item_name: string | undefined;
+        location_id: number
+    }[]
 } 
 
-export default function LocationComponent({locationInfo} : LocationComponentType) {
-    return(
-        <></>
-    )
+export default function LocationComponent({locationInfo, priorities} : LocationComponentProps) {   
+    const [showPrioForm, setShowPrioForm] = useState<boolean>(false);
+
+    const handleClick = () => {
+        setShowPrioForm(prev => !prev);
+    };
     
-    // const renderedItem = () => {
-    //     const hasPrio = priorities.find(prio => prio.priority)
+    const renderedItem = () => {
+        const hasPrio = priorities.find(prio => prio.location_id === locationInfo?.location.id)
     
-    //     if (feed && feed?.feed_list.length > 1 && hasPrio){
-    //         const minPriority = Math.min(...priorities.map(prio => prio.priority !== undefined ? prio.priority : Infinity));
-    //         const priorityWithMinValue = priorities.find(prio => prio.priority === minPriority);
-    //         return(
-    //             <td className="px-4 h-10 border border-gray-400">{priorityWithMinValue?.item_name}</td>
-    //         )
-    //     } else if(feed && feed?.feed_list.length > 1 && !hasPrio)
-    //         return(
-    //             <td className="px-4 h-10 border border-gray-400 bg-red-200"></td>
-    //         )
-    //     else{
-    //         return(
-    //             <td className="px-4 h-10 border border-gray-400">{feed?.feed_list[0].feed_name}</td>
-    //         )
-    //     }
-    // }
-    // return (
-    //     <tr key={location.id}>
-    //         <td className="px-4  h-10 border border-gray-400">{location.name}</td>
-    //         <td className="px-4  h-10 border border-gray-400">{calculation && calculation.feed_per_feeding ? calculation.feed_per_feeding.toFixed(0) : ''}</td>
-    //         <td className="px-4  h-10 border border-gray-400">{feed && feed.feed_type_name}</td>
-    //         {renderedItem()}
+        if (locationInfo?.feed && locationInfo.feed?.feed_list && locationInfo.feed?.feed_list.length > 1 && hasPrio){
+            return(
+                <td className="px-4 h-10 border border-gray-400 bg-blue-100 cursor-pointer" onClick={handleClick}>{hasPrio.item_name}</td>
+            )
+        } else if(locationInfo?.feed && locationInfo?.feed?.feed_list && locationInfo?.feed?.feed_list.length > 1 && !hasPrio)
+            return(
+                <td className="px-4 h-10 border border-gray-400 bg-red-200 cursor-pointer" onClick={handleClick}>{locationInfo.feed.feed_list[0].feed_name}</td>
+            )
+        else if (locationInfo && locationInfo.feed?.feed_list){
+            return(
+                <td className="px-4 h-10 border border-gray-400" >{locationInfo.feed?.feed_list[0].feed_name}</td>
+            )
+        }
+        else {
+            return(
+                <td className="px-4 h-10 border border-gray-400"></td>
+            )
+        }
+    }
+    return (
+        <>
+        <tr key={locationInfo?.location.id}>
+            <td className="px-4 h-10 border border-gray-400">{locationInfo?.location.name}</td>
+            <td className="px-4 h-10 border border-gray-400">{locationInfo?.calculation && locationInfo?.calculation.feed_per_feeding ? locationInfo?.calculation.feed_per_feeding.toFixed(0) : ''}</td>
+            <td className="px-4 h-10 border border-gray-400">{locationInfo?.feed && locationInfo.feed.feed_type_name}</td>
+            {renderedItem()}
             
-    //     </tr>
-    //     )
+        </tr>
+        {locationInfo && showPrioForm && <PriorityForm location={locationInfo} setShowForm={setShowPrioForm} priorities={priorities}/>}
+        </>
+        
+        )
 }
 

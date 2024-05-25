@@ -25,3 +25,23 @@ export type Prio = {
     item_name: string | undefined,
     priority: number | undefined;
 }
+
+export type LocationComponentType = {
+    location: {
+        id: number | undefined;
+        name: string | undefined;
+    };
+    calculation: {
+        feed_per_feeding: number | undefined;
+        fish_weight: number | undefined;
+    };
+    feed: {
+        feed_type_id: number | undefined;
+        feed_type_name: string | undefined;
+        feed_list: {
+            item_id: number;
+            feed_name: string,
+            // prio: number;
+        }[] | undefined;
+    };
+} | undefined

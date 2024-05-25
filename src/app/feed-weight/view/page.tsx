@@ -1,7 +1,12 @@
 import { db } from "@/db";
-import HandlePriorityComponent from "@/components/DailyFeedWeight/handle-priority-ui"
 import LocationComponent from '@/components/DailyFeedWeight/location-info'
-import { Feed } from '@/types/app_types'
+import { Feed, LocationComponentType } from '@/types/app_types'
+
+type AccumulatorType = {
+[key: number]: {
+    totalAmount: number
+}
+};
 
 export default async function DailyFeedWeightPage (){
     const lines = await db.productionlines.findMany({
@@ -14,16 +19,16 @@ export default async function DailyFeedWeightPage (){
         }
     })
 
+    const summary = await getSummaryInfo()
+        
     return(
         <>
-        <div className="flex justify-between my-4">
-            <h1 className="text-lg font-bold">Наважка на день</h1>
-            <div>
-                <HandlePriorityComponent />
-            </div>
+        <div className="flex justify-between my-4 mx-8">
+            <h1 className="text-lg font-bold">Наважка на 1 годування</h1>
+            <h1 className="text-lg font-bold">Зведена таблиця</h1>
         </div>
         
-        <div className="flex justify-center items-center min-h-screen">
+        <div className="flex justify-around min-h-screen content-start">
             <table className="w-1/2 bg-white rounded-lg shadow-lg">
                 <thead>
                     <tr className="bg-gray-800 text-white">
@@ -37,16 +42,14 @@ export default async function DailyFeedWeightPage (){
                     {lines.map(line => (
                         line.pools.map(pool => (
                             pool.locations.flatMap(async loc => {
-                                const location_info = await getLocationInfo(loc.id);
-                                
-                                if (location_info && location_info.feed.feed_list && location_info.feed.feed_list?.length > 1){
-                                    const prios = await getPriority(loc.id);
-                                }
+                                const locInfo = await getLocationInfo(loc.id)
+                                const prioFeed = await getPriorities(loc.id) 
                                 
                                 return (
                                     <LocationComponent
                                         key={loc.id}
-                                        locationInfo={location_info}
+                                        locationInfo={locInfo}
+                                        priorities={prioFeed}
                                     />
                                 );
                             })
@@ -54,9 +57,152 @@ export default async function DailyFeedWeightPage (){
                     ))}
                 </tbody>
             </table>
+            <table className="w-1/3 bg-white rounded-lg shadow-lg self-start">
+                <thead>
+                    <tr className="bg-gray-800 text-white">
+                        <th className="border p-4">Тип корму</th>
+                        <th className="border p-4">Корм</th>
+                        <th className="border p-4">Кількість</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {summary.map( (row, index) => (
+                        <tr key={index}>
+                            <td className="px-4 h-10 border border-gray-400">{row?.prio.feed_type}</td>
+                            <td className="px-4 h-10 border border-gray-400">{row?.prio.feed_name}</td>
+                            <td className="px-4 h-10 border border-gray-400">{row?.totalAmount.toFixed(0)}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
         </div>
         </>
     )
+}
+
+const getSummaryInfo = async () => {
+    const docs = await db.documents.groupBy({
+        by: ['location_id'],
+        where:{
+            doc_type_id: 7
+        },
+        _max:{
+            id: true
+        }
+    });
+
+    const idsWithLocationIdAndPriority = await Promise.all(docs.map(async (doc) => {
+        if (doc._max.id){
+            const docWithLoc = await db.documents.findFirst({
+                select:{
+                    location_id: true
+                },
+                where:{
+                    id: doc._max.id
+                }
+            });
+    
+            const calc_table = await db.calculation_table.findFirst({
+                select:{
+                    feed_per_feeding: true,
+                    fish_weight: true
+                },
+                where:{
+                    doc_id: doc._max.id,
+                    date: new Date()
+                }, 
+            })
+
+            const feedconnections = await db.feedconnections.findFirst({
+                select:{
+                    feed_type_id : true,
+                    feedtypes:{
+                        select:{
+                            items:{
+                                select: {
+                                    id: true
+                                }
+                            }
+                        }
+                    }
+                },
+                where: {
+                    from_fish_weight: {
+                        lte: calc_table?.fish_weight
+                    },
+                    to_fish_weight: {
+                        gte: calc_table?.fish_weight
+                    }
+                }
+            });
+
+            let prio
+            
+            if (docWithLoc?.location_id){
+                prio = await db.priorities.findFirst({
+                    where:{
+                        location_id: docWithLoc?.location_id
+                    }
+                })
+                if (!prio){
+                    prio = {
+                        item_id: feedconnections?.feedtypes?.items[0].id
+                    }
+                }
+            }
+
+            return {
+                ...doc,
+                location_id: docWithLoc?.location_id,
+                prio: prio?.item_id,
+                amount: calc_table?.feed_per_feeding
+            };
+        }
+    }));
+
+    const groupedByPrio = idsWithLocationIdAndPriority.reduce((acc: AccumulatorType, item) => {
+        if (item && item.prio !== undefined && item.amount !== undefined) { // Ensure item is defined and has prio and amount
+          const prio = item.prio;
+          if (!acc[prio]) {
+            acc[prio] = { totalAmount: 0 };
+          }
+          acc[prio].totalAmount += item.amount; // Check if item.amount is defined before summing
+        }
+        return acc;
+      }, {});
+
+      const transformedData = await Promise.all(Object.keys(groupedByPrio).map(async (prio) => {
+        const prioNumber = parseInt(prio);
+        if (!isNaN(prioNumber)) {
+          const item = await db.items.findFirst({
+            select:{
+                name: true,
+                feedtypes:{
+                    select:{
+                        name: true
+                    }
+                }
+            },
+            where: {
+              id: prioNumber
+            }
+          });
+          return {
+            prio: {
+                feed_type: item?.feedtypes?.name,
+                feed_name: item?.name
+            },
+            totalAmount: groupedByPrio[prioNumber].totalAmount,
+            
+          };
+        }
+        return null;
+      }));
+      
+    //   console.log(transformedData);
+      
+    return transformedData
+
 }
 
 const getLocationInfo = async (location_id : number) => {
@@ -95,7 +241,7 @@ const getLocationInfo = async (location_id : number) => {
             feed:{
                 feed_type_id: feeds?.feed_type_id,
                 feed_type_name: feeds?.feed_type_name,
-                feed_list: feeds?.feed_list.map(feed => {
+                feed_list: feeds?.feed_list.map(feed => { 
                     return{
                         item_id: feed.item_id,
                         feed_name: feed.feed_name
@@ -107,8 +253,8 @@ const getLocationInfo = async (location_id : number) => {
 }    
 
 
-const getPriority = async (location_id: number) => {
-
+const getPriorities = async (location_id: number) => {
+    
     const priorities = await db.priorities.findMany({
         include:{
             items: true
@@ -121,7 +267,8 @@ const getPriority = async (location_id: number) => {
     return priorities.map(priority => ({
         item_id: priority.item_id,
         item_name: priority.items?.name,
-        priority: priority.priority
+        location_id: priority.location_id
+        // priority: priority.priority
     }));
 }
 
