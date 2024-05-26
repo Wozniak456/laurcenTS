@@ -1,7 +1,5 @@
 import { db } from "@/db";
-import Link from "next/link";
 import StockingComponent from "@/components/stockin111"
-import { Area } from "@/components/accordion"
 
 export default async function StockingHome() {
 
@@ -51,8 +49,9 @@ export default async function StockingHome() {
               })
               .map(pool => (
                 pool.locations.map(async loc => {
+                 
                   const poolInfo = await calculationForLocation(loc.id, today.toISOString().split("T")[0])
-
+                  
                   return(
                     <div key={pool.id} className="shadow-xl mb-4 p-4 bg-blue-100">
                       <StockingComponent locations={locations} batches={batches} poolInfo={poolInfo} />

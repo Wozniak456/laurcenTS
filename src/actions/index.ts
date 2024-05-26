@@ -1,11 +1,9 @@
 'use server'
 import { db } from "@/db";
 import { caviarRegistering } from "@/db/functions"
-import { select } from "@nextui-org/react";
-import { Prisma, calculation_table } from "@prisma/client";
-import { group, table } from "console";
+import { calculation_table } from "@prisma/client";
 import { revalidatePath } from "next/cache";
-import { RedirectType, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 
 export async function editProdArea(id: number, description: string | null ) {
     await db.productionareas.update({
@@ -347,10 +345,9 @@ export async function createCalcTable(
     formState: {message: string} | undefined, 
     formData: FormData){
         try{
-
-            console.log('Ми в createCalcTable')
-            console.log(formData)
-            const fish_amount: number = parseInt(formData.get('fish_amount') as string);
+            // console.log('Ми в createCalcTable')
+            // console.log(formData)
+            const fish_amount: number = parseInt(formData.get('fish_amount') as string);  // скільки зариблюємо
             const average_fish_mass: number = parseFloat(formData.get('average_fish_mass') as string);
             const percentage = 0;//number = parseFloat(formData.get('percentage') as string);
             const location_id_to: number = parseInt(formData.get('location_id_to') as string); 
@@ -361,9 +358,10 @@ export async function createCalcTable(
                     message: 'Поле "Кількість особин" це число.'
                 };
             }
+            
+            // документ створення калькуляції
 
-                        
-            const document = await db.documents.create({
+            const document_for_location_to = await db.documents.create({
                 data:{
                     doc_type_id: 7, //просто виклик калькуляції
                     location_id: location_id_to,
@@ -371,15 +369,26 @@ export async function createCalcTable(
                     parent_document: parent_doc
                 }
             })
-            console.log('створено документ з doc_type_id: 7')
 
-            const doc_id = document.id
+            if (!document_for_location_to) {
+                throw new Error('Помилка при створенні документа калькуляції');
+            }
+            
+            // console.log('створено документ з doc_type_id: 7')
+
+            const doc_id = document_for_location_to.id
 
             if (average_fish_mass < 25){
-                await getTableByValues(fish_amount, average_fish_mass, percentage, doc_id)
+                const table = await getTableByValues(fish_amount, average_fish_mass, percentage, doc_id)
+                if (!table) {
+                    throw new Error('Помилка при створенні розрахунку');
+                }
             }
             else{
-                await getTableByValuesOver25(fish_amount, average_fish_mass, percentage, doc_id)
+                const table = await getTableByValuesOver25(fish_amount, average_fish_mass, percentage, doc_id)
+                if (!table) {
+                    throw new Error('Помилка при створенні розрахунку');
+                }
             }
             
         }
@@ -1267,82 +1276,138 @@ export async function batchDivision(
     formData: FormData
 ): Promise<{ message: string } | undefined> {
     try {
+        console.log('ми в batchDivision')
         console.log(formData)
-        const location_from : number = parseInt(formData.get('location_id_from') as string);
-        const batch_id_from : number = parseInt(formData.get('batch_id') as string);
 
-        const pDocument = await db.documents.create({
+        const location_from : number = parseInt(formData.get('location_id_from') as string);
+        const batch_id_from : number = parseInt(formData.get('batch_id_from') as string);
+        const fish_qty_in_location_from : number = parseInt(formData.get('fish_qty_in_location_from') as string);
+        const average_fish_mass : number = parseFloat(formData.get('average_fish_mass') as string);
+
+        let sum = 0
+        let index1 = 0
+        while(true){
+            const location_id_to : number = parseInt(formData.get(`location_id_to_${index1}`) as string);
+            const stocking_fish_amount : number = parseInt(formData.get(`stocking_fish_amount_${index1}`) as string);
+            
+            if(!location_id_to){
+                break;
+            }
+
+            sum += stocking_fish_amount
+
+            index1++
+        }
+
+        console.log('HELLO fish_qty_in_location_from', fish_qty_in_location_from, 'sum', sum) 
+
+        if(isNaN(fish_qty_in_location_from) || fish_qty_in_location_from < sum){
+            throw new Error('У басейні немає стільки риби');
+        }
+
+        // створюємо документ розділення
+        const divDoc = await db.documents.create({
             data:{
                 location_id: location_from,
-                doc_type_id: 2, // розділ партії
-                executed_by: 3,                    
+                doc_type_id: 2, // розділення
+                date_time: new Date(),
+                executed_by: 3
             }
         })
-        console.log('1 doc: ', pDocument.id)
 
-        formData.append('p_doc', String(pDocument.id));
+        console.log(`документ розділення для локації ${location_from}`, divDoc)
 
-        let index = 0;
-        while (true) {
-            
-            const key = `location_id_to_${index}`;
-            const quantity : number = Number(formData.get(`fish_amount_${index}`));
-            const id = formData.get(key);
-            if (!id) break;
+        //рахуємо скільки ми хочемо витягнути
 
-            let transactions = await db.itemtransactions.findMany({
-                select:{
-                    id: true,
-                    location_id: true,
-                    quantity: true,
-                    batch_id: true,
+        let index0 = 0
+        while(true){
+            const location_id_to : number = parseInt(formData.get(`location_id_to_${index0}`) as string);
+            const stocking_fish_amount : number = parseInt(formData.get(`stocking_fish_amount_${index0}`) as string);
+
+            if(!location_id_to){
+                break;
+            }
+
+            // знаходимо останнє зариблення для нового басейна
+            const last_stocking = await db.itemtransactions.findFirst({
+                where:{
+                    location_id: location_id_to,
                     documents:{
-                        select:{
-                            doc_type_id: true
-                        }
+                        doc_type_id: 1
+                    },
+                    quantity:{
+                        gt: 0
                     }
                 },
-                where:{
-                    location_id: Number(id),
-                },
-                orderBy: {
+                orderBy:{
                     id: 'desc'
                 }
             })
 
-            const transaction = transactions.find(tran => (
-                tran.documents.doc_type_id === 1 //зариблення
-            ))
-                    
-            
-            formData.append('location_id_to', String(id));
-            formData.append('fish_amount', String(quantity));
-            formData.append('batch_id_to', String(transaction?.batch_id));
+            //якщо у басейні було ненульове зариблення
+            let tran
+            if (last_stocking && last_stocking.quantity > 0){
 
-            if (transaction && transaction.quantity > 0){
-                console.log('У новому басейні щось є')
-                formData.append('fish_amount_in_location_to', String(transaction.quantity));
-                
-                await change_batch_name({formState, formData}, transaction, quantity)
-                formData.set('batch_id', String(batch_id_from));
-                formData.set('fish_amount', String(quantity));
+                // створюємо транзакцію витягування риби з нового басейну, якщо там щось є
+                tran = await db.itemtransactions.create({
+                    data:{
+                        doc_id: divDoc.id,
+                        location_id: location_id_to,
+                        batch_id: last_stocking.batch_id,
+                        quantity: - last_stocking.quantity,
+                        unit_id: 1
+                    }
+                })
+                if (!tran) {
+                    throw new Error('Помилка при створенні транзакції витягування риби з нового басейну');
+                }
+                console.log(`транзакція витягування риби з нового басейну ${location_id_to}`, tran)
             }
-            else{
-                console.log('У новому басейні нічого немає')
-                formData.append('fish_amount_in_location_to', String(0));
-                
-                await change_batch_name({formState, formData}, transaction, quantity)
-                formData.set('batch_id', String(batch_id_from));
-                formData.set('fish_amount', String(quantity));
-            }
+
+            //зариблення. підганяємо вхідні ідентифікатори для функції stockPool 
+
+            formData.delete(`location_id_to_${index0}`);
+            formData.delete(`stocking_fish_amount_${index0}`);
+            formData.delete(`batch_id_from`);
+
+            formData.set('location_id_to', String(location_id_to)) // новий басейн
+            formData.set('fish_amount', String(stocking_fish_amount)) // скільки зариблюємо
+            formData.set('batch_id', String(batch_id_from)) //партія з попереднього
+
+            formData.set('div_doc_id', String(batch_id_from)) //партія з попереднього
             
-            formData.delete('fish_amount_in_location_to');
-            formData.delete('location_id_to');
-            formData.delete('fish_amount');
-            formData.delete('batch_id_to');
-        
-            index++;
+            if(last_stocking){
+                if (last_stocking.quantity >= stocking_fish_amount){
+                    console.log('у басейні більше, ніж прийшло. ', last_stocking.quantity, '>=', stocking_fish_amount)
+                    formData.set('batch_id_to', String(last_stocking?.batch_id)) //партія з нового
+                }
+                else{
+                    console.log('у басейні менше, ніж прийшло. ', last_stocking.quantity, '<', stocking_fish_amount)
+                    formData.set('batch_id_to', String(batch_id_from)) //партія з нового
+                }
+            }
+
+            formData.set('fish_amount_in_location_to', String(last_stocking?.quantity)) //скільки у новому басейні
+
+            await stockPool(formState, formData)
+
+            index0 ++;            
         }
+
+        const info : updatePrevPoolProps = {
+            formData: formData,
+            formState: formState,
+            info:{
+                amount_in_pool: fish_qty_in_location_from - sum,
+                divDocId: divDoc.id,
+            }
+        }
+        console.log('СКІЛЬКИ МИ БУДЕМО ВКИДАТИ В СТАРИЙ БАСЕЙН', fish_qty_in_location_from - sum)
+
+        await updatePrevPool(info)
+
+        revalidatePath('/feeding/view')
+
     } catch (err: unknown) {
         if (err instanceof Error) {
             if (err.message.includes('Foreign key constraint failed')) {
@@ -1362,67 +1427,16 @@ export async function batchDivision(
     redirect('/feeding/view')
 }
 
-interface transactionItem {
-    id: bigint;
-    location_id: number;
-    batch_id: bigint;
-    quantity: number;
-    documents: {
-        doc_type_id: number | null;
-    };
-}
-
-interface formProps{
-    formState: {
-        message: string;
-    } | undefined, 
-    formData: FormData
-}
-
-async function change_batch_name(form: formProps, transaction: transactionItem | undefined, stocking_quantity: number) {
-    
-    const p_doc_id: number = parseInt(form.formData.get('p_doc') as string);
-    const batch_id: number = parseInt(form.formData.get('batch_id') as string);
-    
-    if(transaction){
-        const tran = await db.itemtransactions.create({
-            data:{
-                doc_id: p_doc_id,
-                location_id: transaction.location_id,
-                batch_id: transaction.batch_id,
-                quantity: - transaction.quantity, // виймаємо все з нового басейну, що там було
-                unit_id: 2,
-            }
-        })
-
-        console.log('2 tran виймаємо що було в новому басейні: ', tran.id)
-    
-        form.formData.set('p_tran', String(tran.id));
-
-        if (transaction.quantity >= stocking_quantity){
-            console.log('У басейні більше ніж прибуло')
-            form.formData.set('fish_amount', String(stocking_quantity));
-        }else{
-            console.log('У басейні менше ніж прибуло')
-            form.formData.set('batch_id_to', String(batch_id)); // from
-            form.formData.set('fish_amount', String(stocking_quantity));
-        }
-    }
-
-    await stockPool(form.formState, form.formData)
-}
 
 export async function stockPool(
     formState: { message: string } | undefined,
     formData: FormData
 ): Promise<{ message: string } | undefined> {
     try {
-        console.log('ЗАРИБЛЮЄМО')
-        console.log(formData)
+        // console.log('stockPool')
+        // console.log(formData)
         let location_id_from : number = parseInt(formData.get('location_id_from') as string);
-        if (!location_id_from){
-            location_id_from = 87
-        }
+      
         const location_id_to: number = parseInt(formData.get('location_id_to') as string);
         const batch_id_from: number = parseInt(formData.get('batch_id') as string);
         let batch_id_to: number = parseInt(formData.get('batch_id_to') as string);
@@ -1434,79 +1448,128 @@ export async function stockPool(
         const executed_by = 3 //number = parseInt(formData.get('executed_by') as string);
         const comments: string = formData.get('comments') as string;
 
-        const p_doc: number = parseInt(formData.get('p_doc') as string);
-        const p_tran: number = parseInt(formData.get('p_tran') as string);
+        const p_doc: number = parseInt(formData.get('div_doc_id') as string);
+        // const p_tran: number = parseInt(formData.get('p_tran') as string);
         
+        // перевірка, щоб зі складу не взяли більше, ніж є
 
-        if (location_id_to) {
-            const doc = await db.documents.create({
-                data: {
-                    location_id: location_id_to, // Отримуємо id локації
-                    doc_type_id: 1,
-                    date_time: new Date(),
-                    executed_by: executed_by,
-                    comments: comments,
-                    parent_document: p_doc
+        if (location_id_from == 87){
+            const fish_amount_on_warehouse = await db.itemtransactions.groupBy({
+                by: ['batch_id'],
+                where:{
+                    location_id: 87,
+                    batch_id: batch_id_from
+                },
+                _sum:{
+                    quantity: true
                 }
-            });
+            })
 
-            formData.append('parent_doc', String(doc.id));
-            
-            console.log('Зариблення. Док: ', doc.id)
-            if (!batch_id_to){
-                batch_id_to = batch_id_from
+            const fishQuantityOnWarehouse = fish_amount_on_warehouse[0]?._sum?.quantity || 0;
+
+            if (fishQuantityOnWarehouse === 0 || stocking_quantity > fishQuantityOnWarehouse) {
+                throw new Error('Недостатня кількість на складі');
             }
-            let pTransaction
-
-            pTransaction = await db.itemtransactions.create({
-                data: {
-                    doc_id: doc.id,
-                    location_id: location_id_from,
-                    batch_id: batch_id_from,
-                    quantity: - stocking_quantity,
-                    unit_id: 2,
-                    parent_transaction: p_tran
-                }
-            });
-            console.log('Витягуємо з попереднього. Tran: ', pTransaction.id)
-            let count_to_stock
-
-            if (quantity_in_location_to){
-                count_to_stock = stocking_quantity + quantity_in_location_to
-            }
-            else{
-                quantity_in_location_to = 0
-                count_to_stock = stocking_quantity
-            }
-
-            const newTran = await db.itemtransactions.create({
-                data: {
-                    doc_id: doc.id,
-                    location_id: location_id_to,
-                    batch_id: batch_id_to,
-                    quantity: count_to_stock,
-                    unit_id: 2,
-                    parent_transaction: pTransaction.id
-                }
-            });
-
-            console.log('Зариблюємо. Tran: ', newTran.id)
-
-            const stock = await db.stocking.create({
-                data: {
-                    doc_id: doc.id,
-                    average_weight: average_weight
-                }
-            });
-
-            console.log('Створюємо stocking: ', stock.id)
         }
-        formData.set('fish_amount', String(stocking_quantity + quantity_in_location_to));
-        await createCalcTable(formState, formData)
-        console.log('Створюємо calc table: ')
-        formData.delete('parent_doc');
 
-    } catch (err: unknown) {
+        
+        //якщо зі складу, то batch_id_to не визначено, якщо з басейна, то batch_id_to = та партія, якої більше
+        if(!batch_id_to){
+            batch_id_to = batch_id_from
+        }
+
+        // документ зариблення
+
+        const stockDoc = await db.documents.create({
+            data: {
+                location_id: location_id_to, // Отримуємо id локації
+                doc_type_id: 1,
+                date_time: new Date(),
+                executed_by: executed_by,
+                comments: comments,
+                // parent_document: p_doc
+            }
+        });
+
+        if (!stockDoc) {
+            throw new Error('Помилка при створенні документа зариблення');
+        }
+
+        // console.log(`документ зариблення для ${location_id_to}`, stockDoc)
+
+        // транзакція для витягування з попереднього басейна stocking_quantity
+
+        const fetchTran = await db.itemtransactions.create({
+            data: {
+                doc_id: stockDoc.id,
+                location_id: location_id_from,
+                batch_id: batch_id_from,
+                quantity: - stocking_quantity,
+                unit_id: 2,
+                // parent_transaction: p_tran
+            }
+        });
+
+        if (!fetchTran) {
+            throw new Error('Помилка при створенні транзакції для витягування з попереднього басейна');
+        }
+
+        // console.log(`Витягуємо з попереднього для ${location_id_to}. Tran: `, fetchTran)
+
+        //визначаємо яку кількість зариблювати
+
+        let count_to_stock
+
+        if (quantity_in_location_to){
+            count_to_stock = stocking_quantity + quantity_in_location_to
+        }
+        else{
+            // quantity_in_location_to = 0
+            count_to_stock = stocking_quantity
+        }
+
+        // транзакція для зариблення нового басейна
+
+        const stockTran = await db.itemtransactions.create({
+            data: {
+                doc_id: stockDoc.id,
+                location_id: location_id_to,
+                batch_id: batch_id_to, //?
+                quantity: count_to_stock,
+                unit_id: 2,
+                parent_transaction: fetchTran.id
+            }
+        });
+
+        if (!stockTran) {
+            throw new Error('Помилка при створенні транзакції для зариблення нового басейна');
+        }
+
+        // console.log(`Зариблюємо ${location_id_to}. Tran: `, stockTran)
+        
+        // запис зариблення
+
+        const stock = await db.stocking.create({
+            data: {
+                doc_id: stockDoc.id,
+                average_weight: average_weight
+            }
+        });
+
+        if (!stockTran) {
+            throw new Error('Помилка при створенні запису зариблення');
+        }
+
+        // console.log('Створюємо stocking: ', stock)
+
+        // тепер fish_amount це вся риба, яку зариблюємо.
+        formData.set('fish_amount', String(count_to_stock));
+        formData.set('parent_doc', String(stockDoc.id));
+
+        await createCalcTable(formState, formData)
+
+        // console.log('Створили calc table')
+    } catch (err: unknown) { 
         if (err instanceof Error) {
             if (err.message.includes('Foreign key constraint failed')) {
                 return {
@@ -1686,7 +1749,7 @@ export async function managePriorities(
                 priority: 1
             }
         })
-        
+
         console.log(`пріоритетність для локації ${location_id} оновлена`);
     }
     catch (err: unknown) {
@@ -1705,4 +1768,77 @@ export async function managePriorities(
         }
     }
     revalidatePath('/feed-weight/view')
+}
+
+type updatePrevPoolProps = {
+    formData: FormData,
+    formState: { message: string; } | undefined,
+    info : { 
+        amount_in_pool: number,
+        divDocId: bigint
+    }
+}
+
+async function updatePrevPool({info, formData, formState} : updatePrevPoolProps) {
+    console.log('оновлюємо попередній басейн')
+    const location_id: number = parseInt(formData.get('location_id_from') as string); 
+    const batch_id: number = parseInt(formData.get('batch_id') as string); 
+    const av_weight: number = parseFloat(formData.get('average_fish_mass') as string); 
+
+    //створити документ зариблення залишком
+    const stockDoc = await db.documents.create({
+        data:{
+            location_id: location_id,
+            doc_type_id: 1,
+            date_time: new Date(),
+            executed_by: 3
+        }
+    })
+    console.log('документ зариблення залишком', stockDoc)
+
+    //транзакція витягування що там є за документом розподілу
+
+    const fetchTran = await db.itemtransactions.create({
+        data:{
+            doc_id: info.divDocId,
+            location_id: location_id,
+            batch_id: batch_id,
+            quantity: - info.amount_in_pool,
+            unit_id: 2
+        }
+    })
+    console.log('транзакція витягування що там є за документом розподілу', fetchTran)
+
+    //транзакція зариблення тої ж кількості за документом зариблення
+
+    const stockTran = await db.itemtransactions.create({
+        data:{
+            doc_id: stockDoc.id,
+            location_id: location_id,
+            batch_id: batch_id,
+            quantity: info.amount_in_pool,
+            unit_id: 2
+        }
+    })
+    console.log('транзакція зариблення тої ж кількості за документом зариблення', stockTran)
+
+    //створення запису в stocking
+
+    const stocking = await db.stocking.create({
+        data:{
+            doc_id: stockDoc.id,
+            average_weight: av_weight
+        }
+    })
+
+    console.log('створення запису в stocking', stocking)
+
+    //створення калькуляції
+    formData.set('parent_doc', String(stockDoc.id)) 
+    formData.set('fish_amount', String(info.amount_in_pool)) 
+    formData.set('location_id_to', String(location_id))
+
+    console.log('МИ ОНОВИЛИ fish_amount', info.amount_in_pool)
+    
+    createCalcTable(formState, formData)
 }

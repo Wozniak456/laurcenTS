@@ -3,15 +3,10 @@
 import { useFormState } from "react-dom";
 import * as actions from '@/actions';
 import PartitionForm from "@/components/batch-partition";
-import { useEffect, useState } from "react";
-import {Location, ItemBatch} from '@/components/accordion'
-import { Area } from "@/components/accordion"
+import { useState } from "react";
+import { ItemBatch} from '@/components/accordion'
 import PoolInfo from "@/components/pool-info"
-
-interface Pool{
-    id: number,
-    name: string
-}
+import { batchInfo } from '@/types/app_types'
 
 interface StockPoolProps {
     locations: {
@@ -30,22 +25,14 @@ interface StockPoolProps {
     }
 }
 
-type batchInfo = {
-    batch_name: string | undefined,
-    batch_id: bigint | undefined,
-    qty: number
-  }
-
 export default function StockPoolPage({locations, batches, poolInfo}: StockPoolProps) {
+
+    // console.log(poolInfo.location_id, poolInfo)
     const [showMoreFields, setShowMoreFields] = useState(false);
     const [showPartitionForm, setShowPartitionForm] = useState(false);
     
     const [formState, action] = useFormState(actions.stockPool, { message: '' });
     const [locationIdFrom, setLocationIdFrom] = useState<number | undefined>(undefined);
-
-    // useEffect(() => {
-    //     console.log('Areas have changed:', areas);
-    //   }, [areas]);
 
     return (
         <div>
@@ -62,39 +49,8 @@ export default function StockPoolPage({locations, batches, poolInfo}: StockPoolP
             <div className="flex justify-center flex-col gap-4 ">
                 <h2 className="font-bold">Локація: {locations.find(loc => loc.id === poolInfo.location_id)?.name}</h2>
                 {poolInfo.batch && <PoolInfo poolInfo={poolInfo}/>}
-                
-                <div className={`flex gap-4 ${showMoreFields ? "" : "hidden"}`}>
-                    <label className="w-auto" htmlFor="location_id_from">
-                        Звідки:
-                    </label>
-                    <select
-                        name="location_id_from"
-                        className="border rounded p-2 w-full"
-                        id="location_id_from"
-                        required
-                        onChange={(e) => {
-                            const selectedLocationId = parseInt(e.target.value);
-                            setLocationIdFrom(selectedLocationId);
-                        }}
-                        defaultValue={87}
-                    >
-                        {locations.map(location => (
-                            <option key={location.id} value={location.id}>{location.name}</option>
-                        ))}
-                    </select>
-                </div>
-                <div className={`flex gap-4 ${showMoreFields ? "" : "hidden"}`}>
-                    <label className="w-auto" htmlFor="location_id_to">
-                        Куди:
-                    </label>
-                    <input
-                        name="location_id_to"
-                        className="border rounded p-2 w-full"
-                        id="location_id_to"
-                        defaultValue={poolInfo.location_id}
-                        readOnly
-                    />
-                </div>
+                <input type="hidden" name="location_id_from" value={87} />
+                <input type="hidden" name="location_id_to" value={poolInfo.location_id} />
                 <div className="flex flex-wrap items-center gap-4 justify-between">
                     <div className="flex gap-4 items-center flex-wrap ">
                         <label className="min-w-24" htmlFor="batch_id">
@@ -117,8 +73,10 @@ export default function StockPoolPage({locations, batches, poolInfo}: StockPoolP
                         </label>
                         <input
                             name="fish_amount"
+                            type="number"
                             className="border rounded p-2 max-w-40"
                             id="fish_amount"
+                            min={1}
                             required
                         />
                     </div>
@@ -130,28 +88,29 @@ export default function StockPoolPage({locations, batches, poolInfo}: StockPoolP
                             name="average_fish_mass"
                             className="border rounded p-2 max-w-40"
                             id="average_fish_mass"
+                            type="number"
+                            min={0.0001}
+                            step="any"
                             required
                         />
                     </div>
                 </div>
-                <div className={`flex flex-wrap gap-4 ${showMoreFields ? "" : "hidden"}`}>
-                    <div className="flex gap-4 items-center flex-wrap ">
-                        <label className="min-w-24" htmlFor="comments">
-                            Коментарі
-                        </label>
-                        <input
-                            name="comments"
-                            className="border rounded p-2"
-                            id="comments"
-                        />
+                <div className={`flex items-center w-full gap-4 ${showMoreFields ? "" : "hidden"}`}>
+                    <label className="min-w-24" htmlFor="comments">
+                        Коментарі
+                    </label>
+                    <input
+                        name="comments"
+                        className="border rounded p-2 flex-grow"
+                        id="comments"
+                    />
                     </div>
-                </div>
                 <div className="flex flex-wrap gap-4 justify-end">
                     <button
                         type="submit"
                         className="rounded p-2 bg-blue-200"
                     >
-                        Зарибити
+                        Зарибити зі складу
                     </button>
                     <button
                         type="button"
@@ -174,7 +133,7 @@ export default function StockPoolPage({locations, batches, poolInfo}: StockPoolP
             </div>
             
         </form>
-        {showPartitionForm ? <PartitionForm poolInfo={poolInfo} locations={locations}/>: 'no hello'}
+        {showPartitionForm && <PartitionForm poolInfo={poolInfo} locations={locations}/>}
         </div>
     );
 }

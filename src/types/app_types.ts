@@ -45,3 +45,9 @@ export type LocationComponentType = {
         }[] | undefined;
     };
 } | undefined
+
+export type batchInfo = {
+    batch_name: string | undefined,
+    batch_id: bigint | undefined,
+    qty: number
+  }

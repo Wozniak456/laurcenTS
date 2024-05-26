@@ -25,6 +25,7 @@ type batch_qty = {
 
 
 export default function PoolInfo({poolInfo} : PoolInfoProps){
+    
     return (
         <div className='bg-blue-200'>
             <p>Партія: {poolInfo.batch?.batch_name}</p>
