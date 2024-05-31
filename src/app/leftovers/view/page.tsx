@@ -1,135 +1,86 @@
-import { db } from "@/db";
-import FilterableTable from '@/components/LeftOvers/filtering-table'
-
-interface Saldos {
-    [batchId: string]: {
-        qty: number,
-        // itemId: number,
-        feed_type_name: string,
-        itemName: string,
-        batchName: string
-    };
-}
+'use client'
+import Link from "next/link";
+import { ChangeEvent, useEffect, useState } from "react";
+// import { useFormState } from "react-dom";
+import Header from '@/components/header'
 
 interface DataItem{
-    batch_id: string;
-    batch_name: string;
-    // item_id: number,
-    feed_type_name: string,
-    item_name: string,
-    start_saldo: number;
-    incoming: number;
-    outcoming: number;
-    end_saldo: number;
+  batch_id: string;
+  batch_name: string;
+  // item_id: number,
+  feed_type_name: string,
+  item_name: string,
+  start_saldo: number;
+  incoming: number;
+  outcoming: number;
+  end_saldo: number;
 }
 
-export default async function LeftoversHome() {
+interface FilterableTableProps {
+   data: DataItem[],
+   start: Date | undefined,
+   end: Date | undefined
+}
 
-    let EndSaldoDate = new Date(); // yyyy-mm-dd
-    let StartSaldoDate = new Date(EndSaldoDate);
-    StartSaldoDate.setMonth(StartSaldoDate.getMonth() - 1);
 
+export default function FilterableTable({ }: FilterableTableProps) {
+    const [StartSaldoDate, setStartSaldoDate] = useState<string | undefined>(undefined);
+    const [EndSaldoDate, setEndSaldoDate] = useState<string | undefined>(undefined);
 
-    let data: DataItem[] = []
+    const handleStartInputDateChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const date = new Date(event.target.value)
+        setStartSaldoDate(date.toISOString().split("T")[0]);
+    };
 
-    const end_saldo = await calculateSaldo(undefined, undefined, undefined)
-    const start_saldo = await calculateSaldo(undefined, StartSaldoDate, undefined)
-    const incoming = await calculateSaldo(StartSaldoDate, EndSaldoDate, { gt: 0 })
-    const outcoming = await calculateSaldo(StartSaldoDate, EndSaldoDate, { lt: 0 })
+    const handleEndInputDateChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const date = new Date(event.target.value)
+        setEndSaldoDate(date.toISOString().split("T")[0]);
+    };
 
-    for (const batch_id in end_saldo){
-        if (Object.prototype.hasOwnProperty.call(end_saldo, batch_id)) {
-            data.push({
-                batch_id: batch_id,
-                batch_name: end_saldo[batch_id].batchName,
-                // item_id: end_saldo[batch_id]?.itemId,
-                feed_type_name: end_saldo[batch_id]?.feed_type_name,
-                item_name: end_saldo[batch_id]?.itemName,
-                start_saldo: start_saldo[batch_id]?.qty ? start_saldo[batch_id].qty : 0,
-                incoming: incoming[batch_id]?.qty ? incoming[batch_id].qty : 0,
-                outcoming: outcoming[batch_id]?.qty ? outcoming[batch_id].qty : 0,
-                end_saldo: end_saldo[batch_id]?.qty
-            });
-        }
-    }
-
-    
     return (
-        <div>
-            <FilterableTable data={data} start={StartSaldoDate} end={EndSaldoDate}/>
+        <div className="fixed top-0 left-0 w-full h-full bg-gray-800 bg-opacity-75 flex justify-center items-center">
+            <div className="fixed top-0 left-0 w-full">
+                <Header />
+            </div>
+            <div className="bg-white p-8 rounded shadow-lg w-2/5">
+                <h1 className="text-3xl font-bold mb-8">Розрахунок залишків кормів на складі</h1>
+                <div className="flex flex-col gap-4 justify-between mb-8">
+                    <div className="flex gap-4 flex-wrap items-center">
+                        <label className="w-40" htmlFor="created">
+                            Дата початку:
+                        </label>
+                        <input 
+                            name="created"
+                            className="border rounded p-2 flex-grow min-w-32"
+                            type="date"
+                            id="created"
+                            onChange={handleStartInputDateChange}
+                            required
+                        />
+                    </div>
+                    <div className="flex gap-4 flex-wrap items-center">
+                        <label className="w-40" htmlFor="created">
+                            Дата кінця:
+                        </label>
+                        <input 
+                            name="created"
+                            className="border rounded p-2 flex-grow min-w-32"
+                            type="date"
+                            id="created"
+                            onChange={handleEndInputDateChange}
+                            required
+                        />
+                    </div>
+                </div>
+                {StartSaldoDate && EndSaldoDate &&
+                <div className="flex justify-end w-full">
+                    <Link 
+                        href={`/leftovers/${StartSaldoDate}_${EndSaldoDate}`}
+                        className="py-2 hover:bg-gray-200 w-40 text-center bg-blue-200">
+                        Розрахувати
+                    </Link>
+                </div>}
+            </div>
         </div>
     );
 }
-
-interface FilterSpecifier {
-    gt?: number;
-    lt?: number;
-    gte?: number;
-    lte?: number;
-}
-
-const calculateSaldo = async (startDate: Date | undefined, endDate: Date | undefined, quantityFilter: FilterSpecifier | undefined)
-: Promise<Saldos> => {
-    const result = await db.itemtransactions.groupBy({
-        by: ['batch_id'],
-        where: {
-            locations: {
-                location_type_id: 1
-            },
-            documents: {
-                date_time: {
-                    gte: startDate,
-                    lt: endDate
-                }
-            },
-            quantity: quantityFilter,
-            NOT: {
-                itembatches: {
-                    items: {
-                        feed_type_id: null
-                    }
-                }
-            }
-        },
-        _sum: {
-            quantity: true
-        },
-    });
-
-    const newView = await db.itembatches.findMany({
-        include:{
-            items: {
-                include: {
-                    feedtypes: true
-                }
-            }
-        },
-        where:{
-            id:{
-                in: result.map(result => result.batch_id)
-            }
-        }
-    })
-
-    const mergedResults = newView.map((item: any) => {
-        const sumItem = result.find((r: any) => r.batch_id === item.id);
-        return {
-            ...item,
-            _sum: sumItem ? sumItem._sum.quantity : 0
-        };
-    });
-
-    const saldoData: Saldos = {};
-
-    mergedResults.forEach((batch: any) => {
-        saldoData[batch.id.toString()] = {
-            qty: batch._sum,
-            feed_type_name: batch.items.feedtypes.name,
-            // itemId: batch.items.id,
-            itemName: batch.items.name,
-            batchName: batch.name
-        };
-    });
-    
-    return saldoData;
-};

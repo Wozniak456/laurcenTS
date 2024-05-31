@@ -1,18 +1,18 @@
 import Tabs from '@/components/filter-batch'
 import { db } from '@/db';
-import { UNABLE_TO_FIND_POSTINSTALL_TRIGGER_JSON_SCHEMA_ERROR } from '@prisma/client/scripts/postinstall.js';
-import Link from 'next/link';
+import { TabContentType } from '@/types/app_types'
 
 interface GeneralType{
     id: number,
     name: string
 }
 
+
 async function App() {
     let itemTypes : GeneralType[] = []
     let items : GeneralType[] = []
     let units : GeneralType[] = []
-    let tabContents : any[] = []
+    let tabContents : TabContentType[] = []
 
     const individuals = await db.employees.findMany({
         include:{
@@ -27,47 +27,56 @@ async function App() {
     })
 
 
-    const allItemBatches = await db.itembatches.findMany({ 
-        select: { 
-            id: true, 
-            name: true 
-        } 
-    });
-    tabContents.push({
-        title: 'Усі партії',
-        content: allItemBatches.map(itemBatch => ({ 
-            id: itemBatch.id, 
-            contentLine: itemBatch.name })) 
-    });
-
     try {
-        itemTypes = await db.itemtypes.findMany();
+        itemTypes = await db.itemtypes.findMany({
+            where:{
+                id:{
+                    not: 3
+                }
+            }
+        });
 
         items = await db.items.findMany({
-            select: {
-                id: true,
-                name: true
+            where:{
+                item_type_id:{
+                    in: itemTypes.map(type => type.id)
+                }
             }
         })
 
         units = await db.units.findMany();
 
         for (const itemType of itemTypes) {
-            const itemTypeName = itemType.name;
+            const itemTypeName = itemType.name; // риба чи корм
     
-            const itemBatches = await db.itembatches.findMany({
-                select: { 
-                    id: true, 
-                    name: true 
-                }, 
+            const itemBatches = await db.itembatches.findMany({ // усі партії
+                select:{
+                    id: true,
+                    name: true,
+                    items:{
+                        select:{
+                            itemtypes: true
+                        }
+                    }
+                },
+                where:{
+                    item_id:{
+                        in: items.map(item => item.id)
+                    }
+                },
+                orderBy:{
+                    id: 'desc'
+                }
             });
     
             const tabContent = {
                 title: itemTypeName,
-                content: itemBatches.map(itemBatch => ({ 
+                content: itemBatches
+                .filter(itembatch => itembatch.items.itemtypes?.name === itemTypeName)
+                .map(itemBatch => ({ 
                     id: itemBatch.id, 
                     contentLine: itemBatch.name 
-                })) // Змінено структуру об'єкта content
+                })) 
             };
     
             tabContents.push(tabContent);
@@ -80,12 +89,9 @@ async function App() {
   return (
     <div>
         <div className="flex m-2 justify-between items-center">
-        <h1 className="text-xl font-bold">Партії
-        </h1>
-        <Link href="/batches/new" className="border p-2 rounded">
-          New
-        </Link>
-      </div>
+            <h1 className="text-xl font-bold">Партії
+            </h1>
+        </div>
       <Tabs tabContents={tabContents} items={items} units={units} individuals={individuals}/>
     </div>
   );

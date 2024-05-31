@@ -1,20 +1,22 @@
 'use client'
 
-import React, { useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useFormState } from "react-dom";
 import * as actions from '@/actions';
 import { calculation_table } from "@prisma/client";
+import { calculationAndFeed } from '@/types/app_types'
+import Image from 'next/image';
+import feedButton from '../../public/icons/typcn_arrow-up-outline.svg'
 
 
 interface DaySummaryProps{
-  currentDate: Date,
-  pool: {
-    id: number;
-    name: string;
+  location: {
+    location_id: number;
+    location_name: string;
+    batch_id?: bigint; // batch_id є необов'язковим
   },
-  todayCalculation: calculationAndFeedName | null | undefined,
-  prevCalculation: calculationAndFeedName | null | undefined,
-  transitionDay: number | null,
+  todayCalculation: calculationAndFeed | null | undefined,
+  prevCalculation: calculationAndFeed | null | undefined,
   times: {
     id: number;
     time: string;
@@ -23,8 +25,8 @@ interface DaySummaryProps{
 }
 
 interface itemType{
-    id: number;
-    name: string;
+    id: number | undefined;
+    name: string | undefined;
     description: string | null;
     item_type_id: number | null;
     feed_type_id: number | null;
@@ -32,104 +34,105 @@ interface itemType{
     parent_item: number | null;
 }
 
-interface calculationAndFeedName{
-  calculation?: calculation_table | undefined,
-  feed? : {
-    id?: number,
-    name?: string
-  }
+type feedArray = {
+  item_id: number | undefined,
+  qty: string | undefined
 }
 
 export default function DaySummaryContent({
-  currentDate, 
-  pool, 
+  location, 
   todayCalculation, 
   prevCalculation, 
-  transitionDay, 
   times,
   items
 }
   : DaySummaryProps) {
- 
+    
 
   const [formState, action] = useFormState(actions.feedBatch, { message: '' });
-  const initialSelectedItem = items.find(item => item.feed_type_id === todayCalculation?.feed?.id)?.id;
-  const [selectedItem, setSelectedItem] = useState(initialSelectedItem);
   
-  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedItem(Number(event.target.value));
+  const transitionDay = todayCalculation?.calculation?.transition_day
+
+  let initialValues = times.map(() => 
+    transitionDay && todayCalculation?.calculation?.feed_per_feeding
+      ? (todayCalculation?.calculation?.feed_per_feeding * (transitionDay * 0.2)).toFixed(0) ?? "0"
+      : todayCalculation?.calculation?.feed_per_feeding.toFixed(0) ?? "0"
+  );
+
+  if (transitionDay && prevCalculation?.calculation){
+    initialValues = [
+      ...initialValues,
+      ...times.map(() =>
+        todayCalculation?.calculation?.feed_per_feeding
+          ? (todayCalculation.calculation.feed_per_feeding * (1 - transitionDay * 0.2)).toFixed(0) ?? "0"
+          : "0"
+      )
+    ];
+
+  }
+  
+  const [inputValues, setInputValues] = useState<string[]>(initialValues);
+
+  // const handleButtonClick = () => {
+  //   // console.log(`For pool ${pool.name}:`);
+  //   inputValues.forEach((value, index) => {
+  //     console.log(`Input ${index} changed. New value: ${value}`);
+  //   });
+  // };
+
+  
+  const handleInputChange = (index: number) => (event: ChangeEvent<HTMLInputElement>) => {
+    const newValues = [...inputValues];
+    newValues[index] = event.target.value;
+    setInputValues(newValues);
   };
 
-  // useEffect(() => {
-  //   // Тут ви можете робити що завгодно з новим значенням selectedItem
-  //   console.log('Змінено selectedItem:', selectedItem);
-  // }, [selectedItem]); // Вказати selectedItem як залежність
+  const todayFeed = items.find(item => item.id === todayCalculation?.feed?.item_id);  
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault(); // Щоб уникнути стандартної поведінки відправки форми
-    // Виконати логіку для відправки даних форми
-  };
+  let prevFeed 
+  if(transitionDay && prevCalculation?.calculation){
+    prevFeed = items.find(item => item.id === prevCalculation?.feed?.item_id);
+  }
 
   return (
-    <tr key={pool.id}>
-      <td className="px-4 py-2 border border-gray-400">{pool.name}</td>
+    <>
+     <tr key={`${location.location_id}`}>
+     {/* <tr key={`${pool.id}-1`}> */}
+      <td rowSpan={transitionDay ? 2 : 1} className="px-4 py-2 border border-gray-400 w-14">{location.location_name}</td>
       {todayCalculation?.calculation ? 
         <React.Fragment>
-          <td className="px-4 py-2 border border-gray-400">
-          <div>
-            <select
-                name='feed_item_id'
-                className="border rounded p-2 max-w-24 text-sm"
-                id='feed_item_id'
-                value={selectedItem || ''}
-                onChange={handleSelectChange}
-            >
-              {items
-              .filter(item => item.feed_type_id === todayCalculation?.feed?.id)
-              .map(item => {
-                return(<option 
-                  key={item.id} 
-                  value={item.id}
-                  className="max-w-24"
-                  >{item.name}</option>)
-              })}   
-            </select>
-
-          </div>
-        </td>
-        <td className="px-4 py-2 border border-gray-400">{todayCalculation?.feed?.name}</td>
+          <td className="px-4 py-2 border border-gray-400">{transitionDay ? prevCalculation?.feed?.type_name : todayCalculation?.feed?.type_name}</td>
+          <td className="px-4 py-2 border border-gray-400 w-40">{transitionDay && prevCalculation ? items.find(item => item.id === prevCalculation.feed?.item_id)?.name : items.find(item => item.id === todayCalculation.feed?.item_id)?.name}</td>
+        
         </React.Fragment>
          : 
-      <td className="px-4 py-2 border border-gray-400"></td>
+         <React.Fragment>
+          <td className="px-4 py-2 border border-gray-400"></td>
+          <td className="px-4 py-2 border border-gray-400"></td>
+         </React.Fragment>
         }
         
-      {times.map(time => {
-        if(todayCalculation?.calculation){
+      {times.map((time, index) => {
+        if(todayCalculation?.calculation){ 
           return(
-            <>
-            <td className="px-4 py-2 border border-gray-400">{todayCalculation?.calculation?.feed_per_feeding.toFixed(0)}</td>
+            <React.Fragment key={index}>
+            <td className="px-4 py-2 border border-gray-400">{transitionDay ? (todayCalculation?.calculation?.feed_per_feeding * (transitionDay * 0.2)).toFixed(0) : todayCalculation?.calculation?.feed_per_feeding.toFixed(0)}</td>
             <td className="px-4 py-2 border border-gray-400">
             <form action={action}>
-              <input type="hidden" name="pool_id" value={pool.id} />
-              <input type="hidden" name="executed_by" value={3} />
-              <input type="hidden" name="feed_item_id" value={selectedItem} />
               
-              <div className="flex justify-between">
-                <input
-                  name="feed_given"
-                  className="border w-2/5"
-                  id="feed_given"
-                />
-                <button
-                  type="submit"
-                  className="bg-blue-200 w-3/5 text-sm"
-                >
-                  Годувати
-                </button>
+              <div className="flex justify-center">
+              <input
+                name={`feed_given`}
+                className="border border-black w-full bg-blue-100 text-center"
+                id={`feed_given_${index}`}
+                value={inputValues[index]}
+                onChange={handleInputChange(index)}
+              />
               </div>
             </form>
             </td>
-            </>
+            
+            </React.Fragment >
           )
           
         }
@@ -138,12 +141,91 @@ export default function DaySummaryContent({
             <>
             <td className="px-4 py-2 border border-gray-400"></td>
             <td className="px-4 py-2 border border-gray-400"></td>
+            
             </>
           )
         }
       
       })}
+      <td rowSpan={transitionDay ? 2 : 1} className="px-4 py-2 border border-gray-400">
+      {todayCalculation?.calculation && 
+        <form action={action}>
+          <input type="hidden" name="location_id" value={location.location_id} />
+          <input type="hidden" name="executed_by" value={3} />
+          <input type="hidden" name="item_1" value={todayFeed?.id} />
+          <input type="hidden" name="batch_id" value={Number(location.batch_id)} />
+
+          {transitionDay && prevCalculation?.calculation &&
+            <input type="hidden" name="item_0" value={prevFeed?.id} />
+          }
+
+          {
+            inputValues.map((value, index) => (
+              <input type="hidden" name={`input_${index}`} value={value} />
+            ))
+          }
+          
+          <div className="flex justify-center">
+            <button type="submit" 
+            // onClick={handleButtonClick}
+            >
+              <Image src={feedButton} alt="feeding icon" height={35}/>
+            </button>
+          </div>
+        </form>
+      }
+      </td>
     </tr>
+    {transitionDay &&
+    <tr key={location.location_id}> 
+    {/* <tr key={`${pool.id}-1`}></tr> */}
+    {todayCalculation?.calculation ? 
+      <React.Fragment>
+        <td className="px-4 py-2 border border-gray-400">{todayCalculation?.feed?.type_name}</td>
+        <td className="px-4 py-2 border border-gray-400">{items.find(item => item.id === todayCalculation.feed?.item_id)?.name}</td>
+      
+      </React.Fragment>
+       : 
+    <td className="px-4 py-2 border border-gray-400"></td>
+      }
+      
+    {times.map((time, index) => {
+      if(todayCalculation?.calculation){
+        return(
+          <React.Fragment key={index}>
+          <td className="px-4 py-2 border border-gray-400">{(todayCalculation?.calculation?.feed_per_feeding * (1 - transitionDay * 0.2)).toFixed(0)}</td>
+          
+          <td className="px-4 py-2 border border-gray-400">
+          <form action={action}>
+            
+            <div className="flex justify-between">
+              <input
+                name={`feed_given`}
+                className="border border-black w-full bg-blue-100 text-center"
+                id={`feed_given_${index+times.length}`}
+                value={inputValues[index+times.length]}
+                onChange={handleInputChange(index+times.length)}
+              />
+            </div>
+          </form>
+          </td>
+          </React.Fragment>
+        )
+        
+      }
+      else{
+        return(
+          <>
+          <td className="px-4 py-2 border border-gray-400"></td>
+          <td className="px-4 py-2 border border-gray-400"></td>
+          </>
+        )
+      }
+    
+    })}
+  </tr>
+    }
+        </>
   );
 }
 

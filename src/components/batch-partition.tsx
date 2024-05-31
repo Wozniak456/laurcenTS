@@ -5,16 +5,10 @@ import { useFormState } from 'react-dom';
 import { useEffect, useState } from 'react';
 import deleteImg from '../../public/icons/delete.svg'
 import Image from 'next/image';
+import {  poolInfo, disposalItem } from '@/types/app_types'
 
 interface PartitionFormPageProps {
-    poolInfo: {
-        batch: batchInfo | null;
-        calc: {
-            fish_weight: number;
-        } | null;
-        feed_type_id: string | null | undefined,
-        location_id: number;
-    },
+    poolInfo: poolInfo,
     locations: location[]
 }
 
@@ -55,23 +49,40 @@ export default function PartitionFormPage({poolInfo, locations} : PartitionFormP
 
     return (
         <form className="container mx-auto px-4 py-8 m-4 bg-white shadow-md rounded-lg" action={action}>
-            <h1 className="text-2xl font-bold mb-4">Форма поділу партії</h1>
+            <h1 className="font-bold mb-4 text-center text-base">Форма поділу партії</h1>
             <div className="mb-4">
-                <label className="text-lg" htmlFor="location_id_from">
+                {/* <label className="" htmlFor="location_id_from">
                 Звідки: {locations.find(loc => loc.id === poolInfo.location_id)?.name}
-                </label>
+                </label> */}
                 <input type="hidden" name="location_id_from" value={poolInfo.location_id} />
             </div>
             <div className="mb-4">
-                <p className="text-lg font-semibold mb-2">Басейни для розподілу:</p>
+                <p className="font-semibold text-base mb-2">Басейни для розподілу:</p>
                 <input type="hidden" name="batch_id_from" value={String(poolInfo.batch?.batch_id)} />
                 <input type="hidden" name="fish_qty_in_location_from" value={poolInfo.batch?.qty} />
                 {selectedPools.map((selectedPoolId, index) => {
                     
                     return (
-                        <div key={index} className='flex gap-4'>
+                        <div key={index} className='flex gap-4 mb-4'>
+                            {selectedPoolId && 
+                            <div className='flex items-end pb-2'>
+                                <button 
+                                className="hover:bg-red-100 rounded " 
+                                onClick={() => handleDeleteButton(selectedPoolId)}
+                                type="button"
+                                >
+                                    <Image
+                                        src={deleteImg}
+                                        alt="Delete"
+                                        width={30}
+                                        height={30}
+                                        className='self-end'
+                                    />
+                                </button>
+                            </div>
+                            }
                            <div>
-                                <label className="text-lg" htmlFor={`location_id_to_${index}`}>
+                                <label className="" htmlFor={`location_id_to_${index}`}>
                                     Басейн:
                                 </label>
                                 <select
@@ -92,7 +103,7 @@ export default function PartitionFormPage({poolInfo, locations} : PartitionFormP
                                 </select>
                             </div>
                             <div>
-                                <label className="text-lg" htmlFor={`stocking_fish_amount_${index}`}>
+                                <label className="" htmlFor={`stocking_fish_amount_${index}`}>
                                     Скільки рибин:
                                 </label>
                                 <input
@@ -103,29 +114,13 @@ export default function PartitionFormPage({poolInfo, locations} : PartitionFormP
                                     required
                                 />
                             </div>
-                            {selectedPoolId && 
-                            <div className='flex items-end'>
-                                <button 
-                                className="hover:bg-red-100 rounded " 
-                                onClick={() => handleDeleteButton(selectedPoolId)}
-                                type="button"
-                                >
-                                    <Image
-                                        src={deleteImg}
-                                        alt="Delete"
-                                        width={43}
-                                        height={43}
-                                        className='self-end'
-                                    />
-                                </button>
-                            </div>
-                            }
+                            
                         </div>
                     )
                 })}
                 {selectedPools.length > 0 &&
                     <div>
-                        <label className="text-lg" htmlFor="average_fish_mass">
+                        <label className="" htmlFor="average_fish_mass">
                             Середня вага:
                         </label>
                         <input

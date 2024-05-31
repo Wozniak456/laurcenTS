@@ -1,17 +1,14 @@
 'use client'
 import Link from 'next/link';
-import { useState } from 'react';
-import BatchCreateForm from '@/components/create-batch-form';
+import { useEffect, useState } from 'react';
+import { TabContentType } from '@/types/app_types'
 
 interface ContentProps{
   id: number,
   contentLine: string
 }
 interface TabsProps {
-  tabContents: {
-    title: string,
-    content: ContentProps[]
-  }[],
+  tabContents: TabContentType[],
   items:{
     id: number,
     name: string
@@ -35,12 +32,13 @@ interface TabsProps {
 }
 
 const Tabs: React.FC<TabsProps> = ({ tabContents, items, units, individuals }) => {
-  const [isCreateFormVisible, setCreateFormVisible] = useState(false);
+  // const [isCreateFormVisible, setCreateFormVisible] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
 
   const changeTab = (tabIndex: number) => {
     setActiveTab(tabIndex);
   };
+
 
   return (
     <div className="container p-4 w-full bg-gray-100 rounded-lg mt-4">
@@ -60,13 +58,17 @@ const Tabs: React.FC<TabsProps> = ({ tabContents, items, units, individuals }) =
         ))}
       </div>
       <div className='flex justify-end'>
-        <button 
+        <Link href="/batches/new" className="border p-2 rounded">
+        Додати партію
+        </Link>
+        {/* <button 
           onClick={() => setCreateFormVisible(prevState => !prevState)}
           className="bg-gray-500 hover:bg-yellow-900 text-white py-2 px-2 rounded mb-4 w-fit ">
-          Додати партію
-        </button>
+          {isCreateFormVisible ? <p>Сховати форму</p> : <p>Додати партію</p>}
+        </button> */}
       </div>
-      {isCreateFormVisible && <BatchCreateForm items={items} units={units} individuals={individuals}/>}
+      {/*{isCreateFormVisible && <BatchCreateForm items={items} units={units} individuals={individuals}/>} */}
+       
       <div className="p-6">
         {tabContents.map((content, index) => (
           <div

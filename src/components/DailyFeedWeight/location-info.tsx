@@ -1,56 +1,90 @@
 'use client'
 import React, { useState } from 'react';
-import {Feed, LocationComponentType, Prio} from '@/types/app_types'
+import {Feed, LocationComponentType, Prio, calculationAndFeed, calculationAndFeedExtended} from '@/types/app_types'
 import PriorityForm from '@/components/DailyFeedWeight/priority-form'
+// import { calculationAndFeed } from '@/types/app_types'
 
 export type LocationComponentProps = {
-    locationInfo: LocationComponentType
-    priorities: {
-        item_id: number;
-        item_name: string | undefined;
-        location_id: number
-    }[]
+    location: { 
+        id: number; 
+        name: string;
+    } 
+    todayCalculation: calculationAndFeedExtended | undefined,
+    prevCalculation: calculationAndFeedExtended | undefined
 } 
 
-export default function LocationComponent({locationInfo, priorities} : LocationComponentProps) {   
+export default function LocationComponent({location, todayCalculation, prevCalculation} : LocationComponentProps) {   
+    // console.log(location.name, todayCalculation)
+    
     const [showPrioForm, setShowPrioForm] = useState<boolean>(false);
+    const [selectedDay, setSelectedDay] = useState<calculationAndFeedExtended | null>(null);
 
-    const handleClick = () => {
+    const handleClick = (day: calculationAndFeedExtended) => {
+        setSelectedDay(day);
         setShowPrioForm(prev => !prev);
     };
-    
-    const renderedItem = () => {
-        const hasPrio = priorities.find(prio => prio.location_id === locationInfo?.location.id)
-    
-        if (locationInfo?.feed && locationInfo.feed?.feed_list && locationInfo.feed?.feed_list.length > 1 && hasPrio){
+
+    // const hasPrio = todayCalculation?.feed?.definedPrio
+    const todayItem = todayCalculation?.allItems?.find(item => item.item_id == todayCalculation.feed?.item_id)
+    const transitionDay = todayCalculation?.calculation?.transition_day
+
+    const renderedItem = (day : calculationAndFeedExtended) => {
+        if (day?.calculation !== null && day?.allItems && day?.allItems?.length > 1 && day?.feed?.definedPrio){
             return(
-                <td className="px-4 h-10 border border-gray-400 bg-blue-100 cursor-pointer" onClick={handleClick}>{hasPrio.item_name}</td>
+                <td className="px-4 h-10 border border-gray-400 bg-gray-100 cursor-pointer" onClick={() => handleClick(day)}>{day?.allItems?.find(item => item.item_id == day.feed?.item_id)?.item_name}</td>
             )
-        } else if(locationInfo?.feed && locationInfo?.feed?.feed_list && locationInfo?.feed?.feed_list.length > 1 && !hasPrio)
+        } else if(day?.calculation !== null && day?.allItems && day?.allItems?.length == 1 && day?.feed?.definedPrio){
             return(
-                <td className="px-4 h-10 border border-gray-400 bg-red-200 cursor-pointer" onClick={handleClick}>{locationInfo.feed.feed_list[0].feed_name}</td>
+                <td className="px-4 h-10 border border-gray-400 cursor-pointer" onClick={() => handleClick(day)}>{day?.allItems?.find(item => item.item_id == day.feed?.item_id)?.item_name}</td>
             )
-        else if (locationInfo && locationInfo.feed?.feed_list){
+        } else if(day?.calculation !== null && day?.allItems && day?.allItems?.length > 1 && !day?.feed?.definedPrio)
             return(
-                <td className="px-4 h-10 border border-gray-400" >{locationInfo.feed?.feed_list[0].feed_name}</td>
+                <td className="px-4 h-10 border border-gray-400 bg-red-200 cursor-pointer" onClick={() => handleClick(day)}>{day?.allItems?.find(item => item.item_id == day.feed?.item_id)?.item_name}</td>
             )
-        }
         else {
             return(
                 <td className="px-4 h-10 border border-gray-400"></td>
             )
         }
     }
+
     return (
         <>
-        <tr key={locationInfo?.location.id}>
-            <td className="px-4 h-10 border border-gray-400">{locationInfo?.location.name}</td>
-            <td className="px-4 h-10 border border-gray-400">{locationInfo?.calculation && locationInfo?.calculation.feed_per_feeding ? locationInfo?.calculation.feed_per_feeding.toFixed(0) : ''}</td>
-            <td className="px-4 h-10 border border-gray-400">{locationInfo?.feed && locationInfo.feed.feed_type_name}</td>
-            {renderedItem()}
+        <tr key={`${location.id}-${1}`}>
+            <td rowSpan={transitionDay ? 2 : 1} className="px-4 h-10 border border-gray-400">{location.name}</td>
+
+
+            {transitionDay && todayCalculation?.calculation?.feed_per_feeding ? 
+            <React.Fragment>
+                <td className="px-4 h-10 border border-gray-400">{(todayCalculation?.calculation?.feed_per_feeding * (transitionDay * 0.2)).toFixed(0)}</td> 
+                <td className="px-4 h-10 border border-gray-400">{prevCalculation?.feed?.type_name}</td>
+            </React.Fragment>
             
+            :
+            <React.Fragment>
+                <td className="px-4 h-10 border border-gray-400">{todayCalculation?.calculation?.feed_per_feeding ? (todayCalculation?.calculation?.feed_per_feeding).toFixed(0) : ''}</td>
+                <td className="px-4 h-10 border border-gray-400">{todayCalculation?.feed?.type_name}</td>
+            </React.Fragment>
+            
+            } 
+
+            {prevCalculation ? renderedItem(prevCalculation) 
+            : todayCalculation ? renderedItem(todayCalculation) : <td className="px-4 h-10 border border-gray-400"></td>}
+
+
         </tr>
-        {locationInfo && showPrioForm && <PriorityForm location={locationInfo} setShowForm={setShowPrioForm} priorities={priorities}/>}
+        {transitionDay && todayCalculation?.calculation?.feed_per_feeding &&
+        <tr key={`${location.id}-${2}`}>
+            <td className="px-4 h-10 border border-gray-400">{(todayCalculation?.calculation?.feed_per_feeding * (1 - transitionDay * 0.2)).toFixed(0)}</td>
+            <td className="px-4 h-10 border border-gray-400">{todayCalculation?.feed?.type_name}</td>
+            {renderedItem(todayCalculation)}
+        </tr>
+        }
+
+        {selectedDay && showPrioForm && (
+            <PriorityForm location={location} calculation={selectedDay} setShowForm={setShowPrioForm} />
+        )}
+        
         </>
         
         )

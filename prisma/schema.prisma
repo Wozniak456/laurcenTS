@@ -23,7 +23,7 @@ model calculation_table {
   feed_per_day        Float
   feed_per_feeding    Float
   doc_id              BigInt
-  is_transition_start Boolean   @default(false)
+  transition_day      Int?   
   documents           documents @relation(fields: [doc_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
@@ -48,6 +48,7 @@ model documents {
   locations         locations?          @relation(fields: [location_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   itemtransactions  itemtransactions[]
   stocking          stocking[]
+  disposal_table    disposal_table[]
 }
 
 model employeepositions {
@@ -105,6 +106,7 @@ model itembatches {
   itemtransactions itemtransactions[]
   parametersvalues parametersvalues[]
   priorities       priorities[]
+  disposal_table   disposal_table[]
 }
 
 model items {
@@ -180,6 +182,7 @@ model locations {
   locationtypes    locationtypes      @relation(fields: [location_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   pools            pools?             @relation(fields: [pool_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   priorities       priorities[]
+  disposal_table   disposal_table[]
 }
 
 model locationtypes {
@@ -306,4 +309,24 @@ model datatable_over25 {
 model time_table {
   id               Int      @id @default(autoincrement())
   time             String
+}
+
+model disposal_table {
+  id               Int      @id @default(autoincrement())
+  doc_id           BigInt
+  reason_id        Int
+  qty              Int
+  batch_id         BigInt
+  date             DateTime
+  location_id      Int
+  documents        documents @relation(fields: [doc_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  reasons          disposal_reasons @relation(fields: [reason_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  itembatches      itembatches @relation(fields: [batch_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  locations        locations @relation(fields: [location_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model disposal_reasons {
+  id               Int      @id @default(autoincrement())
+  reason           String   @unique @db.VarChar
+  disposal_table   disposal_table[]
 }

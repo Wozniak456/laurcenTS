@@ -1,7 +1,7 @@
 import { db } from "@/db"
 import { notFound } from "next/navigation";
-import Link from "next/link";
-import * as actions from '@/actions'
+import ItemBatchComponent from '@/components/FishBatch/batch-element'
+import { BatchWithCreationInfo } from '@/types/app_types'
 
 interface BatchesShowPageProps {
     params: {
@@ -10,74 +10,103 @@ interface BatchesShowPageProps {
 }
 
 export default async function BatchesShowPage(props: BatchesShowPageProps){
-    let batch;
-    let item
-
     try{
-        batch = await db.itembatches.findFirst({
+        let batch : BatchWithCreationInfo | null = await db.itembatches.findFirst({
+            select:{
+                id: true,
+                name: true,
+                created: true,
+                items:{
+                    select:{
+                        id: true,
+                        name: true
+                    }
+                }
+            },
             where: { id: parseInt(props.params.id) }
         })
 
-        item = await db.items.findFirst({
+        if (!batch){
+            notFound()
+        }
+
+        const transActionOfCreation = await db.itemtransactions.findFirst({
             select:{
-                name: true
+                id: true,
+                quantity: true,
+                documents:{
+                    select:{
+                        id: true,
+                        date_time: true
+                    }
+                }
             },
             where:{
-                id: batch?.item_id
+                documents:{
+                    doc_type_id: 8 // реєстрація партії,
+                },
+                batch_id: parseInt(props.params.id)
             }
         })
 
-        if (!batch){
-            notFound();
+        batch = {
+            ...batch,
+            docId: transActionOfCreation?.documents.id,
+            tranId: transActionOfCreation?.id,
+            quantity: transActionOfCreation?.quantity,
+            isNew: true
         }
 
-        const deleteBatchAction = actions.deleteItemBatch.bind(null, batch.id, 'batches')
+        // визначаємо чи нова ця партія
+        const AllTransactions = await db.itemtransactions.findMany({
+            where:{
+                documents:{
+                    doc_type_id: {
+                        not: 8 // реєстрація партії
+                    }
+                },
+                batch_id: parseInt(props.params.id)
+            }
+        })
 
-        return(
-            <div>
-                <div className="flex m-4 justify-between center">
-                    <h1 className="text-xl font-bold">{batch.name}</h1>
-                    <div className="flex gap-4">
-                        <Link href={`/batches/${batch.id}/edit`} className="p-2 border rounded">
-                            Edit
-                        </Link>
-                        <form action={deleteBatchAction}>
-                            <button className="p-2 border rounded">Delete</button>
-                        </form>
-                    </div>
-                </div>
-                <div className="p-3 border rounded bg-gray-200 border-gray-200">
-                    <label><b>Description:</b></label>
-                    <h2>
-                        {batch.description} 
-                    </h2>
-                </div>
-                <div className="p-3 border rounded border-gray-200">
-                    <label><b>Item:</b></label>
-                    <h2>
-                        {item ? item.name : 'No item found'} 
-                    </h2>
-                </div>
-                <div className="p-3 border rounded border-gray-200">
-                    <label><b>created:</b></label>
-                    <h2>
-                        {batch.created ? batch.created.toLocaleString() : 'No Date'} 
-                    </h2>
-                </div>
-                <div className="p-3 border rounded border-gray-200">
-                    <label><b>created_by:</b></label>
-                    <h2>
-                        {batch.created_by} 
-                    </h2>
-                </div>
-            </div>
+        if(AllTransactions.length > 0){
+            batch = {
+                ...batch,
+                isNew: false
+            }
+
+            console.log('партія не нова', AllTransactions)
+        }
+
+        
+
+        const items = await db.items.findMany({
+            select: {
+                id: true,
+                name: true
+            },
+            where:{
+                item_type_id:{
+                    in: [1, 2]
+                }
+            }
+        })
+
+        console.log(batch)
+
+        return( 
+           <ItemBatchComponent batch={batch} items={items}/>
         )
+
+        
     }
     catch(error){
         console.error("Error fetching batch data:", error);
-    }finally {
-        await db.$disconnect()
-        .then(() => console.log("Disconnected from the database"))
-        .catch((disconnectError) => console.error("Error disconnecting from the database:", disconnectError));
+    }
+    finally {
+        await db.$executeRaw`SELECT pg_terminate_backend(pid)
+                             FROM pg_stat_activity
+                             WHERE state = 'idle';`;
+        console.log('Disconnected idle sessions successfully.');
     }
 }

@@ -1,9 +1,10 @@
 import { db } from "@/db";
 import StockingComponent from "@/components/stockin111"
+import * as actions from '@/actions/stocking/index';
 import { poolInfo } from '@/types/app_types'
 import {getBatchesInfo} from '@/actions/stocking'
 
-export default async function StockingHome() {
+export default async function RealizationPage() {
 
   const areas = await db.productionareas.findMany({
     include:{
@@ -128,4 +129,3 @@ async function calculationForLocation(location_id : number, date: string){
   return{batch, calc, feed_type_id, location_id}
   
 }
-

@@ -4,6 +4,7 @@ import { caviarRegistering } from "@/db/functions"
 import { calculation_table } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { setTransitionDayForLocation } from '@/actions/stocking'
 
 export async function editProdArea(id: number, description: string | null ) {
     await db.productionareas.update({
@@ -92,25 +93,129 @@ export async function editPurchtable(
     redirect('/purchtable/view');
 }
 
+
+// export async function editItemBatch(
+//     id: bigint,
+//     description: string | null,
+//     item_id: number,
+//     created: Date | null,
+//     created_by: number,
+//     endpoint: string
+//   ) {
+//     await db.itembatches.update({
+//       where: { id },
+//       data: {
+//         description,
+//         item_id,
+//         created,
+//         created_by
+//       }
+//     });
+//     redirect(`/${endpoint}/${id}`);
+//   }
+
 export async function editItemBatch(
-    id: bigint,
-    description: string | null,
-    item_id: number,
-    created: Date | null,
-    created_by: number,
-    endpoint: string
-  ) {
-    await db.itembatches.update({
-      where: { id },
-      data: {
-        description,
-        item_id,
-        created,
-        created_by
-      }
-    });
-    redirect(`/${endpoint}/${id}`);
-  }
+formState: {message: string}, 
+formData: FormData,
+){
+    try{
+        console.log('editItemBatch', formData)
+        const batch_id: number = parseInt(formData.get('batch_id') as string);
+        const item_id: number = parseInt(formData.get('item_id') as string);
+        const dateStr = formData.get('date') as string;
+        const qty: number = parseInt(formData.get('qty') as string);
+        const doc_id: number = parseInt(formData.get('doc_id') as string);
+        const tran_id: number = parseInt(formData.get('tran_id') as string);
+
+        let date_to_insert = new Date(dateStr)
+        let item_id_to_insert = item_id
+
+        // якщо треба змінити кількість
+        if(qty){
+            await db.itemtransactions.update({
+                where:{
+                    id: tran_id
+                },
+                data:{
+                    quantity: qty
+                }
+            })
+        }
+        // якщо треба змінити item_id чи дату реєстрації
+        else if (item_id || dateStr){
+            const itemBatch = await db.itembatches.findFirst({
+                where:{
+                    id: batch_id
+                }
+            })
+
+            if(itemBatch){
+                if(!item_id){
+                    item_id_to_insert = itemBatch?.item_id
+                }
+                if(!dateStr){
+                    date_to_insert = itemBatch.created as Date
+                }
+
+                //якщо треба змінити дату
+                if (dateStr){
+
+                    const name = await getBatchName(item_id_to_insert as number, date_to_insert)
+        
+                    await db.itembatches.update({
+                        where:{
+                            id: batch_id
+                        },
+                        data:{
+                            created: date_to_insert,
+                            name: name
+                        }
+                    })
+                }
+
+                if (item_id){
+
+                    const name = await getBatchName(item_id_to_insert as number, date_to_insert)
+        
+                    await db.itembatches.update({
+                        where:{
+                            id: batch_id
+                        },
+                        data:{
+                            item_id: item_id_to_insert,
+                            name: name
+                        }
+                    })
+                }
+
+            }
+
+        }
+        else{
+            throw new Error('Ви нічого не змінили!');
+        }
+        return{message :'Оновлено!'}
+    }
+    catch(err: unknown){
+        console.log('ми в catch Error editItemBatch')
+        if(err instanceof Error){
+             if (err.message.includes('Unique constraint failed')){
+                return{
+                    message: `Партія з цією назвою вже існує`
+                }
+            }
+            else {
+                return {
+                    message: err.message
+                };
+            }
+        }
+        else{
+            return{message :'Something went wrong!'}
+        }
+    }
+    //redirect('/purchtable/view');
+}
 
 export async function editPool(
     id: number,
@@ -171,11 +276,70 @@ export async function deletePurchLine(id: number) {
     redirect(`/purchtable/view`);
 }
 
-export async function deleteItemBatch(id: bigint, endpoint: string) {
-    await db.itembatches.delete({
-        where: {id}
-    });
-    redirect(`/${endpoint}/view`)
+export async function deleteItemBatch(
+    formState: {message: string}, 
+    formData: FormData) {
+        try{
+            console.log('ми в deleteItemBatch')
+            console.log(formData)
+            const id : number = parseInt(formData.get('batch_id') as string);
+            const create_doc_id : number = parseInt(formData.get('create_doc_id') as string);
+
+            const documents = await db.itemtransactions.findMany({
+                where:{
+                    documents:{
+                        doc_type_id: {
+                            not: 8 // реєстрація партії
+                        }
+                    },
+                    batch_id: id
+                }
+            })
+
+            console.log(documents)
+
+            if (documents.length > 0){
+                throw new Error('Ця партія задіяна в інших повязаних транзакціях.');
+            }
+            
+            await db.itemtransactions.deleteMany({
+                where: {
+                    doc_id: create_doc_id // Assuming create_doc_id is the unique identifier for the item transaction
+                }
+            })
+
+            await db.documents.delete({
+                where: {
+                    id: create_doc_id // Assuming create_doc_id is the unique identifier for the item transaction
+                }
+            })
+
+            await db.itembatches.delete({
+                where: {id}
+            });
+
+            return{message :'Партію видалено!'}
+        }
+        catch(err: unknown){
+            console.log('ми в catch Error deleteItemBatch')
+            if(err instanceof Error){
+                 if (err.message.includes('Unique constraint failed')){
+                    return{
+                        message: `Партія з цією назвою вже існує`
+                    }
+                }
+                else {
+                    return {
+                        message: err.message
+                    };
+                }
+            }
+            else{
+                return{message :'Something went wrong!'}
+            }
+        }
+
+        // redirect('/batches/view');
 }
 
 export async function deleteOneCalculation(id: number) {
@@ -374,7 +538,7 @@ export async function createCalcTable(
                 throw new Error('Помилка при створенні документа калькуляції');
             }
             
-            // console.log('створено документ з doc_type_id: 7')
+            console.log('створено документ з doc_type_id: 7', document_for_location_to.id)
 
             const doc_id = document_for_location_to.id
 
@@ -383,12 +547,14 @@ export async function createCalcTable(
                 if (!table) {
                     throw new Error('Помилка при створенні розрахунку');
                 }
+                setTransitionDayForLocation(location_id_to)
             }
             else{
                 const table = await getTableByValuesOver25(fish_amount, average_fish_mass, percentage, doc_id)
                 if (!table) {
                     throw new Error('Помилка при створенні розрахунку');
                 }
+                setTransitionDayForLocation(location_id_to)
             }
             
         }
@@ -396,6 +562,8 @@ export async function createCalcTable(
             return{message :'Усі поля мають бути заповнені числами!'}
         }
 }
+
+
 
 export async function createProdLine(
     formState: {message: string}, 
@@ -475,6 +643,24 @@ async function getBatchName(item_id: number, date: Date) {
     return `${parts[0].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[2]}/C`;
 }
 
+export async function updateBatches(
+    formState: { message: string } | undefined,
+    formData: FormData
+){
+    try{}
+    catch(err: unknown){
+        if(err instanceof Error){
+            return {
+                message: err.message
+            };
+        }
+        else{
+            return{message :'Something went wrong!'}
+        }
+    }
+    redirect('/batches/view');
+}
+
 export async function createItemBatch(
     formState: { message: string } | undefined,
     formData: FormData
@@ -506,10 +692,10 @@ export async function createItemBatch(
             })
 
             await addingFishBatch(batch.id, quantity, unit_id, created_by )
-
-            // return {
-            //     message: 'Item batch created successfully'
-            // };
+            
+            return {
+                message: `Партія ${name} успішно створена`
+            };
         }
         catch(err: unknown){
             if(err instanceof Error){
@@ -518,6 +704,12 @@ export async function createItemBatch(
                         message: 'There is no any item or employee with such id.'
                     }
                 }
+                else if (err.message.includes('Unique constraint failed')){
+                    return{
+                        message: `Партія з цією назвою вже існує`
+                    }
+                }
+                
                 else {
                     return {
                         message: err.message
@@ -528,7 +720,9 @@ export async function createItemBatch(
                 return{message :'Something went wrong!'}
             }
         }
-    redirect('/batches/view');
+
+    
+    // redirect('/batches/view');
 }
 
 export async function createCaviarBatch(
@@ -1124,7 +1318,7 @@ export async function addingFishBatch(batch_id: bigint, quantity: number, unit_i
             data:{
                 location_id: location_id, 
                 doc_type_id: 8, // Реєстрація партії
-                executed_by: created_by
+                executed_by: created_by,
             }
         })
         if (document) {
@@ -1163,98 +1357,120 @@ export async function feedBatch(
     formState: {message: string}, 
     formData: FormData) {
         try{
+            console.log('feedBatch')
             console.log(formData)
-            const feed_given: number = parseInt(formData.get('feed_given') as string);
-            const pool_id: number = parseInt(formData.get('pool_id') as string);
-            //const fish_weight: number = parseFloat(formData.get('fish_weight') as string);
-            const feed_id: number = parseInt(formData.get('feed_item_id') as string);            
+
+            const fish_batch_id: number = parseInt(formData.get('batch_id') as string);
             const executed_by: number = parseInt(formData.get('executed_by') as string);
-            const comments = formData.get('comments') as string
+            const location_id: number = parseInt(formData.get('location_id') as string);
+            const today_item_id: number = parseInt(formData.get('item_1') as string);
+            const prev_item_id: number = parseInt(formData.get('item_0') as string);
 
-            const feed_batch_id = await getFeedBatchByFeedTypeId(feed_id, feed_given)
+            let index = 0
 
-            console.log('feed_batch_id', feed_batch_id)
+            // спочатку на сьогодні
+            while(index < 5){
+                const qty: number = parseInt(formData.get(`input_${index}`) as string);
 
-            if(feed_batch_id.length > 0){
-                const location_id = await db.locations.findFirst({
-                    select: {
-                        id: true
-                    },
-                    where: {
-                        pool_id: pool_id
+                // if (qty == 0){
+                //     index ++
+                //     continue
+                // }
+
+                const feedDoc = await db.documents.create({
+                    data:{
+                        location_id: location_id,
+                        doc_type_id: 9,
+                        date_time: new Date(),
+                        executed_by: executed_by
                     }
-                });
+                })
 
-                if (location_id) {
-                    const doc = await db.documents.create({
-                        data: {
-                            location_id: location_id.id, // Отримуємо id локації
-                            doc_type_id: 9, // годування
-                            date_time: new Date(),
-                            executed_by: executed_by,
-                            comments: comments
-                        }
-                    });
+                const batches_id = await getFeedBatchByItemId(today_item_id, qty)
 
-                    // Створюємо функцію для створення транзакцій
-                    const createTransactions = async (batch: BatchType, feed_amount: number) => {
-                        if (batch._sum.quantity !== null){
-                            const pTransaction = await db.itemtransactions.create({
+                console.log('партія корму: ', batches_id)
+
+                let left_to_feed = qty / 1000
+
+                // console.log(left_to_feed)
+                for (const batch of batches_id) {
+                    if (batch._sum.quantity) {
+
+                        // Якщо вистачає корму в першій партії
+                        if (batch._sum.quantity >= left_to_feed) {
+                            const fetchTran = await db.itemtransactions.create({
                                 data: {
-                                    doc_id: doc.id,
-                                    location_id: 87, // Склад
+                                    doc_id: feedDoc.id,
+                                    location_id: 87,
                                     batch_id: batch.batch_id,
-                                    quantity: - feed_amount/1000,
+                                    quantity: -left_to_feed,
                                     unit_id: 2
                                 }
                             });
-                
-                            await db.itemtransactions.create({
+
+                            const feedTran = await db.itemtransactions.create({
                                 data: {
-                                    doc_id: doc.id,
-                                    location_id: location_id.id,
+                                    doc_id: feedDoc.id,
+                                    location_id: location_id,
                                     batch_id: batch.batch_id,
-                                    quantity: feed_amount/1000,
-                                    unit_id: 2,
-                                    parent_transaction: pTransaction.id
+                                    quantity: left_to_feed,
+                                    unit_id: 2
                                 }
                             });
-                        }
-                    };
-            
-                    if (feed_batch_id.length === 1) {
-                        await createTransactions(feed_batch_id[0], feed_given);
-                    } else {
-                        let feed_already_given = 0;
-                        const sortedBatches = feed_batch_id.sort((a, b) => Number(a.batch_id) - Number(b.batch_id)); // Сортуємо масив
-                    
-                        for (let i = 0; i < sortedBatches.length - 1; i++) {
-                            const batch = sortedBatches[i];
-                            console.log(batch.batch_id, 'batch._sum.quantity', batch._sum.quantity)
-                            if (batch._sum.quantity !== null) { // Перевіряємо, чи не є quantity null
-                                await createTransactions(batch, batch._sum.quantity * 1000);
-                                feed_already_given += batch._sum.quantity; // Додаємо кількість корму, яку відняли
-                            }
-                        }
-            
-                        // Остання партія
-                        const lastBatch = sortedBatches[sortedBatches.length - 1];
 
-                        if (lastBatch._sum.quantity !== null) {
-                            const remainingQuantity = feed_given - feed_already_given * 1000; // Вираховуємо залишкову кількість корму
-                            if (remainingQuantity > 0) {
-                                await createTransactions(lastBatch, remainingQuantity);
-                            }
+                            // console.log(`Витягнули зі складу: ${fetchTran.id} і вкинули в басейн: ${feedTran.id}`)
+
+                            left_to_feed = 0;
+                            break; // Виходимо з циклу, бо всю необхідну кількість взято
                         } else {
-                            console.log('Error! Quantity is null for batch', lastBatch.batch_id);
+                            // Якщо потрібно використовувати ще одну партію
+                            const fetchTran = await db.itemtransactions.create({
+                                data: {
+                                    doc_id: feedDoc.id,
+                                    location_id: 87,
+                                    batch_id: batch.batch_id,
+                                    quantity: - batch._sum.quantity,
+                                    unit_id: 2
+                                }
+                            });
+
+                            const feedTran = await db.itemtransactions.create({
+                                data: {
+                                    doc_id: feedDoc.id,
+                                    location_id: location_id,
+                                    batch_id: batch.batch_id,
+                                    quantity: batch._sum.quantity,
+                                    unit_id: 2
+                                }
+                            });
+
+                            console.log(`Витягнули зі складу: ${fetchTran.id} і вкинули в басейн: ${feedTran.id}`)
+                            left_to_feed -= batch._sum.quantity; // Віднімаємо використану кількість
+                            console.log('left_to_feed = ', left_to_feed)
                         }
                     }
-                        
+                }
+
+                if (left_to_feed > 0) {
+                    console.log(`Не вдалося знайти достатню кількість корму для годування. Залишилося ${left_to_feed}.`);
+                }
+                
+                console.log('Витягнули зі складу ')
+
+                index ++;
+            }
+
+            // тепер попереднє (якщо є)
+            if (prev_item_id){
+                while(index < 10){
+                    const qty: number = parseInt(formData.get(`input_${index}`) as string);
+    
+                    console.log(qty)
+    
+                    index ++;
                 }
             }
-            else{
-                throw new Error('Недостатньо корму')
-            }
+                       
         }
         catch(err: unknown){
             if(err instanceof Error){
@@ -1448,7 +1664,6 @@ export async function stockPool(
         const executed_by = 3 //number = parseInt(formData.get('executed_by') as string);
         const comments: string = formData.get('comments') as string;
 
-        const p_doc: number = parseInt(formData.get('div_doc_id') as string);
         // const p_tran: number = parseInt(formData.get('p_tran') as string);
         
         // перевірка, щоб зі складу не взяли більше, ніж є
@@ -1495,7 +1710,7 @@ export async function stockPool(
             throw new Error('Помилка при створенні документа зариблення');
         }
 
-        // console.log(`документ зариблення для ${location_id_to}`, stockDoc)
+        console.log(`документ зариблення для ${location_id_to}`, stockDoc.id)
 
         // транзакція для витягування з попереднього басейна stocking_quantity
 
@@ -1514,7 +1729,7 @@ export async function stockPool(
             throw new Error('Помилка при створенні транзакції для витягування з попереднього басейна');
         }
 
-        // console.log(`Витягуємо з попереднього для ${location_id_to}. Tran: `, fetchTran)
+        console.log(`Витягуємо з попереднього для ${location_id_to}. Tran: `, fetchTran.id)
 
         //визначаємо яку кількість зариблювати
 
@@ -1545,7 +1760,7 @@ export async function stockPool(
             throw new Error('Помилка при створенні транзакції для зариблення нового басейна');
         }
 
-        // console.log(`Зариблюємо ${location_id_to}. Tran: `, stockTran)
+        console.log(`Зариблюємо ${location_id_to}. Tran: `, stockTran.id)
         
         // запис зариблення
 
@@ -1560,7 +1775,7 @@ export async function stockPool(
             throw new Error('Помилка при створенні запису зариблення');
         }
 
-        // console.log('Створюємо stocking: ', stock)
+        console.log('Створюємо stocking: ', stock.id)
 
         // тепер fish_amount це вся риба, яку зариблюємо.
         formData.set('fish_amount', String(count_to_stock));
@@ -1622,14 +1837,14 @@ export async function getFeedTypeId(fish_weight: number){
     return feed_type_id;
 }
 
-export async function getFeedBatchByFeedTypeId(feed_id: number, quantity: number) {
+export async function getFeedBatchByItemId(item_id: number, quantity: number) {
     
     const batches = await db.itembatches.findMany({
         select:{
             id: true
         },
         where: {
-            item_id: feed_id            
+            item_id: item_id            
         },
     })
 
@@ -1841,4 +2056,80 @@ async function updatePrevPool({info, formData, formState} : updatePrevPoolProps)
     console.log('МИ ОНОВИЛИ fish_amount', info.amount_in_pool)
     
     createCalcTable(formState, formData)
+}
+
+
+// реєстрація списання
+
+export async function disposal(
+    formState: { message: string } | undefined,
+    formData: FormData
+) {
+    try {
+        console.log('ми в disposal')
+        console.log(formData)
+
+        const location_id_from: number = parseInt(formData.get('location_id_from') as string);
+        const fish_amount_in_pool : number = parseInt(formData.get('fish_amount_in_pool') as string);
+        const batch_id: number = parseInt(formData.get('batch_id') as string);
+        const reason_id: number = parseInt(formData.get('reason') as string);
+        const qty: number = parseInt(formData.get('qty') as string);
+        const average_weight_str = formData.get('average_fish_mass') as string;
+
+        //створення документа списання
+        const disposalDoc = await db.documents.create({
+            data:{
+                location_id: location_id_from,
+                doc_type_id: 11,
+                date_time: new Date(),
+                executed_by: 3
+            }
+        })
+
+        console.log('документ списання', disposalDoc.id)
+
+        //створення запису із вказанням деталей списання
+        const disposalRecord = await db.disposal_table.create
+        ({
+            data:{
+                doc_id: disposalDoc.id,
+                reason_id: reason_id,
+                qty: qty,
+                batch_id: batch_id,
+                date: new Date(),
+                location_id: location_id_from
+            }
+        })
+        console.log('запис із вказанням деталей списання', disposalRecord.id)
+
+        //створення транзакції списання
+        const disposalTran = await db.itemtransactions.create({
+            data:{
+                doc_id: disposalDoc.id,
+                location_id: location_id_from, 
+                batch_id: batch_id,
+                quantity: - qty,
+                unit_id: 1
+            }
+        })
+
+        console.log('транзакція списання', disposalTran.id)
+
+        formData.set('fish_amount_in_pool', String(fish_amount_in_pool - qty))
+        formData.set('location_id_to', String(location_id_from))
+        formData.set('fish_amount', String(fish_amount_in_pool - qty))
+               
+
+        await stockPool(formState, formData)
+    }
+    catch (err: unknown) {
+        if (err instanceof Error) {
+            return {
+                message: err.message
+            };
+        } else {
+            return { message: 'Something went wrong!' };
+        }
+    }
+    revalidatePath('/feed-weight/view')
 }

@@ -3,10 +3,11 @@
 import { useFormState } from "react-dom";
 import * as actions from '@/actions';
 import PartitionForm from "@/components/batch-partition";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ItemBatch} from '@/components/accordion'
 import PoolInfo from "@/components/pool-info"
-import { batchInfo } from '@/types/app_types'
+import { batchInfo, poolInfo, disposalItem } from '@/types/app_types'
+import DisposalForm from '@/components/Stocking/disposal-form'
 
 interface StockPoolProps {
     locations: {
@@ -15,42 +16,48 @@ interface StockPoolProps {
         location_type_id: number
     }[],
     batches: ItemBatch[],
-    poolInfo: {
-        batch: batchInfo | null;
-        calc: {
-            fish_weight: number;
-        } | null;
-        feed_type_id: string | null | undefined,
-        location_id: number;
-    }
+    poolInfo: poolInfo,
+    disposal_reasons: disposalItem[]
 }
 
-export default function StockPoolPage({locations, batches, poolInfo}: StockPoolProps) {
+export default function StockPoolPage({locations, batches, poolInfo, disposal_reasons}: StockPoolProps) {
 
     // console.log(poolInfo.location_id, poolInfo)
     const [showMoreFields, setShowMoreFields] = useState(false);
     const [showPartitionForm, setShowPartitionForm] = useState(false);
+    const [showDisposalForm, setShowDisposalForm] = useState(false);
+
+    const handleDisposalFormButton = () => {
+        setShowDisposalForm(true)
+    }
+
+    useEffect(() => {
+        console.log(showDisposalForm);
+    }, [showDisposalForm]);
     
     const [formState, action] = useFormState(actions.stockPool, { message: '' });
     const [locationIdFrom, setLocationIdFrom] = useState<number | undefined>(undefined);
 
+    
+
     return (
         <div>
-            <form className="container mx-auto px-4 m-4 " action={action}>
+            <form className="container mx-auto m-4 " action={action}>
             <div className="flex justify-end">
-                <button
+                {/* <button
                     type="button"
                     className="text-blue-600 hover:underline"
                     onClick={() => setShowMoreFields(!showMoreFields)}
                 >
-                    {showMoreFields ? "Згорнути" : "Більше..."}
-                </button>
+                    {showMoreFields ? "Згорнути" : "Керувати басейном..."}
+                </button> */}
             </div>
             <div className="flex justify-center flex-col gap-4 ">
                 <h2 className="font-bold">Локація: {locations.find(loc => loc.id === poolInfo.location_id)?.name}</h2>
                 {poolInfo.batch && <PoolInfo poolInfo={poolInfo}/>}
                 <input type="hidden" name="location_id_from" value={87} />
                 <input type="hidden" name="location_id_to" value={poolInfo.location_id} />
+                {!poolInfo.batch && 
                 <div className="flex flex-wrap items-center gap-4 justify-between">
                     <div className="flex gap-4 items-center flex-wrap ">
                         <label className="min-w-24" htmlFor="batch_id">
@@ -94,8 +101,8 @@ export default function StockPoolPage({locations, batches, poolInfo}: StockPoolP
                             required
                         />
                     </div>
-                </div>
-                <div className={`flex items-center w-full gap-4 ${showMoreFields ? "" : "hidden"}`}>
+                </div>}
+                {/* <div className={`flex items-center w-full gap-4 ${showMoreFields ? "" : "hidden"}`}>
                     <label className="min-w-24" htmlFor="comments">
                         Коментарі
                     </label>
@@ -104,14 +111,19 @@ export default function StockPoolPage({locations, batches, poolInfo}: StockPoolP
                         className="border rounded p-2 flex-grow"
                         id="comments"
                     />
-                    </div>
+                    </div> */}
                 <div className="flex flex-wrap gap-4 justify-end">
-                    <button
-                        type="submit"
-                        className="rounded p-2 bg-blue-200"
-                    >
-                        Зарибити зі складу
-                    </button>
+                    {!poolInfo.batch &&
+                    
+                        <button
+                            type="submit"
+                            className="rounded p-2 bg-blue-200"
+                        >
+                            Зарибити зі складу
+                        </button>
+                    }
+                    {poolInfo.batch &&
+                    <>
                     <button
                         type="button"
                         className="rounded p-2 bg-blue-200"
@@ -119,6 +131,17 @@ export default function StockPoolPage({locations, batches, poolInfo}: StockPoolP
                     >
                         Розділити
                     </button>
+
+                    <button
+                        type="button"
+                        className="rounded p-2 bg-blue-200"
+                        onClick={handleDisposalFormButton}
+                    >
+                        Списати
+                    </button>
+                    </>
+                    }
+                    
                     
                 </div>
                 
@@ -128,12 +151,10 @@ export default function StockPoolPage({locations, batches, poolInfo}: StockPoolP
                     </div>
                 )}
             </div>
-            <div>
-             
-            </div>
             
         </form>
-        {showPartitionForm && <PartitionForm poolInfo={poolInfo} locations={locations}/>}
+        {showPartitionForm && <PartitionForm poolInfo={poolInfo} locations={locations}/>} 
+        {showDisposalForm && <DisposalForm poolInfo={poolInfo} reasons={disposal_reasons} setShowDisposalForm={setShowDisposalForm}/>}
         </div>
     );
 }

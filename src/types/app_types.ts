@@ -1,3 +1,27 @@
+import { calculation_table } from "@prisma/client";
+
+export type BatchWithCreationInfo = {
+    id: bigint;
+    name: string;
+    items: {
+        id: number;
+        name: string;
+    } | null;
+    docId?: bigint,
+    tranId?: bigint,
+    quantity?: number,
+    created?: Date | null;
+    isNew?: boolean
+}
+
+export type TabContentType = {
+    title: string,
+    content: {
+        id: bigint,
+        contentLine: string
+    }[]
+}
+
 export type getCurrentFeedCountType = {
     batch_name : string | undefined;
     feed_type_id: {
@@ -51,3 +75,34 @@ export type batchInfo = {
     batch_id: bigint | undefined,
     qty: number
   }
+export type poolInfo = {
+    batch: batchInfo | null | undefined;
+    calc: {
+        fish_weight: number;
+    } | null;
+    feed_type_id: string | null | undefined,
+    location_id: number;
+    location_name?: string
+}
+
+export interface calculationAndFeed{
+    calculation?: calculation_table | undefined  | null,
+    feed? : {
+        type_id?: number,
+        type_name?: string,
+        item_id?: number,
+        definedPrio?: boolean
+    }
+}
+
+export interface calculationAndFeedExtended extends calculationAndFeed{
+    allItems?: {
+        item_id: number;
+        item_name: string;
+    }[] | undefined
+} 
+
+export type disposalItem = {
+    id: number,
+    reason: string
+}

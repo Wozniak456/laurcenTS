@@ -3,26 +3,26 @@ import { LocationComponentType } from '@/types/app_types';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import { useFormState } from 'react-dom';
 import * as actions from '@/actions';
+import { calculationAndFeedExtended } from '@/types/app_types'
 
 type PriorityFormType = {
-    location: LocationComponentType,
+    location: { 
+        id: number; 
+        name: string;
+    },
+    calculation: calculationAndFeedExtended | undefined,
     setShowForm: React.Dispatch<React.SetStateAction<boolean>>,
-    priorities: {
-        item_id: number;
-        item_name: string | undefined;
-        location_id: number
-    }[]
+    
 }
 
 interface SelectedFeeds {
     [key: string]: number;
 }
 
-export default function PriorityForm({location, setShowForm, priorities} : PriorityFormType) {
+export default function PriorityForm({location, calculation, setShowForm} : PriorityFormType) {
     // const [priority, setpriority] = useState<number | undefined>(undefined);  
     
-    const priority = priorities.find(prio => prio.location_id === location?.location.id)
-    console.log( priority)
+    const priority = calculation?.feed?.item_id
           
     function handleCloseModal() {
         setShowForm(prev => !prev);
@@ -39,10 +39,10 @@ export default function PriorityForm({location, setShowForm, priorities} : Prior
 
                 <div className="flex gap-2 items-center justify-center">
                     <h1 className="text-lg font-semibold min-w-24" >
-                        {location?.location.name} 
+                        {location.name} 
                     </h1>
                     <div className="flex flex-col gap-1">
-                        {location?.feed.feed_list
+                        {calculation?.allItems
                         ?.map((item, index) => (
                             <div key={index} className="flex items-center">
                                 <input 
@@ -51,13 +51,13 @@ export default function PriorityForm({location, setShowForm, priorities} : Prior
                                     name={`feed`} 
                                     value={item.item_id} 
                                     className="mr-2"
-                                    defaultChecked={priority?.item_id == item.item_id ? true : false}
+                                    defaultChecked={item.item_id == priority ? true : false}
                                 />
-                                <label htmlFor={`feed_${item.item_id}_${index}`} className="text-sm">{item.feed_name}</label>
+                                <label htmlFor={`feed_${item.item_id}_${index}`} className="text-sm">{item.item_name}</label>
                             </div>
                         ))}
                     </div>
-                    <input type="hidden" name={`location`} value={location?.location.id} />
+                    <input type="hidden" name={`location`} value={location.id} />
                 </div>
                             
                 
