@@ -1,12 +1,13 @@
 'use client'
 
-import React, { ChangeEvent, useEffect, useRef, useState } from "react";
+import React, { ChangeEvent, use, useEffect, useState } from "react";
 import { useFormState } from "react-dom";
 import * as actions from '@/actions';
-import { calculation_table } from "@prisma/client";
 import { calculationAndFeed } from '@/types/app_types'
 import Image from 'next/image';
 import feedButton from '../../public/icons/typcn_arrow-up-outline.svg'
+import SuccessButton from'../../public/icons/SuccessFeeding.svg'
+import CrossButton from'../../public/icons/UnsuccessfulFeeding.svg'
 
 
 interface DaySummaryProps{
@@ -55,8 +56,8 @@ export default function DaySummaryContent({
 
   let initialValues = times.map(() => 
     transitionDay && todayCalculation?.calculation?.feed_per_feeding
-      ? (todayCalculation?.calculation?.feed_per_feeding * (transitionDay * 0.2)).toFixed(0) ?? "0"
-      : todayCalculation?.calculation?.feed_per_feeding.toFixed(0) ?? "0"
+      ? (todayCalculation?.calculation?.feed_per_feeding * (transitionDay * 0.2)).toFixed(1) ?? "0"
+      : todayCalculation?.calculation?.feed_per_feeding.toFixed(1) ?? "0"
   );
 
   if (transitionDay && prevCalculation?.calculation){
@@ -64,7 +65,7 @@ export default function DaySummaryContent({
       ...initialValues,
       ...times.map(() =>
         todayCalculation?.calculation?.feed_per_feeding
-          ? (todayCalculation.calculation.feed_per_feeding * (1 - transitionDay * 0.2)).toFixed(0) ?? "0"
+          ? (todayCalculation.calculation.feed_per_feeding * (1 - transitionDay * 0.2)).toFixed(1) ?? "0"
           : "0"
       )
     ];
@@ -72,14 +73,6 @@ export default function DaySummaryContent({
   }
   
   const [inputValues, setInputValues] = useState<string[]>(initialValues);
-
-  // const handleButtonClick = () => {
-  //   // console.log(`For pool ${pool.name}:`);
-  //   inputValues.forEach((value, index) => {
-  //     console.log(`Input ${index} changed. New value: ${value}`);
-  //   });
-  // };
-
   
   const handleInputChange = (index: number) => (event: ChangeEvent<HTMLInputElement>) => {
     const newValues = [...inputValues];
@@ -93,6 +86,12 @@ export default function DaySummaryContent({
   if(transitionDay && prevCalculation?.calculation){
     prevFeed = items.find(item => item.id === prevCalculation?.feed?.item_id);
   }
+
+  const [buttonMode, setButtonMode] = useState(false);
+
+  useEffect(()=> {
+    console.log('buttonMode changed',buttonMode)
+  },[buttonMode])
 
   return (
     <>
@@ -116,7 +115,7 @@ export default function DaySummaryContent({
         if(todayCalculation?.calculation){ 
           return(
             <React.Fragment key={index}>
-            <td className="px-4 py-2 border border-gray-400">{transitionDay ? (todayCalculation?.calculation?.feed_per_feeding * (transitionDay * 0.2)).toFixed(0) : todayCalculation?.calculation?.feed_per_feeding.toFixed(0)}</td>
+            <td className="px-4 py-2 border border-gray-400">{transitionDay ? (todayCalculation?.calculation?.feed_per_feeding * (transitionDay * 0.2)).toFixed(1) : todayCalculation?.calculation?.feed_per_feeding.toFixed(1)}</td>
             <td className="px-4 py-2 border border-gray-400">
             <form action={action}>
               
@@ -166,12 +165,28 @@ export default function DaySummaryContent({
           }
           
           <div className="flex justify-center">
-            <button type="submit" 
-            // onClick={handleButtonClick}
-            >
-              <Image src={feedButton} alt="feeding icon" height={35}/>
-            </button>
-          </div>
+          <button 
+            type="submit" 
+            className="inline-flex items-center justify-center transform transition-transform duration-100 active:scale-50 focus:scale-100"
+            onClick={() => { setButtonMode(true); }}
+          >
+            {!buttonMode && <Image src={feedButton} alt="feeding icon" height={35} />}
+            {formState.message && 
+            <>
+            {buttonMode && <Image 
+                src={formState.message.includes('успішно') ? SuccessButton : CrossButton} 
+                alt="status icon" 
+                height={30}/>}
+            </>
+              
+            }
+{/* 
+            {formState.message && 
+            <p>{formState.message}</p>
+              
+            } */}
+          </button>
+        </div>
         </form>
       }
       </td>
@@ -193,7 +208,7 @@ export default function DaySummaryContent({
       if(todayCalculation?.calculation){
         return(
           <React.Fragment key={index}>
-          <td className="px-4 py-2 border border-gray-400">{(todayCalculation?.calculation?.feed_per_feeding * (1 - transitionDay * 0.2)).toFixed(0)}</td>
+          <td className="px-4 py-2 border border-gray-400">{(todayCalculation?.calculation?.feed_per_feeding * (1 - transitionDay * 0.2)).toFixed(1)}</td>
           
           <td className="px-4 py-2 border border-gray-400">
           <form action={action}>

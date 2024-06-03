@@ -82,7 +82,8 @@ export type poolInfo = {
     } | null;
     feed_type_id: string | null | undefined,
     location_id: number;
-    location_name?: string
+    location_name?: string;
+    allowedToEdit: boolean;
 }
 
 export interface calculationAndFeed{

@@ -93,6 +93,7 @@ model individuals {
 
 model itembatches {
   id               BigInt             @id @default(autoincrement())
+  generation       String?             @unique @db.VarChar
   name             String             @unique @db.VarChar
   description      String?
   item_id          Int
@@ -123,6 +124,7 @@ model items {
   itemtypes                                      itemtypes?        @relation(fields: [item_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   feedtypes                                      feedtypes?        @relation(fields: [feed_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   purchaselines                                  purchaselines[]
+  saleslines                                     saleslines[]
   priorities                                     priorities[]
 }
 
@@ -151,6 +153,8 @@ model itemtransactions {
   locations          locations   @relation(fields: [location_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   units              units       @relation(fields: [unit_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   transactionsstate  transactionsstate @relation(fields: [status_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  purchaselines      purchaselines[]
+  saleslines         saleslines[]
 }
 
 model transactionsstate {
@@ -253,6 +257,7 @@ model purchaselines {
   items               items      @relation(fields: [item_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   purchtable          purchtable @relation(fields: [purchase_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   units               units      @relation(fields: [unit_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  itemtransactions    itemtransactions?      @relation(fields: [item_transaction_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model purchtable {
@@ -263,6 +268,28 @@ model purchtable {
   vendor_doc_number String          @db.VarChar
   purchaselines     purchaselines[]
   vendors           vendors         @relation(fields: [vendor_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model salestable {
+  id                BigInt          @id @default(autoincrement())
+  doc_id            BigInt?
+  date_time         DateTime        @default(now()) @db.Timestamp(6)
+  customer_id       Int
+  saleslines        saleslines[]
+  customers         customers         @relation(fields: [customer_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model saleslines {
+  id                  Int        @id @default(autoincrement())
+  salestable_id       BigInt
+  item_transaction_id BigInt?
+  item_id             Int
+  quantity            Float
+  unit_id             Int
+  items               items      @relation(fields: [item_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  salestable          salestable @relation(fields: [salestable_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  units               units      @relation(fields: [unit_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  itemtransactions    itemtransactions?      @relation(fields: [item_transaction_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model stocking {
@@ -278,6 +305,7 @@ model units {
   items            items[]
   itemtransactions itemtransactions[]
   purchaselines    purchaselines[]
+  saleslines       saleslines[]
 }
 
 model vendors {
@@ -285,6 +313,13 @@ model vendors {
   name        String       @unique @db.VarChar
   description String?
   purchtable  purchtable[]
+}
+
+model customers {
+  id          Int          @id @default(autoincrement())
+  name        String       @unique @db.VarChar
+  description String?
+  salestable  salestable[]
 }
 
 model datatable_below25 {

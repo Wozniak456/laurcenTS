@@ -387,7 +387,7 @@ export async function registerGoodsInProduction(
         const document = await db.documents.create({
             data:{
                location_id: 87, // склад 
-               doc_type_id: 8, // розподіл партії
+               doc_type_id: 8, // Реєстрація партії
                executed_by: 3,
             }
         })
@@ -610,6 +610,85 @@ export async function createProdLine(
     redirect('/prod-lines/view');
 }
 
+
+export async function createSalesTableRecord(
+    formState: {message: string}, 
+    formData: FormData,
+    ){ 
+        try{
+            // console.log('ми в createSalesTableRecord')
+            console.log(formData)
+            const dateTimeString = formData.get('delivery_date') as string;
+            const customer_id: number = parseInt(formData.get('customer_id') as string);
+
+            const dateTime = new Date(dateTimeString);
+                   
+            const salesRecord = await db.salestable.create({
+                data:{
+                    date_time: dateTime,
+                    customer_id: customer_id
+                }
+            })
+
+            if(!salesRecord){
+                throw new Error('Помилка')
+            }
+            return{message: `Видаткову накладну №${salesRecord.id} успішно додано`}
+            
+        }
+        catch(err: unknown){
+            if(err instanceof Error){
+                {
+                    return {message: err.message};
+                }
+            }
+            else{
+                return{message :'Something went wrong!'}
+            }
+        }
+}
+
+export async function createSalesLineRecord(
+    formState: {message: string}, 
+    formData: FormData,
+    ){ 
+        try{
+            console.log('ми в createSalesLineRecord')
+            console.log(formData)
+
+            const item_id: number = parseInt(formData.get('item_id') as string);
+            const quantity: number = parseInt(formData.get('quantity') as string);
+            const unit_id: number = parseInt(formData.get('unit_id') as string);
+            const header_id: number = parseInt(formData.get('header_id') as string);
+                   
+            const salesLineRecord = await db.saleslines.create({
+                data:{
+                    salestable_id: header_id,
+                    item_id: item_id,
+                    quantity: quantity,
+                    unit_id: unit_id
+                }
+            })
+
+            if(!salesLineRecord){
+                throw new Error('Помилка')
+            }
+
+            return{message: `Новий рядок видаткової накладної №${header_id} успішно додано`}
+            
+        }
+        catch(err: unknown){
+            if(err instanceof Error){
+                {
+                    return {message: err.message};
+                }
+            }
+            else{
+                return{message :'Something went wrong!'}
+            }
+        }
+}
+
 export async function createPurchTableRecord(
     formState: {message: string}, 
     formData: FormData,
@@ -641,6 +720,44 @@ export async function createPurchTableRecord(
 async function getBatchName(item_id: number, date: Date) {
     const parts = date.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit', year: 'numeric' }).split('.');
     return `${parts[0].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[2]}/C`;
+}
+
+
+export async function updateSalesTable(
+    formState: { message: string } | undefined,
+    formData: FormData
+){
+    try{}
+    catch(err: unknown){
+        if(err instanceof Error){
+            return {
+                message: err.message
+            };
+        }
+        else{
+            return{message :'Something went wrong!'}
+        }
+    }
+    redirect('/realization/headers/view');
+}
+
+export async function updateSalesLines(
+    formState: { message: string } | undefined,
+    formData: FormData
+){
+    const header_id : number = parseInt(formData.get('header_id') as string);
+    try{}
+    catch(err: unknown){
+        if(err instanceof Error){
+            return {
+                message: err.message
+            };
+        }
+        else{
+            return{message :'Something went wrong!'}
+        }
+    }
+    redirect(`/realization/headers/${header_id}`);
 }
 
 export async function updateBatches(
@@ -688,6 +805,15 @@ export async function createItemBatch(
                     item_id,
                     created,
                     created_by
+                }
+            })
+
+            await db.itembatches.update({
+                where:{
+                    id: batch.id
+                },
+                data:{
+                    generation: String(batch.id)
                 }
             })
 
@@ -1370,12 +1496,7 @@ export async function feedBatch(
 
             // спочатку на сьогодні
             while(index < 5){
-                const qty: number = parseInt(formData.get(`input_${index}`) as string);
-
-                // if (qty == 0){
-                //     index ++
-                //     continue
-                // }
+                const qty: number = parseFloat(formData.get(`input_${index}`) as string);
 
                 const feedDoc = await db.documents.create({
                     data:{
@@ -1482,7 +1603,7 @@ export async function feedBatch(
                 return{message :'Something went wrong!'}
             }
         }
-    return { message: `Успішно` };
+    return { message: `успішно` };
 
     //redirect('/summary-feeding-table/day');
     }
@@ -1649,8 +1770,8 @@ export async function stockPool(
     formData: FormData
 ): Promise<{ message: string } | undefined> {
     try {
-        // console.log('stockPool')
-        // console.log(formData)
+        console.log('stockPool')
+        console.log(formData)
         let location_id_from : number = parseInt(formData.get('location_id_from') as string);
       
         const location_id_to: number = parseInt(formData.get('location_id_to') as string);
@@ -1720,7 +1841,7 @@ export async function stockPool(
                 location_id: location_id_from,
                 batch_id: batch_id_from,
                 quantity: - stocking_quantity,
-                unit_id: 2,
+                unit_id: 1,
                 // parent_transaction: p_tran
             }
         });
@@ -1749,9 +1870,9 @@ export async function stockPool(
             data: {
                 doc_id: stockDoc.id,
                 location_id: location_id_to,
-                batch_id: batch_id_to, //?
+                batch_id: batch_id_to, //
                 quantity: count_to_stock,
-                unit_id: 2,
+                unit_id: 1,
                 parent_transaction: fetchTran.id
             }
         });
@@ -1783,7 +1904,7 @@ export async function stockPool(
 
         await createCalcTable(formState, formData)
 
-        // console.log('Створили calc table')
+        console.log('Створили calc table')
     } catch (err: unknown) { 
         if (err instanceof Error) {
             if (err.message.includes('Foreign key constraint failed')) {
@@ -1848,6 +1969,8 @@ export async function getFeedBatchByItemId(item_id: number, quantity: number) {
         },
     })
 
+    console.log('усі batches', batches)
+
     const batches_quantity = await db.itemtransactions.groupBy({
         by: ['batch_id'],
         where: {
@@ -1861,10 +1984,14 @@ export async function getFeedBatchByItemId(item_id: number, quantity: number) {
         }
     });
 
+    console.log('batches_quantity', batches_quantity)
+
     // Якщо в партії не вистачає корму на годування, то брати з іншої партії
     const batches_array = []; // Масив для зберігання партій
     let totalQuantity = 0; // Змінна для зберігання загальної кількості корму
     quantity = quantity / 1000
+
+    console.log('totalQuantity: ', totalQuantity, 'quantity: ', quantity)
 
     while (totalQuantity < quantity && batches_quantity.length > 0) {
         //знаходимо партію з найменшим id (найстарішу)
@@ -1885,7 +2012,7 @@ export async function getFeedBatchByItemId(item_id: number, quantity: number) {
     
     // Перевірка, чи було знайдено необхідну кількість корму
     if (totalQuantity < quantity) {
-        return []
+        throw new Error('Немає достатньо корму');
     }
     else{
         return batches_array;
@@ -2131,5 +2258,118 @@ export async function disposal(
             return { message: 'Something went wrong!' };
         }
     }
-    revalidatePath('/feed-weight/view')
+    revalidatePath('/feeding/view')
+}
+
+
+export async function updateCurrentPoolState(
+    formState: { message: string } | undefined,
+    formData: FormData
+) {
+    try {
+        console.log('ми в updateCurrentPoolState')
+        console.log(formData)
+
+        let batch_id_before: number = parseInt(formData.get('batch_id_before') as string);
+        let fish_amount_before: number = parseInt(formData.get('fish_amount_before') as string);
+        const average_fish_mass_before: number = parseInt(formData.get('average_fish_mass_before') as string);
+        const location_id_to: number = parseInt(formData.get('location_id_to') as string);
+        const batch_id_from: number = parseInt(formData.get('batch_id') as string);
+        const fish_amount: number = parseInt(formData.get('fish_amount') as string);
+
+        if(!batch_id_before && !fish_amount_before && !average_fish_mass_before){
+            throw new Error('')
+        }
+
+        //перевірка чи вистачає потрібного корму на складі
+        const fish_amount_on_warehouse = await db.itemtransactions.groupBy({
+            by: ['batch_id'],
+            where:{
+                location_id: 87,
+                batch_id: batch_id_from
+            },
+            _sum:{
+                quantity: true
+            }
+        })
+
+        const fishQuantityOnWarehouse = fish_amount_on_warehouse[0]?._sum?.quantity || 0; //100
+
+        let newFishQuantityOnWarehouse = fishQuantityOnWarehouse //100
+
+        if(!batch_id_before ){
+            console.log('ПАРТІЯ НЕ ЗМІНИЛАСЯ')
+            console.log('fish_amount_before: ', fish_amount_before, 'fishQuantityOnWarehouse: ', fishQuantityOnWarehouse)
+            newFishQuantityOnWarehouse = fish_amount_before + fishQuantityOnWarehouse//300
+        }
+
+        console.log('newFishQuantityOnWarehouse', newFishQuantityOnWarehouse)
+
+        if ( fish_amount > newFishQuantityOnWarehouse) {
+            console.log('fish_amount > newFishQuantityOnWarehouse: ', fish_amount > newFishQuantityOnWarehouse)
+            throw new Error('Недостатня кількість на складі');
+        }
+
+        if(!batch_id_before){
+            batch_id_before = batch_id_from
+        }
+
+        if(!fish_amount_before){
+            fish_amount_before = fish_amount
+        }
+
+        
+        //повертаємо до складу те, що було перед зміною 
+
+        const arriveDoc = await db.documents.create({
+            data:{
+                location_id: location_id_to,
+                doc_type_id: 12, //повернення до складу
+                executed_by: 3
+            }
+        })
+
+        //витягуємо з басейна
+
+        const fetchTran = await db.itemtransactions.create({
+            data:{
+                doc_id: arriveDoc.id,
+                location_id: location_id_to,
+                batch_id: batch_id_before,
+                quantity: - fish_amount_before,
+                unit_id: 1
+            }
+        })
+
+        //повертаємо на склад
+
+        const arriveTran = await db.itemtransactions.create({
+            data:{
+                doc_id: arriveDoc.id,
+                location_id: 87,
+                batch_id: batch_id_before,
+                quantity: fish_amount_before,
+                unit_id: 1,
+                parent_transaction: fetchTran.id
+            }
+        })
+
+        formData.set('location_id_from', '87')
+
+       
+
+        await stockPool(formState, formData)
+
+        // return({message: 'hello'})
+    }
+    catch (err: unknown) {
+        if (err instanceof Error) {
+            return {
+                message: err.message
+            };
+        } else {
+            return { message: 'Something went wrong!' };
+        }
+    }
+    revalidatePath('/feeding/view')
 }

@@ -86,11 +86,6 @@ export default function PurchTableComponent({ purchtables, vendors, items }: Pur
         setShowRegisterModal(true)
     }
 
-    // useEffect(() => {
-    //     console.log("selectedRow changed:", selectedRow);
-    // }, [selectedRow]); 
-    
-
     return(
         <div className="flex flex-col gap-4 my-4">
             <div className="flex justify-between items-center mb-2">
@@ -123,7 +118,9 @@ export default function PurchTableComponent({ purchtables, vendors, items }: Pur
                 </thead>
 
                 <tbody>
-                    {purchtables.map(header => (
+                    {purchtables
+                    .sort((a, b) => Number(b.id) - Number(a.id))
+                    .map(header => (
                     <tr 
                     key={header.id} 
                     onClick={() => handleRowClick(header.id)} 
@@ -143,9 +140,9 @@ export default function PurchTableComponent({ purchtables, vendors, items }: Pur
                                     'Posted'
                             }
                         </td>
-                        {header.doc_id === null ?  
+                        {header.doc_id === null && 
 
-                        <td className=" border border-gray-400 text-center">
+                        <td className=" border border-gray-400 text-center w-16">
                             <button 
                             className="hover:bg-blue-100  rounded" 
                             onClick={handleEditPurchHeader}>
@@ -165,11 +162,10 @@ export default function PurchTableComponent({ purchtables, vendors, items }: Pur
                             setShowForm={setShowEditModal}
                         /> }
                         </td>
-                        : <td className=" border border-gray-400 text-center"></td>
                         }
 
-                        {header.doc_id === null ? 
-                        <td className=" border border-gray-400 text-center">
+                        {header.doc_id === null &&
+                        <td className=" border border-gray-400 text-center  w-16">
                             
                             <button 
                             className="hover:bg-red-100 rounded" 
@@ -189,11 +185,10 @@ export default function PurchTableComponent({ purchtables, vendors, items }: Pur
                             setShowModal={setShowDeleteModal} 
                             />}
                         </td>
-                        : <td className=" border border-gray-400 text-center"></td>    
                         }
 
-                        {header.doc_id === null ? 
-                        <td className=" border border-gray-400 text-center">
+                        {header.doc_id === null && 
+                        <td className=" border border-gray-400 text-center w-16">
                             
                             {header.purchaselines.length > 0 && 
                             <button 
@@ -215,7 +210,7 @@ export default function PurchTableComponent({ purchtables, vendors, items }: Pur
                             setShowForm={setShowRegisterModal} 
                             />}
                         </td>
-                        : <td className="px-4 py-2 border border-gray-400 text-center"></td>}
+                    }
                         
                     </tr>
                     ))}

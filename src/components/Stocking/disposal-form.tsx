@@ -29,7 +29,7 @@ export default function DisposalFormPage({poolInfo, setShowDisposalForm, reasons
     // }, [selectedReason])
 
     return (
-        <div className="fixed top-0 left-0 w-full h-full bg-gray-800 bg-opacity-75 flex justify-center items-center">
+        <div className="fixed top-0 left-0 w-full h-full bg-gray-800 bg-opacity-75 flex justify-center items-center z-10">
             <div className="bg-white p-4 rounded shadow-lg w-1/3">
             <h1 className="font-bold mb-4 text-center text-base">Форма списання риби з басейну {poolInfo.location_name}</h1>
                 <form className="mx-auto px-4 m-4" action={action} onSubmit={handleCloseForm}>

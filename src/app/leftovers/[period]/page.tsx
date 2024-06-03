@@ -30,7 +30,7 @@ export default async function LeftoversPerPeriod(props: LeftoversPerPeriodProps)
         const EndSaldoDate1 = new Date(parts[1])
 
         const EndSaldoDate: Date = new Date(EndSaldoDate1);
-        EndSaldoDate.setDate(EndSaldoDate.getDate() +1 );
+        EndSaldoDate.setDate(EndSaldoDate.getDate() + 1 );
         
         
         const end_saldo = await calculateSaldo(undefined, undefined, undefined)
@@ -72,14 +72,14 @@ export default async function LeftoversPerPeriod(props: LeftoversPerPeriodProps)
                 <table className="table-auto border-collapse w-full">
                     <thead className="bg-gray-200">
                     <tr className="bg-blue-100">
-                    <th className="px-2 py-2   border-gray-400">Batch ID</th>
-                        <th className="px-2 py-2   border-gray-400">Batch Name</th>
-                        <th className="px-2 py-2  border-gray-400">Feed Type</th>
-                        <th className="px-2 py-2 border-gray-400">Item Name</th>
-                        <th className="px-2 py-2 border-gray-400">Start Saldo</th>
-                        <th className="px-2 py-2 border-gray-400">Incoming</th>
-                        <th className="px-2 py-2   border-gray-400">Outcoming</th>
-                        <th className="px-2 py-2  border-gray-400">End Saldo</th>
+                    <th className="px-2 py-2 border-gray-400">ID партії</th>
+                        <th className="px-2 py-2 border-gray-400">Назва партії</th>
+                        <th className="px-2 py-2 border-gray-400">Тип корму</th>
+                        <th className="px-2 py-2 border-gray-400">Назва товару</th>
+                        <th className="px-2 py-2 border-gray-400 w-32">На початку розрахунку</th>
+                        <th className="px-2 py-2 border-gray-400 w-32">Прийшло</th>
+                        <th className="px-2 py-2 border-gray-400 w-32">Реалізовано</th>
+                        <th className="px-2 py-2 border-gray-400 w-32">Зараз на складі</th>
                     </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">

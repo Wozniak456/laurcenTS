@@ -61,14 +61,8 @@ const Tabs: React.FC<TabsProps> = ({ tabContents, items, units, individuals }) =
         <Link href="/batches/new" className="border p-2 rounded">
         Додати партію
         </Link>
-        {/* <button 
-          onClick={() => setCreateFormVisible(prevState => !prevState)}
-          className="bg-gray-500 hover:bg-yellow-900 text-white py-2 px-2 rounded mb-4 w-fit ">
-          {isCreateFormVisible ? <p>Сховати форму</p> : <p>Додати партію</p>}
-        </button> */}
       </div>
-      {/*{isCreateFormVisible && <BatchCreateForm items={items} units={units} individuals={individuals}/>} */}
-       
+      
       <div className="p-6">
         {tabContents.map((content, index) => (
           <div

@@ -4,7 +4,8 @@ import { useFormState } from "react-dom";
 import * as actions from '@/actions';
 import PartitionForm from "@/components/batch-partition";
 import { useEffect, useState } from "react";
-import { ItemBatch} from '@/components/accordion'
+// import { ItemBatch} from '@/components/accordion'
+import { itembatches } from "@prisma/client";
 import PoolInfo from "@/components/pool-info"
 import { batchInfo, poolInfo, disposalItem } from '@/types/app_types'
 import DisposalForm from '@/components/Stocking/disposal-form'
@@ -15,7 +16,7 @@ interface StockPoolProps {
         name: string,
         location_type_id: number
     }[],
-    batches: ItemBatch[],
+    batches: itembatches[],
     poolInfo: poolInfo,
     disposal_reasons: disposalItem[]
 }
@@ -42,6 +43,11 @@ export default function StockPoolPage({locations, batches, poolInfo, disposal_re
 
     return (
         <div>
+            <div className="my-4">
+                <h2 className="font-bold">Локація: {locations.find(loc => loc.id === poolInfo.location_id)?.name}</h2>
+            </div>
+            
+            {poolInfo.batch && <PoolInfo poolInfo={poolInfo} batches={batches}/>}
             <form className="container mx-auto m-4 " action={action}>
             <div className="flex justify-end">
                 {/* <button
@@ -53,8 +59,7 @@ export default function StockPoolPage({locations, batches, poolInfo, disposal_re
                 </button> */}
             </div>
             <div className="flex justify-center flex-col gap-4 ">
-                <h2 className="font-bold">Локація: {locations.find(loc => loc.id === poolInfo.location_id)?.name}</h2>
-                {poolInfo.batch && <PoolInfo poolInfo={poolInfo}/>}
+                
                 <input type="hidden" name="location_id_from" value={87} />
                 <input type="hidden" name="location_id_to" value={poolInfo.location_id} />
                 {!poolInfo.batch && 

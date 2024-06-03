@@ -1,7 +1,7 @@
 import { db } from "@/db";
 import StockingComponent from "@/components/stockin111"
 import { poolInfo } from '@/types/app_types'
-import {getBatchesInfo} from '@/actions/stocking'
+import {getBatchesInfo, calculationForLocation} from '@/actions/stocking'
 
 export default async function StockingHome() {
 
@@ -75,57 +75,3 @@ export default async function StockingHome() {
     </div>
   );
 }
-
-async function getFeedType(fish_weight : number) {
-  const feed_connection = await db.feedconnections.findFirst({
-    where:{
-      from_fish_weight:{
-        lte: fish_weight
-      },
-      to_fish_weight:{
-        gte: fish_weight
-      }
-    }
-  })
-
-  if (feed_connection){
-    const feed_type = await db.feedtypes.findFirst({
-      where:{
-        id: feed_connection.feed_type_id
-      }
-    })
-    return feed_type?.name
-  }
-}
-
-async function calculationForLocation(location_id : number, date: string){
-
-  let batch = null
-  let calc = null
-  let feed_type_id = null
-  
-  calc = await db.calculation_table.findFirst({
-    select:{
-      fish_weight: true
-    },
-    where:{
-      documents:{
-        location_id: location_id
-      },
-      date: new Date(date)
-    },
-    orderBy:{
-      id: 'desc'
-    },
-    take: 1
-  })
-
-  if(calc){
-    batch = await getBatchesInfo(location_id)
-    feed_type_id = await getFeedType(calc.fish_weight)
-  }
-
-  return{batch, calc, feed_type_id, location_id}
-  
-}
-

@@ -68,7 +68,7 @@ export default function CreateEditPurchHeaderForm({
                     <div className="flex flex-row gap-2 justify-between items-start">
                         <div className=" flex items-center gap-2">
                             <label className="" htmlFor='delivery_date'>
-                                Delivery date: 
+                                Дата приходу: 
                             </label>
                             <input
                                 name='delivery_date'
@@ -81,13 +81,13 @@ export default function CreateEditPurchHeaderForm({
                         </div>
                         <div className="flex flex-row gap-4 flex-wrap items-start justify-end">
                             <div className="flex flex-col gap-2">
-                                <div className=" flex items-center gap-2">
+                                <div className=" flex flex-col  gap-2">
                                     <label className="" htmlFor='vendor_id'>
-                                        Vendor ID:
+                                        Постачальник:
                                     </label>
                                     <select 
                                         name='vendor_id'
-                                        className="border rounded p-2 h-10 w-32" 
+                                        className="border rounded p-2 h-10 " 
                                         id='vendor_id'
                                         required
                                         onChange={(e) => handleSelectedVendor(Number(e.target.value)) }  
@@ -96,23 +96,23 @@ export default function CreateEditPurchHeaderForm({
                                         <option value="">Оберіть...</option>
                                         {vendors
                                             .map(vendor => (
-                                                <option key={vendor.id} value={vendor.id}>{vendor.id}</option>
+                                                <option key={vendor.id} value={vendor.id}>{vendor.name}</option>
                                         ))}
                                     </select>
                                 </div>
-                                <div>
+                                {/* <div>
                                     {selectedVendor ? <p>{selectedVendor}</p> : ''}
-                                </div>
+                                </div> */}
 
                             </div>
                             
-                            <div className=" flex items-center gap-2">
+                            <div className=" flex flex-col gap-2">
                                 <label className="" htmlFor='vendor_doc_id'>
-                                Vendor doc ID: 
+                                    Документ постачальника: 
                                 </label>
                                 <input
                                     name='vendor_doc_id'
-                                    className="border rounded p-2 w-24 h-10" // Додайте висоту тут
+                                    className="border rounded p-2  h-10" // Додайте висоту тут
                                     id='vendor_doc_id'
                                     required
                                     defaultValue={header ? header.vendor_doc_number : undefined}

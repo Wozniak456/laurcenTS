@@ -63,67 +63,63 @@ export default function CreateEditLineForm({purchId,
     return(
         <div className="fixed top-0 left-0 w-full h-full bg-gray-800 bg-opacity-75 flex justify-center items-center">
         <div className="bg-white p-8 rounded shadow-lg w-1/2">
-            <h2 className="text-lg font-semibold mb-4">Нова накладна</h2>
-            <form className="mb-4" action={action} onSubmit={handleCloseModal}>
-            <input type="hidden" name="purchase_id" value={String(purchId)} />
-            {line ? <input type="hidden" name="purch_line_id" value={String(line.id)} /> : ''}
-            <div className="flex flex-row gap-2 justify-between items-start flex-wrap">
-                <div className="flex flex-col gap-2">
-                    <div className=" flex items-center gap-2">
+            <h2 className="text-lg font-semibold mb-4 text-center">Новий рядок накладної</h2>
+            <form className="mt-8" action={action} onSubmit={handleCloseModal}>
+                <input type="hidden" name="purchase_id" value={String(purchId)} />
+                {line ? <input type="hidden" name="purch_line_id" value={String(line.id)} /> : ''}
+                <div className="flex flex-row gap-2 justify-between items-start flex-wrap">
+                    <div className="flex flex-col gap-2 w-full max-w-64">
                         <label className="" htmlFor='item_id'>
-                        Item ID: 
-                    </label>
-                    <select 
-                        name='item_id'
-                        className="border rounded p-2 h-10 w-32" 
-                        id='item_id'
-                        required
-                        onChange={(e) => handleSelectedItem(Number(e.target.value)) }
-                        defaultValue={line ? line.item_id : undefined}  
-                        // value={line ? line.item_id : ''}
-                    >
-                        <option value="">Оберіть...</option>
-                        {items
-                            .map(item => (
-                                <option key={item.id} value={item.id}>{item.id}</option>
-                        ))}
-                    </select>
-                    </div>
-                    <div>
-                        {selectedItem ? <p>{selectedItem}</p> : ''}
-                    </div>
+                            Призначення: 
+                        </label>
+                        <select 
+                            name='item_id'
+                            className="border rounded p-2 h-10" 
+                            id='item_id'
+                            required
+                            onChange={(e) => handleSelectedItem(Number(e.target.value)) }
+                            defaultValue={line ? line.item_id : undefined}  
+                            // value={line ? line.item_id : ''}
+                        >
+                            <option value="">Оберіть...</option>
+                            {items.map(item => (
+                                    <option key={item.id} value={item.id}>{item.name}</option>
+                            ))}
+                        </select>
 
+                    </div>
+                    <div className="flex flex-col gap-2 w-full max-w-48">
+                        <label className="" htmlFor='quantity'>
+                            Кількість: 
+                        </label>
+                        <input
+                            name='quantity'
+                            className="border rounded p-2 h-10" // Додайте висоту тут
+                            id='quantity'
+                            required
+                            type="number"
+                            min={1}
+                            defaultValue={line ? line.quantity : undefined} 
+                        />
+                    </div>
+                    <div className="flex flex-col gap-2 w-full max-w-48">
+                        <label htmlFor='unit_id'>Одиниця виміру:</label>
+                        <input type="hidden" name="unit_id" value={items.find(item => item.name === selectedItem)?.units?.id} />
+                        <label className="border rounded p-2  h-10">{items.find(item => item.name === selectedItem)?.units?.name || ''}</label>
+                    </div>
+                </div> 
+                <div className="flex flex-wrap gap-2 justify-between mt-4">
+                    <button 
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                        type="submit"
+                        >
+                        Зберегти
+                    </button>
+                    <button className="hover:bg-blue-500 hover:text-white border font-bold py-2 px-4 rounded" 
+                    onClick={handleCloseModal}>
+                        Скасувати
+                    </button>
                 </div>
-                <div className=" flex items-center gap-2">
-                    <label className="" htmlFor='quantity'>
-                    Quantity: 
-                    </label>
-                    <input
-                        name='quantity'
-                        className="border rounded p-2 w-24 h-10" // Додайте висоту тут
-                        id='quantity'
-                        required
-                        defaultValue={line ? line.quantity : undefined} 
-                    />
-                </div>
-                <div className="flex items-center gap-2">
-                    <label htmlFor='unit_id'>Unit:</label>
-                    <input type="hidden" name="unit_id" value={items.find(item => item.name === selectedItem)?.units?.id} />
-                    <label className="border rounded p-2 w-24 h-10">{items.find(item => item.name === selectedItem)?.units?.name || ''}</label>
-                </div>
-            </div> 
-            <div className="flex justify-between mt-4">
-                <button 
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                    type="submit"
-                    >
-                    Зберегти
-                </button>
-                <button className="hover:bg-blue-500 hover:text-white border font-bold py-2 px-4 rounded" 
-                onClick={handleCloseModal}>
-                    Скасувати
-                </button>
-            </div>
             </form>
             
         </div>
