@@ -48,32 +48,33 @@ export default function RegisteringGoods({
     return(
         <div className="fixed top-0 left-0 w-full h-full bg-gray-800 bg-opacity-75 flex justify-center items-center cursor-default">
             <div className="bg-white p-8 rounded shadow-lg w-3/5">
-            <h2 className="text-lg font-semibold mb-4">Реєстрація приходу товару</h2>
-            
-            <form className="mb-4" action={action} onSubmit={handleCloseModal}>
+                <div className="flex flex-start">
+                    <h2 className="text-lg font-semibold">Реєстрація приходу товару</h2>
+                </div>
+            <form className="my-8" action={action} onSubmit={handleCloseModal}>
 
                 <table className="min-w-full">
                     <thead>
-                        <tr className="bg-green-100 ">
-                            <th scope="col" className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <tr className="bg-blue-100 ">
+                            <th scope="col" className="px-6 py-3 ">
                                 Назва товару
                             </th>
-                            <th scope="col" className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th scope="col" className="px-6 py-3 ">
                                 К-сть
                             </th>
-                            <th scope="col" className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th scope="col" className="px-6 py-3 ">
                                 Од. Виміру
                             </th>
-                            <th scope="col" className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th scope="col" className="px-6 py-3 ">
                                 Назва партії
                             </th>
-                            <th scope="col" className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th scope="col" className="px-6 py-3 ">
                             Дата придатності
                             </th>
-                            <th scope="col" className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider max-w-32">
+                            <th scope="col" className="px-6 py-3 ">
                             Пакування, кг
                             </th>
-                            <th scope="col" className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider max-w-32">
+                            <th scope="col" className="px-6 py-3 ">
                             Ціна, грн
                             </th>
                         </tr>
@@ -143,7 +144,7 @@ export default function RegisteringGoods({
                 <input type="hidden" name="header_id" value={String(header?.id)} /> 
                 <div className="flex justify-between mt-4">
                     <button 
-                        className="bg-green-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                         type="submit"
                         >
                         Зберегти

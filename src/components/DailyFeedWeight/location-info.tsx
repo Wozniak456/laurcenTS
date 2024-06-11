@@ -31,7 +31,7 @@ export default function LocationComponent({location, todayCalculation, prevCalcu
     const renderedItem = (day : calculationAndFeedExtended) => {
         if (day?.calculation !== null && day?.allItems && day?.allItems?.length > 1 && day?.feed?.definedPrio){
             return(
-                <td className="px-4 h-10 border border-gray-400 bg-gray-100 cursor-pointer" onClick={() => handleClick(day)}>{day?.allItems?.find(item => item.item_id == day.feed?.item_id)?.item_name}</td>
+                <td className="px-4 h-10 border border-gray-400 bg-green-100 cursor-pointer" onClick={() => handleClick(day)}>{day?.allItems?.find(item => item.item_id == day.feed?.item_id)?.item_name}</td>
             )
         } else if(day?.calculation !== null && day?.allItems && day?.allItems?.length == 1 && day?.feed?.definedPrio){
             return(

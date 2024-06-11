@@ -74,6 +74,7 @@ export default function StockPoolPage({locations, batches, poolInfo, disposal_re
                             id="batch_id"
                             required
                         >
+                            <option>Не обрано</option>
                             {batches.map(batch => (
                                 <option key={batch.id} value={Number(batch.id)}>{batch.name}</option>
                             ))}

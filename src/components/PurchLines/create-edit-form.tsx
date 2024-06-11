@@ -63,8 +63,8 @@ export default function CreateEditLineForm({purchId,
     return(
         <div className="fixed top-0 left-0 w-full h-full bg-gray-800 bg-opacity-75 flex justify-center items-center">
         <div className="bg-white p-8 rounded shadow-lg w-1/2">
-            <h2 className="text-lg font-semibold mb-4 text-center">Новий рядок накладної</h2>
-            <form className="mt-8" action={action} onSubmit={handleCloseModal}>
+            <h2 className="text-lg font-semibold mb-4">Новий рядок накладної</h2>
+            <form className="my-8" action={action} onSubmit={handleCloseModal}>
                 <input type="hidden" name="purchase_id" value={String(purchId)} />
                 {line ? <input type="hidden" name="purch_line_id" value={String(line.id)} /> : ''}
                 <div className="flex flex-row gap-2 justify-between items-start flex-wrap">

@@ -69,9 +69,9 @@ export default function PoolInfoComponent({poolInfo, batches} : PoolInfoProps){
                         onChange={handleBatchIdChange}
                         disabled={!editionAllowed}
                     >
-                        {batches.map(batch => (
-                            <option key={batch.id} value={Number(batch.id)}>{batch.name}</option>
-                        ))}
+                    {batches.map(batch => (
+                        <option key={batch.id} value={Number(batch.id)}>{batch.name}</option>
+                    ))}
                     </select>
                 </div>
                 <div className="mb-4">

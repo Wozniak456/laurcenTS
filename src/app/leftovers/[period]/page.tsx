@@ -77,8 +77,8 @@ export default async function LeftoversPerPeriod(props: LeftoversPerPeriodProps)
                         <th className="px-2 py-2 border-gray-400">Тип корму</th>
                         <th className="px-2 py-2 border-gray-400">Назва товару</th>
                         <th className="px-2 py-2 border-gray-400 w-32">На початку розрахунку</th>
-                        <th className="px-2 py-2 border-gray-400 w-32">Прийшло</th>
-                        <th className="px-2 py-2 border-gray-400 w-32">Реалізовано</th>
+                        <th className="px-2 py-2 border-gray-400 w-32">Прибуло</th>
+                        <th className="px-2 py-2 border-gray-400 w-32">Списано</th>
                         <th className="px-2 py-2 border-gray-400 w-32">Зараз на складі</th>
                     </tr>
                     </thead>

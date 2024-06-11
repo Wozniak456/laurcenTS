@@ -76,7 +76,7 @@ const Tabs: React.FC<TabsProps> = ({ tabContents, items, units, individuals }) =
               className="flex justify-between items-center p-2 hover:bg-gray-200 border-b border-gray-300 pb-2"
               >
                 <div>{item.contentLine}</div>
-                <div>View</div>
+                <div className='text-sm text-gray-400'>Перегляд</div>
               </Link>
             ))}
           </div>

@@ -808,16 +808,13 @@ export async function createItemBatch(
                 }
             })
 
-            await db.itembatches.update({
-                where:{
-                    id: batch.id
-                },
+            await addingFishBatch(batch.id, quantity, unit_id, created_by )
+
+            await db.batch_generation.create({
                 data:{
-                    generation: String(batch.id)
+                    location_id: 87
                 }
             })
-
-            await addingFishBatch(batch.id, quantity, unit_id, created_by )
             
             return {
                 message: `Партія ${name} успішно створена`
@@ -1539,7 +1536,17 @@ export async function feedBatch(
                                 }
                             });
 
-                            // console.log(`Витягнули зі складу: ${fetchTran.id} і вкинули в басейн: ${feedTran.id}`)
+                            // const cost_record = await db.cost_table.create({
+                            //     data:{
+                            //         batch_id: fish_batch_id,
+                            //         location_id: location_id,
+                            //         cost: batch.price as number / 1000 * qty,
+                            //         item_transaction_id: feedTran.id
+                            //     }
+                            // })
+
+                            console.log(`Витягнули зі складу: ${fetchTran.id} і вкинули в басейн: ${feedTran.id}`)
+                            // console.log(`Собівартість змінилася, ${cost_record}`)
 
                             left_to_feed = 0;
                             break; // Виходимо з циклу, бо всю необхідну кількість взято
@@ -1607,6 +1614,10 @@ export async function feedBatch(
 
     //redirect('/summary-feeding-table/day');
     }
+
+
+//     
+
 
 export async function batchDivision(
     formState: { message: string } | undefined,
@@ -1961,15 +1972,12 @@ export async function getFeedTypeId(fish_weight: number){
 export async function getFeedBatchByItemId(item_id: number, quantity: number) {
     
     const batches = await db.itembatches.findMany({
-        select:{
-            id: true
-        },
         where: {
             item_id: item_id            
         },
     })
 
-    console.log('усі batches', batches)
+    // console.log('усі batches', batches)
 
     const batches_quantity = await db.itemtransactions.groupBy({
         by: ['batch_id'],
@@ -1984,7 +1992,16 @@ export async function getFeedBatchByItemId(item_id: number, quantity: number) {
         }
     });
 
-    console.log('batches_quantity', batches_quantity)
+    const batches_quantity_with_price = batches_quantity.map(bq => {
+        const batch = batches.find(batch => batch.id === bq.batch_id);
+        return {
+            ...bq,
+            price: batch ? batch.price : null // Add price if batch is found, otherwise null
+        };
+    });
+
+    console.log('batches_quantity_with_price', batches_quantity_with_price)
+    // console.log('batches_quantity', batches_quantity)
 
     // Якщо в партії не вистачає корму на годування, то брати з іншої партії
     const batches_array = []; // Масив для зберігання партій
@@ -1993,9 +2010,9 @@ export async function getFeedBatchByItemId(item_id: number, quantity: number) {
 
     console.log('totalQuantity: ', totalQuantity, 'quantity: ', quantity)
 
-    while (totalQuantity < quantity && batches_quantity.length > 0) {
+    while (totalQuantity < quantity && batches_quantity_with_price.length > 0) {
         //знаходимо партію з найменшим id (найстарішу)
-        const minBatch = batches_quantity.reduce((min, current) => min.batch_id < current.batch_id ? min : current);
+        const minBatch = batches_quantity_with_price.reduce((min, current) => min.batch_id < current.batch_id ? min : current);
 
         batches_array.push(minBatch);
 
@@ -2006,8 +2023,8 @@ export async function getFeedBatchByItemId(item_id: number, quantity: number) {
             break;
         }
     
-        const minIndex = batches_quantity.indexOf(minBatch); // Знаходимо індекс поточної партії
-        batches_quantity.splice(minIndex, 1); // Видаляємо поточну партію з масиву
+        const minIndex = batches_quantity_with_price.indexOf(minBatch); // Знаходимо індекс поточної партії
+        batches_quantity_with_price.splice(minIndex, 1); // Видаляємо поточну партію з масиву
     }
     
     // Перевірка, чи було знайдено необхідну кількість корму

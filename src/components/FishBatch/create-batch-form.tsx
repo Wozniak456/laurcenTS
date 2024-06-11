@@ -130,7 +130,7 @@ export default function ItemBatchCreateForm({items, units} : ItemBatchCreateForm
                             ) : null
                         }
                         <div className='flex justify-between flex-wrap gap-2 inline-block'>
-                            <button type="submit" className="rounded p-2 bg-green-200">
+                            <button type="submit" className="rounded p-2 bg-blue-200">
                                 Створити
                             </button>
                            

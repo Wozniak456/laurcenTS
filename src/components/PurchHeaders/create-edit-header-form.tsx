@@ -65,8 +65,8 @@ export default function CreateEditPurchHeaderForm({
                 {header ? <h2 className="text-lg font-semibold mb-4">Редагування накладної</h2> : <h2 className="text-lg font-semibold mb-4">Нова накладна</h2>}
          
                 <form className="mb-4" action={action} onSubmit={handleCloseModal}>
-                    <div className="flex flex-row gap-2 justify-between items-start">
-                        <div className=" flex items-center gap-2">
+                    <div className="flex flex-row gap-2 justify-between items-start my-8">
+                        <div className=" flex flex-col gap-2">
                             <label className="" htmlFor='delivery_date'>
                                 Дата приходу: 
                             </label>
@@ -79,8 +79,7 @@ export default function CreateEditPurchHeaderForm({
                                 defaultValue={header ? header.date_time.toISOString().split("T")[0] : ''}
                             />
                         </div>
-                        <div className="flex flex-row gap-4 flex-wrap items-start justify-end">
-                            <div className="flex flex-col gap-2">
+                        <div className="flex flex-col gap-2">
                                 <div className=" flex flex-col  gap-2">
                                     <label className="" htmlFor='vendor_id'>
                                         Постачальник:
@@ -118,7 +117,9 @@ export default function CreateEditPurchHeaderForm({
                                     defaultValue={header ? header.vendor_doc_number : undefined}
                                 />
                             </div>
-                        </div> 
+                        {/* <div className="flex flex-row gap-4 flex-wrap items-start justify-end">
+                            
+                        </div>  */}
                     </div>
                     <input type="hidden" name="header_id" value={String(header?.id)} /> 
                     <div className="flex justify-between mt-4">
