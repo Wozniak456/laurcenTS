@@ -15,7 +15,21 @@ interface Pool{
 }
 
 type PoolInfoProps = {
-    poolInfo: poolInfo
+    location: {
+        id: number;
+        location_type_id: number;
+        name: string;
+        pool_id: number | null;
+    },
+    poolInfo: {
+        batchId: bigint | undefined;
+        batchName: string | undefined;
+        qty: number | undefined;
+        fishWeight: number | undefined;
+        feedType: string | undefined;
+        updateDate: string | undefined;
+        allowedToEdit: boolean;
+    },
     batches: itembatches[]
 }
 
@@ -25,17 +39,17 @@ type batch_qty = {
   }
 
 
-export default function PoolInfoComponent({poolInfo, batches} : PoolInfoProps){
+export default function PoolInfoComponent({location, poolInfo, batches} : PoolInfoProps){
     const [editionAllowed, setEditionAllowed] = useState<boolean>(false)
 
-    const initialBatchId = Number(poolInfo.batch?.batch_id);
-    const initialCount = Number(poolInfo.batch?.qty);
-    const initialAvMass = Number(poolInfo.calc?.fish_weight);
+    const initialBatchId = Number(poolInfo.batchId);
+    const initialCount = Number(poolInfo.qty);
+    const initialAvMass = Number(poolInfo.fishWeight);
 
     // Стан для змінних
-    const [batchId, setBatchId] = useState<number>(Number(poolInfo.batch?.batch_id));
-    const [count, setCount] = useState<number>( Number(poolInfo.batch?.qty));
-    const [avMass, setAvMass] = useState<number>(Number(poolInfo.calc?.fish_weight));
+    const [batchId, setBatchId] = useState<number>(Number(poolInfo.batchId));
+    const [count, setCount] = useState<number>( Number(poolInfo.qty));
+    const [avMass, setAvMass] = useState<number>(Number(poolInfo.fishWeight));
 
     const handleBatchIdChange = (event: ChangeEvent<HTMLSelectElement>) => {
         setBatchId(Number(event.target.value));
@@ -51,13 +65,16 @@ export default function PoolInfoComponent({poolInfo, batches} : PoolInfoProps){
 
     const [formState, updatePoolInfoAction] = useFormState(actions.updateCurrentPoolState, { message: '' })
 
-    console.log(poolInfo.location_name , poolInfo.allowedToEdit)
+    // console.log(poolInfo.location_name , poolInfo.allowedToEdit)
     
+    // console.log('poolInfo.cost', poolInfo.cost)
+
     return (
         <div className='bg-blue-200 p-4 rounded-md shadow-md '>
             <div className='flex justify-between gap-1 '> 
                 <div className="mb-4">
                     <label htmlFor="batchName" className="block text-gray-700 font-bold mb-2">Партія:</label>
+                    {/* <label htmlFor="batchName" className="block text-gray-700 font-bold mb-2">{poolInfo.cost?.toFixed(4)}</label> */}
                     <select
                         name="batch_id"
                         className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300 ${
@@ -93,7 +110,7 @@ export default function PoolInfoComponent({poolInfo, batches} : PoolInfoProps){
                     id="fishWeight"
                     type="number"
                     step='any'
-                    value={avMass}
+                    value={avMass.toFixed(1)}
                     onChange={handleAvMassChange}
                     disabled={!editionAllowed}
                     className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300 ${
@@ -119,7 +136,7 @@ export default function PoolInfoComponent({poolInfo, batches} : PoolInfoProps){
                     onSubmit={() => {setEditionAllowed(false)}}
                  >
                     {/* <input type="hidden" name="location_id_from" value={poolInfo.location_id} /> */}
-                    <input type="hidden" name="location_id_to" value={poolInfo.location_id} />
+                    <input type="hidden" name="location_id_to" value={location.id} />
 
                     {batchId != initialBatchId && <input type="hidden" name="batch_id_before" value={initialBatchId} />}
                     {count != initialCount && <input type="hidden" name="fish_amount_before" value={initialCount} />}

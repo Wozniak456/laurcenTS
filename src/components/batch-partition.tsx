@@ -8,7 +8,21 @@ import Image from 'next/image';
 import {  poolInfo, disposalItem } from '@/types/app_types'
 
 interface PartitionFormPageProps {
-    poolInfo: poolInfo,
+    location: {
+        id: number;
+        location_type_id: number;
+        name: string;
+        pool_id: number | null;
+    },
+    poolInfo: {
+        batchId: bigint | undefined;
+        batchName: string | undefined;
+        qty: number | undefined;
+        fishWeight: number | undefined;
+        feedType: string | undefined;
+        updateDate: string | undefined;
+        allowedToEdit: boolean;
+    }
     locations: location[]
 }
 
@@ -24,7 +38,7 @@ type batchInfo = {
     qty: number
   }
 
-export default function PartitionFormPage({poolInfo, locations} : PartitionFormPageProps) {
+export default function PartitionFormPage({location, poolInfo, locations} : PartitionFormPageProps) {
     const [selectedPools, setSelectedPools] = useState<(number | null)[]>([]);
     const [formState, action] = useFormState(actions.batchDivision, { message: '' });
     
@@ -51,13 +65,13 @@ export default function PartitionFormPage({poolInfo, locations} : PartitionFormP
         <form className="container mx-auto px-4 py-4 m-4 bg-white shadow-md rounded-lg" action={action}>
             {/* <h1 className="font-bold mb-4 text-center text-base">Форма поділу партії</h1> */}
             <div className="mb-4">
-                <input type="hidden" name="location_id_from" value={poolInfo.location_id} />
+                <input type="hidden" name="location_id_from" value={location.id} />
             </div>
             <div className="mb-4 flex flex-col items-center">
                 <div className='flex flex-col my-4'>
                     <p className="font-semibold text-base mb-8">Басейни для розподілу:</p>
-                    <input type="hidden" name="batch_id_from" value={String(poolInfo.batch?.batch_id)} />
-                    <input type="hidden" name="fish_qty_in_location_from" value={poolInfo.batch?.qty} />
+                    <input type="hidden" name="batch_id_from" value={String(poolInfo.batchId)} />
+                    <input type="hidden" name="fish_qty_in_location_from" value={poolInfo.qty} />
                     {selectedPools.map((selectedPoolId, index) => {
                         
                         return (

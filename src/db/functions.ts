@@ -1,4 +1,89 @@
 import { db } from "@/db";
+import ExcelJS from 'exceljs';
+// import path from 'path';
+import fs from 'fs/promises';
+
+//fill the datatables 
+export async function fillDatatables() {
+    const filePath = './public/datatables.xlsx';
+    try {
+        const fileBuffer = await fs.readFile(filePath);
+        const workbook = new ExcelJS.Workbook();
+        await workbook.xlsx.load(fileBuffer);
+
+        await tableDueToFishWeight(workbook, 'lt25')
+        await tableDueToFishWeight(workbook, 'gt25')
+
+    } catch (error) {
+        console.error('Error reading or importing Excel file:', error);
+        return [];
+    }
+}
+
+export async function tableDueToFishWeight(workbook: ExcelJS.Workbook, fishType: string){
+    if (fishType === 'lt25'){ //less than 25
+        const worksheetName = 'Datatabel1';
+        let worksheet = workbook.getWorksheet(worksheetName);
+
+        if (!worksheet) {
+            throw new Error(`Worksheet '${worksheetName}' not found in the Excel file.`);
+        }
+
+        let isFirstRow = true; // Флаг для першого рядка
+
+        await db.datatable_below25.deleteMany()
+
+        worksheet.eachRow(async (row) => {
+            if (isFirstRow) {
+                isFirstRow = false;// Пропускаємо перший рядок
+                return; 
+            }
+
+            await db.datatable_below25.create({
+                data: {
+                    day: Number(row.getCell(5).text.trim()),
+                    feedingLevel: Number(row.getCell(3).text.trim()),
+                    fc: Number(row.getCell(4).text.trim()),
+                    weight: Number(row.getCell(2).text.trim()),
+                    voerhoeveelheid: Number(row.getCell(6).text.trim())
+                }
+            });
+           
+        });
+    }
+    else if (fishType === 'gt25'){ //greater than 25
+        const worksheetName = 'Datatabel2';
+        let worksheet = workbook.getWorksheet(worksheetName);
+
+        if (!worksheet) {
+            throw new Error(`Worksheet '${worksheetName}' not found in the Excel file.`);
+        }
+
+        let isFirstRow = true; // Флаг для першого рядка
+
+        await db.datatable_over25.deleteMany()
+
+        worksheet.eachRow(async (row) => {
+            if (isFirstRow) {
+                isFirstRow = false; // Пропускаємо перший рядок
+                return; 
+            }
+
+            await db.datatable_over25.create({
+                data: {
+                    day: Number(row.getCell(1).text.trim()),
+                    av_weight: Number(row.getCell(2).text.trim()),
+                    weight: Number(row.getCell(3).text.trim()),
+                    uitval: Number(row.getCell(4).text.trim()),
+                    voederconversie: Number(row.getCell(7).text.trim()),
+                    voederniveau: Number(row.getCell(5).text.trim())
+                }
+            });
+           
+        });
+    }
+
+}
 
 export async function caviarRegistering(locationId: number, executedBy: number, purchId: number, comments?: string)
 : Promise<bigint | null> {

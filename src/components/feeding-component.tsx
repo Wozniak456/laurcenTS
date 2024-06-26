@@ -16,15 +16,26 @@ interface StockPoolProps {
         name: string,
         location_type_id: number
     }[],
+    location: {
+        id: number;
+        location_type_id: number;
+        name: string;
+        pool_id: number | null;
+    },
     batches: itembatches[],
-    poolInfo: poolInfo,
+    poolInfo: {
+        batchId: bigint | undefined;
+        batchName: string | undefined;
+        qty: number | undefined;
+        fishWeight: number | undefined;
+        feedType: string | undefined;
+        updateDate: string | undefined;
+        allowedToEdit: boolean;
+    },
     disposal_reasons: disposalItem[]
 }
 
-export default function StockPoolPage({locations, batches, poolInfo, disposal_reasons}: StockPoolProps) {
-
-    // console.log(poolInfo.location_id, poolInfo)
-    const [showMoreFields, setShowMoreFields] = useState(false);
+export default function StockPoolPage({location, locations, batches, poolInfo, disposal_reasons}: StockPoolProps) {
     const [showPartitionForm, setShowPartitionForm] = useState(false);
     const [showDisposalForm, setShowDisposalForm] = useState(false);
 
@@ -32,37 +43,25 @@ export default function StockPoolPage({locations, batches, poolInfo, disposal_re
         setShowDisposalForm(true)
     }
 
-    useEffect(() => {
-        console.log(showDisposalForm);
-    }, [showDisposalForm]);
     
     const [formState, action] = useFormState(actions.stockPool, { message: '' });
-    const [locationIdFrom, setLocationIdFrom] = useState<number | undefined>(undefined);
-
-    
 
     return (
         <div>
             <div className="my-4">
-                <h2 className="font-bold">Локація: {locations.find(loc => loc.id === poolInfo.location_id)?.name}</h2>
-            </div>
+                <h2 className="font-bold">Локація: {location.name}</h2>
+            </div> 
             
-            {poolInfo.batch && <PoolInfo poolInfo={poolInfo} batches={batches}/>}
+            {poolInfo.qty && poolInfo.qty > 0 ? <PoolInfo location={location} poolInfo={poolInfo} batches={batches}/> : ''}
+            
             <form className="container mx-auto m-4 " action={action}>
             <div className="flex justify-end">
-                {/* <button
-                    type="button"
-                    className="text-blue-600 hover:underline"
-                    onClick={() => setShowMoreFields(!showMoreFields)}
-                >
-                    {showMoreFields ? "Згорнути" : "Керувати басейном..."}
-                </button> */}
             </div>
             <div className="flex justify-center flex-col gap-4 ">
                 
                 <input type="hidden" name="location_id_from" value={87} />
-                <input type="hidden" name="location_id_to" value={poolInfo.location_id} />
-                {!poolInfo.batch && 
+                <input type="hidden" name="location_id_to" value={location.id} />
+                {(!poolInfo.batchName || poolInfo.qty == 0) && 
                 <div className="flex flex-wrap items-center gap-4 justify-between">
                     <div className="flex gap-4 items-center flex-wrap ">
                         <label className="min-w-24" htmlFor="batch_id">
@@ -119,7 +118,7 @@ export default function StockPoolPage({locations, batches, poolInfo, disposal_re
                     />
                     </div> */}
                 <div className="flex flex-wrap gap-4 justify-end">
-                    {!poolInfo.batch &&
+                    {(!poolInfo.batchName || poolInfo.qty==0) &&
                     
                         <button
                             type="submit"
@@ -128,7 +127,7 @@ export default function StockPoolPage({locations, batches, poolInfo, disposal_re
                             Зарибити зі складу
                         </button>
                     }
-                    {poolInfo.batch &&
+                    {poolInfo.qty && poolInfo.qty > 0 ?
                     <>
                     <button
                         type="button"
@@ -145,7 +144,7 @@ export default function StockPoolPage({locations, batches, poolInfo, disposal_re
                     >
                         Списати
                     </button>
-                    </>
+                    </> : ''
                     }
                     
                     
@@ -159,8 +158,8 @@ export default function StockPoolPage({locations, batches, poolInfo, disposal_re
             </div>
             
         </form>
-        {showPartitionForm && <PartitionForm poolInfo={poolInfo} locations={locations}/>} 
-        {showDisposalForm && <DisposalForm poolInfo={poolInfo} reasons={disposal_reasons} setShowDisposalForm={setShowDisposalForm}/>}
+        {showPartitionForm && <PartitionForm location={location} poolInfo={poolInfo} locations={locations}/>} 
+        {showDisposalForm && <DisposalForm location={location} poolInfo={poolInfo} reasons={disposal_reasons} setShowDisposalForm={setShowDisposalForm}/>}
         </div>
     );
 }

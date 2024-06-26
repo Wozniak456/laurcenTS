@@ -16,6 +16,7 @@ interface DaySummaryProps{
     location_name: string;
     batch_id?: bigint; // batch_id є необов'язковим
   },
+  today: string,
   todayCalculation: calculationAndFeed | null | undefined,
   prevCalculation: calculationAndFeed | null | undefined,
   times: {
@@ -41,36 +42,38 @@ type feedArray = {
 }
 
 export default function DaySummaryContent({
-  location, 
+  location,
+  today, 
   todayCalculation, 
   prevCalculation, 
   times,
   items
 }
   : DaySummaryProps) {
+
+    const actualDate = new Date()
+
+    const [formState, action] = useFormState(actions.feedBatch, { message: '' });
     
+    const transitionDay = todayCalculation?.calculation?.transition_day
 
-  const [formState, action] = useFormState(actions.feedBatch, { message: '' });
-  
-  const transitionDay = todayCalculation?.calculation?.transition_day
+    let initialValues = times.map(() => 
+      transitionDay && todayCalculation?.calculation?.feed_per_feeding
+        ? (todayCalculation.calculation.feed_per_feeding * (1 - transitionDay * 0.2)).toFixed(1) ?? "0"
+        : todayCalculation?.calculation?.feed_per_feeding.toFixed(1) ?? "0"
+    );
 
-  let initialValues = times.map(() => 
-    transitionDay && todayCalculation?.calculation?.feed_per_feeding
-      ? (todayCalculation?.calculation?.feed_per_feeding * (transitionDay * 0.2)).toFixed(1) ?? "0"
-      : todayCalculation?.calculation?.feed_per_feeding.toFixed(1) ?? "0"
-  );
+    if (transitionDay && prevCalculation?.calculation){
+      initialValues = [
+        ...initialValues,
+        ...times.map(() =>
+          todayCalculation?.calculation?.feed_per_feeding
+            ? (todayCalculation?.calculation?.feed_per_feeding * (transitionDay * 0.2)).toFixed(1) ?? "0"
+            : "0"
+        )
+      ];
 
-  if (transitionDay && prevCalculation?.calculation){
-    initialValues = [
-      ...initialValues,
-      ...times.map(() =>
-        todayCalculation?.calculation?.feed_per_feeding
-          ? (todayCalculation.calculation.feed_per_feeding * (1 - transitionDay * 0.2)).toFixed(1) ?? "0"
-          : "0"
-      )
-    ];
-
-  }
+    }
   
   const [inputValues, setInputValues] = useState<string[]>(initialValues);
   
@@ -89,9 +92,6 @@ export default function DaySummaryContent({
 
   const [buttonMode, setButtonMode] = useState(false);
 
-  useEffect(()=> {
-    console.log('buttonMode changed',buttonMode)
-  },[buttonMode])
 
   return (
     <>
@@ -115,9 +115,9 @@ export default function DaySummaryContent({
         if(todayCalculation?.calculation){ 
           return(
             <React.Fragment key={index}>
-            <td className="px-4 py-2 border border-gray-400">{transitionDay ? (todayCalculation?.calculation?.feed_per_feeding * (transitionDay * 0.2)).toFixed(1) : todayCalculation?.calculation?.feed_per_feeding.toFixed(1)}</td>
+            <td className="px-4 py-2 border border-gray-400">{transitionDay ? (todayCalculation?.calculation?.feed_per_feeding * (1 - transitionDay * 0.2)).toFixed(1) : todayCalculation?.calculation?.feed_per_feeding.toFixed(1)}</td>
             <td className="px-4 py-2 border border-gray-400">
-            <form action={action}>
+            <form>
               
               <div className="flex justify-center">
               <input
@@ -151,11 +151,19 @@ export default function DaySummaryContent({
         <form action={action}>
           <input type="hidden" name="location_id" value={location.location_id} />
           <input type="hidden" name="executed_by" value={3} />
-          <input type="hidden" name="item_1" value={todayFeed?.id} />
+
+          {!transitionDay ?
+            <input type="hidden" name="item_0" value={todayFeed?.id}/> 
+            :
+            <input type="hidden" name="item_0" value={prevFeed?.id}/> 
+          }
+
+          {/* <input type="hidden" name="item_0" value={todayFeed?.id}/> */}
+          
           <input type="hidden" name="batch_id" value={Number(location.batch_id)} />
 
           {transitionDay && prevCalculation?.calculation &&
-            <input type="hidden" name="item_0" value={prevFeed?.id} />
+            <input type="hidden" name="item_1" value={todayFeed?.id} />
           }
 
           {
@@ -164,10 +172,11 @@ export default function DaySummaryContent({
             ))
           }
           
+        {today == actualDate.toISOString().split("T")[0] &&
           <div className="flex justify-center">
           <button 
             type="submit" 
-            className="inline-flex items-center justify-center transform transition-transform duration-100 active:scale-50 focus:scale-100"
+            className=""
             onClick={() => { setButtonMode(true); }}
           >
             {!buttonMode && <Image src={feedButton} alt="feeding icon" height={35} />}
@@ -180,13 +189,16 @@ export default function DaySummaryContent({
             </>
               
             }
-{/* 
-            {formState.message && 
-            <p>{formState.message}</p>
-              
+
+            {/* {formState.message && 
+            <div className="fixed left-10 bg-gray-100 top-1/2 transform -translate-y-1/2 ml-4">
+              <p>{formState.message}</p>
+            </div>
             } */}
           </button>
         </div>
+        }
+        
         </form>
       }
       </td>
@@ -205,10 +217,10 @@ export default function DaySummaryContent({
       }
       
     {times.map((time, index) => {
-      if(todayCalculation?.calculation){
+      if(todayCalculation?.calculation){ 
         return(
-          <React.Fragment key={index}>
-          <td className="px-4 py-2 border border-gray-400">{(todayCalculation?.calculation?.feed_per_feeding * (1 - transitionDay * 0.2)).toFixed(1)}</td>
+          <React.Fragment key={index}> 
+          <td className="px-4 py-2 border border-gray-400">{(todayCalculation?.calculation?.feed_per_feeding * (transitionDay * 0.2)).toFixed(1)}</td>
           
           <td className="px-4 py-2 border border-gray-400">
           <form action={action}>

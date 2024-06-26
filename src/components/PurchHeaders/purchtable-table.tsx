@@ -53,6 +53,7 @@ interface PurchTableComponentProps {
             id: number;
             name: string;
         } | null;
+        vendor_id: number | null;
     }[]
 }
 

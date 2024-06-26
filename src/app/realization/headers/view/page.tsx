@@ -34,7 +34,7 @@ export default async function PurchtableHome() {
   return (
       <div className="flex flex-col gap-4 my-4">
           <div className="flex justify-between items-center mb-2">
-              <h1 className="text-xl font-bold">Прибуткові накладні</h1>
+              <h1 className="text-xl font-bold">Видаткові накладні</h1>
               <Link href={'/realization/headers/new'}>
                   <button className="hover:bg-blue-100 py-2 px-2 rounded">
                       <Image

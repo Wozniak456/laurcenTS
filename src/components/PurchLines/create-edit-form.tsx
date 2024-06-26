@@ -4,7 +4,32 @@ import { useFormState } from "react-dom";
 import * as actions from '@/actions';
 
 interface PurchLinesComponentProps {
-    purchId: bigint | undefined,
+    purchHeader: {
+        id: bigint;
+        doc_id: bigint | null;
+        date_time: Date;
+        vendor_id: number;
+        vendor_doc_number: string;
+        vendors: {
+            id: number;
+            name: string;
+            description: string | null;
+        };
+        purchaselines: {
+            id: number;
+            items: {
+                id: number;
+                name: string;
+                feed_type_id: number | null;
+            };
+            quantity: number;
+            units: {
+                id: number;
+                name: string;
+            };
+            item_id: number;
+        }[];
+    } | undefined,
     line?: {
         id: number;
         items: {
@@ -27,14 +52,14 @@ interface PurchLinesComponentProps {
             id: number;
             name: string;
         } | null;
+        vendor_id: number | null;
     }[],
     setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
     // setSelectedLine: React.Dispatch<React.SetStateAction<number | undefined>>
 }
 
-export default function CreateEditLineForm({purchId, 
+export default function CreateEditLineForm({purchHeader, 
     line, 
-    index, 
     items, 
     setShowModal, 
 } : PurchLinesComponentProps){
@@ -65,7 +90,7 @@ export default function CreateEditLineForm({purchId,
         <div className="bg-white p-8 rounded shadow-lg w-1/2">
             <h2 className="text-lg font-semibold mb-4">Новий рядок накладної</h2>
             <form className="my-8" action={action} onSubmit={handleCloseModal}>
-                <input type="hidden" name="purchase_id" value={String(purchId)} />
+                <input type="hidden" name="purchase_id" value={String(purchHeader?.id)} />
                 {line ? <input type="hidden" name="purch_line_id" value={String(line.id)} /> : ''}
                 <div className="flex flex-row gap-2 justify-between items-start flex-wrap">
                     <div className="flex flex-col gap-2 w-full max-w-64">
@@ -82,7 +107,9 @@ export default function CreateEditLineForm({purchId,
                             // value={line ? line.item_id : ''}
                         >
                             <option value="">Оберіть...</option>
-                            {items.map(item => (
+                            {items
+                            .filter(item => item.vendor_id == purchHeader?.vendor_id)
+                            .map(item => (
                                     <option key={item.id} value={item.id}>{item.name}</option>
                             ))}
                         </select>

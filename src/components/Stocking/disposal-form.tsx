@@ -6,12 +6,26 @@ import { useEffect, useState } from 'react';
 import { poolInfo, disposalItem } from '@/types/app_types'
 
 interface DisposalFormPageProps {
-    poolInfo: poolInfo,
+    location: {
+        id: number;
+        location_type_id: number;
+        name: string;
+        pool_id: number | null;
+    },
+    poolInfo: {
+        batchId: bigint | undefined;
+        batchName: string | undefined;
+        qty: number | undefined;
+        fishWeight: number | undefined;
+        feedType: string | undefined;
+        updateDate: string | undefined;
+        allowedToEdit: boolean;
+    },
     setShowDisposalForm : React.Dispatch<React.SetStateAction<boolean>>;
     reasons: disposalItem[]
 }
 
-export default function DisposalFormPage({poolInfo, setShowDisposalForm, reasons} : DisposalFormPageProps) {
+export default function DisposalFormPage({location, poolInfo, setShowDisposalForm, reasons} : DisposalFormPageProps) {
     const [selectedReason, setSelectedReason] = useState<number | undefined>(undefined)
 
     const handleCloseForm = () => {
@@ -31,13 +45,13 @@ export default function DisposalFormPage({poolInfo, setShowDisposalForm, reasons
     return (
         <div className="fixed top-0 left-0 w-full h-full bg-gray-800 bg-opacity-75 flex justify-center items-center z-10">
             <div className="bg-white p-4 rounded shadow-lg w-1/3">
-            <h1 className="font-bold mb-4 text-center text-base">Форма списання риби з басейну {poolInfo.location_name}</h1>
+            <h1 className="font-bold mb-4 text-center text-base">Форма списання риби з басейну {location.name}</h1>
                 <form className="mx-auto px-4 m-4" action={action} onSubmit={handleCloseForm}>
 
-                    <input type="hidden" name="batch_id" value={String(poolInfo.batch?.batch_id)} />
-                    <input type="hidden" name="location_id_from" value={String(poolInfo.location_id)} />
-                    <input type="hidden" name="fish_amount_in_pool" value={String(poolInfo.batch?.qty)} />
-                    <input type="hidden" name="average_fish_mass" value={String(poolInfo.calc?.fish_weight)} />
+                    <input type="hidden" name="batch_id" value={String(poolInfo.batchId)} />
+                    <input type="hidden" name="location_id_from" value={String(location.id)} />
+                    <input type="hidden" name="fish_amount_in_pool" value={String(poolInfo.qty)} />
+                    <input type="hidden" name="average_fish_mass" value={String(poolInfo.fishWeight)} />
                     
                     <div className='flex flex-wrap gap-2 mb-8 justify-between'>
                         <div className='flex flex-col gap-2'>
@@ -66,7 +80,7 @@ export default function DisposalFormPage({poolInfo, setShowDisposalForm, reasons
                                 name='qty'
                                 className="border rounded p-2 w-full"
                                 id='qty'
-                                max={poolInfo.batch?.qty}
+                                max={poolInfo.qty}
                                 required
                             />
                         </div>

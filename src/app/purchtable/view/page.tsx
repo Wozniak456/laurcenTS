@@ -36,7 +36,8 @@ export default async function PurchtableHome() {
     select:{
       id: true,
       name: true,
-      units: true
+      units: true,
+      vendor_id: true 
     }
   })
 

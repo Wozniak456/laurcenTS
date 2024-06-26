@@ -31,7 +31,7 @@ export async function calculationForLocation(location_id : number, date: string)
   if(calc){
     batch = await getBatchesInfo(location_id)
     const feed_type = await getFeedType(calc.fish_weight)
-    feed_type_id = feed_type?.feedtypes?.name
+    feed_type_id = feed_type?.id
   }
 
   const lastTran = await db.itemtransactions.findFirst({
@@ -61,6 +61,7 @@ export async function calculationForLocation(location_id : number, date: string)
       allowedToEdit = true
     }
   }
+
 
   return{batch, calc, feed_type_id, location_id, allowedToEdit}
 }
@@ -92,7 +93,7 @@ export async function setTransitionDayForLocation(location_id: number){
 
         const feedType = await getFeedType(records[i].fish_weight);
         
-        if (feedType?.feedtypes?.id !== currType?.feedtypes?.id){
+        if (feedType?.id !== currType?.id){
             currType = feedType
 
             await db.calculation_table.update({
@@ -114,22 +115,17 @@ export async function setTransitionDayForLocation(location_id: number){
 async function getFeedType(fish_weight : number | undefined) {
     if(fish_weight !== undefined){
       
-      const startFeedType = await db.feedconnections.findFirst({
-        select:{
-          feedtypes: {
-            select:{
-              id: true,
-              name: true
+      const startFeedType = await db.feedtypes.findFirst({
+        where:{
+          feedconnections:{
+            from_fish_weight:{
+              lte: fish_weight
+            },
+            to_fish_weight:{
+              gte: fish_weight
             }
           }
-        },
-        where:{
-          from_fish_weight:{
-            lte: fish_weight
-          },
-          to_fish_weight:{
-            gte: fish_weight
-          }
+          
         }
       })
       return startFeedType

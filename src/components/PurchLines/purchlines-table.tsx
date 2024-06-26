@@ -58,6 +58,7 @@ interface PurchLinesComponentProps {
             id: number;
             name: string;
         } | null;
+        vendor_id: number | null;
     }[]
 }
 
@@ -121,7 +122,7 @@ export default function PurchLinesList( {lines, purchHeader, items} : PurchLines
 
             {showModal && (
                 <CreateEditLineForm 
-                purchId={purchHeader?.id} 
+                purchHeader={purchHeader} 
                 items={items} 
                 setShowModal={setShowModal} 
                 />

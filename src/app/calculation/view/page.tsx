@@ -2,7 +2,12 @@ import { db } from "@/db";
 import Link from "next/link";
 import type {calculation_table} from '@prisma/client'
 
+// import {fillDatatables} from '@/db/functions'
+
+
 export default async function CalculationHome() {
+  // await fillDatatables()
+
   let distinctRecords : calculation_table[];
 
   distinctRecords = await db.$queryRaw`

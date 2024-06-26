@@ -2,6 +2,24 @@
 
 import { db } from "@/db"
 import { calculationAndFeed } from "@/types/app_types"
+import * as actions from "@/actions/index"
+
+
+  //акумуляція по зїдженому корму та ціною корму
+export const getTotalAmount = async (generationId : bigint, itemId: number) => {
+    const data = await actions.getFeedAmountsAndNames(generationId);
+
+    const amount =  data
+      .filter((entry) => entry.item_id === itemId)
+      .reduce((total, entry) => total + entry.total_amount, 0);
+
+    const price = data
+      .filter((entry) => entry.item_id === itemId && entry.price !== null)
+      .reduce((total, entry) => total + (entry.price ?? 0) / 1000 * entry.total_amount, 0);
+
+    return { amount, price };
+};
+
 
 export async function getPrevCalc(location_id : number, calc : calculationAndFeed | null) {
     
@@ -22,15 +40,15 @@ export async function getPrevCalc(location_id : number, calc : calculationAndFee
   
           let item
           
-          if (feed_type && feed_type.feedtypes){
-            item = await getItemPerType(feed_type.feedtypes.id, location_id)
+          if (feed_type){
+            item = await getItemPerType(feed_type.id, location_id)
           }
   
           return {
             calculation: records14[index - 1],
             feed: {
-              type_id: feed_type?.feedtypes?.id,
-              type_name: feed_type?.feedtypes?.name,
+              type_id: feed_type?.id,
+              type_name: feed_type?.name,
               item_id: item?.item_id,
               definedPrio: item?.definedPrio
             }
@@ -62,16 +80,18 @@ export async function getPrevCalc(location_id : number, calc : calculationAndFee
       if (calculation){
         feed_type = await getFeedType(calculation.fish_weight)
     
-        if (feed_type && feed_type.feedtypes){
-          item = await getItemPerType(feed_type.feedtypes.id, location_id)
+        if (feed_type){
+          item = await getItemPerType(feed_type.id, location_id)
         }
       }
+
+      // console.log(location_id, item)
     
       return {
         calculation: calculation,
         feed: {
-          type_id: feed_type?.feedtypes?.id,
-          type_name: feed_type?.feedtypes?.name,
+          type_id: feed_type?.id,
+          type_name: feed_type?.name,
           item_id: item?.item_id,
           definedPrio: item?.definedPrio
         }
@@ -137,21 +157,15 @@ export async function getPrevCalc(location_id : number, calc : calculationAndFee
   async function getFeedType(fish_weight : number | undefined) {
     if(fish_weight !== undefined){
       
-      const startFeedType = await db.feedconnections.findFirst({
-        select:{
-          feedtypes: {
-            select:{
-              id: true,
-              name: true
-            }
-          }
-        },
+      const startFeedType = await db.feedtypes.findFirst({
         where:{
-          from_fish_weight:{
-            lte: fish_weight
-          },
-          to_fish_weight:{
-            gte: fish_weight
+          feedconnections:{
+            from_fish_weight:{
+              lte: fish_weight
+            },
+            to_fish_weight:{
+              gte: fish_weight
+            }
           }
         }
       })

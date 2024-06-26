@@ -142,6 +142,7 @@ export default function RegisteringGoods({
                 </table>
                     
                 <input type="hidden" name="header_id" value={String(header?.id)} /> 
+                <input type="hidden" name="vendor_id" value={String(header?.vendor_id)} /> 
                 <div className="flex justify-between mt-4">
                     <button 
                         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"

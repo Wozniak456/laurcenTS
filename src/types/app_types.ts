@@ -75,15 +75,17 @@ export type batchInfo = {
     batch_id: bigint | undefined,
     qty: number
   }
+
 export type poolInfo = {
     batch: batchInfo | null | undefined;
     calc: {
         fish_weight: number;
     } | null;
-    feed_type_id: string | null | undefined,
+    feed_type_id: number | null | undefined,
     location_id: number;
     location_name?: string;
     allowedToEdit: boolean;
+    cost?: number | undefined
 }
 
 export interface calculationAndFeed{
