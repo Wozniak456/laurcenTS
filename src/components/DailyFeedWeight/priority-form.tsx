@@ -1,6 +1,4 @@
 'use client'
-import { LocationComponentType } from '@/types/app_types';
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import { useFormState } from 'react-dom';
 import * as actions from '@/actions';
 import { calculationAndFeedExtended } from '@/types/app_types'
@@ -12,15 +10,9 @@ type PriorityFormType = {
     },
     calculation: calculationAndFeedExtended | undefined,
     setShowForm: React.Dispatch<React.SetStateAction<boolean>>,
-    
 }
 
-interface SelectedFeeds {
-    [key: string]: number;
-}
-
-export default function PriorityForm({location, calculation, setShowForm} : PriorityFormType) {
-    // const [priority, setpriority] = useState<number | undefined>(undefined);  
+export default function PriorityForm({location, calculation, setShowForm} : PriorityFormType) { 
     
     const priority = calculation?.feed?.item_id
           

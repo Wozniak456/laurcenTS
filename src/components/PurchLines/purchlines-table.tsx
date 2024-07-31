@@ -1,14 +1,21 @@
 'use client'
 
-import React, { useEffect, useState } from "react";
-import { useFormState } from "react-dom";
-import * as actions from '@/actions';
+import React, { useState } from "react";
 import Image from 'next/image';
-// import deleteButton from '../../public/icons/delete.svg'
 import newFileButton from '../../../public/icons/create.svg'
-// import editButton from '../../public/icons/edit.svg'
 import PurchLineItem from '@/components/PurchLines/purch-line-element'
 import CreateEditLineForm from '../PurchLines/create-edit-form'
+import { Button, Popover, PopoverContent, PopoverTrigger } from "@nextui-org/react";
+import {
+    Table,
+    TableHeader,
+    TableBody,
+    TableColumn,
+    TableRow,
+    TableCell
+  } from "@nextui-org/table";
+import line from "next-auth/providers/line";
+import PurchLineDeleteForm from "./delete-message";
 
 interface PurchLinesComponentProps {
     lines: {
@@ -72,24 +79,110 @@ export default function PurchLinesList( {lines, purchHeader, items} : PurchLines
     };
 
     return(
-        <div>
+        <div className="mt-2">
             <div className="flex justify-between items-center mb-4">
-                <h1 className="text-xl font-bold">Рядки прибуткової накладної</h1>
+                <h1 className="text-xl font-bold">Рядки прибуткової накладної: {purchHeader?.vendors.name} ({purchHeader?.vendor_doc_number})</h1>
                 <div>
-                    {purchHeader?.doc_id === null && (
-                        <button className="hover:bg-blue-100 py-2 px-2 rounded" onClick={handleCreateNewPurchLine}>
-                        <Image
-                            src={newFileButton}
-                            alt="New Document Icon"
-                            width={30}
-                            height={30}
-                        />
-                    </button>
-                    )}
+                    {!purchHeader?.doc_id ? 
+                    <Popover placement="bottom" backdrop="blur">
+                        <PopoverTrigger>
+                            <Button color="primary" onClick={handleCreateNewPurchLine}>
+                                Новий рядок
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent>
+                            <CreateEditLineForm 
+                                purchHeader={purchHeader} 
+                                items={items} 
+                                // setShowModal={setShowModal} 
+                            />
+                        </PopoverContent>
+                    </Popover>
+                : null}
                     
                 </div>
             </div>
-            <table className="w-full text-sm">
+
+            <Table >
+  <TableHeader>
+    <TableColumn className="text-center">Index</TableColumn>
+    <TableColumn className="text-center">Item ID</TableColumn>
+    <TableColumn className="text-center">Item Name</TableColumn>
+    <TableColumn className="text-center">Feed Type ID</TableColumn>
+    <TableColumn className="text-center">Unit Name</TableColumn>
+    <TableColumn className="text-center">Quantity</TableColumn>
+    <TableColumn className="text-center">Actions</TableColumn>
+  </TableHeader>
+  <TableBody>
+    {lines && lines.length > 0 ? (
+      lines
+      .sort((a, b) => a.id - b.id)
+      .map((line, index) => (
+        // <PurchLineItem 
+        //   key={line.id}
+        //   purch_header={purchHeader} 
+        //   line={line} 
+        //   index={index} 
+        //   items={items} 
+        //   setSelectedLine={setSelectedLine}
+        //   selectedLine={selectedLine}
+        // />
+        <TableRow key={index}>
+            <TableCell className="text-center">{index + 1}</TableCell>
+            <TableCell className="text-center">{line?.item_id}</TableCell>
+            <TableCell className="text-center">{line?.items.name}</TableCell>
+            <TableCell className="text-center">{line?.items.feed_type_id}</TableCell>
+            <TableCell className="text-center">{line?.units.name}</TableCell>
+            <TableCell className="text-center">{line?.quantity}</TableCell>
+            <TableCell className="w-40 whitespace-nowrap text-center">
+                {!purchHeader?.doc_id && 
+                <>
+                <Popover placement="bottom">
+                    <PopoverTrigger>
+                        <Button color="primary" className="mr-2">
+                        Edit
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent>
+                        <CreateEditLineForm 
+                            purchHeader={purchHeader} 
+                            line={line} 
+                            index={index} 
+                            items={items} 
+                            // setShowModal={setShowEditModal} 
+                        />
+                    </PopoverContent>
+                </Popover>
+                <Popover placement="bottom">
+                    <PopoverTrigger>
+                        <Button color="danger">
+                        Delete
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent>
+                        <PurchLineDeleteForm 
+                        line={line} 
+                        // setShowModal={setShowDeleteModal} 
+                        />
+                    </PopoverContent>
+                </Popover></>}
+            </TableCell>
+        </TableRow>
+      ))
+    ) : (
+      <TableRow>
+        <TableCell className="text-center">No data</TableCell>
+        <TableCell className="text-center">No data</TableCell>
+        <TableCell className="text-center">No data</TableCell>
+        <TableCell className="text-center">No data</TableCell>
+        <TableCell className="text-center">No data</TableCell>
+        <TableCell className="text-center">No data</TableCell>
+        <TableCell className="text-center">No data</TableCell>
+      </TableRow>
+    )}
+  </TableBody>
+</Table>
+            {/* <table className="w-full text-sm">
                 <thead className="bg-blue-200">
                     <tr>
                         <th className="px-4 py-2 text-center border border-gray-400"># Line</th>
@@ -98,7 +191,7 @@ export default function PurchLinesList( {lines, purchHeader, items} : PurchLines
                         <th className="px-4 py-2 text-center border border-gray-400">Feed type</th>
                         <th className="px-4 py-2 text-center border border-gray-400">Unit ID</th>            
                         <th className="px-4 py-2 text-center border border-gray-400">Qty</th>  
-                        <th className="px-4 py-2 text-center border border-gray-400">Edit</th> 
+                        <th colSpan={3} className="px-4 py-2 text-center border border-gray-400">Edit</th> 
                     </tr>
                 </thead>
                 <tbody>
@@ -118,15 +211,15 @@ export default function PurchLinesList( {lines, purchHeader, items} : PurchLines
                     )}
                 )}
                 </tbody> 
-            </table>
+            </table> */}
 
-            {showModal && (
+            {/* {showModal && (
                 <CreateEditLineForm 
                 purchHeader={purchHeader} 
                 items={items} 
                 setShowModal={setShowModal} 
                 />
-            )}
+            )} */}
             
         </div>
         

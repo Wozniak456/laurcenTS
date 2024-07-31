@@ -1,8 +1,7 @@
 import { db } from "@/db"
-import { notFound } from "next/navigation";
-import ItemBatchComponent from '@/components/FishBatch/batch-element'
-import { BatchWithCreationInfo } from '@/types/app_types'
 import Link from "next/link";
+import * as actions from '@/actions'
+import  LeftoversTable  from '@/components/leftovers-table'
 
 interface LeftoversPerPeriodProps {
     params: {
@@ -33,10 +32,10 @@ export default async function LeftoversPerPeriod(props: LeftoversPerPeriodProps)
         EndSaldoDate.setDate(EndSaldoDate.getDate() + 1 );
         
         
-        const end_saldo = await calculateSaldo(undefined, undefined, undefined)
-        const start_saldo = await calculateSaldo(undefined, StartSaldoDate, undefined)
-        const incoming = await calculateSaldo(StartSaldoDate, EndSaldoDate, { gt: 0 })
-        const outcoming = await calculateSaldo(StartSaldoDate, EndSaldoDate, { lt: 0 })
+        const end_saldo = await actions.calculateSaldo(undefined, undefined, undefined)
+        const start_saldo = await actions.calculateSaldo(undefined, StartSaldoDate, undefined)
+        const incoming = await actions.calculateSaldo(StartSaldoDate, EndSaldoDate, { gt: 0 })
+        const outcoming = await actions.calculateSaldo(StartSaldoDate, EndSaldoDate, { lt: 0 })
 
         let data: DataItem[] = []
 
@@ -69,7 +68,7 @@ export default async function LeftoversPerPeriod(props: LeftoversPerPeriodProps)
                     <h1>Початок: {StartSaldoDate.toISOString().split("T")[0]}</h1>
                     <h1>Кінець: {EndSaldoDate1.toISOString().split("T")[0]}</h1>
                 </div>
-                <table className="table-auto border-collapse w-full">
+                {/* <table className="table-auto border-collapse w-full">
                     <thead className="bg-gray-200">
                     <tr className="bg-blue-100">
                     <th className="px-2 py-2 border-gray-400">ID партії</th>
@@ -98,7 +97,10 @@ export default async function LeftoversPerPeriod(props: LeftoversPerPeriodProps)
                         </tr>
                     ))}
                     </tbody>
-                </table> 
+                </table>  */}
+                <LeftoversTable data={data}/>
+
+                
             </div>
            </div>
         )
@@ -115,89 +117,3 @@ export default async function LeftoversPerPeriod(props: LeftoversPerPeriodProps)
         console.log('Disconnected idle sessions successfully.');
     }
 }
-
-
-interface Saldos {
-    [batchId: string]: {
-        qty: number,
-        // itemId: number,
-        feed_type_name: string,
-        itemName: string,
-        batchName: string
-    };
-}
-
-interface FilterSpecifier {
-    gt?: number;
-    lt?: number;
-    gte?: number;
-    lte?: number;
-}
-
-const calculateSaldo = async (startDate: Date | undefined, endDate: Date | undefined, quantityFilter: FilterSpecifier | undefined)
-: Promise<Saldos> => {
-
-    console.log('endDate', endDate)
-    const result = await db.itemtransactions.groupBy({
-        by: ['batch_id'],
-        where: {
-            locations: {
-                location_type_id: 1
-            },
-            documents: {
-                date_time: {
-                    gte: startDate,
-                    lte: endDate
-                }
-            },
-            quantity: quantityFilter,
-            NOT: {
-                itembatches: {
-                    items: {
-                        feed_type_id: null
-                    }
-                }
-            }
-        },
-        _sum: {
-            quantity: true
-        },
-    });
-
-    const newView = await db.itembatches.findMany({
-        include:{
-            items: {
-                include: {
-                    feedtypes: true
-                }
-            }
-        },
-        where:{
-            id:{
-                in: result.map(result => result.batch_id)
-            }
-        }
-    })
-
-    const mergedResults = newView.map((item: any) => {
-        const sumItem = result.find((r: any) => r.batch_id === item.id);
-        return {
-            ...item,
-            _sum: sumItem ? sumItem._sum.quantity : 0
-        };
-    });
-
-    const saldoData: Saldos = {};
-
-    mergedResults.forEach((batch: any) => {
-        saldoData[batch.id.toString()] = {
-            qty: batch._sum,
-            feed_type_name: batch.items.feedtypes.name,
-            // itemId: batch.items.id,
-            itemName: batch.items.name,
-            batchName: batch.name
-        };
-    });
-    
-    return saldoData;
-};

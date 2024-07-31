@@ -1,10 +1,8 @@
 import { db } from "@/db"
-import { notFound } from "next/navigation";
-import {calculationForLocation} from '@/actions/stocking'
-
-import Link from "next/link";
+import {calculationForLocation, poolInfo} from '@/actions/stocking'
 import React from "react";
 import Component111 from '@/components/Real111/111withInputs' 
+import {poolInfoType} from '@/types/app_types'
 
 interface LeftoversPerPeriodProps {
     params: {
@@ -12,14 +10,6 @@ interface LeftoversPerPeriodProps {
     }
 }
 
-type aggregatedInfoType = {
-    batchName: string | undefined;
-    qty: number | undefined;
-    fishWeight: number | undefined;
-    feedType: string | undefined;
-    updateDate: string | undefined;
-    plan_weight?: number
-}
 export default async function LeftoversPerPeriod(props: LeftoversPerPeriodProps){
     
     try{
@@ -68,7 +58,7 @@ export default async function LeftoversPerPeriod(props: LeftoversPerPeriodProps)
                                             <td colSpan={7} className="px-4 py-2 border text-center bg-blue-300 border-gray-400"> {line.name}</td>
                                         </tr>
                                         {line.pools.map(async (pool, poolIndex) => {
-                                            let aggregatedInfo : aggregatedInfoType = await poolInfo(pool.locations[0].id, date)
+                                            let aggregatedInfo : poolInfoType = await poolInfo(pool.locations[0].id, date)
                                             const plan = await calculationForLocation(pool.locations[0].id, date)
 
                                             if (plan.calc != null){
@@ -78,7 +68,6 @@ export default async function LeftoversPerPeriod(props: LeftoversPerPeriodProps)
                                                 }
                                             }
                                             
-
                                             return(
                                                 <React.Fragment key={poolIndex}>
                                                     <tr>
@@ -111,78 +100,4 @@ export default async function LeftoversPerPeriod(props: LeftoversPerPeriodProps)
         //                      WHERE state = 'idle';`;
         // console.log('Disconnected idle sessions successfully.');
     }
-}
-
-
-const poolInfo = async (location_id: number, date: string) => {
-    const dateValue = new Date(date)
-    dateValue.setHours(23, 59, 59, 999);
-
-    const lastStocking = await db.documents.findFirst({
-        select:{
-            date_time: true,
-            stocking:{
-                select:{
-                    average_weight: true
-                }
-            },
-            itemtransactions:{
-                select:{
-                    itembatches:{
-                        select:{
-                            name: true
-                        }
-                    },
-                    quantity: true
-                },
-                where:{
-                    quantity:{
-                        gte: 0
-                    }
-                }
-            },
-        },
-        where:{
-            location_id: location_id,
-            doc_type_id: 1,
-            date_time:{
-                lte: dateValue
-            }
-        },
-        orderBy:{
-            id: 'desc'
-        },
-        take: 1
-    })
-
-    // console.log('lastStocking', lastStocking)
-
-    let feedType
-
-    if (lastStocking){
-        feedType = await getFeedType(lastStocking?.stocking[0].average_weight)
-    }
-
-    const batchName = lastStocking?.itemtransactions[0].itembatches.name
-    const qty = lastStocking?.itemtransactions[0].quantity
-    const fishWeight = lastStocking?.stocking[0].average_weight
-    const updateDate = lastStocking?.date_time.toISOString().split("T")[0];
-    
-    return({batchName, qty, fishWeight, feedType, updateDate})
-}
-
-async function getFeedType(fish_weight : number) {
-    const feed_connection = await db.feedtypes.findFirst({
-      where:{
-        feedconnections:{
-          from_fish_weight:{
-            lte: fish_weight
-          },
-          to_fish_weight:{
-            gte: fish_weight
-          }
-        }
-      }
-    })
-    return feed_connection?.name
 }

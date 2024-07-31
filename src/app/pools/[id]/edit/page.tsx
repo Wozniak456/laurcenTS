@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { notFound } from "next/navigation";
-import PoolEditForm from "@/components/pool-edit-form";
+import PoolEditForm from "@/components/Pools/pool-edit-form";
 
 interface PoolEditPageProps {
     params: {

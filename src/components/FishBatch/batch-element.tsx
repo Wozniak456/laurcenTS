@@ -3,11 +3,11 @@ import * as actions from '@/actions'
 import { useFormState } from "react-dom";
 import Image from 'next/image';
 import CloseButton from '../../../public/icons/close-square-light.svg'
-import type {itembatches} from '@prisma/client'
-import Link from 'next/link';
 import { BatchWithCreationInfo } from '@/types/app_types'
 import { ChangeEvent, useState } from 'react';
 import BatchDeleteForm from '@/components/FishBatch/delete-message'
+
+import { Button, Input, Popover, PopoverContent, PopoverTrigger } from '@nextui-org/react';
 
 type ItemBatchComponentProps = {
     batch: BatchWithCreationInfo,
@@ -22,11 +22,8 @@ export default function ItemBatchComponent({
 } : ItemBatchComponentProps){
 
     const [allowToEdit, setAllowToEdit] = useState<boolean>(false);
-
     const [UpdateActionState, UpdateAction] = useFormState(actions.updateBatches, {message: ''});
-
     const [updateBatchActionState, updateBatchAction] = useFormState(actions.editItemBatch, {message: ''});
-    
     const [showDeleteMessage, setShowDeleteMessage ] = useState<boolean>(false)
 
     const handleAlloEditButton = () => {
@@ -55,7 +52,35 @@ export default function ItemBatchComponent({
     };
     
     return(
-        <div className="fixed top-0 left-0 w-full h-full bg-gray-800 bg-opacity-75 flex justify-center items-center">
+        // <Popover placement='left'>
+        //     <PopoverTrigger>
+        //         <Button color='primary'>Create a batch</Button>
+        //     </PopoverTrigger>
+        //     <PopoverContent>
+        //         <form>
+        //             <div className='flex flex-col gap-4 p-4 w-80'>
+        //                 <h3>Create a batch</h3>
+
+        //                 <Input 
+        //                     name='title'
+        //                     label='title'
+        //                     labelPlacement='outside'
+        //                     placeholder='title'
+        //                 />
+
+        //                 <Input 
+        //                     name='content'
+        //                     label='content'
+        //                     labelPlacement='outside'
+        //                     placeholder='content'
+        //                 />
+
+        //                 <FormButton>Create a batch</FormButton>
+        //             </div>
+        //         </form>
+        //     </PopoverContent>
+        // </Popover>
+        <div className="fixed top-0 left-0 w-full h-full bg-gray-400 bg-opacity-75 flex justify-center items-center">
             <div className="bg-white p-8 rounded shadow-lg w-2/5">
                 <div className='flex justify-between items-center mb-4'>
                     <h2 className="text-lg font-semibold text-center">Партія {batch.name}</h2>
@@ -87,7 +112,6 @@ export default function ItemBatchComponent({
                                     <option 
                                     key={item.id} 
                                     value={item.id}
-                                    // disabled={allowToEdit ? false : true}
                                     >{item.name}</option>
                                 ))}
                             </select>
@@ -123,22 +147,6 @@ export default function ItemBatchComponent({
                                 required
                             />
                         </div>
-                        
-                        {/* <div className="flex gap-4 flex-wrap items-center">
-                            <label className="w-40" htmlFor="unit_id">
-                                Одиниця виміру:
-                            </label>
-                            <select
-                                name="unit_id"
-                                className="border rounded p-2 flex-grow min-w-32"
-                                id="unit_id"
-                                required
-                            >
-                                {units.map(unit => (
-                                    <option key={unit.id} value={unit.id}>{unit.name}</option>
-                                ))}
-                            </select>
-                        </div> */}
                     </form>
                     {batch.isNew ?
                     <div className="flex gap-4 justify-between flex-wrap">
@@ -160,7 +168,6 @@ export default function ItemBatchComponent({
                             <button 
                                 className="p-2 border rounded bg-blue-500 text-white hover:bg-blue-600 transition-colors duration-200  min-w-64"
                                 type='submit'
-                                // onClick={handleAlloEditButton}
                             >
                                 <p>Зберегти</p>
                             </button>
@@ -175,7 +182,7 @@ export default function ItemBatchComponent({
                             </button>
                     </div> : <p className='text-gray-500 mt-4 text-center'>* Партія вже задіяна у транзакціях, тому редагування чи видалення недоступне</p>}
                 </div>
-                    {showDeleteMessage && <BatchDeleteForm batch={batch} setShowModal={setShowDeleteMessage}/>}
+                    {showDeleteMessage && <BatchDeleteForm batch={batch} />}
                     {
                         updateBatchActionState && updateBatchActionState.message ? (
                             <div className={`my-2 p-2 border rounded ${updateBatchActionState.message.includes('Оновлено!') ? 'bg-green-200 border-green-400' : 'bg-red-200 border-red-400'}`}>

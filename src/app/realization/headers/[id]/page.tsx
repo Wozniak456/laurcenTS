@@ -124,7 +124,7 @@ export default async function SaleLines(props: SaleLinesProps) {
                 </thead>
                 <tbody>
                   {header.saleslines.map((line, index) => (
-                    <tr>
+                    <tr key={index}>
                       <td className="px-2 py-2 border border-gray-400 text-center">{index+1}</td>
                       <td className="px-2 py-2 border border-gray-400 text-center">{line.items.id}</td>
                       <td className="px-2 py-2 border border-gray-400 text-center">{line.items.name}</td>

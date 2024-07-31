@@ -20,7 +20,7 @@ export default async function PurchTableShowPage(props: PurchTableShowPageProps)
             notFound();
         }
 
-        const deletePurchRecordAction = actions.deletePurchRecord.bind(null, purch_record.id)
+        const deletePurchRecordAction = actions.deletePurchTable.bind(null, purch_record.id)
 
         return(
             <div>

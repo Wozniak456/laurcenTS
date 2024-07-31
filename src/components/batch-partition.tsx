@@ -2,10 +2,9 @@
 
 import * as actions from '@/actions';
 import { useFormState } from 'react-dom';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import deleteImg from '../../public/icons/delete.svg'
 import Image from 'next/image';
-import {  poolInfo, disposalItem } from '@/types/app_types'
 
 interface PartitionFormPageProps {
     location: {
@@ -15,14 +14,20 @@ interface PartitionFormPageProps {
         pool_id: number | null;
     },
     poolInfo: {
-        batchId: bigint | undefined;
-        batchName: string | undefined;
+        batch: {
+            id: bigint;
+            name: string;
+        } | undefined;
         qty: number | undefined;
         fishWeight: number | undefined;
-        feedType: string | undefined;
+        feedType: {
+            id: number;
+            name: string;
+            feedconnection_id: number | null;
+        } | null | undefined;
         updateDate: string | undefined;
         allowedToEdit: boolean;
-    }
+    },
     locations: location[]
 }
 
@@ -31,12 +36,6 @@ type location = {
     name: string,
     location_type_id: number
 }
-
-type batchInfo = {
-    batch_name: string | undefined,
-    batch_id: bigint | undefined,
-    qty: number
-  }
 
 export default function PartitionFormPage({location, poolInfo, locations} : PartitionFormPageProps) {
     const [selectedPools, setSelectedPools] = useState<(number | null)[]>([]);
@@ -59,18 +58,15 @@ export default function PartitionFormPage({location, poolInfo, locations} : Part
         };
     };
 
-    // useEffect(() => {console.log(selectedPools)}, [selectedPools])
-
     return (
         <form className="container mx-auto px-4 py-4 m-4 bg-white shadow-md rounded-lg" action={action}>
-            {/* <h1 className="font-bold mb-4 text-center text-base">Форма поділу партії</h1> */}
             <div className="mb-4">
                 <input type="hidden" name="location_id_from" value={location.id} />
             </div>
             <div className="mb-4 flex flex-col items-center">
                 <div className='flex flex-col my-4'>
                     <p className="font-semibold text-base mb-8">Басейни для розподілу:</p>
-                    <input type="hidden" name="batch_id_from" value={String(poolInfo.batchId)} />
+                    <input type="hidden" name="batch_id_from" value={String(poolInfo.batch?.id)} />
                     <input type="hidden" name="fish_qty_in_location_from" value={poolInfo.qty} />
                     {selectedPools.map((selectedPoolId, index) => {
                         

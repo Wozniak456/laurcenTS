@@ -1,24 +1,16 @@
 'use client'
-import Link from "next/link";
-import { ChangeEvent, KeyboardEventHandler, useEffect, useState } from "react";
-import Header from '@/components/header'
+import { useState } from "react";
 import { useFormState } from "react-dom";
 import * as actions from '@/actions';
 import Image from "next/image";
 import SaveButton from '../../../public/icons/Save.svg'
+import {poolInfoType} from '@/types/app_types'
 
 
 interface FilterableTableProps {
     date: string,
     poolIndex: number,
-    aggregatedData: {
-        batchName: string | undefined;
-        qty: number | undefined;
-        fishWeight: number | undefined;
-        feedType: string | undefined;
-        updateDate: string | undefined;
-        plan_weight?: number
-    }   
+    aggregatedData: poolInfoType
 }
 
 export default function SelectDay({date, poolIndex, aggregatedData }: FilterableTableProps) {
@@ -47,7 +39,7 @@ export default function SelectDay({date, poolIndex, aggregatedData }: Filterable
 
     return (
         <>
-            <td className="px-4 py-2 border text-center border-gray-400"> {aggregatedData.batchName}</td>
+            <td className="px-4 py-2 border text-center border-gray-400"> {aggregatedData.batch?.name}</td>
             <td className="px-4 py-2 border text-center border-gray-400"> {aggregatedData.qty}</td>
             
             <td className="px-4 py-2 border text-center border-gray-400">{aggregatedData.plan_weight?.toFixed(1)}</td>
@@ -58,10 +50,10 @@ export default function SelectDay({date, poolIndex, aggregatedData }: Filterable
                     value={fishWeight !== undefined ? fishWeight.toString() : ''}
                     onChange={handleFishWeightChange}
                     className="px-2 py-1 rounded-md text-center"
-                    disabled={!aggregatedData.batchName || date != today}
+                    disabled={!aggregatedData.batch?.name || date != today}
                 />
             </td>
-            <td className="px-4 py-2 border text-center border-gray-400"> {aggregatedData.feedType}</td>
+            <td className="px-4 py-2 border text-center border-gray-400"> {aggregatedData.feedType?.name}</td>
             <td className="px-4 py-2 border text-center border-gray-400"> {aggregatedData.updateDate}</td>
             <td>
                 <form action={action}>

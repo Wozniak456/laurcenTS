@@ -1,6 +1,5 @@
 import { db } from "@/db";
-import * as actions from "@/actions"
-import { calculationForLocation } from '@/actions/stocking/index'
+import * as stockingActions from '@/actions/stocking'
 
 export default async function WeekSummary() {
      
@@ -27,10 +26,9 @@ export default async function WeekSummary() {
     }
 })
 
-  const now = new Date(); // Поточна дата
+  const now = new Date();
   const datesArray: Date[] = [];
 
-  // Додавання дат до масиву
   for (let i = 0; i < 10; i++) {
     const currentDate = new Date();
     currentDate.setDate(now.getDate() + i);
@@ -53,17 +51,11 @@ export default async function WeekSummary() {
                     <th className="px-4 py-2 border border-gray-400 text-center bg-blue-100 text-sm">Корм &rarr;</th>
                     {line.pools.map(async pool => {
 
-                      const fishWeight = await getLastStocking(pool.locations[0].id)
-
-                      let feedType 
-
-                      if (fishWeight){
-                        feedType = await getFeedType(fishWeight)
-                      }
+                      const poolInfo = await stockingActions.poolInfo(pool.locations[0].id, now.toISOString().split("T")[0])
 
                       return(
                         <th key={pool.id} className="px-4 py-2 border border-gray-400 text-center bg-blue-100 text-sm">
-                            {feedType}
+                            {poolInfo.feedType?.name}
                         </th>
                       )
                         
@@ -83,7 +75,7 @@ export default async function WeekSummary() {
                         <td className="px-4 py-2 border border-gray-400 text-center font-normal whitespace-nowrap text-sm">{date.toISOString().split("T")[0]}</td>
                         {line.pools.map(async (pool, poolIndex) => {
 
-                          const calc = await todayCalculationForLocation(pool.locations[0].id, date.toISOString().split("T")[0])
+                          const calc = await stockingActions.calculationForLocation(pool.locations[0].id, date.toISOString().split("T")[0])
 
                           return(
                             <td key={poolIndex} className="px-4 py-2 border border-gray-400 text-center font-normal text-sm">
@@ -104,55 +96,4 @@ export default async function WeekSummary() {
     </div>
   );
   
-}
-
-
-export async function todayCalculationForLocation(location_id : number, date: string){
-
-  const calc = await db.calculation_table.findFirst({
-    where:{
-      documents:{
-        location_id: location_id
-      },
-      date: new Date(date)
-    },
-    orderBy:{
-      id: 'desc'
-    },
-    take: 1
-  })
-  return{calc}
-}
-
-
-async function getFeedType(fish_weight : number) {
-  const feed_connection = await db.feedtypes.findFirst({
-    where:{
-      feedconnections:{
-        from_fish_weight:{
-          lte: fish_weight
-        },
-        to_fish_weight:{
-          gte: fish_weight
-        }
-      }
-    }
-  })
-  return feed_connection?.name
-}
-
-async function getLastStocking(location_id: number){
-  const lastStocking = await db.stocking.findFirst({
-    where:{
-      documents:{
-        location_id: location_id
-      },
-    },
-    orderBy:{
-      id: 'desc'
-    },
-    take: 1
-  })
-
-  return lastStocking?.average_weight
 }

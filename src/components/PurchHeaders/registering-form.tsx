@@ -1,7 +1,17 @@
 'use client'
-import { useEffect, useState } from "react";
 import { useFormState } from "react-dom";
 import * as actions from '@/actions';
+import FormButton from "../common/form-button";
+import { Input } from "@nextui-org/react";
+import {
+    Table,
+    TableHeader,
+    TableBody,
+    TableColumn,
+    TableRow,
+    TableCell
+  } from "@nextui-org/table";
+// import line from "next-auth/providers/line";
 
 interface RegisteringGoodsProps{
     header?: {
@@ -46,14 +56,14 @@ export default function RegisteringGoods({
     const [formState, action] = useFormState(actions.registerGoodsInProduction, { message: '' });
 
     return(
-        <div className="fixed top-0 left-0 w-full h-full bg-gray-800 bg-opacity-75 flex justify-center items-center cursor-default">
-            <div className="bg-white p-8 rounded shadow-lg w-3/5">
-                <div className="flex flex-start">
-                    <h2 className="text-lg font-semibold">Реєстрація приходу товару</h2>
-                </div>
-            <form className="my-8" action={action} onSubmit={handleCloseModal}>
+        <div className="">
+            {/* <div className="bg-white p-8 rounded shadow-lg w-3/5"> */}
+            <div className="flex flex-start my-4">
+                <h2 className="text-lg font-semibold">Реєстрація приходу товару</h2>
+            </div>
+            <form className="" action={action} onSubmit={handleCloseModal}>
 
-                <table className="min-w-full">
+                {/* <table className="min-w-full">
                     <thead>
                         <tr className="bg-blue-100 ">
                             <th scope="col" className="px-6 py-3 ">
@@ -139,25 +149,87 @@ export default function RegisteringGoods({
                         </tr>
                         ))}
                     </tbody>
-                </table>
+                </table> */}
+
+                <Table aria-label="">
+                    <TableHeader>
+                        <TableColumn className="text-center">Item name</TableColumn>
+                        <TableColumn className="text-center">Qty</TableColumn>
+                        <TableColumn className="text-center">Unit</TableColumn>
+                        <TableColumn className="text-center">Batch name</TableColumn>
+                        <TableColumn className="text-center">Expiration date</TableColumn>
+                        <TableColumn className="text-center">Packing</TableColumn>
+                        <TableColumn className="text-center">Price</TableColumn>
+                    </TableHeader>
+                    <TableBody>
+                        {header ? header.purchaselines
+                        .map((line, index) => (
+                            <TableRow key={index}>
+                                <TableCell className="text-center">{line.items.name}</TableCell>
+                                <TableCell className="text-center">{line.quantity}</TableCell>
+                                <TableCell className="text-center">{line.units.name}</TableCell>
+                                <TableCell className="text-center">
+                                    <Input 
+                                        name={`batch_name_${line.id}`}
+                                        placeholder="Назва партії"
+                                        isRequired
+                                        // isInvalid={!!formState?.errors?.delivery_date}
+                                        // errorMessage={formState?.errors?.delivery_date?.join(', ') || ''}
+                                    />
+                                </TableCell>
+                                <TableCell className="text-center">
+                                    <Input 
+                                        name={`expire_date_${line.id}`}
+                                        type="date"
+                                        isRequired
+                                        // isInvalid={!!formState?.errors?.delivery_date}
+                                        // errorMessage={formState?.errors?.delivery_date?.join(', ') || ''}
+                                    />
+                                </TableCell>
+                                <TableCell className="text-center">
+                                    <Input 
+                                        name={`packing_${line.id}`}
+                                        isRequired
+                                        type="number"
+                                        min={0}
+                                        // isInvalid={!!formState?.errors?.delivery_date}
+                                        // errorMessage={formState?.errors?.delivery_date?.join(', ') || ''}
+                                    />
+                                </TableCell>
+                                <TableCell className="text-center">
+                                    <Input 
+                                        name={`price_${line.id}`}
+                                        isRequired
+                                        type="number"
+                                        min={0}
+                                        // isInvalid={!!formState?.errors?.delivery_date}
+                                        // errorMessage={formState?.errors?.delivery_date?.join(', ') || ''}
+                                    />
+                                </TableCell>
+                            </TableRow>
+                            )) : 
+                            <TableRow>
+                                <TableCell className="text-center">2</TableCell>
+                                <TableCell className="text-center">2</TableCell>
+                                <TableCell className="text-center">2</TableCell>
+                                <TableCell className="text-center">2</TableCell>
+                                <TableCell className="text-center">2</TableCell>
+                                <TableCell className="text-center">2</TableCell>
+                                <TableCell className="text-center">2</TableCell>
+                            </TableRow>}
+                    </TableBody>
+                </Table>
                     
                 <input type="hidden" name="header_id" value={String(header?.id)} /> 
                 <input type="hidden" name="vendor_id" value={String(header?.vendor_id)} /> 
-                <div className="flex justify-between mt-4">
-                    <button 
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                        type="submit"
-                        >
+                <div className="flex justify-end my-4">
+                    <FormButton color="primary">
                         Зберегти
-                    </button>
-                    <button className="hover:bg-blue-500 hover:text-white border font-bold py-2 px-4 rounded" 
-                    onClick={handleCloseModal}>
-                        Скасувати
-                    </button>
+                    </FormButton>
                 </div>
             </form>
                 
-            </div>
+            {/* </div> */}
             {formState && formState.message && (
                 <div className="my-2 p-2 border rounded border-red-400">
                     {formState.message}

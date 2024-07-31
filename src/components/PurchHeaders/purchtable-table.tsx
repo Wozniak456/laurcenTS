@@ -1,8 +1,8 @@
 'use client'
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useFormState } from "react-dom";
-import * as actions from '@/actions';
+import * as CRUDactions from '@/actions'
 import PurchLinesList from '@/components/PurchLines/purchlines-table'
 import Image from 'next/image';
 import deleteButton from '../../../public/icons/delete.svg'
@@ -12,7 +12,15 @@ import registerGoodsButton from '../../../public/icons/goods-in.svg'
 import CreateEditPurchHeaderForm from '../PurchHeaders/create-edit-header-form'
 import PurchHeaderDeleteForm from '../PurchHeaders/delete-message'
 import RegisteringGoods from '../PurchHeaders/registering-form'
-import { headers } from "next/headers";
+import { Button, Popover, PopoverContent, PopoverTrigger } from "@nextui-org/react";
+import {
+    Table,
+    TableHeader,
+    TableBody,
+    TableColumn,
+    TableRow,
+    TableCell
+  } from "@nextui-org/table";
 
 interface PurchTableComponentProps {
     purchtables: {
@@ -58,7 +66,7 @@ interface PurchTableComponentProps {
 }
 
 export default function PurchTableComponent({ purchtables, vendors, items }: PurchTableComponentProps){
-    const [formState, action] = useFormState(actions.createPurchTableRecord, { message: '' });
+    // const [formState, action] = useFormState(CRUDactions.createPurchTable, { message: '' });
     const [selectedRow, setSelectedRow] = useState<bigint | undefined>(undefined);
     const [showCreatePurchHeaderModal, setShowCreatePurchHeaderModal] = useState<boolean>(false);
     
@@ -87,149 +95,119 @@ export default function PurchTableComponent({ purchtables, vendors, items }: Pur
         setShowRegisterModal(true)
     }
 
+    const [showForm, setShowForm] = useState(false);
+    const [currentHeader, setCurrentHeader] = useState<BigInt|null>(null);
+
+    const handleRowSelection = (headerID: bigint) => {
+        setCurrentHeader(headerID);
+        handleRowClick(headerID);
+        setShowForm(true);
+    };
+
     return(
         <div className="flex flex-col gap-4 my-4">
-            <div className="flex justify-between items-center mb-2">
+            <div className="flex justify-between items-center mb-2 w-full">
                 <h1 className="text-xl font-bold">Прибуткові накладні</h1>
-                <div>
-                    <button className="hover:bg-blue-100 py-2 px-2 rounded" onClick={handleCreateNewPurchTable}>
-                        <Image
-                            src={newFileButton}
-                            alt="New Document Icon"
-                            width={30}
-                            height={30}
-                            title="Це зображення видаляє елемент" 
-                        />
-                    </button>
-                </div>
-                
+                <Popover placement="left-start">
+                    <PopoverTrigger>
+                        <Button color="primary">
+                            Нова накладна
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent>
+                        <CreateEditPurchHeaderForm vendors={vendors} setShowForm={setShowCreatePurchHeaderModal}/>
+                    </PopoverContent>
+                </Popover>
             </div>
-            <table className="w-full text-sm">
-
-                <thead>
-                    <tr className="bg-blue-100">
-                        <th className="px-2 py-2 text-center border border-gray-400">Doc ID</th>
-                        <th className="px-2 py-2 text-center border border-gray-400">Delivery Date</th>
-                        <th className="px-2 py-2 text-center border border-gray-400">Vendor Doc ID</th>
-                        <th className="px-2 py-2 text-center border border-gray-400">Vendor ID</th>
-                        <th className="px-2 py-2 text-center border border-gray-400">Vendor Name</th>            
-                        <th className="px-2 py-2 text-center border border-gray-400">Status</th> 
-                        <th colSpan={3} className="py-2 text-center border border-gray-400">Edit</th>            
-                    </tr> 
-                </thead>
-
-                <tbody>
-                    {purchtables
-                    .sort((a, b) => Number(b.id) - Number(a.id))
-                    .map(header => (
-                    <tr 
-                    key={header.id} 
-                    onClick={() => handleRowClick(header.id)} 
-                    className={selectedRow === header.id ? "cursor-pointer bg-blue-50" : "cursor-pointer"}>
-                        <td className="px-2 py-2 border border-gray-400 text-center">
-                            {header.doc_id !== null ? Number(header.doc_id) : ''}
-                        </td>
-                        <td className="px-2 py-2 border border-gray-400 text-center">{header.date_time.toISOString().split("T")[0]}</td>
-                        <td className="px-2 py-2 border border-gray-400 text-center">{header.vendor_doc_number}</td>
-                        <td className="px-2 py-2 border border-gray-400 text-center">{header.vendor_id}</td>
-                        <td className="px-2 py-2 border border-gray-400 text-center">{header.vendors.name}</td>            
-                        <td className="px-2 py-2 border border-gray-400 text-center">
+        <Table isStriped aria-label="Example static collection table">
+            <TableHeader>
+                <TableColumn className="text-center">Doc ID</TableColumn>
+                <TableColumn className="text-center">Delivery Date</TableColumn>
+                <TableColumn className="text-center">Vendor Doc ID</TableColumn>
+                <TableColumn className="text-center">Vendor ID</TableColumn>
+                <TableColumn className="text-center">Vendor Name</TableColumn>
+                <TableColumn className="text-center">Status</TableColumn>
+                <TableColumn className="text-center">Actions</TableColumn>
+            </TableHeader>
+            <TableBody>
+                {purchtables
+                .sort((a, b) => Number(b.id) - Number(a.id))
+                .map(header => (
+                    <TableRow key={header.id} onClick={() => handleRowSelection(header.id)}>
+                        <TableCell className="text-center">{header.doc_id !== null ? Number(header.doc_id) : ''}</TableCell>
+                        <TableCell className="text-center">{header.date_time.toISOString().split("T")[0]}</TableCell>
+                        <TableCell className="text-center">{header.vendor_doc_number}</TableCell>
+                        <TableCell className="text-center">{header.vendor_id}</TableCell>
+                        <TableCell className="text-center">{header.vendors.name}</TableCell>
+                        <TableCell className="text-center">
                             {header.purchaselines.length === 0 ? 
                                 'None' : 
                                 header.doc_id === null ? 
                                     'Saved' : 
                                     'Posted'
                             }
-                        </td>
-                        {header.doc_id === null && 
-
-                        <td className=" border border-gray-400 text-center w-16">
-                            <button 
-                            className="hover:bg-blue-100  rounded" 
-                            onClick={handleEditPurchHeader}>
-                                <Image
-                                    src={editButton}
-                                    alt="Edit"
-                                    width={30}
-                                    height={30}
-                                />
-                            </button> 
-
-                        {showEditModal 
-                        && selectedRow === header.id 
-                        && <CreateEditPurchHeaderForm 
-                            header={header}
-                            vendors={vendors}
-                            setShowForm={setShowEditModal}
-                        /> }
-                        </td>
-                        }
-
-                        {header.doc_id === null &&
-                        <td className=" border border-gray-400 text-center  w-16">
-                            
-                            <button 
-                            className="hover:bg-red-100 rounded" 
-                            onClick={handleDeletePurchHeader}>
-                                <Image
-                                    src={deleteButton}
-                                    alt="Delete"
-                                    width={30}
-                                    height={30}
-                                />
-                            </button>
-
-                            {showDeleteModal 
-                            && selectedRow === header.id
-                            && <PurchHeaderDeleteForm
-                            header={header}
-                            setShowModal={setShowDeleteModal} 
-                            />}
-                        </td>
-                        }
-
-                        {header.doc_id === null && 
-                        <td className=" border border-gray-400 text-center w-16">
-                            
-                            {header.purchaselines.length > 0 && 
-                            <button 
-                            className="hover:bg-green-100 rounded" 
-                            onClick={handleRegisterGoodsInProduction}>
-                                <Image
-                                    src={registerGoodsButton}
-                                    alt="Register goods"
-                                    width={30}
-                                    height={30}
-                                />
-                            </button> 
-                            } 
-
-                            {showRegisterModal 
-                            && selectedRow === header.id
-                            && <RegisteringGoods
-                            header={header}
-                            setShowForm={setShowRegisterModal} 
-                            />}
-                        </td>
-                    }
-                        
-                    </tr>
+                        </TableCell>
+                        <TableCell className="w-80">
+                            {header.doc_id === null && (
+                                <div className="w-full">
+                                    <Popover placement="left-start" >
+                                        <PopoverTrigger>
+                                            <Button className="mr-2" color="primary" onClick={handleEditPurchHeader}>
+                                                Edit
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent>
+                                            <CreateEditPurchHeaderForm 
+                                                header={header}
+                                                vendors={vendors}
+                                                setShowForm={setShowEditModal}
+                                            />
+                                        </PopoverContent>
+                                    </Popover>
+                                    <Popover placement="left-start">
+                                        <PopoverTrigger>
+                                            <Button className="mr-2" color="danger" onClick={handleDeletePurchHeader}>
+                                                Delete
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent>
+                                            <PurchHeaderDeleteForm
+                                                header={header}
+                                                setShowModal={setShowDeleteModal} 
+                                            />
+                                        </PopoverContent>
+                                    </Popover>
+                                    {header.purchaselines.length > 0 && (
+                                        <Popover placement="left-start">
+                                            <PopoverTrigger>
+                                                <Button color="default" onClick={handleRegisterGoodsInProduction}>
+                                                    Register
+                                                </Button>
+                                            </PopoverTrigger>
+                                            <PopoverContent>
+                                                <RegisteringGoods
+                                                    header={header}
+                                                    setShowForm={setShowRegisterModal} 
+                                                />
+                                            </PopoverContent>
+                                        </Popover>
+                                    )}
+                                </div>
+                            )}
+                        </TableCell>
+                    </TableRow>
                     ))}
-                    
-                </tbody>
+            </TableBody>
+        </Table>
 
-            </table>
-            
-
-            {selectedRow !== undefined && 
+        {showForm && currentHeader && (
             <PurchLinesList 
-            lines={purchtables.find(table => table.id === selectedRow)?.purchaselines}
-            purchHeader={purchtables.find(table => table.id === selectedRow)} 
-            items={items}
-            />}
-
-            {/* для створення накладної */}
-            { showCreatePurchHeaderModal && <CreateEditPurchHeaderForm vendors={vendors} setShowForm={setShowCreatePurchHeaderModal}/>}
+                lines={purchtables.find(table => table.id === selectedRow)?.purchaselines}
+                purchHeader={purchtables.find(table => table.id === selectedRow)} 
+                items={items}
+            />
+            )}
+            
         </div>
     )
 }

@@ -1,12 +1,12 @@
 import { db } from "@/db";
 import Link from "next/link";
 import Image from 'next/image';
-import deleteButton from '../../../../../public/icons/delete.svg'
+// import deleteButton from '../../../../../public/icons/delete.svg'
 import newFileButton from '../../../../../public/icons/create.svg'
-import editButton from '../../../../../public/icons/edit.svg'
-import registerGoodsButton from '../../../../../public/icons/goods-in.svg'
+// import editButton from '../../../../../public/icons/edit.svg'
+// import registerGoodsButton from '../../../../../public/icons/goods-in.svg'
 
-import PurchTableComponent from "@/components/PurchHeaders/purchtable-table"
+// import PurchTableComponent from "@/components/PurchHeaders/purchtable-table"
 import SalesView from '@/components/SalesHeaders/sales-headers-view'
 
 export default async function PurchtableHome() {
@@ -62,8 +62,8 @@ export default async function PurchtableHome() {
                   </tr> 
               </thead>
               <tbody>
-                {salestables.map((table) => (
-                  <SalesView header={table}/>
+                {salestables.map((table, tableIndex) => (
+                  <SalesView key={tableIndex} header={table}/>
                 ))}
                 
               </tbody>

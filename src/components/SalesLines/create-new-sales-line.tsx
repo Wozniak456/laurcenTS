@@ -31,8 +31,8 @@ export default function CreateEditSalesHeaderForm({
     header,
     items
 } : CreateEditSalesLineFormProps){
-    const [formState, action] = useFormState(actions.createSalesLineRecord, { message: '' });
-    const [UpdateActionState, UpdateAction] = useFormState(actions.updateSalesLines, {message: ''});
+    // const [formState, action] = useFormState(actions.createSalesLineRecord, { message: '' });
+    // const [UpdateActionState, UpdateAction] = useFormState(actions.updateSalesLines, {message: ''});
 
     const [chosenItem, setChosenItem ] = useState<itemWithUnit | undefined>(undefined)
 
@@ -49,7 +49,7 @@ export default function CreateEditSalesHeaderForm({
             <div className="bg-white p-8 rounded shadow-lg w-2/3">
                 <div className='flex justify-between items-center mb-8'>
                     <h2 className="text-lg font-semibold text-center">Новий рядок видаткової накладної № {Number(header.id)}</h2>
-                    <form action={UpdateAction} className='flex justify-end'> 
+                    {/* <form action={UpdateAction} className='flex justify-end'> 
                     <input type="hidden" name="header_id" value={String(header?.id)} />
                         <button 
                             type="submit" 
@@ -57,10 +57,10 @@ export default function CreateEditSalesHeaderForm({
                             >
                             <Image src={CloseButton} alt='Close Button'/>
                         </button>
-                    </form>
+                    </form> */}
                     
                 </div>
-                <form action={action}
+                <form
                     className='flex flex-col flex-wrap gap-4'>
                     <div className="flex flex-wrap gap-4 justify-between">
                         <div className="mb-4 flex flex-col">
@@ -114,13 +114,13 @@ export default function CreateEditSalesHeaderForm({
                         Save
                     </button>
                 </form>
-                {
+                {/* {
                     formState && formState.message ? (
                         <div className={`my-2 p-2 border rounded ${formState.message.includes('успішно') ? 'bg-green-200 border-green-400' : 'bg-red-200 border-red-400'}`}>
                             {formState.message}
                         </div>
                     ) : null
-                }
+                } */}
                 
             </div>
         </div>

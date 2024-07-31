@@ -4,7 +4,7 @@ import { useFormState } from "react-dom";
 import * as actions from '@/actions';
 
 export default function PurchtableCreatePage(){
-    const [formState, action] = useFormState(actions.createPurchTableRecord, {message: ''});
+    const [formState, action] = useFormState(actions.createPurchTable, {message: ''});
 
     return(
         <form action={action}>

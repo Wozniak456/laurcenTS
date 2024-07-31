@@ -30,7 +30,7 @@ export default async function BatchesShowPage(props: BatchesShowPageProps){
             notFound()
         }
 
-        const transActionOfCreation = await db.itemtransactions.findFirst({
+        const transactionOfCreation = await db.itemtransactions.findFirst({
             select:{
                 id: true,
                 quantity: true,
@@ -51,9 +51,9 @@ export default async function BatchesShowPage(props: BatchesShowPageProps){
 
         batch = {
             ...batch,
-            docId: transActionOfCreation?.documents.id,
-            tranId: transActionOfCreation?.id,
-            quantity: transActionOfCreation?.quantity,
+            docId: transactionOfCreation?.documents.id,
+            tranId: transactionOfCreation?.id,
+            quantity: transactionOfCreation?.quantity,
             isNew: true
         }
 
@@ -74,11 +74,7 @@ export default async function BatchesShowPage(props: BatchesShowPageProps){
                 ...batch,
                 isNew: false
             }
-
-            console.log('партія не нова', AllTransactions)
         }
-
-        
 
         const items = await db.items.findMany({
             select: {
@@ -92,21 +88,11 @@ export default async function BatchesShowPage(props: BatchesShowPageProps){
             }
         })
 
-        console.log(batch)
-
         return( 
            <ItemBatchComponent batch={batch} items={items}/>
         )
-
-        
     }
     catch(error){
         console.error("Error fetching batch data:", error);
-    }
-    finally {
-        await db.$executeRaw`SELECT pg_terminate_backend(pid)
-                             FROM pg_stat_activity
-                             WHERE state = 'idle';`;
-        console.log('Disconnected idle sessions successfully.');
     }
 }

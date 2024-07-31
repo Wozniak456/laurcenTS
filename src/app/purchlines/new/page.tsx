@@ -4,7 +4,7 @@ import { useFormState } from "react-dom";
 import * as actions from '@/actions';
 
 export default function PurchaseLinesCreatePage(){
-    const [formState, action] = useFormState(actions.createPurchLineRecord, {message: ''});
+    const [formState, action] = useFormState(actions.createPurchLine, {message: ''});
 
     return(
         <form action={action}>

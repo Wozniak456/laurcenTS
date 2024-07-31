@@ -55,20 +55,20 @@ export default function DaySummaryContent({
 
     const [formState, action] = useFormState(actions.feedBatch, { message: '' });
     
-    const transitionDay = todayCalculation?.calculation?.transition_day
+    const transitionDay = todayCalculation?.calc?.transition_day
 
     let initialValues = times.map(() => 
-      transitionDay && todayCalculation?.calculation?.feed_per_feeding
-        ? (todayCalculation.calculation.feed_per_feeding * (1 - transitionDay * 0.2)).toFixed(1) ?? "0"
-        : todayCalculation?.calculation?.feed_per_feeding.toFixed(1) ?? "0"
+      transitionDay && todayCalculation?.calc?.feed_per_feeding
+        ? (todayCalculation.calc.feed_per_feeding * (1 - transitionDay * 0.2)).toFixed(1) ?? "0"
+        : todayCalculation?.calc?.feed_per_feeding.toFixed(1) ?? "0"
     );
 
-    if (transitionDay && prevCalculation?.calculation){
+    if (transitionDay && prevCalculation?.calc){
       initialValues = [
         ...initialValues,
         ...times.map(() =>
-          todayCalculation?.calculation?.feed_per_feeding
-            ? (todayCalculation?.calculation?.feed_per_feeding * (transitionDay * 0.2)).toFixed(1) ?? "0"
+          todayCalculation?.calc?.feed_per_feeding
+            ? (todayCalculation?.calc?.feed_per_feeding * (transitionDay * 0.2)).toFixed(1) ?? "0"
             : "0"
         )
       ];
@@ -86,7 +86,7 @@ export default function DaySummaryContent({
   const todayFeed = items.find(item => item.id === todayCalculation?.feed?.item_id);  
 
   let prevFeed 
-  if(transitionDay && prevCalculation?.calculation){
+  if(transitionDay && prevCalculation?.calc){
     prevFeed = items.find(item => item.id === prevCalculation?.feed?.item_id);
   }
 
@@ -98,7 +98,7 @@ export default function DaySummaryContent({
      <tr key={`${location.location_id}`}>
      {/* <tr key={`${pool.id}-1`}> */}
       <td rowSpan={transitionDay ? 2 : 1} className="px-4 py-2 border border-gray-400 w-14">{location.location_name}</td>
-      {todayCalculation?.calculation ? 
+      {todayCalculation?.calc ? 
         <React.Fragment>
           <td className="px-4 py-2 border border-gray-400">{transitionDay ? prevCalculation?.feed?.type_name : todayCalculation?.feed?.type_name}</td>
           <td className="px-4 py-2 border border-gray-400 w-40">{transitionDay && prevCalculation ? items.find(item => item.id === prevCalculation.feed?.item_id)?.name : items.find(item => item.id === todayCalculation.feed?.item_id)?.name}</td>
@@ -112,10 +112,10 @@ export default function DaySummaryContent({
         }
         
       {times.map((time, index) => {
-        if(todayCalculation?.calculation){ 
+        if(todayCalculation?.calc){ 
           return(
             <React.Fragment key={index}>
-            <td className="px-4 py-2 border border-gray-400">{transitionDay ? (todayCalculation?.calculation?.feed_per_feeding * (1 - transitionDay * 0.2)).toFixed(1) : todayCalculation?.calculation?.feed_per_feeding.toFixed(1)}</td>
+            <td className="px-4 py-2 border border-gray-400">{transitionDay ? (todayCalculation?.calc?.feed_per_feeding * (1 - transitionDay * 0.2)).toFixed(1) : todayCalculation?.calc?.feed_per_feeding.toFixed(1)}</td>
             <td className="px-4 py-2 border border-gray-400">
             <form>
               
@@ -147,7 +147,7 @@ export default function DaySummaryContent({
       
       })}
       <td rowSpan={transitionDay ? 2 : 1} className="px-4 py-2 border border-gray-400">
-      {todayCalculation?.calculation && 
+      {todayCalculation?.calc && 
         <form action={action}>
           <input type="hidden" name="location_id" value={location.location_id} />
           <input type="hidden" name="executed_by" value={3} />
@@ -162,13 +162,13 @@ export default function DaySummaryContent({
           
           <input type="hidden" name="batch_id" value={Number(location.batch_id)} />
 
-          {transitionDay && prevCalculation?.calculation &&
+          {transitionDay && prevCalculation?.calc &&
             <input type="hidden" name="item_1" value={todayFeed?.id} />
           }
 
           {
             inputValues.map((value, index) => (
-              <input type="hidden" name={`input_${index}`} value={value} />
+              <input key={index} type="hidden" name={`input_${index}`} value={value} />
             ))
           }
           
@@ -206,7 +206,7 @@ export default function DaySummaryContent({
     {transitionDay &&
     <tr key={location.location_id}> 
     {/* <tr key={`${pool.id}-1`}></tr> */}
-    {todayCalculation?.calculation ? 
+    {todayCalculation?.calc ? 
       <React.Fragment>
         <td className="px-4 py-2 border border-gray-400">{todayCalculation?.feed?.type_name}</td>
         <td className="px-4 py-2 border border-gray-400">{items.find(item => item.id === todayCalculation.feed?.item_id)?.name}</td>
@@ -217,10 +217,10 @@ export default function DaySummaryContent({
       }
       
     {times.map((time, index) => {
-      if(todayCalculation?.calculation){ 
+      if(todayCalculation?.calc){ 
         return(
           <React.Fragment key={index}> 
-          <td className="px-4 py-2 border border-gray-400">{(todayCalculation?.calculation?.feed_per_feeding * (transitionDay * 0.2)).toFixed(1)}</td>
+          <td className="px-4 py-2 border border-gray-400">{(todayCalculation?.calc?.feed_per_feeding * (transitionDay * 0.2)).toFixed(1)}</td>
           
           <td className="px-4 py-2 border border-gray-400">
           <form action={action}>

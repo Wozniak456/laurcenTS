@@ -1,5 +1,4 @@
 import { db } from "@/db";
-import Link from "next/link";
 
 import PurchTableComponent from "@/components/PurchHeaders/purchtable-table"
 

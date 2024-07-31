@@ -1,7 +1,6 @@
 'use client'
 import type {purchtable} from '@prisma/client'
 import { useState } from 'react';
-import * as actions from '@/actions';
 
 interface PurchRecordEditFormProps{
     purchtableRecord: purchtable

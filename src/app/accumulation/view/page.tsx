@@ -93,9 +93,9 @@ export default async function StockingHome() {
                 <th colSpan={3} className="px-4 py-2 border border-gray-400"></th>
                 {batches.map(async (generation, genIndex) => {
                   return(
-                    <React.Fragment>
-                      <th key={genIndex} className="px-4 py-2 border border-gray-400">кг</th>
-                      <th key={genIndex} className="px-4 py-2 border border-gray-400">грн</th>
+                    <React.Fragment key={genIndex}>
+                      <th className="px-4 py-2 border border-gray-400">кг</th>
+                      <th className="px-4 py-2 border border-gray-400">грн</th>
                     </React.Fragment>
                   )
                 })}
@@ -125,7 +125,7 @@ export default async function StockingHome() {
                         const generationData = await feeding_actions.getTotalAmount(generation.id, item.id);
                         // console.log(generation.id, generationData)
                         return (
-                          <React.Fragment>
+                          <React.Fragment key={genIndex}>
                           <td
                             key={`${genIndex}-1`}
                             className={`px-4 py-2 border border-gray-400 text-center ${

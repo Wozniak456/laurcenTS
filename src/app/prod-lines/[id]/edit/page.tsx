@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { notFound } from "next/navigation";
-import ProdLineEditForm from "@/components/line-edit-form";
+import ProdLineEditForm from "@/components/ProdLines/line-edit-form";
 
 interface ProdLineEditPageProps {
     params: {

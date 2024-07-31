@@ -1,5 +1,4 @@
 'use client'
-import { useEffect, useState } from "react";
 import { useFormState } from "react-dom";
 import * as actions from '@/actions';
 import { customers } from "@prisma/client";
@@ -13,25 +12,25 @@ interface CreateEditSalesHeaderFormProps{
 export default function CreateEditSalesHeaderForm({
     customers
 } : CreateEditSalesHeaderFormProps){
-    const [formState, action] = useFormState(actions.createSalesTableRecord, { message: '' });
-    const [UpdateActionState, UpdateAction] = useFormState(actions.updateSalesTable, {message: ''});
+    // const [formState, action] = useFormState(actions.createSalesTableRecord, { message: '' });
+    // const [UpdateActionState, UpdateAction] = useFormState(actions.updateSalesTable, {message: ''});
 
     return(
         <div className="fixed top-0 left-0 w-full h-full bg-gray-800 bg-opacity-75 flex justify-center items-center">
             <div className="bg-white p-8 rounded shadow-lg w-1/3">
                 <div className='flex justify-between items-center mb-4'>
                     <h2 className="text-lg font-semibold text-center">Нова видаткова накладна</h2>
-                    <form action={UpdateAction} className='flex justify-end'> 
+                    {/* <form action={UpdateAction} className='flex justify-end'> 
                         <button 
                             type="submit" 
                             className="rounded p-2 hover:bg-red-200"
                             >
                             <Image src={CloseButton} alt='Close Button'/>
                         </button>
-                    </form>
+                    </form> */}
                     
                 </div>
-                <form className="my-4" action={action}>
+                <form className="my-4" >
                     <div className="flex flex-wrap gap-2 justify-between items-start">
                         <div className=" flex flex-col gap-2">
                             <label className="" htmlFor='delivery_date'>
@@ -77,13 +76,13 @@ export default function CreateEditSalesHeaderForm({
                         
                     </div>
                 </form>
-                {
+                {/* {
                     formState && formState.message ? (
                         <div className={`my-2 p-2 border rounded ${formState.message.includes('успішно') ? 'bg-green-200 border-green-400' : 'bg-red-200 border-red-400'}`}>
                             {formState.message}
                         </div>
                     ) : null
-                }
+                } */}
                 
             </div>
         </div>

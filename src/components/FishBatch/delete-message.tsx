@@ -1,5 +1,4 @@
 'use client'
-import { useState } from 'react';
 import * as actions from '@/actions';
 import { useFormState } from 'react-dom';
 import { BatchWithCreationInfo } from '@/types/app_types'
@@ -8,16 +7,12 @@ import CloseButton from '../../../public/icons/close-square-light.svg'
 
 interface BatchDeleteFormProps {
     batch: BatchWithCreationInfo,
-    setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
+    // setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function BatchDeleteForm({batch, setShowModal} : BatchDeleteFormProps){
+export default function BatchDeleteForm({batch} : BatchDeleteFormProps){
     const [formState, action] = useFormState(actions.deleteItemBatch, {message: ''});
     const [UpdateActionState, UpdateAction] = useFormState(actions.updateBatches, {message: ''});
-
-    const handleCloseModal = () => {
-        setShowModal(false)
-    }
 
     return(        
         <div className="fixed top-0 left-0 w-full h-full bg-gray-800 bg-opacity-75 flex justify-center items-center">

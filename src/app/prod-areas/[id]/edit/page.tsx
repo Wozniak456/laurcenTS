@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { notFound } from "next/navigation";
-import ProdAreaEditForm from "@/components/area-edit-form";
+import ProdAreaEditForm from "@/components/ProdArea/area-edit-form";
 
 interface ProdAreaEditPageProps {
     params: {

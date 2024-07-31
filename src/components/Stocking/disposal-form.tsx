@@ -2,8 +2,8 @@
 
 import * as actions from '@/actions';
 import { useFormState } from 'react-dom';
-import { useEffect, useState } from 'react';
-import { poolInfo, disposalItem } from '@/types/app_types'
+import { useState } from 'react';
+import { disposalItem } from '@/types/app_types'
 
 interface DisposalFormPageProps {
     location: {
@@ -13,11 +13,17 @@ interface DisposalFormPageProps {
         pool_id: number | null;
     },
     poolInfo: {
-        batchId: bigint | undefined;
-        batchName: string | undefined;
+        batch: {
+            id: bigint;
+            name: string;
+        } | undefined;
         qty: number | undefined;
         fishWeight: number | undefined;
-        feedType: string | undefined;
+        feedType: {
+            id: number;
+            name: string;
+            feedconnection_id: number | null;
+        } | null | undefined;
         updateDate: string | undefined;
         allowedToEdit: boolean;
     },
@@ -38,17 +44,13 @@ export default function DisposalFormPage({location, poolInfo, setShowDisposalFor
 
     const [formState, action] = useFormState(actions.disposal, { message: '' });
 
-    // useEffect(() => {
-    //     console.log(selectedReason)
-    // }, [selectedReason])
-
     return (
         <div className="fixed top-0 left-0 w-full h-full bg-gray-800 bg-opacity-75 flex justify-center items-center z-10">
             <div className="bg-white p-4 rounded shadow-lg w-1/3">
             <h1 className="font-bold mb-4 text-center text-base">Форма списання риби з басейну {location.name}</h1>
                 <form className="mx-auto px-4 m-4" action={action} onSubmit={handleCloseForm}>
 
-                    <input type="hidden" name="batch_id" value={String(poolInfo.batchId)} />
+                    <input type="hidden" name="batch_id" value={String(poolInfo.batch?.id)} />
                     <input type="hidden" name="location_id_from" value={String(location.id)} />
                     <input type="hidden" name="fish_amount_in_pool" value={String(poolInfo.qty)} />
                     <input type="hidden" name="average_fish_mass" value={String(poolInfo.fishWeight)} />

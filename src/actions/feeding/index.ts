@@ -1,11 +1,11 @@
 'use server'
 
 import { db } from "@/db"
-import { calculationAndFeed } from "@/types/app_types"
-import * as actions from "@/actions/index"
+import * as actions from "@/actions"
+import * as stockingActions from '@/actions/stocking'
 
 
-  //акумуляція по зїдженому корму та ціною корму
+//акумуляція по зїдженому корму та ціною корму
 export const getTotalAmount = async (generationId : bigint, itemId: number) => {
     const data = await actions.getFeedAmountsAndNames(generationId);
 
@@ -20,191 +20,162 @@ export const getTotalAmount = async (generationId : bigint, itemId: number) => {
     return { amount, price };
 };
 
-
-export async function getPrevCalc(location_id : number, calc : calculationAndFeed | null) {
+//замінити на calculationForLocation
+// export async function getTodayCalculation(location_id : number, today : Date) : Promise<calculationAndFeed> {
+//   try{
+//     const calculation = await db.calculation_table.findFirst({
+//       where:{
+//         documents:{
+//           location_id: location_id
+//         },
+//         date: today
+//       },
+//       orderBy: {
+//         id: 'desc'
+//       }
+//     })
+  
+//     let feed_type
+//     let item
     
-    const records14 = await get14CalculationForPool(location_id)
+//     if (calculation){
+//       feed_type = await getFeedType(calculation.fish_weight)
+  
+//       if (feed_type){
+//         item = await getItemPerType(feed_type.id, location_id)
+//       }
+//     }
 
-    if (calc !== null){
-      let index = records14.findIndex(record => record.id === calc.calculation?.id)
-      // console.log('index', index)
-  
-      while(true){
-        if( index <= 0){
-          return null
-        }
-        
-        if ( records14[index - 1].transition_day === null){
-  
-          const feed_type = await getFeedType(records14[index - 1].fish_weight)
-  
-          let item
-          
-          if (feed_type){
-            item = await getItemPerType(feed_type.id, location_id)
-          }
-  
-          return {
-            calculation: records14[index - 1],
-            feed: {
-              type_id: feed_type?.id,
-              type_name: feed_type?.name,
-              item_id: item?.item_id,
-              definedPrio: item?.definedPrio
-            }
-          }
-        }
-  
-        index--
-      }
-    }
-  }
-  
-  export async function getTodayCalculation(location_id : number, today : Date) : Promise<calculationAndFeed> {
-    try{
-      const calculation = await db.calculation_table.findFirst({
-        where:{
-          documents:{
-            location_id: location_id
-          },
-          date: today
-        },
-        orderBy: {
-          id: 'desc'
-        }
-      })
-    
-      let feed_type
-      let item
-      
-      if (calculation){
-        feed_type = await getFeedType(calculation.fish_weight)
-    
-        if (feed_type){
-          item = await getItemPerType(feed_type.id, location_id)
-        }
-      }
+//     return {
+//       calculation: calculation,
+//       feed: {
+//         type_id: feed_type?.id,
+//         type_name: feed_type?.name,
+//         item_id: item?.item_id,
+//         definedPrio: item?.definedPrio
+//       }
+//     }
 
-      // console.log(location_id, item)
-    
-      return {
-        calculation: calculation,
-        feed: {
-          type_id: feed_type?.id,
-          type_name: feed_type?.name,
-          item_id: item?.item_id,
-          definedPrio: item?.definedPrio
-        }
-      }
-
-    }
-    catch(error){
-      console.error("Error fetching batch data:", error);
-      return {
-        calculation: null,
-        feed: undefined
-    };
-    }
-    
-  }
+//   }
+//   catch(error){
+//     console.error("Error fetching batch data:", error);
+//     return {
+//       calculation: null,
+//       feed: undefined
+//   };
+//   }
   
-  async function getItemPerType(feed_type_id : number, location_id : number) {
-    let definedPrio
+// }
 
-    const items = await db.items.findMany({
-      where:{
-        feed_type_id : feed_type_id
-      }
+const getLocationSummary = (async (location_id: number, today: Date) => {
+  const todayCalc = await stockingActions.calculationForLocation(location_id, today.toISOString().split("T")[0]) 
+  const prevCalc = await stockingActions.getPrevCalc(location_id, todayCalc);
+  return {todayCalc, prevCalc}
+})
+
+type LocationSummary = {
+  uniqueItemId: number;
+  totalFeed: number;
+};
+
+type locationForFeedWeight = {
+  id: number;
+  pools: {
+      id: number;
+      locations: {
+          id: number;
+          name: string;
+      }[];
+  }[];
+}[]
+
+export const getAllSummary = async (lines: locationForFeedWeight, today: Date) => {
+  const locationSummary: { [itemId: number]: LocationSummary } = {};
+
+  await Promise.all(
+    lines.map(async line => {
+      await Promise.all(
+        line.pools.map(async pool => {
+          await Promise.all(
+            pool.locations.map(async loc => {
+
+              const isPoolFilled = await isFilled(loc.id)
+
+              if (isPoolFilled == true){
+                  const { todayCalc, prevCalc } = await getLocationSummary(loc.id, today);
+
+              // Обробка todayCalc
+              if (todayCalc && todayCalc.feed && todayCalc.calc && todayCalc.feed.item_id) {
+                  const itemId = todayCalc.feed.item_id;
+                  let feedPerFeeding = todayCalc.calc.feed_per_feeding;
+                  
+                  // let feedingEdited
+
+                  if(todayCalc.calc.transition_day){
+                      feedPerFeeding = feedPerFeeding * (1 - todayCalc.calc.transition_day * 0.2)
+                  }
+
+                  if (!locationSummary[itemId]) {
+                      locationSummary[itemId] = {
+                      totalFeed: feedPerFeeding,
+                      uniqueItemId: itemId,
+                      };
+                      // console.log(`Додаємо ${feedPerFeeding} до корму: ${itemId}`)
+                  } else {
+                      locationSummary[itemId].totalFeed += feedPerFeeding;
+                      // console.log(`Додаємо ${feedPerFeeding} до корму: ${itemId}`)
+                  }
+              }
+
+              // Обробка prevCalc
+              if (prevCalc && prevCalc.feed && prevCalc.calc && prevCalc.feed.item_id && todayCalc && todayCalc.feed && todayCalc.calc) {
+                  const itemId = prevCalc.feed.item_id;
+                  let feedPerFeeding = todayCalc.calc.feed_per_feeding;
+
+                  if(todayCalc.calc.transition_day){
+                      feedPerFeeding = feedPerFeeding * (todayCalc.calc.transition_day * 0.2)
+                  }
+                  
+                  if (todayCalc.calc.transition_day){
+                      if (!locationSummary[itemId]) {
+                          locationSummary[itemId] = {
+                          totalFeed: feedPerFeeding,
+                          uniqueItemId: itemId,
+                          };
+                      } else {
+                          locationSummary[itemId].totalFeed += feedPerFeeding;
+                      }
+                  }
+              }
+              }
+            })
+          );
+        })
+      );
     })
-  
-    //якщо немає колізій, то повертаємо єдиний корм для виду
-    if(items.length == 1){
-      return{
-        item_id: items[0].id,
-        definedPrio: true
-      }
-    }
-  
-    //якщо колізія є, то обираємо корм
-    if (items.length > 1){
-      const prio = await db.priorities.findFirst({
-        where:{
-          location_id: location_id
-        },
-        orderBy:{
-          id: 'desc'
-        }
-      })
-  
-      //якщо для басейну обрано корм, повертаємо його
-      if (prio){
-        return{
-          item_id: prio.item_id,
-          definedPrio: true
-        }
-      }
-      //якщо для басейну не обрано корм, повертаємо перший елемент
-      else{
-        return{
-          item_id: items[0].id,
-          definedPrio: false
-        }
-      }
-    }
-  }
-  
-  
-  async function getFeedType(fish_weight : number | undefined) {
-    if(fish_weight !== undefined){
-      
-      const startFeedType = await db.feedtypes.findFirst({
-        where:{
-          feedconnections:{
-            from_fish_weight:{
-              lte: fish_weight
-            },
-            to_fish_weight:{
-              gte: fish_weight
-            }
-          }
-        }
-      })
-      return startFeedType
-    }
-    // return null
-    
-  }
-  
-  async function get14CalculationForPool(location_id : number) {
-    // console.log('location_id', location_id)
-    const calc_table_ids = await db.calculation_table.groupBy({
-      by: ['date'],
-      _max: {
-        id: true,
-      },
-      where:{
-        documents:{
-          location_id: location_id
-        }
-      },
-      orderBy:{
-        date: 'asc'
-      },
-      take: 14
-    });
+  );
 
-    
-  
-    const calc_table14 = await db.calculation_table.findMany({
+  return locationSummary;
+};
+
+// басейн заповнений?
+export const isFilled = async (location_id : number)  => {
+  const lastStocking = await db.itemtransactions.findFirst({
       where:{
-        id: {
-          in: calc_table_ids.map(record => Number(record._max.id))
-        }
+          documents:{
+              doc_type_id: 1 //зариблення
+          },
+          location_id: location_id,
       },
       orderBy:{
-        id: 'asc'
-      }
-    }) 
-  
-    return calc_table14
+          id: 'desc'
+      },
+      take: 1
+  })
+
+  if (lastStocking && lastStocking?.quantity > 0){
+      return true
+  }else{
+      return false
   }
+}

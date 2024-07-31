@@ -3,11 +3,10 @@
 import { useFormState } from "react-dom";
 import * as actions from '@/actions';
 import PartitionForm from "@/components/batch-partition";
-import { useEffect, useState } from "react";
-// import { ItemBatch} from '@/components/accordion'
+import { useState } from "react";
 import { itembatches } from "@prisma/client";
-import PoolInfo from "@/components/pool-info"
-import { batchInfo, poolInfo, disposalItem } from '@/types/app_types'
+import PoolInfo from "@/components/Pools/pool-info"
+import { disposalItem } from '@/types/app_types'
 import DisposalForm from '@/components/Stocking/disposal-form'
 
 interface StockPoolProps {
@@ -24,11 +23,17 @@ interface StockPoolProps {
     },
     batches: itembatches[],
     poolInfo: {
-        batchId: bigint | undefined;
-        batchName: string | undefined;
+        batch: {
+            id: bigint;
+            name: string;
+        } | undefined;
         qty: number | undefined;
         fishWeight: number | undefined;
-        feedType: string | undefined;
+        feedType: {
+            id: number;
+            name: string;
+            feedconnection_id: number | null;
+        } | null | undefined;
         updateDate: string | undefined;
         allowedToEdit: boolean;
     },
@@ -61,7 +66,7 @@ export default function StockPoolPage({location, locations, batches, poolInfo, d
                 
                 <input type="hidden" name="location_id_from" value={87} />
                 <input type="hidden" name="location_id_to" value={location.id} />
-                {(!poolInfo.batchName || poolInfo.qty == 0) && 
+                {(!poolInfo.batch || poolInfo.qty == 0) && 
                 <div className="flex flex-wrap items-center gap-4 justify-between">
                     <div className="flex gap-4 items-center flex-wrap ">
                         <label className="min-w-24" htmlFor="batch_id">
@@ -118,7 +123,7 @@ export default function StockPoolPage({location, locations, batches, poolInfo, d
                     />
                     </div> */}
                 <div className="flex flex-wrap gap-4 justify-end">
-                    {(!poolInfo.batchName || poolInfo.qty==0) &&
+                    {(!poolInfo.batch || poolInfo.qty==0) &&
                     
                         <button
                             type="submit"

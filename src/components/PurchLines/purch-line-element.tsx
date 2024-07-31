@@ -1,14 +1,20 @@
 'use client'
 
-import React, { useEffect, useState } from "react";
-import { useFormState } from "react-dom";
-import * as actions from '@/actions';
+import React, { useState } from "react";
 import Image from 'next/image';
 import deleteButton from '../../../public/icons/delete.svg'
-import newFileButton from '../../../public/icons/create.svg'
 import editButton from '../../../public/icons/edit.svg'
 import CreateEditLineForm from '../PurchLines/create-edit-form'
 import PurchLineDeleteForm from '../PurchLines/delete-message'
+import { Button, Popover, PopoverContent, PopoverTrigger } from "@nextui-org/react";
+import {
+    Table,
+    TableHeader,
+    TableBody,
+    TableColumn,
+    TableRow,
+    TableCell
+  } from "@nextui-org/table";
 
 interface PurchLinesComponentProps {
     purch_header: {
@@ -59,6 +65,7 @@ interface PurchLinesComponentProps {
             id: number;
             name: string;
         } | null;
+        vendor_id: number | null;
     }[],
     
     setSelectedLine: React.Dispatch<React.SetStateAction<number | undefined>>,
@@ -73,71 +80,64 @@ export default function PurchLineItem( {purch_header, line, index, items, setSel
     const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
    
     function handleEditPurchLine(){
-        setShowEditModal(true)
+        // setShowEditModal(true)
         setSelectedLine(line.id)
     }
 
     function handleDeletePurchLine(){
-        setShowDeleteModal(true)
+        // setShowDeleteModal(true)
         setSelectedLine(line.id)
         //setSelectedLine(line.id)
     }
 
-    return(
-        <tr key={line?.id}>
-            <React.Fragment>
-                <td className="px-4 py-2 border border-gray-400 text-center">{index + 1}</td>
-                <td className="px-4 py-2 border border-gray-400 text-center">{line?.item_id}</td>
-                <td className="px-4 py-2 border border-gray-400 text-center">{line?.items.name}</td>
-                <td className="px-4 py-2 border border-gray-400 text-center">{line?.items.feed_type_id}</td>
-                <td className="px-4 py-2 border border-gray-400 text-center">{line?.units.name}</td>            
-
-                <td className="px-4 py-2 border border-gray-400 text-center">{line?.quantity}</td> 
-
-                <td className="text-center">
-                {purch_header?.doc_id === null && (
-                    <div>
-                        <button className="hover:bg-blue-100 py-1 px-1 rounded" onClick={handleEditPurchLine}>
-                            <Image
-                                src={editButton}
-                                alt="Edit"
-                                width={30}
-                                height={30}
-                            />
-                        </button> 
-                        <button className="hover:bg-red-100 py-1 px-1 rounded" onClick={handleDeletePurchLine}>
-                            <Image
-                                src={deleteButton}
-                                alt="Delete"
-                                width={30}
-                                height={30}
-                            />
-                        </button> 
-                    </div>
-                )}
-
-
-                    {showEditModal 
-                        && selectedLine === line.id 
-                       && <CreateEditLineForm purchId={purch_header?.id} line={line} index={index} items={items} setShowModal={setShowEditModal} 
-                       // setSelectedLine={setSelectedLine}
-                       />}
-       
-                       {showDeleteModal 
-                        && selectedLine === line.id 
-                       && <PurchLineDeleteForm 
-                       line={line} 
-                       setShowModal={setShowDeleteModal}
-                       // setSelectedLine={setSelectedLine}
-                       />}
-                
-                    
-                </td>
-            </React.Fragment>
-            
-            
-
-        </tr>
-        
-      )
+    return (
+      <TableRow>
+      <TableCell>{index + 1}</TableCell>
+      <TableCell>{line?.item_id}</TableCell>
+      <TableCell>{line?.items.name}</TableCell>
+      <TableCell>{line?.items.feed_type_id}</TableCell>
+      <TableCell>{line?.units.name}</TableCell>
+      <TableCell>{line?.quantity}</TableCell>
+      <TableCell className="w-auto whitespace-nowrap">
+        <Popover placement="bottom">
+          <PopoverTrigger>
+            <Button color="primary" onClick={handleEditPurchLine}>
+              Edit
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent>
+            <CreateEditLineForm 
+              purchHeader={purch_header} 
+              line={line} 
+              index={index} 
+              items={items} 
+              // setShowModal={setShowEditModal} 
+            />
+          </PopoverContent>
+        </Popover>
+        <Popover placement="bottom">
+          <PopoverTrigger>
+            <Button color="danger" onClick={handleDeletePurchLine}>
+              Delete
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent>
+            <PurchLineDeleteForm 
+              line={line} 
+              // setShowModal={setShowDeleteModal} 
+            />
+          </PopoverContent>
+        </Popover>
+      </TableCell>
+    </TableRow>
+    // <TableRow>
+    //     <TableCell>No data</TableCell>
+    //     <TableCell>No data</TableCell>
+    //     <TableCell>No data</TableCell>
+    //     <TableCell>No data</TableCell>
+    //     <TableCell>No data</TableCell>
+    //     <TableCell>No data</TableCell>
+    //     <TableCell>No data</TableCell>
+    // </TableRow>
+      );
 }

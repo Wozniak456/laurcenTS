@@ -1,29 +1,27 @@
 'use client'
 import Link from "next/link";
 import { ChangeEvent, useEffect, useState } from "react";
-// import { useFormState } from "react-dom";
 import Header from '@/components/header'
+import { Button } from "@nextui-org/react";
+// interface DataItem{
+//   batch_id: string;
+//   batch_name: string;
+//   feed_type_name: string,
+//   item_name: string,
+//   start_saldo: number;
+//   incoming: number;
+//   outcoming: number;
+//   end_saldo: number;
+// }
 
-interface DataItem{
-  batch_id: string;
-  batch_name: string;
-  // item_id: number,
-  feed_type_name: string,
-  item_name: string,
-  start_saldo: number;
-  incoming: number;
-  outcoming: number;
-  end_saldo: number;
-}
-
-interface FilterableTableProps {
-   data: DataItem[],
-   start: Date | undefined,
-   end: Date | undefined
-}
+// interface FilterableTableProps {
+//    data: DataItem[],
+//    start: Date | undefined,
+//    end: Date | undefined
+// }
 
 
-export default function FilterableTable({ }: FilterableTableProps) {
+export default function FilterableTable() {
     const [StartSaldoDate, setStartSaldoDate] = useState<string | undefined>(undefined);
     const [EndSaldoDate, setEndSaldoDate] = useState<string | undefined>(undefined);
 
@@ -74,11 +72,14 @@ export default function FilterableTable({ }: FilterableTableProps) {
                 </div>
                 {StartSaldoDate && EndSaldoDate &&
                 <div className="flex justify-end w-full">
-                    <Link 
-                        href={`/leftovers/${StartSaldoDate}_${EndSaldoDate}`}
-                        className="py-2 hover:bg-gray-200 w-40 text-center bg-blue-200">
-                        Розрахувати
-                    </Link>
+                    <Button color="primary">
+                        <Link 
+                            href={`/leftovers/${StartSaldoDate}_${EndSaldoDate}`}
+                            // className="py-2 hover:bg-gray-200 w-40 text-center bg-blue-200"
+                            >
+                            Розрахувати
+                        </Link>
+                    </Button>
                 </div>}
             </div>
         </div>

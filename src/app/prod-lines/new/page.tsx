@@ -9,18 +9,6 @@ export default function ProdLineCreatePage(){
     const [formState, action] = useFormState(actions.createProdLine, {message: ''});
     const [areas, setAreas] = useState<productionareas[]>([]);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const areasData = await actions.getAreas();
-                setAreas(areasData);
-            } catch (error) {
-                console.error('Error fetching areas:', error);
-            }
-        };
-
-        fetchData();
-    }, []);
     return(
         <form className="flex flex-col justify-center" action={action}>
             <h3 className="font-bold m-3">Create a Production Line</h3>
@@ -35,7 +23,7 @@ export default function ProdLineCreatePage(){
                     id="prod_area_id"
                     >
                         {areas.map(area => (
-                            <option key={area.id} value={area.id}>{area.name}</option>
+                            <option key={area.id} value={area.id}>{area.name}</option> 
                     ))}
                     </select>
                 </div>

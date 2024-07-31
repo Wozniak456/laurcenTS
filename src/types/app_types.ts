@@ -89,13 +89,20 @@ export type poolInfo = {
 }
 
 export interface calculationAndFeed{
-    calculation?: calculation_table | undefined  | null,
-    feed? : {
-        type_id?: number,
-        type_name?: string,
-        item_id?: number,
-        definedPrio?: boolean
-    }
+    batch?: {
+        batch_name: string | undefined;
+        batch_id: bigint | undefined;
+        qty: number;
+    } | null;
+    calc?: calculation_table | undefined  | null;
+    feed?: {
+        type_id: number | undefined;
+        type_name: string | undefined;
+        item_id: number | undefined;
+        definedPrio: boolean | undefined;
+    },
+    location_id?: number;
+    allowedToEdit?: boolean;
 }
 
 export interface calculationAndFeedExtended extends calculationAndFeed{
@@ -108,4 +115,21 @@ export interface calculationAndFeedExtended extends calculationAndFeed{
 export type disposalItem = {
     id: number,
     reason: string
+}
+
+export type poolInfoType = {
+    batch: {
+        id: bigint;
+        name: string;
+    } | undefined;
+    qty: number | undefined;
+    fishWeight: number | undefined;
+    feedType: {
+        id: number;
+        name: string;
+        feedconnection_id: number | null;
+    } | null | undefined;
+    updateDate: string | undefined;
+    allowedToEdit: boolean;
+    plan_weight?: number
 }

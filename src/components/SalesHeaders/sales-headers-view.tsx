@@ -23,8 +23,8 @@ interface SalesHeadersProps{
 export default function SalesHeaders({
     header
 } : SalesHeadersProps){
-    const [formState, action] = useFormState(actions.createSalesTableRecord, { message: '' });
-    const [UpdateActionState, UpdateAction] = useFormState(actions.updateSalesTable, {message: ''});
+    // const [formState, action] = useFormState(actions.createSalesTableRecord, { message: '' });
+    // const [UpdateActionState, UpdateAction] = useFormState(actions.updateSalesTable, {message: ''});
 
     const router = useRouter();
 

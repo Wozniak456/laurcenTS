@@ -2,6 +2,8 @@
 import { useEffect, useState } from "react";
 import { useFormState } from "react-dom";
 import * as actions from '@/actions';
+import { Button, Input, Select, SelectItem } from "@nextui-org/react";
+import FormButton from "../common/form-button";
 
 interface PurchLinesComponentProps {
     purchHeader: {
@@ -54,28 +56,28 @@ interface PurchLinesComponentProps {
         } | null;
         vendor_id: number | null;
     }[],
-    setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
+   
+    // setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
     // setSelectedLine: React.Dispatch<React.SetStateAction<number | undefined>>
 }
 
-export default function CreateEditLineForm({purchHeader, 
+export default function CreateEditLineForm({
+    purchHeader, 
     line, 
     items, 
-    setShowModal, 
+    // setShowModal, 
 } : PurchLinesComponentProps){
 
     const [selectedItem, setSelectedItem] = useState<string | undefined>('');
 
     useEffect(() => {
-        if (line) {
-            setSelectedItem(items.find(item => item.id === line.item_id)?.name);
-        }
-    }, [line, items]);
+        console.log('selectedItem: ', selectedItem)
+    }, [selectedItem]);
 
-    const [formState, action] = useFormState(line ? actions.editPurchline : actions.createPurchLineRecord, { message: '' });
+    const [formState, action] = useFormState(line ? actions.editPurchline : actions.createPurchLine, { message: '' });
     
     const handleCloseModal = () => {
-        setShowModal(false);
+        // setShowModal(false);
         setSelectedItem('')
         // setSelectedLine(undefined)
     };
@@ -86,14 +88,13 @@ export default function CreateEditLineForm({purchHeader,
     };
 
     return(
-        <div className="fixed top-0 left-0 w-full h-full bg-gray-800 bg-opacity-75 flex justify-center items-center">
-        <div className="bg-white p-8 rounded shadow-lg w-1/2">
+        <div className="p-4">
             <h2 className="text-lg font-semibold mb-4">Новий рядок накладної</h2>
             <form className="my-8" action={action} onSubmit={handleCloseModal}>
                 <input type="hidden" name="purchase_id" value={String(purchHeader?.id)} />
                 {line ? <input type="hidden" name="purch_line_id" value={String(line.id)} /> : ''}
                 <div className="flex flex-row gap-2 justify-between items-start flex-wrap">
-                    <div className="flex flex-col gap-2 w-full max-w-64">
+                    {/* <div className="flex flex-col gap-2 w-full max-w-64">
                         <label className="" htmlFor='item_id'>
                             Призначення: 
                         </label>
@@ -114,8 +115,40 @@ export default function CreateEditLineForm({purchHeader,
                             ))}
                         </select>
 
-                    </div>
-                    <div className="flex flex-col gap-2 w-full max-w-48">
+                    </div> */}
+                    <Select 
+                            label="Призначення:" 
+                            name="item_id"
+                            labelPlacement="outside"
+                            placeholder="Призначення:"
+                            isRequired
+                            // isInvalid={!!formState?.errors?.vendor_id}
+                            // errorMessage={formState?.errors?.vendor_id?.join(', ')}
+                            onChange={(e) => handleSelectedItem(Number(e.target.value)) }
+                            defaultSelectedKeys={
+                                line && line.items && line.items.name ? 
+                                [items.filter(item => item.name === line.items.name).map(item => String(item.id))[0]]
+                                : undefined
+                            }
+                        >
+                            {items.map(item => (
+                                <SelectItem key={item.id} value={String(item.id)}>{item.name}</SelectItem>
+                            ))}
+                        </Select>
+                    {/* <Select 
+                        label="Призначення:" 
+                        name="item_id"
+                        labelPlacement="outside"
+                        placeholder="Призначення:"
+                        isRequired
+                        defaultSelectedKeys={line && line.item_id ? [line.item_id] : []}
+                    >
+                        {items.map(item => (
+                            <SelectItem key={item.id} value={item.id}>{item.name}</SelectItem>
+                        ))}
+                    </Select> */}
+
+                    {/* <div className="flex flex-col gap-2 w-full max-w-48">
                         <label className="" htmlFor='quantity'>
                             Кількість: 
                         </label>
@@ -128,28 +161,44 @@ export default function CreateEditLineForm({purchHeader,
                             min={1}
                             defaultValue={line ? line.quantity : undefined} 
                         />
-                    </div>
-                    <div className="flex flex-col gap-2 w-full max-w-48">
+                    </div> */}
+                    <Input 
+                            name="quantity"
+                            label='Кількість:'
+                            labelPlacement="outside"
+                            placeholder="Кількість:"
+                            isRequired
+                            // isInvalid={!!formState?.errors?.delivery_date}
+                            // errorMessage={formState?.errors?.delivery_date?.join(', ') || ''}
+                            defaultValue={line ? line.quantity.toString() : ''}
+                        />
+                    {/* <div className="flex flex-col gap-2 w-full max-w-48"> 
                         <label htmlFor='unit_id'>Одиниця виміру:</label>
-                        <input type="hidden" name="unit_id" value={items.find(item => item.name === selectedItem)?.units?.id} />
+                        
                         <label className="border rounded p-2  h-10">{items.find(item => item.name === selectedItem)?.units?.name || ''}</label>
-                    </div>
+                    </div> */}
+                    <Input 
+                        name="unit_id"
+                        label='Одиниця виміру:'
+                        labelPlacement="outside"
+                        placeholder="Одиниця виміру:"
+                        isRequired
+                        value={`${line ? line.units.name : selectedItem ? items.find(item => item.name === selectedItem)?.units?.name : ''}`}
+                        disabled
+                        // isInvalid={!!formState?.errors?.delivery_date}
+                        // errorMessage={formState?.errors?.delivery_date?.join(', ') || ''}
+                        
+                    />
+                    <input type="hidden" name="unit_id" value={line ? line.units.id : items.find(item => item.name === selectedItem)?.units?.id} />
                 </div> 
-                <div className="flex flex-wrap gap-2 justify-between mt-4">
-                    <button 
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                        type="submit"
-                        >
+                <div className="flex flex-wrap gap-2 justify-end mt-4">
+                    <FormButton color="primary">
                         Зберегти
-                    </button>
-                    <button className="hover:bg-blue-500 hover:text-white border font-bold py-2 px-4 rounded" 
-                    onClick={handleCloseModal}>
-                        Скасувати
-                    </button>
+                    </FormButton>
                 </div>
             </form>
             
-        </div>
+        {/* </div> */}
     </div>
     )
 }

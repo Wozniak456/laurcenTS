@@ -1,27 +1,33 @@
-'use client'
-import { useEffect } from "react";
-// import { useGlobalContext } from "@/app/context/page";
+import { Button } from '@nextui-org/react'
+import * as actions from '@/actions'
+import { auth } from "@/auth";
+import Profile from '@/components/profile'
 
-export default function Home() {
-//   const {userId, setUserId, data, setData} = useGlobalContext();
+export default async function Home() {
+  const session = await auth();
 
-//   useEffect(() => {
-//     setUserId('2');
-//     setData([
-//       {firstName: 'Tim'},
-//       {firstName: 'Tim2'},
-//       {firstName: 'Tim3'},
-//     ])
-//   }, []);
   return (
     <div>
       <div className="flex m-2 justify-between items-center">
         <h1 className="text-xl font-bold">Home page</h1>
       </div>
-      <div className="flex flex-col gap-2">
-        {/* <p>UserId: {userId}</p>
-        <p>First Names: </p>
-        {data.map((e,i) => <p key={i}>{e.firstName}</p>)} */}
+      <div >
+        {/* <form action={actions.signIn}>
+          <Button type="submit">Sign In</Button>
+        </form> */}
+
+        {/* <form action={actions.signOut}>
+          <Button type="submit">Sign out</Button>
+        </form> */}
+
+        {/* {
+          session?.user 
+          ? <div>{JSON.stringify(session.user)}</div> 
+          : <div>Signed Out</div>
+        }
+
+        <Profile /> */}
+        
       </div>
     </div>
   );

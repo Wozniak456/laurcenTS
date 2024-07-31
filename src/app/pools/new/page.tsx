@@ -9,19 +9,6 @@ export default function PoolCreatePage(){
     const [formState, action] = useFormState(actions.createPool, {message: ''});
     const [areas, setAreas] = useState<productionlines[]>([]);
     
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const linesData = await actions.getLines();
-                setAreas(linesData);
-            } catch (error) {
-                console.error('Error fetching areas:', error);
-            }
-        };
-
-        fetchData();
-    }, []);
-
     return(
         <form className="container mx-auto px-4 m-4 max-w-[800px]" action={action}>
             <h3 className="font-bold m-3">Create a Pool</h3>

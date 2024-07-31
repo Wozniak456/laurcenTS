@@ -1,10 +1,10 @@
 'use client'
 
 import { useFormState } from "react-dom";
-import * as actions from '@/actions';
+import * as CRUDactions from '@/actions'
 
 export default function ProdAreaCreatePage(){
-    const [formState, action] = useFormState(actions.createProdArea, {message: ''});
+    const [formState, action] = useFormState(CRUDactions.createProdArea, {message: ''});
 
     return(
         <form className="container mx-auto px-4 m-4 max-w-[800px]" action={action}>

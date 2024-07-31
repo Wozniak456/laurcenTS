@@ -1,10 +1,10 @@
 import Link from "next/link";
-import React, { useState } from "react";
+import React from "react";
 import { db } from "@/db";
 import DailyFeedWeightPage from '@/app/feed-weight/view/page'
 
-import * as actions from "@/actions/feeding"
-import {getBatchesInfo} from '@/actions/stocking'
+import * as stockingActions from "@/actions/stocking"
+import * as actions from '@/actions'
 
 import DaySummaryContent from "@/components/day-summary"
 
@@ -17,16 +17,14 @@ interface DayFeedingProps {
 interface LocationInfo {
     location_id: number;
     location_name: string;
-    batch_id?: bigint; // batch_id є необов'язковим
+    batch_id?: bigint; 
   }
 
 export default async function DayFeeding(props: DayFeedingProps) {
     const today = props.params.index;
 
-
     const currentDate: Date = new Date();
     
-    // дні, доступні для вибору
     let dates = [];
 
     for (let i = -2; i <= 7; i++) {
@@ -98,7 +96,7 @@ export default async function DayFeeding(props: DayFeedingProps) {
                 {line.pools.map(pool => {
                     return Promise.all(pool.locations.map(async loc => {
                     
-                    const isPoolFilled = await isFilled(loc.id)
+                    const isPoolFilled = await actions.isFilled(loc.id)
 
                     let prevCalc = null;
 
@@ -110,18 +108,18 @@ export default async function DayFeeding(props: DayFeedingProps) {
                     let todayCalc
 
                     if(isPoolFilled === true){
-                        todayCalc = await actions.getTodayCalculation(loc.id, new Date(today));
+                        todayCalc = await stockingActions.calculationForLocation(loc.id, today);
                 
-                        if (todayCalc.calculation?.transition_day !== null){
-                        prevCalc = await actions.getPrevCalc(loc.id, todayCalc);
+                        if (todayCalc.calc?.transition_day !== null){
+                        prevCalc = await stockingActions.getPrevCalc(loc.id, todayCalc);
                         }
             
-                        const batchInfo = await getBatchesInfo(loc.id)
+                        const batchInfo = await stockingActions.poolInfo(loc.id, today)
             
                         if (batchInfo) {
                         locationInfo = {
                             ...locationInfo,
-                            batch_id: batchInfo.batch_id
+                            batch_id: batchInfo.batch?.id
                         };
                         }
                     }
@@ -151,23 +149,3 @@ export default async function DayFeeding(props: DayFeedingProps) {
     );
 }
 
-const isFilled = async (location_id : number)  => {
-    const lastStocking = await db.itemtransactions.findFirst({
-        where:{
-            documents:{
-                doc_type_id: 1 //зариблення
-            },
-            location_id: location_id,
-        },
-        orderBy:{
-            id: 'desc'
-        },
-        take: 1
-    })
-
-    if (lastStocking && lastStocking?.quantity > 0){
-        return true
-    }else{
-        return false
-    }
-}
