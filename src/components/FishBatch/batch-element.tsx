@@ -7,7 +7,11 @@ import { BatchWithCreationInfo } from '@/types/app_types'
 import { ChangeEvent, useState } from 'react';
 import BatchDeleteForm from '@/components/FishBatch/delete-message'
 
+import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Checkbox, Link} from "@nextui-org/react";
+
+
 import { Button, Input, Popover, PopoverContent, PopoverTrigger } from '@nextui-org/react';
+import FormButton from '../common/form-button';
 
 type ItemBatchComponentProps = {
     batch: BatchWithCreationInfo,
@@ -20,6 +24,8 @@ export default function ItemBatchComponent({
     batch,
     items
 } : ItemBatchComponentProps){
+
+    const {isOpen, onOpen, onOpenChange} = useDisclosure();
 
     const [allowToEdit, setAllowToEdit] = useState<boolean>(false);
     const [UpdateActionState, UpdateAction] = useFormState(actions.updateBatches, {message: ''});
@@ -52,45 +58,14 @@ export default function ItemBatchComponent({
     };
     
     return(
-        // <Popover placement='left'>
-        //     <PopoverTrigger>
-        //         <Button color='primary'>Create a batch</Button>
-        //     </PopoverTrigger>
-        //     <PopoverContent>
-        //         <form>
-        //             <div className='flex flex-col gap-4 p-4 w-80'>
-        //                 <h3>Create a batch</h3>
-
-        //                 <Input 
-        //                     name='title'
-        //                     label='title'
-        //                     labelPlacement='outside'
-        //                     placeholder='title'
-        //                 />
-
-        //                 <Input 
-        //                     name='content'
-        //                     label='content'
-        //                     labelPlacement='outside'
-        //                     placeholder='content'
-        //                 />
-
-        //                 <FormButton>Create a batch</FormButton>
-        //             </div>
-        //         </form>
-        //     </PopoverContent>
-        // </Popover>
         <div className="fixed top-0 left-0 w-full h-full bg-gray-400 bg-opacity-75 flex justify-center items-center">
             <div className="bg-white p-8 rounded shadow-lg w-2/5">
                 <div className='flex justify-between items-center mb-4'>
                     <h2 className="text-lg font-semibold text-center">Партія {batch.name}</h2>
                     <form action={UpdateAction} className='flex justify-end'> 
-                        <button 
-                            type="submit" 
-                            className="rounded p-2 hover:bg-red-200"
-                            >
+                        <FormButton color='default'>
                             <Image src={CloseButton} alt='Close Button'/>
-                        </button>
+                        </FormButton>
                     </form>
                 </div>
                 <div className="flex flex-col gap-4">
@@ -151,11 +126,19 @@ export default function ItemBatchComponent({
                     {batch.isNew ?
                     <div className="flex gap-4 justify-between flex-wrap">
                     {!allowToEdit && 
-                        <button 
-                            className="p-2 border rounded bg-blue-500 text-white hover:bg-blue-600 transition-colors duration-200 min-w-64"
-                            onClick={handleAlloEditButton}>
-                                <p>Увімкнути редагування</p>
-                        </button>} 
+                        // <button 
+                        //     className="p-2 border rounded bg-blue-500 text-white hover:bg-blue-600 transition-colors duration-200 min-w-64"
+                        //     onClick={handleAlloEditButton}>
+                        //         <p>Увімкнути редагування</p>
+                        // </button>
+
+                        <Button color='default' onClick={handleAlloEditButton}>
+                            Увімкнути редагування
+                        </Button>
+                        
+                        } 
+
+
                         {allowToEdit && 
                         <form action={updateBatchAction}>
                             <input type="hidden" name="batch_id" value={String(batch.id)} /> 
@@ -165,24 +148,49 @@ export default function ItemBatchComponent({
                             <input type="hidden" name="doc_id" value={String(batch.docId)} />
                             <input type="hidden" name="tran_id" value={String(batch.tranId)} />
 
-                            <button 
+                            {/* <button 
                                 className="p-2 border rounded bg-blue-500 text-white hover:bg-blue-600 transition-colors duration-200  min-w-64"
                                 type='submit'
                             >
                                 <p>Зберегти</p>
-                            </button>
+                            </button> */}
+
+                            <FormButton color='primary'>
+                                Зберегти
+                            </FormButton>
 
                         </form>
                         }
-                            <button 
+                            {/* <button 
                             type="submit" 
                             className="p-2 border rounded bg-red-500 text-white hover:bg-red-600 transition-colors duration-200  min-w-64"
                             onClick={handleDeleteButton}>
                                 Видалити партію
-                            </button>
+                            </button> */}
+
+                    <Button onPress={onOpen} color="danger">Видалити партію</Button>
+                        <Modal 
+                            isOpen={isOpen} 
+                            onOpenChange={onOpenChange}
+                            placement="top-center"
+                        >
+                            <ModalContent>
+                            {(onClose) => (
+                                <>
+                                <ModalHeader className="flex flex-col gap-1"></ModalHeader>
+                                <ModalBody>
+                                    <BatchDeleteForm batch={batch} />
+                                </ModalBody>
+                                <ModalFooter>
+                                    
+                                </ModalFooter>
+                                </>
+                            )}
+                            </ModalContent>
+                        </Modal>
                     </div> : <p className='text-gray-500 mt-4 text-center'>* Партія вже задіяна у транзакціях, тому редагування чи видалення недоступне</p>}
                 </div>
-                    {showDeleteMessage && <BatchDeleteForm batch={batch} />}
+                    {/* {showDeleteMessage && <BatchDeleteForm batch={batch} />} */}
                     {
                         updateBatchActionState && updateBatchActionState.message ? (
                             <div className={`my-2 p-2 border rounded ${updateBatchActionState.message.includes('Оновлено!') ? 'bg-green-200 border-green-400' : 'bg-red-200 border-red-400'}`}>

@@ -1,5 +1,6 @@
 'use server'
 import { db } from "@/db";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 export async function deleteItemBatch(
@@ -52,9 +53,9 @@ export async function deleteItemBatch(
                 });
             });
 
-            console.log('Transaction successful');
+            // console.log('Transaction successful');
             
-            return{message :'Партію видалено!'}
+            // return{message :'Партію видалено!'}
         }
         catch(err: unknown){
             console.log('ми в catch Error deleteItemBatch')
@@ -74,5 +75,6 @@ export async function deleteItemBatch(
                 return{message :'Something went wrong!'}
             }
         }
-        // redirect('/batches/view');
+        revalidatePath('/batches/view')
+        redirect('/batches/view');
 }

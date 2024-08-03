@@ -25,55 +25,12 @@ export default function ItemBatchCreateForm({items, units} : ItemBatchCreateForm
 
     const [UpdateActionState, UpdateAction] = useFormState(actions.updateBatches, {message: ''});
 
-
-    {/* <form>
-            <div className='flex flex-col gap-4 p-4 w-80'>
-              <h3>Create a topic</h3>
-              <Input 
-                label="Name" 
-                labelPlacement='outside' 
-                placeholder='Name'/>
-              <Textarea 
-                label='Description' 
-                labelPlacement='outside' 
-                placeholder='Describe your topic'/>
-                <Button type='submit'>Submit</Button>
-            </div>
-          </form> */}
     return(
         <div className="p-2 w-full">
-            {/* <div className=""> */}
-            <h2 className="text-lg font-semibold text-center mb-4">Створення нової партії</h2>
-                {/* <div className='flex justify-between gap-4 items-center mb-4'>
-                    
-                    <form action={UpdateAction} className='flex justify-end'> 
-                        <button 
-                            type="submit" 
-                            className="rounded hover:bg-red-200"
-                            >
-                            <Image src={CloseButton} alt='Close Button'/>
-                        </button>
-                    </form>
-                </div> */}
-                
                 <form action={action}>
                     <div className="flex flex-col gap-4">
                         <div className="flex gap-4 flex-wrap items-center">
-                            {/* <label className="w-40" htmlFor="item_id">
-                                Призначення партії:
-                            </label> 
-                            <select
-                                name="item_id"
-                                className="border rounded p-2 flex-grow min-w-32"
-                                id="item_id"
-                                defaultValue={13}
-                                required
-                            >
-                                {items.map(type => (
-                                    <option key={type.id} value={type.id}>{type.name}</option>
-                                ))}
-                            </select> */}
-
+                            
                             <Select 
                                 label="Призначення партії:" 
                                 name="item_id"
@@ -100,30 +57,8 @@ export default function ItemBatchCreateForm({items, units} : ItemBatchCreateForm
                                 errorMessage={formState.errors?.created}
                                 isRequired
                             />
-                            {/* <label className="w-40" htmlFor="created">
-                                Дата створення:
-                            </label> */}
-                            
-                            {/* <input 
-                                name="created"
-                                className="border rounded p-2 flex-grow min-w-32"
-                                type="date"
-                                id="created"
-                                required
-                            /> */}
                         </div>
                         <div className="flex gap-4 flex-wrap items-center">
-                            {/* <label className="w-40" htmlFor="quantity">
-                                Кількість:
-                            </label>
-                            <input 
-                                name="quantity"
-                                className="border rounded p-2 flex-grow min-w-32"
-                                id="quantity"
-                                type="number"
-                                min={1}
-                                required
-                            /> */}
                             <Input 
                                 label="Кількість:" 
                                 name="quantity"
@@ -135,19 +70,6 @@ export default function ItemBatchCreateForm({items, units} : ItemBatchCreateForm
                             />
                         </div>
                         <div className="flex gap-4 flex-wrap items-center">
-                            {/* <label className="w-40" htmlFor="unit_id">
-                                Одиниця виміру:
-                            </label>
-                            <select
-                                name="unit_id"
-                                className="border rounded p-2 flex-grow min-w-32"
-                                id="unit_id"
-                                required
-                            >
-                                {units.map(unit => (
-                                    <option key={unit.id} value={unit.id}>{unit.name}</option>
-                                ))}
-                            </select> */}
 
                             <Select 
                                 label="Одиниця виміру:" 
@@ -176,10 +98,6 @@ export default function ItemBatchCreateForm({items, units} : ItemBatchCreateForm
                             ) : null
                         } */}
                         <div className='flex justify-center flex-wrap gap-2 inline-block'>
-                            {/* <button type="submit" className="rounded p-2 bg-blue-200">
-                                Створити
-                            </button> */}
-
                             {formState.errors._form 
                             ?   <div className='p-2 bg-red-200 border rouded border-red-400'>
                                     {formState.errors._form?.join(', ')}

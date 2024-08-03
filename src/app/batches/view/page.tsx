@@ -27,13 +27,22 @@ export default async function FishBatchesComponent() {
         }
     })
 
+    const items = await db.items.findMany({
+        where:{
+            item_type_id: {
+                not: 3
+            }
+        }
+    })
+    const units = await db.units.findMany()
+
     return (
     <div>
         <div>
             <h1 className="text-xl font-bold m-2">Партії</h1>
         </div>
         <div>
-            <BatchesComponent batches={batches}/>
+            <BatchesComponent batches={batches} items={items} units={units}/>
         </div>      
     </div>
   );

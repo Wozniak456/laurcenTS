@@ -1,13 +1,15 @@
-import Link from 'next/link';
+// import Link from 'next/link';
+'use client'
 import {
-  Input,
-  Button, 
   Textarea,
   Popover,
   PopoverTrigger,
   PopoverContent
 } from '@nextui-org/react'
-import BatchCreatePage from '@/app/batches/new/page'
+import BatchCreatePage from '@/components/FishBatch/create-batch-form'
+
+import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Checkbox, Input, Link} from "@nextui-org/react";
+
 
 interface BatchesComponentProps {
   batches: {
@@ -21,20 +23,48 @@ interface BatchesComponentProps {
         name: string;
     };
   }[],
+  items: {
+    id: number;
+    name: string;
+    description: string | null;
+    item_type_id: number | null;
+    feed_type_id: number | null;
+    default_unit_id: number | null;
+    parent_item: number | null;
+    vendor_id: number | null;
+  }[ ],
+  units: {
+    id: number;
+    name: string;
+  }[]
 }
 
-export default function BatchesComponent({batches} : BatchesComponentProps) {  
+export default function BatchesComponent({batches, items, units} : BatchesComponentProps) {  
+  const {isOpen, onOpen, onOpenChange} = useDisclosure();
   return (
     <div className="container p-4 w-full bg-gray-100 rounded-lg mt-4">
       <div className='flex justify-end'>
-      <Popover placement='left'>
-        <PopoverTrigger>
-          <Button color='primary' className='z-1'>Add a new batch</Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-80">
-          <BatchCreatePage />
-        </PopoverContent>
-      </Popover>
+
+      <Button onPress={onOpen} color="primary">Нова партія</Button>
+      <Modal 
+        isOpen={isOpen} 
+        onOpenChange={onOpenChange}
+        placement="top-center"
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">Нова партія</ModalHeader>
+              <ModalBody>
+                <BatchCreatePage items={items} units={units}/>
+              </ModalBody>
+              <ModalFooter>
+                
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
       </div>
 
       {/* <div className='flex justify-end'>

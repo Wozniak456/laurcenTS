@@ -1,5 +1,7 @@
 'use server'
 import { db } from "@/db";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 // import { redirect } from "next/navigation";
 
 
@@ -83,7 +85,7 @@ export async function editItemBatch(
             else{
                 throw new Error('Ви нічого не змінили!');
             }
-            return{message :'Оновлено!'}
+            // return{message :'Оновлено!'}
         }
         catch(err: unknown){
             console.log('ми в catch Error editItemBatch')
@@ -103,7 +105,8 @@ export async function editItemBatch(
                 return{message :'Something went wrong!'}
             }
         }
-        //redirect('/purchtable/view');
+        revalidatePath(`/batches/${formData.get('batch_id')}`)
+        redirect(`/batches/${formData.get('batch_id')}`);
     }
 
 async function getBatchName(item_id: number, date: Date) {
