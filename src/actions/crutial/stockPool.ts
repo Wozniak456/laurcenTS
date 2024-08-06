@@ -263,5 +263,5 @@ export async function stockPool(
         }
     }
 
-    revalidatePath('/feeding/view')
+    revalidatePath('/pool-managing/view')
 }

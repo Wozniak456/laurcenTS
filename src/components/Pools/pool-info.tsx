@@ -7,6 +7,7 @@ import { ChangeEvent, useEffect, useState } from 'react'
 import { itembatches } from "@prisma/client";
 import { useFormState } from 'react-dom'
 import * as actions from '@/actions';
+import { Input, Select, SelectItem } from '@nextui-org/react'
 
 interface Pool{
     id: number,
@@ -65,54 +66,51 @@ export default function PoolInfoComponent({location, poolInfo, batches} : PoolIn
     const [formState, updatePoolInfoAction] = useFormState(actions.updateCurrentPoolState, { message: '' })
 
     return (
-        <div className='bg-blue-200 p-4 rounded-md shadow-md '>
-            <div className='flex justify-between gap-1 '> 
-                <div className="mb-4">
-                    <label htmlFor="batchName" className="block text-gray-700 font-bold mb-2">Партія:</label>
-                    {/* <label htmlFor="batchName" className="block text-gray-700 font-bold mb-2">{poolInfo.cost?.toFixed(4)}</label> */}
-                    <select
+        <div className='w-full'>
+            <div className='flex gap-4 flex-wrap'> 
+                    <Select 
+                        label="Партія" 
                         name="batch_id"
-                        className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300 ${
-                            !editionAllowed ? 'bg-white text-gray-800 opacity-90 cursor-not-allowed' : 'border-gray-900'
+                        className={`focus:outline-none focus:ring focus:border-blue-300 ${
+                            !editionAllowed ? 'text-gray-800 opacity-90 cursor-not-allowed' : 'border-gray-900'
                           }`}
-                        id="batch_id"
-                        required
+                        // isInvalid={!!formState.errors?.unit_id}
+                        // errorMessage={formState.errors?.unit_id}
+                        isRequired
                         value={batchId}
                         onChange={handleBatchIdChange}
-                        disabled={!editionAllowed}
+                        disabled={!editionAllowed} 
                     >
-                    {batches.map(batch => (
-                        <option key={batch.id} value={Number(batch.id)}>{batch.name}</option>
-                    ))}
-                    </select>
-                </div>
-                <div className="mb-4">
-                    <label htmlFor="quantity" className="block text-gray-700 font-bold mb-2">Кількість:</label>
-                    <input
-                    id="quantity"
-                    type="number"
-                    value={count}
-                    onChange={handleCountChange}
-                    disabled={!editionAllowed}
-                    className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300 ${
-                        !editionAllowed ? 'bg-white text-gray-800 opacity-90 cursor-not-allowed' : 'border-gray-900'
-                      }`}
+                        {batches.map(batch => (
+                            <SelectItem key={Number(batch.id)} value={Number(batch.id)}>{batch.name}</SelectItem>
+                        ))}
+                    </Select>
+                    <Input 
+                        label="Кількість:" 
+                        name="quantity"
+                        value={count.toString()}
+                        type='number'
+                        onChange={handleCountChange}
+                        disabled={!editionAllowed}
+                        isRequired
+                        className={`focus:outline-none focus:ring focus:border-blue-300 ${
+                            !editionAllowed ? ' text-gray-800 opacity-90 cursor-not-allowed' : 'border-gray-900'
+                          }`}
                     />
-                </div>
-                <div className="mb-4">
-                    <label htmlFor="fishWeight" className="block text-gray-700 font-bold mb-2">Сер. вага:</label>
-                    <input
-                    id="fishWeight"
-                    type="number"
-                    step='any'
-                    value={avMass.toFixed(1)}
-                    onChange={handleAvMassChange}
-                    disabled={!editionAllowed}
-                    className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300 ${
-                        !editionAllowed ? 'bg-white text-gray-800 opacity-90 cursor-not-allowed' : 'border-gray-900'
-                      }`}
-                    />
-                </div>
+                    <Input 
+                        label="Сер. вага, г" 
+                        name="fishWeight"
+                        type='number'
+                        min={0.0001}
+                        step="any"
+                        value={avMass.toFixed(1)}
+                        onChange={handleAvMassChange}
+                        disabled={!editionAllowed}
+                        className={`focus:outline-none focus:ring focus:border-blue-300 ${
+                            !editionAllowed ? 'text-gray-800 opacity-90 cursor-not-allowed' : 'border-gray-900'
+                        }`}
+                        isRequired
+                    />             
             </div>
             {poolInfo.allowedToEdit &&
             <div className='flex gap-4'>

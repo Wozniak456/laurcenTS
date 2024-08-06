@@ -2,6 +2,8 @@ import { db } from "@/db";
 import StockingComponent from "@/components/feeding-component"
 import * as stockingActions from '@/actions/stocking'
 
+export const dynamic = 'force-dynamic'
+
 export default async function StockingHome() {
   const today = new Date()
   const areas = await db.productionareas.findMany({
@@ -36,11 +38,11 @@ export default async function StockingHome() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen  text-sm">
       {areas.map(area => (
-        <div key={area.id} className="mb-4 p-4">
+        <div key={area.id} className="w-full">
           <div className="text-3xl font-bold">{area.name}</div>
           {area.productionlines.map(line => (
-            <div key={line.id} className=" mb-4 p-4">
-              <div className="text-xl font-bold">{line.name}</div>
+            <div key={line.id} className="">
+              <div className="text-xl font-bold my-4">{line.name}</div>
               {line.pools
               
               .sort((a, b) => {

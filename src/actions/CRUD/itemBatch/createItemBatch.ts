@@ -3,7 +3,7 @@ import { db } from "@/db";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { z } from 'zod'
-import { auth } from '@/auth'
+// import { auth } from '@/auth'
 import { itembatches } from "@prisma/client";
 import paths from "@/paths";
 
@@ -45,15 +45,15 @@ export async function createItemBatch(
         }
     }
 
-    const session = await auth();
+    // const session = await auth();
 
-    if(!session || !session.user){
-        return{
-            errors:{
-                _form: ['You must be sign in to do this.']
-            }
-        }
-    }
+    // if(!session || !session.user){
+    //     return{
+    //         errors:{
+    //             _form: ['You must be sign in to do this.']
+    //         }
+    //     }
+    // }
 
     let batch : itembatches
 

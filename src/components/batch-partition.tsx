@@ -5,6 +5,8 @@ import { useFormState } from 'react-dom';
 import { useState } from 'react';
 import deleteImg from '../../public/icons/delete.svg'
 import Image from 'next/image';
+import FormButton from './common/form-button';
+import { Button } from '@nextui-org/react';
 
 interface PartitionFormPageProps {
     location: {
@@ -40,6 +42,7 @@ type location = {
 export default function PartitionFormPage({location, poolInfo, locations} : PartitionFormPageProps) {
     const [selectedPools, setSelectedPools] = useState<(number | null)[]>([]);
     const [formState, action] = useFormState(actions.batchDivision, { message: '' });
+    // const [updateFormState, updateFormStateAction] = useFormState(actions.updatePoolManaging, { message: '' });
     
     const handleDeleteButton = (index: number) => {
         setSelectedPools(selectedPools.filter(item => item !== index))
@@ -59,7 +62,7 @@ export default function PartitionFormPage({location, poolInfo, locations} : Part
     };
 
     return (
-        <form className="container mx-auto px-4 py-4 m-4 bg-white shadow-md rounded-lg" action={action}>
+        <form className="" action={action} onSubmit={() => {actions.updatePoolManaging}}>
             <div className="mb-4">
                 <input type="hidden" name="location_id_from" value={location.id} />
             </div>
@@ -158,20 +161,13 @@ export default function PartitionFormPage({location, poolInfo, locations} : Part
                 
                 
                 <div className='flex justify-around m-4 w-full'>
-                    <button 
-                        type="button" 
-                        className="rounded p-2 bg-blue-200 hover:bg-blue-300"
-                        onClick={() => setSelectedPools([...selectedPools, null])}
-                    >
+                    <Button color='primary' onClick={() => setSelectedPools([...selectedPools, null])}> 
                         Додати басейн
-                    </button>
+                    </Button>
                     {selectedPools.length > 0 && selectedPools[0] !== null &&
-                    <button
-                    type="submit"
-                    className="rounded p-2 bg-blue-200 hover:bg-blue-300"
-                    >
-                    Розділити
-                    </button> 
+                    <FormButton color='primary'>
+                        Розділити
+                    </FormButton>
                     }
                 </div>
             </div>

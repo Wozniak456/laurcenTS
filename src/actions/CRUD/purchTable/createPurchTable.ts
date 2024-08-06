@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import type { purchtable } from "@prisma/client"; 
 import { revalidatePath } from "next/cache";
 import { z } from 'zod'
-import { auth } from '@/auth'
+// import { auth } from '@/auth'
 import paths from "@/paths";
 
 interface createPurchTableFormState{
@@ -29,14 +29,14 @@ export async function createPurchTable(
 
             const date_time = new Date(createdString);
                    
-            const session = await auth()
-            if(!session || !session.user){
-                return{
-                    errors:{
-                        _form: ["Для здійснення цієї дії Ви маєте бути авторизовані!"]
-                    }
-                }
-            }
+            // const session = await auth()
+            // if(!session || !session.user){
+            //     return{
+            //         errors:{
+            //             _form: ["Для здійснення цієї дії Ви маєте бути авторизовані!"]
+            //         }
+            //     }
+            // }
             const purchRecord = await db.purchtable.create({
                 data:{
                     date_time,

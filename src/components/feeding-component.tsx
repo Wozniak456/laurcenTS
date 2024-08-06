@@ -8,6 +8,8 @@ import { itembatches } from "@prisma/client";
 import PoolInfo from "@/components/Pools/pool-info"
 import { disposalItem } from '@/types/app_types'
 import DisposalForm from '@/components/Stocking/disposal-form'
+import { Input, Select, SelectItem, Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/react";
+import FormButton from "./common/form-button";
 
 interface StockPoolProps {
     locations: {
@@ -43,7 +45,8 @@ interface StockPoolProps {
 export default function StockPoolPage({location, locations, batches, poolInfo, disposal_reasons}: StockPoolProps) {
     const [showPartitionForm, setShowPartitionForm] = useState(false);
     const [showDisposalForm, setShowDisposalForm] = useState(false);
-
+    const {isOpen, onOpen, onOpenChange} = useDisclosure();
+    
     const handleDisposalFormButton = () => {
         setShowDisposalForm(true)
     }
@@ -68,87 +71,99 @@ export default function StockPoolPage({location, locations, batches, poolInfo, d
                 <input type="hidden" name="location_id_to" value={location.id} />
                 {(!poolInfo.batch || poolInfo.qty == 0) && 
                 <div className="flex flex-wrap items-center gap-4 justify-between">
-                    <div className="flex gap-4 items-center flex-wrap ">
-                        <label className="min-w-24" htmlFor="batch_id">
-                            Партія
-                        </label>
-                        <select
-                            name="batch_id"
-                            className="border rounded p-2 max-w-fit"
-                            id="batch_id"
-                            required
-                        >
-                            <option>Не обрано</option>
-                            {batches.map(batch => (
-                                <option key={batch.id} value={Number(batch.id)}>{batch.name}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className="flex gap-4 items-center flex-wrap ">
-                        <label className="min-w-24" htmlFor="fish_amount">
-                            Кількість
-                        </label>
-                        <input
-                            name="fish_amount"
-                            type="number"
-                            className="border rounded p-2 max-w-40"
-                            id="fish_amount"
-                            min={1}
-                            required
-                        />
-                    </div>
-                    <div className="flex gap-4 items-center flex-wrap ">
-                        <label className="min-w-24" htmlFor="average_fish_mass">
-                            Сер. вага, г
-                        </label>
-                        <input
-                            name="average_fish_mass"
-                            className="border rounded p-2 max-w-40"
-                            id="average_fish_mass"
-                            type="number"
-                            min={0.0001}
-                            step="any"
-                            required
-                        />
-                    </div>
-                </div>}
-                {/* <div className={`flex items-center w-full gap-4 ${showMoreFields ? "" : "hidden"}`}>
-                    <label className="min-w-24" htmlFor="comments">
-                        Коментарі
-                    </label>
-                    <input
-                        name="comments"
-                        className="border rounded p-2 flex-grow"
-                        id="comments"
+                  
+                    <Select 
+                        label="Партія" 
+                        name="batch_id"
+                        // isInvalid={!!formState.errors?.unit_id}
+                        // errorMessage={formState.errors?.unit_id}
+                        isRequired
+                        // placeholder="Партія" 
+                    >
+                        {batches.map(batch => (
+                            <SelectItem key={Number(batch.id)} value={Number(batch.id)}>{batch.name}</SelectItem>
+                        ))}
+                    </Select>
+                    <Input 
+                        label="Кількість:" 
+                        name="fish_amount"
+                        type='number'
+                        min={1}
+                        // isInvalid={!!formState.errors?.quantity}
+                        // errorMessage={formState.errors?.quantity}
+                        isRequired
                     />
-                    </div> */}
+
+                    <Input 
+                        label="Сер. вага, г" 
+                        name="average_fish_mass"
+                        type='number'
+                        min={0.0001}
+                        step="any"
+                        // isInvalid={!!formState.errors?.quantity}
+                        // errorMessage={formState.errors?.quantity}
+                        isRequired
+                    />
+                </div>}
                 <div className="flex flex-wrap gap-4 justify-end">
                     {(!poolInfo.batch || poolInfo.qty==0) &&
-                    
-                        <button
-                            type="submit"
-                            className="rounded p-2 bg-blue-200"
-                        >
-                            Зарибити зі складу
-                        </button>
+                    <FormButton color="primary">
+                        Зарибити зі складу
+                    </FormButton>
+                        // <button
+                        //     type="submit"
+                        //     className="rounded p-2 bg-blue-200"
+                        // >
+                        //     Зарибити зі складу
+                        // </button>
+
                     }
                     {poolInfo.qty && poolInfo.qty > 0 ?
                     <>
-                    <button
+                    {/* <button
                         type="button"
                         className="rounded p-2 bg-blue-200"
                         onClick={() => setShowPartitionForm(!showPartitionForm)}
                     >
                         Розділити
-                    </button>
+                    </button> */}
+                    <Button color="primary" 
+                        onClick={() => setShowPartitionForm(!showPartitionForm)}
+                    >
+                        Розділити
+                    </Button>
 
-                    <button
+                    {/* <button
                         type="button"
                         className="rounded p-2 bg-blue-200"
                         onClick={handleDisposalFormButton}
                     >
                         Списати
-                    </button>
+                    </button> */}
+                    {/* <Button color="default" onClick={handleDisposalFormButton}>
+                        Списати
+                    </Button> */}
+
+                    <Button onPress={onOpen} color="default">Списати</Button>
+                    <Modal 
+                        isOpen={isOpen} 
+                        onOpenChange={onOpenChange}
+                        placement="top-center"
+                    >
+                        <ModalContent>
+                        {(onClose) => (
+                            <>
+                            <ModalHeader className="flex flex-col gap-1">Списання</ModalHeader>
+                            <ModalBody>
+                                <DisposalForm location={location} poolInfo={poolInfo} reasons={disposal_reasons} setShowDisposalForm={setShowDisposalForm}/>
+                            </ModalBody>
+                            <ModalFooter>
+                                
+                            </ModalFooter>
+                            </>
+                        )}
+                        </ModalContent>
+                    </Modal>
                     </> : ''
                     }
                     
@@ -164,7 +179,7 @@ export default function StockPoolPage({location, locations, batches, poolInfo, d
             
         </form>
         {showPartitionForm && <PartitionForm location={location} poolInfo={poolInfo} locations={locations}/>} 
-        {showDisposalForm && <DisposalForm location={location} poolInfo={poolInfo} reasons={disposal_reasons} setShowDisposalForm={setShowDisposalForm}/>}
+        {/* {showDisposalForm && <DisposalForm location={location} poolInfo={poolInfo} reasons={disposal_reasons} setShowDisposalForm={setShowDisposalForm}/>} */}
         </div>
     );
 }

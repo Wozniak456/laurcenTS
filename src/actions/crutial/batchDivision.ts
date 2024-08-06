@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { stockPool } from "./stockPool";
 import { updatePrevPool } from './updatePrevPool'
 
+
 type updatePrevPoolProps = {
     formData: FormData,
     formState: { message: string; } | undefined,
@@ -147,7 +148,7 @@ export async function batchDivision(
 
         await updatePrevPool(info)
 
-        revalidatePath('/feeding/view')
+        
 
     } catch (err: unknown) {
         if (err instanceof Error) {
@@ -165,5 +166,8 @@ export async function batchDivision(
         }
     }
     
-    redirect('/feeding/view')
+    console.log('revalidatePath, redirect')
+
+    revalidatePath('/pool-managing/view') 
+    redirect('/pool-managing/view')
 }

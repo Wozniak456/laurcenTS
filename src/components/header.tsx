@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react';
-import HeaderAuth from '@/components/header-auth'; // Ваш компонент авторизації
+// import HeaderAuth from '@/components/header-auth'; // Ваш компонент авторизації
 import { Button, Navbar, Popover, PopoverContent, PopoverTrigger } from '@nextui-org/react';
 import HeaderList from '@/components/header-list'
 
@@ -36,9 +36,9 @@ export default function Header() {
                     </Popover>
                 </div> 
                 
-                <div className="flex justify-end p-4">
+                {/* <div className="flex justify-end p-4">
                     <HeaderAuth />
-                </div>
+                </div> */}
 
             {isMenuOpen && (
                 <div className="absolute bg-white border border-gray-300 shadow-lg p-4 mt-2 rounded w-full top-full left-0 z-100">

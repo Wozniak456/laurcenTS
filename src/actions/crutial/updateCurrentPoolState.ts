@@ -112,5 +112,5 @@ export async function updateCurrentPoolState(
             return { message: 'Something went wrong!' };
         }
     }
-    revalidatePath('/feeding/view')
+    revalidatePath('/pool-managing/view')
 }

@@ -70,7 +70,7 @@ export default function ItemBatchComponent({
                 </div>
                 <div className="flex flex-col gap-4">
                     <form className='flex flex-col gap-2'>
-                        <div className="flex gap-4 flex-wrap items-center">
+                        {/* <div className="flex gap-4 flex-wrap items-center">
                             <label className="w-40" htmlFor="item_id">
                                 Призначення партії:
                             </label> 
@@ -90,8 +90,15 @@ export default function ItemBatchComponent({
                                     >{item.name}</option>
                                 ))}
                             </select>
-                        </div>
-                        <div className="flex gap-4 flex-wrap items-center">
+                        </div> */}
+                        <Input 
+                            label="Призначення партії:" 
+                            placeholder='Призначення партії:'
+                            defaultValue={items.find(item => item.id === 13)?.name}
+                            disabled
+                        />
+                        <input type="hidden" name="item_id" value={13} />
+                        {/* <div className="flex gap-4 flex-wrap items-center">
                             <label className="w-40" htmlFor="created">
                                 Дата створення:
                             </label>
@@ -105,8 +112,22 @@ export default function ItemBatchComponent({
                                 onChange={handleInputDateChange}
                                 required
                             />
-                        </div>
-                        <div className="flex gap-4 flex-wrap items-center">
+                        </div> */}
+                        <Input 
+                            name="created"
+                            label= "Дата створення:"
+                            type="date"
+                            labelPlacement="outside"
+                            placeholder="Дата створення:"
+                            defaultValue={batch.created ? batch.created.toISOString().split("T")[0] : ''}
+                            disabled={!allowToEdit}
+                            onChange={handleInputDateChange}
+                            required
+                            // isInvalid={!!formState.errors.delivery_date}
+                            // errorMessage={formState.errors.delivery_date?.join(', ')}
+                        />
+                        
+                        {/* <div className="flex gap-4 flex-wrap items-center">
                             <label className="w-40" htmlFor="quantity">
                                 Кількість:
                             </label>
@@ -121,7 +142,19 @@ export default function ItemBatchComponent({
                                 min={1}
                                 required
                             />
-                        </div>
+                        </div> */}
+                        <Input 
+                            label="Кількість:" 
+                            name="quantity"
+                            defaultValue={batch.quantity?.toString()}
+                            onChange={handleInputQtyChange}
+                            disabled={!allowToEdit}
+                            type="number"
+                            min={1}
+                            // isInvalid={!!formState.errors?.quantity}
+                            // errorMessage={formState.errors?.quantity}
+                            isRequired
+                        />
                     </form>
                     {batch.isNew ?
                     <div className="flex gap-4 justify-between flex-wrap">

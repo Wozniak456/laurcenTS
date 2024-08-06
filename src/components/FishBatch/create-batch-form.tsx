@@ -23,7 +23,7 @@ export default function ItemBatchCreateForm({items, units} : ItemBatchCreateForm
         errors: {}
     });
 
-    const [UpdateActionState, UpdateAction] = useFormState(actions.updateBatches, {message: ''});
+    // const [UpdateActionState, UpdateAction] = useFormState(actions.updateBatches, {message: ''});
 
     return(
         <div className="p-2 w-full">
@@ -31,7 +31,7 @@ export default function ItemBatchCreateForm({items, units} : ItemBatchCreateForm
                     <div className="flex flex-col gap-4">
                         <div className="flex gap-4 flex-wrap items-center">
                             
-                            <Select 
+                            {/* <Select 
                                 label="Призначення партії:" 
                                 name="item_id"
                                 required
@@ -39,13 +39,25 @@ export default function ItemBatchCreateForm({items, units} : ItemBatchCreateForm
                                 errorMessage={formState.errors && formState.errors?.item_id}
                                 // placeholder="Призначення партії:" 
                                 isRequired
+                                value={13}
                             >
                                 {items.map(type => (
                                     <SelectItem key={type.id} value={type.id}>
                                         {type.name}
                                     </SelectItem >
                                 ))}
-                            </Select>
+                            </Select> */}
+                            <Input 
+                                label="Призначення партії:" 
+                                // name="item_id"
+                                placeholder='Призначення партії:'
+                                defaultValue={items.find(item => item.id === 13)?.name}
+                                // isInvalid={!!formState.errors?.created}
+                                // errorMessage={formState.errors?.created}
+                                isRequired
+                            />
+                            <input type="hidden" name="item_id" value={13} />
+
                         </div>
                         <div className="flex gap-4 flex-wrap items-center">
                             <Input 

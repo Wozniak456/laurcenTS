@@ -24,7 +24,7 @@ export async function calculationForLocation(location_id : number, date: string)
     take: 1
   })
 
-  //приймаємо рішення чи показуватимемо кнопку редагування на /feeding/view
+  //приймаємо рішення чи показуватимемо кнопку редагування на /pool-managing/view
 
   if(calc){
     batch = await getBatchesInfo(location_id)

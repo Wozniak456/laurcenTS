@@ -1,7 +1,8 @@
 import Link from "next/link";
 import React from "react";
 import { db } from "@/db";
-import DailyFeedWeightPage from '@/app/feed-weight/view/page'
+import DailyFeedWeightPage from '@/components/DailyFeedWeight/daily-feed-weight'
+import * as feedingActions from "@/actions/feeding"
 
 import * as stockingActions from "@/actions/stocking"
 import * as actions from '@/actions'
@@ -33,15 +34,33 @@ export default async function DayFeeding(props: DayFeedingProps) {
       dates.push(newDate.toISOString().split("T")[0]);
     }
 
+    // const lines = await db.productionlines.findMany({
+    //     include: {
+    //       pools: {
+    //         include:{
+    //           locations: true
+    //         }
+    //       }
+    //     }
+    // });
+
     const lines = await db.productionlines.findMany({
-        include: {
-          pools: {
-            include:{
-              locations: true
+        select:{
+            id: true,
+            name: true,
+            pools:{
+                select:{
+                    id: true,
+                    locations:{
+                        select:{
+                            id: true,
+                            name: true
+                        }
+                    }
+                }
             }
-          }
         }
-    });
+    })
 
     const times = await db.time_table.findMany();
   
@@ -50,6 +69,8 @@ export default async function DayFeeding(props: DayFeedingProps) {
         item_type_id: 3
       }
     })
+
+    const summary = await feedingActions.getAllSummary(lines, currentDate)
 
     return (
         <div className="flex flex-col justify-center ">
@@ -144,7 +165,7 @@ export default async function DayFeeding(props: DayFeedingProps) {
                 </tbody>
                 </table>
             ))}
-            <DailyFeedWeightPage date={today}/>
+            <DailyFeedWeightPage lines={lines} summary={summary} items={items} date={today} />
         </div>
     );
 }

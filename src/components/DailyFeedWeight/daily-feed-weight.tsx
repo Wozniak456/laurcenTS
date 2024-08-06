@@ -1,44 +1,44 @@
-import { db } from "@/db";
 import LocationComponent from '@/components/DailyFeedWeight/location-info'
 import * as feedingActions from "@/actions/feeding"
 import * as stockingActions from "@/actions/stocking"
 import * as actions from "@/actions"
 import { calculationAndFeed, calculationAndFeedExtended } from '@/types/app_types'
 
-interface DailyFeedWeightPageProps{
+type LocationSummary = {
+    uniqueItemId: number;
+    totalFeed: number;
+};
+
+interface DailyFeedWeightProps{
+    lines: {
+        id: number;
+        pools: {
+            id: number;
+            locations: {
+                name: string;
+                id: number;
+            }[];
+        }[];
+    }[],
+    summary: {
+        [itemId: number]: LocationSummary;
+    },
+    items: {
+        id: number;
+        name: string;
+        description: string | null;
+        item_type_id: number | null;
+        feed_type_id: number | null;
+        default_unit_id: number | null;
+        parent_item: number | null;
+        vendor_id: number | null;
+    }[],
     date: string
 }
 
-//керування пріоритетностями та наважка на годування
-export default async function DailyFeedWeightPage (today : DailyFeedWeightPageProps){
-    try {
-        const parsedDate = new Date(today.date);
-        if (isNaN(parsedDate.getTime())) {
-            throw new Error('Invalid date format');
-        }
-
-        const lines = await db.productionlines.findMany({
-            select:{
-                id: true,
-                pools:{
-                    select:{
-                        id: true,
-                        locations:{
-                            select:{
-                                id: true,
-                                name: true
-                            }
-                        }
-                    }
-                }
-            }
-        })
-
-        const summary = await feedingActions.getAllSummary(lines, new Date(today.date))
-        const items = await db.items.findMany()
-
-        return(
-            <>
+export default function DailyFeedWeight({lines, summary, items, date}: DailyFeedWeightProps){
+    return(
+        <>
             <div className="flex justify-between my-4 mx-8">
                 <h1 className="text-lg font-bold">Наважка на 1 годування</h1>
                 <h1 className="text-lg font-bold">Зведена таблиця</h1>
@@ -66,7 +66,7 @@ export default async function DailyFeedWeightPage (today : DailyFeedWeightPagePr
                                     let prevCalcExtended : calculationAndFeedExtended | undefined
     
                                     if(isPoolFilled === true){
-                                        const todayCalc : calculationAndFeed = await stockingActions.calculationForLocation(loc.id, today.date);
+                                        const todayCalc : calculationAndFeed = await stockingActions.calculationForLocation(loc.id, date);
     
                                         if (todayCalc.feed && todayCalc.feed.type_id){
                                             todayCalcExtended = {
@@ -118,12 +118,5 @@ export default async function DailyFeedWeightPage (today : DailyFeedWeightPagePr
                 </table>
             </div>
             </>
-        )
-
-    }
-    catch (error) {
-        // Обробка помилок, якщо виникає проблема з датою або доступом до даних
-        console.error('Помилка в DailyFeedWeightPage:', error);
-        return <div>Помилка під час завантаження даних.</div>;
-    }
+    )
 }

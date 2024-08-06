@@ -2,6 +2,7 @@
 import { db } from "@/db";
 import { revalidatePath } from "next/cache";
 import { stockPool } from "./stockPool";
+import { redirect } from "next/navigation";
 
 // реєстрація списання
 export async function disposal(
@@ -74,5 +75,8 @@ export async function disposal(
             return { message: 'Something went wrong!' };
         }
     }
-    revalidatePath('/feeding/view')
+    revalidatePath('/pool-managing/view')
+    redirect('/pool-managing/view')
+    // 
+    
 }
