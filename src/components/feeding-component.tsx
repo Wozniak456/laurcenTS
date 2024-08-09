@@ -71,7 +71,7 @@ export default function StockPoolPage({location, locations, batches, poolInfo, d
                 <input type="hidden" name="location_id_to" value={location.id} />
                 {(!poolInfo.batch || poolInfo.qty == 0) && 
                 <div className="flex flex-wrap items-center gap-4 justify-between">
-                  
+                  <div className='w-full sm:w-1/3'>
                     <Select 
                         label="Партія" 
                         name="batch_id"
@@ -84,6 +84,8 @@ export default function StockPoolPage({location, locations, batches, poolInfo, d
                             <SelectItem key={Number(batch.id)} value={Number(batch.id)}>{batch.name}</SelectItem>
                         ))}
                     </Select>
+                    </div>
+                    <div className='w-full sm:w-1/4'>
                     <Input 
                         label="Кількість:" 
                         name="fish_amount"
@@ -93,6 +95,8 @@ export default function StockPoolPage({location, locations, batches, poolInfo, d
                         // errorMessage={formState.errors?.quantity}
                         isRequired
                     />
+                    </div>
+                    <div className='w-full sm:w-1/4'>
 
                     <Input 
                         label="Сер. вага, г" 
@@ -104,6 +108,7 @@ export default function StockPoolPage({location, locations, batches, poolInfo, d
                         // errorMessage={formState.errors?.quantity}
                         isRequired
                     />
+                    </div>
                 </div>}
                 <div className="flex flex-wrap gap-4 justify-end">
                     {(!poolInfo.batch || poolInfo.qty==0) &&

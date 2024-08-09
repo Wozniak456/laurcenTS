@@ -61,6 +61,9 @@ export default function CreateEditPurchHeaderForm({
 
     const [formState, action] = useFormState(header ? actions.editPurchtable : actions.createPurchTable, { errors: {} });
 
+    useEffect(() => {
+        console.log('header changed, ', header)
+    }, [header])
     return(
         <div className="w-full">
             {/* <div className="bg-white p-8 rounded shadow-lg w-2/3"> */}

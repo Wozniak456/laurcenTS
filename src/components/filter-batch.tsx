@@ -1,11 +1,5 @@
 // import Link from 'next/link';
 'use client'
-import {
-  Textarea,
-  Popover,
-  PopoverTrigger,
-  PopoverContent
-} from '@nextui-org/react'
 import BatchCreatePage from '@/components/FishBatch/create-batch-form'
 
 import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Checkbox, Input, Link} from "@nextui-org/react";

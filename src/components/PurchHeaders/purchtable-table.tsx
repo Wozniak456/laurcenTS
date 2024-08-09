@@ -12,7 +12,7 @@ import registerGoodsButton from '../../../public/icons/goods-in.svg'
 import CreateEditPurchHeaderForm from '../PurchHeaders/create-edit-header-form'
 import PurchHeaderDeleteForm from '../PurchHeaders/delete-message'
 import RegisteringGoods from '../PurchHeaders/registering-form'
-import { Button, Popover, PopoverContent, PopoverTrigger } from "@nextui-org/react";
+import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/react";
 import {
     Table,
     TableHeader,
@@ -21,6 +21,9 @@ import {
     TableRow,
     TableCell
   } from "@nextui-org/table";
+
+import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Checkbox, Input, Link} from "@nextui-org/react";
+
 
 interface PurchTableComponentProps {
     purchtables: {
@@ -66,6 +69,9 @@ interface PurchTableComponentProps {
 }
 
 export default function PurchTableComponent({ purchtables, vendors, items }: PurchTableComponentProps){
+
+    const {isOpen, onOpen, onOpenChange} = useDisclosure();
+
     // const [formState, action] = useFormState(CRUDactions.createPurchTable, { message: '' });
     const [selectedRow, setSelectedRow] = useState<bigint | undefined>(undefined);
     const [showCreatePurchHeaderModal, setShowCreatePurchHeaderModal] = useState<boolean>(false);
@@ -108,7 +114,7 @@ export default function PurchTableComponent({ purchtables, vendors, items }: Pur
         <div className="flex flex-col gap-4 my-4">
             <div className="flex justify-between items-center mb-2 w-full">
                 <h1 className="text-xl font-bold">Прибуткові накладні</h1>
-                <Popover placement="left-start">
+                {/* <Popover placement="left-start">
                     <PopoverTrigger>
                         <Button color="primary">
                             Нова накладна
@@ -117,7 +123,27 @@ export default function PurchTableComponent({ purchtables, vendors, items }: Pur
                     <PopoverContent>
                         <CreateEditPurchHeaderForm vendors={vendors} setShowForm={setShowCreatePurchHeaderModal}/>
                     </PopoverContent>
-                </Popover>
+                </Popover> */}
+                <Button onPress={onOpen} color="primary">Нова накладна</Button>
+                <Modal 
+                    isOpen={isOpen} 
+                    onOpenChange={onOpenChange}
+                    placement="top-center"
+                >
+                    <ModalContent>
+                    {(onClose) => (
+                        <>
+                        <ModalHeader className="flex flex-col gap-1"></ModalHeader>
+                        <ModalBody>
+                        <CreateEditPurchHeaderForm vendors={vendors} setShowForm={setShowCreatePurchHeaderModal}/>
+                        </ModalBody>
+                        <ModalFooter>
+                            
+                        </ModalFooter>
+                        </>
+                    )}
+                    </ModalContent>
+                </Modal>
             </div>
         <Table isStriped aria-label="Example static collection table">
             <TableHeader>
@@ -178,19 +204,10 @@ export default function PurchTableComponent({ purchtables, vendors, items }: Pur
                                         </PopoverContent>
                                     </Popover>
                                     {header.purchaselines.length > 0 && (
-                                        <Popover placement="left-start">
-                                            <PopoverTrigger>
-                                                <Button color="default" onClick={handleRegisterGoodsInProduction}>
-                                                    Register
-                                                </Button>
-                                            </PopoverTrigger>
-                                            <PopoverContent>
-                                                <RegisteringGoods
-                                                    header={header}
-                                                    setShowForm={setShowRegisterModal} 
-                                                />
-                                            </PopoverContent>
-                                        </Popover>
+                                        <RegisteringGoods
+                                        header={header}
+                                        setShowForm={setShowRegisterModal} 
+                                    />
                                     )}
                                 </div>
                             )}

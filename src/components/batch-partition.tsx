@@ -6,7 +6,7 @@ import { useState } from 'react';
 import deleteImg from '../../public/icons/delete.svg'
 import Image from 'next/image';
 import FormButton from './common/form-button';
-import { Button } from '@nextui-org/react';
+import { Button, Input, Select, SelectItem } from '@nextui-org/react';
 
 interface PartitionFormPageProps {
     location: {
@@ -94,46 +94,31 @@ export default function PartitionFormPage({location, poolInfo, locations} : Part
                                         />
                                     </button>
                                 </div>
-                                <div className='flex flex-wrap gap-4'>
-                                    <div className='flex items-center gap-2'>
-                                        <div className="w-24">
-                                            <label htmlFor={`location_id_to_${index}`}>
-                                                Басейн:
-                                            </label>
-                                        </div> 
-                                        
-                                        <select
-                                            name={`location_id_to_${index}`}
-                                            className="border rounded p-2 max-w-40"
-                                            id={`location_id_to_${index}`}
-                                            required
-                                            onChange={handlePoolChange(index)}
-                                            value={selectedPoolId !== null ? selectedPoolId.toString() : ""}
-                                        >
-                                            <option value="" disabled hidden>Виберіть басейн</option>
-                                            {locations
-                                                .filter(location => location.location_type_id === 2)
-                                                .sort((a, b) => a.id - b.id)
-                                                .map((location, index) => (
-                                                    <option key={index} value={location.id}>{location.name}</option>
-                                                ))}
-                                        </select>
+                                <div className="flex flex-wrap items-center gap-2 justify-between w-full">
+                                <div className='w-1/2'>
+                                    <Select 
+                                        label="Басейн:" 
+                                        name={`location_id_to_${index}`}
+                                        isRequired
+                                        onChange={handlePoolChange(index)}
+                                    >
+                                        {locations
+                                            .filter(location => location.location_type_id === 2)
+                                            .sort((a, b) => a.id - b.id)
+                                            .map((location, index) => (
+                                                <SelectItem key={index} value={location.id}>{location.name}</SelectItem>
+                                            ))}
+                                    </Select>
                                     </div>
-                                    <div className='flex gap-2 items-center'>
-                                        <div className="w-24">
-                                            <label className="" htmlFor={`stocking_fish_amount_${index}`}>
-                                                Кількість:
-                                            </label>
-                                        </div>
-                                        <input
-                                            name={`stocking_fish_amount_${index}`}
-                                            className="border rounded p-2  max-w-40"
-                                            id={`stocking_fish_amount_${index}`}
-                                            type='number'
-                                            min={1}
-                                            // max={poolInfo.batch?.qty}
-                                            required
-                                        />
+                                    <div className='w-2/5'>
+                                    <Input 
+                                        placeholder='Кількість:'
+                                        
+                                        name={`stocking_fish_amount_${index}`}
+                                        type='number'
+                                        min={1}
+                                        isRequired
+                                    />
                                     </div>
                                 </div>
                                 
@@ -142,20 +127,13 @@ export default function PartitionFormPage({location, poolInfo, locations} : Part
                         )
                     })}
                     {selectedPools.length > 0 &&
-                        <div className='ml-[34px] flex gap-2 items-center'>
-                            <div className="min-w-24">
-                                <label className="" htmlFor="average_fish_mass">
-                                    Сер. вага:
-                                </label>
-                            </div>
-                            
-                            <input
-                                name="average_fish_mass"
-                                className="border rounded p-2 w-full"
-                                id="average_fish_mass"
-                                required
-                            />
-                        </div>
+                        <Input 
+                            placeholder='Сер. вага:'
+                            name="average_fish_mass"
+                            type='number'
+                            min={1}
+                            isRequired
+                        />
                     }
                 </div>
                 
