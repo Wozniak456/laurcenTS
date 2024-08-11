@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useFormState } from "react-dom";
 import * as CRUDactions from '@/actions'
 import PurchLinesList from '@/components/PurchLines/purchlines-table'
@@ -67,6 +67,20 @@ interface PurchTableComponentProps {
         vendor_id: number | null;
     }[]
 }
+interface line {
+    id: number;
+    items: {
+        id: number;
+        name: string;
+        feed_type_id: number | null;
+    };
+    quantity: number;
+    units: {
+        id: number;
+        name: string;
+    };
+    item_id: number;
+}
 
 export default function PurchTableComponent({ purchtables, vendors, items }: PurchTableComponentProps){
 
@@ -74,6 +88,9 @@ export default function PurchTableComponent({ purchtables, vendors, items }: Pur
 
     // const [formState, action] = useFormState(CRUDactions.createPurchTable, { message: '' });
     const [selectedRow, setSelectedRow] = useState<bigint | undefined>(undefined);
+    
+
+
     const [showCreatePurchHeaderModal, setShowCreatePurchHeaderModal] = useState<boolean>(false);
     
 
@@ -104,11 +121,19 @@ export default function PurchTableComponent({ purchtables, vendors, items }: Pur
     const [showForm, setShowForm] = useState(false);
     const [currentHeader, setCurrentHeader] = useState<BigInt|null>(null);
 
+
+    const [linesList, setLinesList] = useState<line[] | undefined>(purchtables.find(table => table.id === selectedRow)?.purchaselines);
+
     const handleRowSelection = (headerID: bigint) => {
         setCurrentHeader(headerID);
         handleRowClick(headerID);
         setShowForm(true);
     };
+
+    useEffect(() => {
+        // setLinesList(purchtables.find(table => table.id === selectedRow)?.purchaselines);
+        console.log('selectedRow changed, ', selectedRow)
+    }, [selectedRow]);
 
     return(
         <div className="flex flex-col gap-4 my-4">
@@ -219,7 +244,8 @@ export default function PurchTableComponent({ purchtables, vendors, items }: Pur
 
         {showForm && currentHeader && (
             <PurchLinesList 
-                lines={purchtables.find(table => table.id === selectedRow)?.purchaselines}
+                // lines={linesList}
+                // {purchtables.find(table => table.id === selectedRow)?.purchaselines}
                 purchHeader={purchtables.find(table => table.id === selectedRow)} 
                 items={items}
             />

@@ -4,6 +4,7 @@ import * as actions from '@/actions';
 import { calculationAndFeedExtended } from '@/types/app_types'
 
 type PriorityFormType = {
+    date: string,
     location: { 
         id: number; 
         name: string;
@@ -12,7 +13,7 @@ type PriorityFormType = {
     setShowForm: React.Dispatch<React.SetStateAction<boolean>>,
 }
 
-export default function PriorityForm({location, calculation, setShowForm} : PriorityFormType) { 
+export default function PriorityForm({date, location, calculation, setShowForm} : PriorityFormType) { 
     
     const priority = calculation?.feed?.item_id
           
@@ -51,6 +52,8 @@ export default function PriorityForm({location, calculation, setShowForm} : Prio
                     </div>
                     <input type="hidden" name={`location`} value={location.id} />
                 </div>
+
+                <input type="hidden" name={`date`} value={date} />
                             
                 
                 <div className="flex justify-between mt-4">

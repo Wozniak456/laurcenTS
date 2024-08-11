@@ -90,6 +90,7 @@ export default function DailyFeedWeight({lines, summary, items, date}: DailyFeed
                                     return (
                                         <LocationComponent
                                             key={loc.id}
+                                            date={date}
                                             location={{ id: loc.id, name: loc.name}}
                                             todayCalculation={todayCalcExtended}
                                             prevCalculation={prevCalcExtended}

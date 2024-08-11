@@ -4,6 +4,7 @@ import { calculationAndFeedExtended} from '@/types/app_types'
 import PriorityForm from '@/components/DailyFeedWeight/priority-form'
 
 export type LocationComponentProps = {
+    date: string,
     location: { 
         id: number; 
         name: string;
@@ -12,7 +13,7 @@ export type LocationComponentProps = {
     prevCalculation: calculationAndFeedExtended | undefined
 } 
 
-export default function LocationComponent({location, todayCalculation, prevCalculation} : LocationComponentProps) {   
+export default function LocationComponent({date, location, todayCalculation, prevCalculation} : LocationComponentProps) {   
   
     const [showPrioForm, setShowPrioForm] = useState<boolean>(false);
     const [selectedDay, setSelectedDay] = useState<calculationAndFeedExtended | null>(null);
@@ -78,7 +79,7 @@ export default function LocationComponent({location, todayCalculation, prevCalcu
         }
 
         {selectedDay && showPrioForm && (
-            <PriorityForm location={location} calculation={selectedDay} setShowForm={setShowPrioForm} />
+            <PriorityForm date={date} location={location} calculation={selectedDay} setShowForm={setShowPrioForm} />
         )}
         
         </>

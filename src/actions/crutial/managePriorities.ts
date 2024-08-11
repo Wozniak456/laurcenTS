@@ -44,5 +44,6 @@ export async function managePriorities(
             return { message: 'Something went wrong!' };
         }
     }
-    revalidatePath('/feed-weight/view')
+    revalidatePath(`/summary-feeding/day/${formData.get('date')}`)
+    // revalidatePath(`/summary-feeding/day/${formData.get('date')}`)
 }

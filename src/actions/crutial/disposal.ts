@@ -77,6 +77,4 @@ export async function disposal(
     }
     revalidatePath('/pool-managing/view')
     redirect('/pool-managing/view')
-    // 
-    
 }

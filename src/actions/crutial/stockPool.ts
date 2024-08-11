@@ -264,4 +264,5 @@ export async function stockPool(
     }
 
     revalidatePath('/pool-managing/view')
+    revalidatePath('/summary-feeding-table/week')
 }

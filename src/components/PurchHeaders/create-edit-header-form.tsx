@@ -64,6 +64,7 @@ export default function CreateEditPurchHeaderForm({
     useEffect(() => {
         console.log('header changed, ', header)
     }, [header])
+    
     return(
         <div className="w-full">
             {/* <div className="bg-white p-8 rounded shadow-lg w-2/3"> */}

@@ -5,7 +5,8 @@ import * as actions from '@/actions';
 import Image from "next/image";
 import SaveButton from '../../../public/icons/Save.svg'
 import {poolInfoType} from '@/types/app_types'
-
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from "@nextui-org/react";
+import SuccessForm from "../success-form";
 
 interface FilterableTableProps {
     date: string,
@@ -14,7 +15,7 @@ interface FilterableTableProps {
 }
 
 export default function SelectDay({date, poolIndex, aggregatedData }: FilterableTableProps) {
-
+    const {isOpen, onOpen, onClose} = useDisclosure();
     const todayDate = new Date()
     const today = todayDate.toISOString().split("T")[0]
 
@@ -63,9 +64,31 @@ export default function SelectDay({date, poolIndex, aggregatedData }: Filterable
                     
                     {fishWeight != initialFishWeight ?
                         <div className="w-10 ">
-                            <button className=" p-1 rounded hover:bg-green-200">
+                            {/* <button type="submit" className=" p-1 rounded hover:bg-green-200">
                                 <Image src={SaveButton} alt="save" width={30} />
-                            </button>
+                            </button> */}
+                            <Button onPress={onOpen} type="submit" >
+                                <Image src={SaveButton} alt="save" width={30} />
+                            </Button>
+                            <Modal 
+                                isOpen={isOpen} 
+                                onClose={onClose}
+                                placement="top-center"
+                            >
+                                <ModalContent>
+                                {(onClose) => (
+                                    <>
+                                    <ModalHeader className="flex flex-col gap-1"></ModalHeader>
+                                    <ModalBody>
+                                        <SuccessForm />
+                                    </ModalBody>
+                                    <ModalFooter>
+                                        
+                                    </ModalFooter>
+                                    </>
+                                )}
+                                </ModalContent>
+                            </Modal>
                         </div> :
                         <div className="w-10 ">
                             <button className=" p-1 rounded hover:bg-green-200">

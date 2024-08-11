@@ -166,8 +166,9 @@ export async function batchDivision(
         }
     }
     
-    console.log('revalidatePath, redirect')
 
     revalidatePath('/pool-managing/view') 
+    revalidatePath(`/accumulation/view`)
+    revalidatePath('/leftovers/view')
     redirect('/pool-managing/view')
 }

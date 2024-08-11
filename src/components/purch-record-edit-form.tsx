@@ -1,6 +1,8 @@
 'use client'
 import type {purchtable} from '@prisma/client'
 import { useState } from 'react';
+import * as actions from '@/actions';
+import { useFormState } from 'react-dom';
 
 interface PurchRecordEditFormProps{
     purchtableRecord: purchtable
@@ -18,12 +20,13 @@ export default function PurchRecordEditForm({purchtableRecord: purchtableRecord}
         setVendorDocNumber(event.target.value);
     };
 
-    // const editPurchRecordAction = actions.editPurchtable.bind(null, Number(purchtableRecord.id), vendorId, vendorDocNumber)
-    
+    //  const editPurchRecordAction = actions.editPurchtable.bind(null, Number(purchtableRecord.id), vendorId, vendorDocNumber)
+    //  const [formState, action] = useFormState(actions.editPurchtable, { message: '' })
+     const [formState, action] = useFormState(actions.editPurchtable, {errors: {}});
     return(
         <div className="p-3 border rounded border-gray-200">
             <form 
-            // action={editPurchRecordAction} 
+             action={action} 
             className='flex flex-col'>
                 <div className="flex gap-4">
                     <label className="w-24" htmlFor="vendor_id">

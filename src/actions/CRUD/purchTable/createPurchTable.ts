@@ -49,6 +49,7 @@ export async function createPurchTable(
         catch(err: unknown){
             return{errors:{}}
         }
-
+    revalidatePath('/purchtable/view')
+    
     redirect('/purchtable/view');
 }

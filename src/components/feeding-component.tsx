@@ -45,11 +45,11 @@ interface StockPoolProps {
 export default function StockPoolPage({location, locations, batches, poolInfo, disposal_reasons}: StockPoolProps) {
     const [showPartitionForm, setShowPartitionForm] = useState(false);
     const [showDisposalForm, setShowDisposalForm] = useState(false);
-    const {isOpen, onOpen, onOpenChange} = useDisclosure();
+    const {isOpen, onOpen, onClose} = useDisclosure();
     
-    const handleDisposalFormButton = () => {
-        setShowDisposalForm(true)
-    }
+    // const handleDisposalFormButton = () => {
+    //     setShowDisposalForm(true)
+    // }
 
     
     const [formState, action] = useFormState(actions.stockPool, { message: '' });
@@ -152,7 +152,8 @@ export default function StockPoolPage({location, locations, batches, poolInfo, d
                     <Button onPress={onOpen} color="default">Списати</Button>
                     <Modal 
                         isOpen={isOpen} 
-                        onOpenChange={onOpenChange}
+                        // onOpenChange={onOpenChange}
+                        onClose={onClose} 
                         placement="top-center"
                     >
                         <ModalContent>

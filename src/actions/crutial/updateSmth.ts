@@ -79,6 +79,13 @@ export async function updateSmth(
             return { message: 'Something went wrong!' };
         }
     }
+    // revalidatePath(`/pool-managing/view`)
+    // revalidatePath(`/summary-feeding-table/week`)
+    
+    // revalidatePath(`/accumulation/view`)
     // revalidatePath(`general-summary/${date}`)
+
+
+    // revalidatePath(`/summary-feeding-table/day/2024-08-11`)
     redirect(`/general-summary/${date}`)
 }

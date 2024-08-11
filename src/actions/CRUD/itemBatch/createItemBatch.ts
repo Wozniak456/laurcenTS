@@ -92,6 +92,7 @@ export async function createItemBatch(
             }
         }
     }
+    revalidatePath('/pool-managing/view')
     revalidatePath('/batches/view')
     redirect(paths.batchesItem(batch.id.toString()));
 }

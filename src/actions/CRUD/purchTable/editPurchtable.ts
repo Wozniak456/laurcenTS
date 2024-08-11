@@ -1,5 +1,6 @@
 'use server'
 import { db } from "@/db";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 interface createPurchTableFormState{
@@ -37,5 +38,6 @@ export async function editPurchtable(
         catch(err: unknown){
             return{errors:{}}
         }
+    revalidatePath('/purchtable/view')
     redirect('/purchtable/view');
 }

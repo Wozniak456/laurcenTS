@@ -1,5 +1,6 @@
 'use server'
 import { db } from "@/db";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 export async function editPurchline(
@@ -27,5 +28,6 @@ export async function editPurchline(
         catch(err: unknown){
             return{message :'Something went wrong!'}
         }
+    revalidatePath('/purchtable/view')
     redirect('/purchtable/view');
 }

@@ -1,4 +1,5 @@
 'use server'
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 export async function updateBatches(
@@ -16,5 +17,6 @@ export async function updateBatches(
             return{message :'Something went wrong!'}
         }
     }
+    revalidatePath('/batches/view')
     redirect('/batches/view');
 }

@@ -59,6 +59,10 @@ export default async function LeftoversPerPeriod(props: LeftoversPerPeriodProps)
                                         </tr>
                                         {line.pools.map(async (pool, poolIndex) => {
                                             let aggregatedInfo : poolInfoType = await poolInfo(pool.locations[0].id, date)
+
+                                            // if (aggregatedInfo.batch)
+                                            //     console.log('aggregatedInfo', aggregatedInfo)
+
                                             const plan = await calculationForLocation(pool.locations[0].id, date)
 
                                             if (plan.calc != null){

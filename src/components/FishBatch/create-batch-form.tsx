@@ -30,23 +30,6 @@ export default function ItemBatchCreateForm({items, units} : ItemBatchCreateForm
                 <form action={action}>
                     <div className="flex flex-col gap-4">
                         <div className="flex gap-4 flex-wrap items-center">
-                            
-                            {/* <Select 
-                                label="Призначення партії:" 
-                                name="item_id"
-                                required
-                                isInvalid={!!formState.errors && !!formState.errors?.item_id}
-                                errorMessage={formState.errors && formState.errors?.item_id}
-                                // placeholder="Призначення партії:" 
-                                isRequired
-                                value={13}
-                            >
-                                {items.map(type => (
-                                    <SelectItem key={type.id} value={type.id}>
-                                        {type.name}
-                                    </SelectItem >
-                                ))}
-                            </Select> */}
                             <Input 
                                 label="Призначення партії:" 
                                 // name="item_id"
@@ -55,6 +38,7 @@ export default function ItemBatchCreateForm({items, units} : ItemBatchCreateForm
                                 // isInvalid={!!formState.errors?.created}
                                 // errorMessage={formState.errors?.created}
                                 isRequired
+                                isDisabled
                             />
                             <input type="hidden" name="item_id" value={13} />
 
@@ -82,10 +66,21 @@ export default function ItemBatchCreateForm({items, units} : ItemBatchCreateForm
                             />
                         </div>
                         <div className="flex gap-4 flex-wrap items-center">
-
-                            <Select 
+                            <Input 
+                                label="Одиниця виміру:"
+                                // name="item_id"
+                                placeholder="Одиниця виміру:"
+                                defaultValue={units.find(unit => unit.id === 1)?.name}
+                                // isInvalid={!!formState.errors?.created}
+                                // errorMessage={formState.errors?.created}
+                                isRequired
+                                isDisabled
+                            />
+                            <input type="hidden" name="unit_id" value={1} />
+                            {/* <Select 
                                 label="Одиниця виміру:" 
                                 name="unit_id"
+                                defaultValue={units.find(unit => unit.id === 13)?.name}
                                 required
                                 isInvalid={!!formState.errors?.unit_id}
                                 errorMessage={formState.errors?.unit_id}
@@ -97,7 +92,7 @@ export default function ItemBatchCreateForm({items, units} : ItemBatchCreateForm
                                         {unit.name}
                                     </SelectItem>
                                 ))}
-                            </Select>
+                            </Select> */}
                         </div>
                         <input type="hidden" name="created_by" value={3} />
                         

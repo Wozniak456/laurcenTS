@@ -3,7 +3,7 @@
 import EditButton from '../../../public/icons/edit.svg'
 import SaveButton from '../../../public/icons/Save.svg'
 import Image from 'next/image'
-import { ChangeEvent, useState } from 'react'
+import { ChangeEvent, useEffect, useState } from 'react'
 import { itembatches } from "@prisma/client";
 import { useFormState } from 'react-dom'
 import * as actions from '@/actions';
@@ -51,6 +51,10 @@ export default function PoolInfoComponent({location, poolInfo, batches} : PoolIn
     const [count, setCount] = useState<number>( Number(poolInfo.qty));
     const [avMass, setAvMass] = useState<number>(Number(poolInfo.fishWeight));
 
+    useEffect(() => {
+        setCount(Number(poolInfo.qty));
+    }, [poolInfo.qty]);
+    
     const handleBatchIdChange = (event: ChangeEvent<HTMLSelectElement>) => {
         setBatchId(Number(event.target.value));
     }

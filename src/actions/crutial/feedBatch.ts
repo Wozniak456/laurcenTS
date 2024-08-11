@@ -257,5 +257,7 @@ export async function feedBatch(
         }
     // return { message: `успішно` };
     revalidatePath(`/summary-feeding-table/day/${formData.get('date_time')}`)
+    revalidatePath(`/accumulation/view`)
+    revalidatePath('/leftovers/view')
     redirect(`/summary-feeding-table/day/${formData.get('date_time')}`);
     }

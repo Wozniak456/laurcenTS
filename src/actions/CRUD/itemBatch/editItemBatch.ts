@@ -106,6 +106,7 @@ export async function editItemBatch(
             }
         }
         revalidatePath(`/batches/${formData.get('batch_id')}`)
+        revalidatePath('/batches/view')
         redirect(`/batches/${formData.get('batch_id')}`);
     }
 

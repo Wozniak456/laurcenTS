@@ -1,5 +1,6 @@
 'use server'
 import { db } from "@/db";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 export async function deletePurchTable(id: bigint) {
@@ -12,5 +13,6 @@ export async function deletePurchTable(id: bigint) {
     await db.purchtable.delete({
         where: {id}
     });
+    revalidatePath('/purchtable/view')
     redirect(`/purchtable/view`)
 }
