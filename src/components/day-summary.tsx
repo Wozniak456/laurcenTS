@@ -15,6 +15,7 @@ interface DaySummaryProps{
     location_id: number;
     location_name: string;
     batch_id?: bigint; // batch_id є необов'язковим
+    fed_today?: boolean
   },
   today: string,
   todayCalculation: calculationAndFeed | null | undefined,
@@ -151,6 +152,7 @@ export default function DaySummaryContent({
         <form action={action}>
           <input type="hidden" name="location_id" value={location.location_id} />
           <input type="hidden" name="executed_by" value={3} />
+          <input type="hidden" name="date_time" value={today}/> 
 
           {!transitionDay ?
             <input type="hidden" name="item_0" value={todayFeed?.id}/> 
@@ -172,7 +174,9 @@ export default function DaySummaryContent({
             ))
           }
           
-        {today == actualDate.toISOString().split("T")[0] &&
+        {
+         today <= actualDate.toISOString().split("T")[0] && 
+         !location.fed_today &&
           <div className="flex justify-center">
           <button 
             type="submit" 

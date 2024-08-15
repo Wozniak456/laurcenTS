@@ -8,6 +8,7 @@ import * as stockingActions from "@/actions/stocking"
 import * as actions from '@/actions'
 
 import DaySummaryContent from "@/components/day-summary"
+import { start } from "repl";
 
 interface DayFeedingProps {
   params: {
@@ -18,31 +19,23 @@ interface DayFeedingProps {
 interface LocationInfo {
     location_id: number;
     location_name: string;
-    batch_id?: bigint; 
+    batch_id?: bigint;
+    fed_today?: boolean 
   }
 
 export default async function DayFeeding(props: DayFeedingProps) {
     const today = props.params.index;
+    console.log(today)
 
     const currentDate: Date = new Date();
     
     let dates = [];
 
-    for (let i = -2; i <= 7; i++) {
+    for (let i = -6; i <= 2; i++) {
       let newDate = new Date();
       newDate.setDate(currentDate.getDate() + i);
       dates.push(newDate.toISOString().split("T")[0]);
     }
-
-    // const lines = await db.productionlines.findMany({
-    //     include: {
-    //       pools: {
-    //         include:{
-    //           locations: true
-    //         }
-    //       }
-    //     }
-    // });
 
     const lines = await db.productionlines.findMany({
         select:{
@@ -71,6 +64,29 @@ export default async function DayFeeding(props: DayFeedingProps) {
     })
 
     const summary = await feedingActions.getAllSummary(lines, currentDate)
+
+    const feedingForLocation = async (locationId: number) => {
+        const startOfDay = new Date(today);
+        // console.log(startOfDay)
+        // startOfDay.setHours(0, 0, 0, 0); // Встановлює час на початок дня (00:00:00.000)
+
+        const endOfDay = new Date(today);
+        endOfDay.setHours(23, 59, 59, 999); // Встановлює час на кінець дня (23:59:59.999)
+
+        const feedingDocument = await db.documents.findMany({
+            where:{
+                doc_type_id: 9,
+                date_time: {
+                    gte: startOfDay, // Більше або дорівнює початку дня
+                    lte: endOfDay,   // Менше або дорівнює кінцю дня
+                },
+                location_id: locationId
+            }
+        })
+        if(feedingDocument.length > 0)
+            console.log('date_time: ', startOfDay, 'locationId', locationId, ' feedingDocument', feedingDocument.length);
+        return feedingDocument.length >= 1;
+    }
 
     return (
         <div className="flex flex-col justify-center ">
@@ -123,8 +139,11 @@ export default async function DayFeeding(props: DayFeedingProps) {
 
                     let locationInfo : LocationInfo = {
                         location_id: loc.id,
-                        location_name: loc.name
+                        location_name: loc.name,
+                        fed_today: await feedingForLocation(loc.id)
                     };
+
+                    // console.log(locationInfo)
 
                     let todayCalc
 

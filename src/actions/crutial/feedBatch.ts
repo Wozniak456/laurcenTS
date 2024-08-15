@@ -1,6 +1,8 @@
 'use server'
 import { db } from "@/db";
 import { getFeedBatchByItemId } from './getFeedBatchByItemId'
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 export async function feedBatch(
     formState: {message: string}, 
@@ -11,6 +13,7 @@ export async function feedBatch(
 
             const fish_batch_id: number = parseInt(formData.get('batch_id') as string);
             const executed_by: number = parseInt(formData.get('executed_by') as string);
+            const date_time = formData.get('date_time') as string; 
             const location_id: number = parseInt(formData.get('location_id') as string);
             const new_item_id: number = parseInt(formData.get('item_1') as string); // нове або поточне, існує коли є перехід
             const today_item_id: number = parseInt(formData.get('item_0') as string); // попереднє, існує завжди
@@ -25,7 +28,7 @@ export async function feedBatch(
                     data:{
                         location_id: location_id,
                         doc_type_id: 9,
-                        date_time: new Date(),
+                        date_time: new Date(date_time),
                         executed_by: executed_by
                     }
                 })
@@ -137,7 +140,7 @@ export async function feedBatch(
                         data:{
                             location_id: location_id,
                             doc_type_id: 9,
-                            date_time: new Date(),
+                            date_time: new Date(date_time),
                             executed_by: executed_by
                         }
                     })
@@ -252,7 +255,7 @@ export async function feedBatch(
                 return{message :'Something went wrong!'}
             }
         }
-    return { message: `успішно` };
-
-    //redirect('/summary-feeding-table/day');
+    // return { message: `успішно` };
+    revalidatePath(`/summary-feeding-table/day/${formData.get('date_time')}`)
+    redirect(`/summary-feeding-table/day/${formData.get('date_time')}`);
     }

@@ -3,7 +3,21 @@ import * as actions from "@/actions/index"
 import * as feeding_actions from "@/actions/feeding"
 import React from "react";
 import { Table, TableBody, TableCell, TableColumn, TableHeader } from "@nextui-org/react";
-import { it } from "node:test";
+
+interface BatchWithTotals extends batchesType {
+  totalAmount: number;
+  totalPrice: number;
+}
+
+interface batchesType {
+  id: bigint;
+  location: {
+      name: string;
+  };
+  itembatches: {
+      name: string;
+  } | null;
+}[]
 
 export default async function StockingHome() {
   //я знайшла всі покоління
@@ -20,11 +34,6 @@ export default async function StockingHome() {
           name: true
         }
       },
-      // itemtransactions: {
-      //   select:{
-
-      //   }
-      // }
     }
   })
 
@@ -65,42 +74,36 @@ export default async function StockingHome() {
       return genWithData;
     };
 
-    const batches = await getFilteredGenerations()
-
-    // Обчислення суми значень для кожної колонки
-    const totalAmounts = Array.from({ length: batches.length }, () => 0);
-    const totalPrices = Array.from({ length: batches.length }, () => 0);
-
-    for (let genIndex = 0; genIndex < batches.length; genIndex++) {
-      for (const vendor of vendors) {
-        for (const item of vendor.items) {
-          const generationData = await feeding_actions.getTotalAmount(batches[genIndex].id, item.id);
-          if (generationData !== undefined) {
-            totalAmounts[genIndex] += generationData.amount;
-            totalPrices[genIndex] += generationData.price;
-          }
-        }
-      }
-    }
+    const a = await getFilteredGenerations()
     
-    // Додавання рядка зі сумами
-    const totalRow = (
-      <tr>
-        <td className="px-4 py-2 border border-gray-400 font-bold text-center">Total</td>
-        <td className="px-4 py-2 border border-gray-400 font-bold"></td>
-        <td className="px-4 py-2 border border-gray-400 font-bold"></td>
-        {totalAmounts.map((amount, index) => (
-          <React.Fragment key={index}>
-            <td className="px-4 py-2 border border-gray-400 font-bold text-center">{(amount / 1000).toFixed(1)}</td>
-            <td className="px-4 py-2 border border-gray-400 font-bold text-center">{totalPrices[index].toFixed(1)}</td>
-          </React.Fragment>
-        ))}
-      </tr>
+    // Fetch batches
+    const batches: BatchWithTotals[] = await getFilteredGenerations() as BatchWithTotals[];
+
+    await Promise.all(
+      batches.map(async (batch) => {
+        batch.totalAmount = 0;
+        batch.totalPrice = 0;
+    
+        await Promise.all(
+          vendors.flatMap(vendor =>
+            vendor.items.flatMap(async item => {
+              const generationData = await feeding_actions.getTotalAmount(batch.id, item.id);
+              if (generationData !== undefined) {
+                batch.totalAmount += generationData.amount;
+                batch.totalPrice += generationData.price;
+              }
+            })
+          )
+        );
+      })
     );
 
+    console.log(batches);
+    
+    
     return(
         <>
-          <table className="min-w-full table-auto w-full">
+          <table className="min-w-full table-auto w-full my-8">
             <thead>
               <tr className="bg-blue-100">
                 <th className="px-4 py-2 border border-gray-400"></th>
@@ -110,6 +113,7 @@ export default async function StockingHome() {
                       colSpan={vendor.items.length} 
                       className="px-4 py-2 border border-gray-400">{vendor.name}</th>
                 ))}
+                <th className="px-4 py-2 border border-gray-400">Total</th>
               </tr>
 
               <tr className="bg-blue-100">
@@ -119,6 +123,7 @@ export default async function StockingHome() {
                     <th key={itemIndex} className="py-2 border border-gray-400 text-sm text-nowrap">{`${item.feedtypes?.feedconnections?.from_fish_weight ? parseFloat(item.feedtypes?.feedconnections?.from_fish_weight.toPrecision(4)) : '-'} - ${item.feedtypes?.feedconnections?.to_fish_weight ? item.feedtypes?.feedconnections?.to_fish_weight : ''}`}</th>
                   )) 
                 ))}
+                <th className="px-4 py-2 border border-gray-400"></th>
               </tr>
 
               <tr className="bg-blue-100">
@@ -128,61 +133,65 @@ export default async function StockingHome() {
                     <th key={itemIndex} className="py-2 border border-gray-400 text-sm text-nowrap">{item.feedtypes?.name}</th>
                   )) 
                 ))}
+                <th className="px-4 py-2 border border-gray-400"></th>
               </tr>
-
-
-              {/* <tr className="bg-blue-100">
-                <th colSpan={3} className="px-4 py-2 border border-gray-400"></th>
-                {batches.map(async (generation, genIndex) => {
-                  return(
-                    <React.Fragment key={genIndex}>
-                      <th className="px-4 py-2 border border-gray-400">кг</th>
-                      <th className="px-4 py-2 border border-gray-400">грн</th>
-                    </React.Fragment>
-                  )
-                })}
-              </tr> */}
             </thead>
             <tbody>
-              {batches.map( async (batch, batchIndex)=>{
-                // const generationData = await feeding_actions.getTotalAmount(batch.id, item.id);
+              {batches
+              // без цього зявляються похибки обрахунку (дуже малі значення)
+              .filter(batch => batch.totalAmount > 0.0001) 
+              .sort((a, b) => a.location.name.localeCompare(b.location.name))
+              .map( async (batch, batchIndex) => {
+                console.log(batch.location.name, batch)
                 return(
-                <tr key={batchIndex} className="">
-                  <td className="px-4 py-2 border border-gray-400 bg-blue-100">{batch.location.name}, {batch.itembatches?.name}</td>
+                  <React.Fragment key={batchIndex}>
+                  <tr className="px-4 py-2 border border-gray-400">
+                    <td rowSpan={2} className={`text-sm px-4 py-2 border border-gray-400 ${batchIndex % 2 == 0 ? 'bg-blue-100' : 'bg-green-100'}`}>{batch.itembatches?.name}, {batch.location.name}</td>
+                    {vendors.map((vendor, vendorIndex) => (
+                    vendor.items.map(async (item, itemIndex) => {
+                      const generationData = await feeding_actions.getTotalAmount(batch.id, item.id);
+                    return(
+                      <td
+                            key={`${batchIndex}-1`}
+                            className={`px-4 py-2 border border-gray-400 text-center text-sm ${
+                              generationData === undefined ? "border-2 border-dashed" : ""
+                            }`}
+                          >
+                            {generationData !== undefined && generationData.amount !== 0 ? (generationData.amount/1000).toFixed(6) : ""}
+                      </td>
+                    )
+                    })
+                  ))}
+                    <td className="px-4 py-2 border border-gray-400 text-sm"> {Number(batch.totalAmount / 1000).toFixed(3)} кг</td>
+                  </tr>
+
+                  <tr className="px-4 py-2 border border-gray-400">
+                    
+                    {vendors.map((vendor, vendorIndex) => (
+                    vendor.items.map(async (item, itemIndex) => {
+                      const generationData = await feeding_actions.getTotalAmount(batch.id, item.id);
+                    return(
+                      <td
+                          key={`${batchIndex}-2`}
+                          className={`px-4 py-2 border border-gray-400 text-center text-sm ${
+                            generationData === undefined ? "border-2 border-dashed" : ""
+                          }`}
+                        >
+                            {generationData !== undefined && generationData.price !== 0 ? generationData.price.toFixed(1) : ""}
+                          </td>
+                    )
+                    })
+                  ))}
+                    <td className="px-4 py-2 border border-gray-400 text-sm"> {Number(batch.totalPrice.toFixed(1))} грн</td>
+                  </tr>
+                  </React.Fragment>
                   
-                  {}
-                  {/* <td className="px-4 py-2 border border-gray-400"></td>
-                  <td className="px-4 py-2 border border-gray-400"></td>
-                  <td className="px-4 py-2 border border-gray-400"></td>
-                  <td className="px-4 py-2 border border-gray-400"></td>
-                  <td className="px-4 py-2 border border-gray-400"></td>
-                  <td className="px-4 py-2 border border-gray-400"></td>
-                  <td className="px-4 py-2 border border-gray-400"></td>
-                  <td className="px-4 py-2 border border-gray-400"></td>
-                  <td className="px-4 py-2 border border-gray-400"></td>
-                  <td className="px-4 py-2 border border-gray-400"></td>
-                  <td className="px-4 py-2 border border-gray-400"></td> */}
-                </tr>
                 )
                 
               })}
                
             </tbody>
           </table>
-
-
-
-
-          {/* <Table isStriped aria-label="Example static collection table">
-            <TableHeader>
-                <TableColumn className="text-center">Doc ID</TableColumn>
-                <TableColumn className="text-center">Delivery Date</TableColumn>
-            </TableHeader>
-            <TableBody>
-                <TableCell className="text-center">1</TableCell>
-                <TableCell className="text-center">2</TableCell>
-            </TableBody>
-        </Table> */}
         </>
     )
 }

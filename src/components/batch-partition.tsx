@@ -2,7 +2,7 @@
 
 import * as actions from '@/actions';
 import { useFormState } from 'react-dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import deleteImg from '../../public/icons/delete.svg'
 import Image from 'next/image';
 import FormButton from './common/form-button';
@@ -61,6 +61,8 @@ export default function PartitionFormPage({location, poolInfo, locations} : Part
         };
     };
 
+    useEffect(() => {console.log('selectedPools changed', selectedPools)}, [selectedPools])
+
     return (
         <form className="" action={action} onSubmit={() => {actions.updatePoolManaging}}>
             <div className="mb-4">
@@ -106,7 +108,7 @@ export default function PartitionFormPage({location, poolInfo, locations} : Part
                                             .filter(location => location.location_type_id === 2)
                                             .sort((a, b) => a.id - b.id)
                                             .map((location, index) => (
-                                                <SelectItem key={index} value={location.id}>{location.name}</SelectItem>
+                                                <SelectItem key={location.id} value={location.id}>{location.name}</SelectItem>
                                             ))}
                                     </Select>
                                     </div>
