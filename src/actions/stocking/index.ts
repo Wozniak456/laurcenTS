@@ -276,7 +276,7 @@ export async function createCalcBelow25(fishAmount: number, averageFishMass: num
 
   const date = Array.from({ length: numberOfRecords }, (_, i) => {
       const currentDate = new Date();
-      currentDate.setDate(currentDate.getDate() + i);
+      currentDate.setDate(currentDate.getDate() + i + 1);
       return currentDate;
   });
 
