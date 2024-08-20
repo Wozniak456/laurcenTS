@@ -7,6 +7,7 @@ import SaveButton from '../../../public/icons/Save.svg'
 import {poolInfoType} from '@/types/app_types'
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from "@nextui-org/react";
 import SuccessForm from "../success-form";
+import FormButton from "../common/form-button";
 
 interface FilterableTableProps {
     date: string,
@@ -64,35 +65,13 @@ export default function SelectDay({date, poolIndex, aggregatedData }: Filterable
                     
                     {fishWeight != initialFishWeight ?
                         <div className="w-10 ">
-                            {/* <button type="submit" className=" p-1 rounded hover:bg-green-200">
+                            <FormButton color="default">
                                 <Image src={SaveButton} alt="save" width={30} />
-                            </button> */}
-                            <Button onPress={onOpen} type="submit" >
-                                <Image src={SaveButton} alt="save" width={30} />
-                            </Button>
-                            <Modal 
-                                isOpen={isOpen} 
-                                onClose={onClose}
-                                placement="top-center"
-                            >
-                                <ModalContent>
-                                {(onClose) => (
-                                    <>
-                                    <ModalHeader className="flex flex-col gap-1"></ModalHeader>
-                                    <ModalBody>
-                                        <SuccessForm />
-                                    </ModalBody>
-                                    <ModalFooter>
-                                        
-                                    </ModalFooter>
-                                    </>
-                                )}
-                                </ModalContent>
-                            </Modal>
+                            </FormButton>
                         </div> :
                         <div className="w-10 ">
                             <button className=" p-1 rounded hover:bg-green-200">
-                                {/* <Image src={SaveButton} alt="save" width={30} /> */}
+                                
                             </button>
                         </div>
                     }
