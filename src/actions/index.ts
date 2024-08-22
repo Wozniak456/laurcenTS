@@ -43,3 +43,5 @@ export { updateCurrentPoolState } from './crutial/updateCurrentPoolState'
 export { updatePrevPool } from './crutial/updatePrevPool'
 export { updateSmth } from './crutial/updateSmth'
 export { updatePoolManaging } from './crutial/updatePoolManaging'
+
+export { fishFetching } from './crutial/fishFetching'

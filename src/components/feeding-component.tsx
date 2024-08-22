@@ -10,6 +10,7 @@ import { disposalItem } from '@/types/app_types'
 import DisposalForm from '@/components/Stocking/disposal-form'
 import { Input, Select, SelectItem, Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/react";
 import FormButton from "./common/form-button";
+import FetchingForm from "./fetching";
 
 interface StockPoolProps {
     locations: {
@@ -46,11 +47,6 @@ export default function StockPoolPage({location, locations, batches, poolInfo, d
     const [showPartitionForm, setShowPartitionForm] = useState(false);
     const [showDisposalForm, setShowDisposalForm] = useState(false);
     const {isOpen, onOpen, onClose} = useDisclosure();
-    
-    // const handleDisposalFormButton = () => {
-    //     setShowDisposalForm(true)
-    // }
-
     
     const [formState, action] = useFormState(actions.stockPool, { message: '' });
 
@@ -112,42 +108,29 @@ export default function StockPoolPage({location, locations, batches, poolInfo, d
                 </div>}
                 <div className="flex flex-wrap gap-4 justify-end">
                     {(!poolInfo.batch || poolInfo.qty==0) &&
-                    <FormButton color="primary">
+                     <FormButton color="primary">
                         Зарибити зі складу
                     </FormButton>
-                        // <button
-                        //     type="submit"
-                        //     className="rounded p-2 bg-blue-200"
-                        // >
-                        //     Зарибити зі складу
-                        // </button>
-
+                   
+                        
                     }
+
+                    
+
                     {poolInfo.qty && poolInfo.qty > 0 ?
                     <>
-                    {/* <button
-                        type="button"
-                        className="rounded p-2 bg-blue-200"
-                        onClick={() => setShowPartitionForm(!showPartitionForm)}
-                    >
-                        Розділити
-                    </button> */}
                     <Button color="primary" 
                         onClick={() => setShowPartitionForm(!showPartitionForm)}
                     >
                         Розділити
                     </Button>
 
-                    {/* <button
-                        type="button"
-                        className="rounded p-2 bg-blue-200"
-                        onClick={handleDisposalFormButton}
+                    {/* <Button color="primary" 
+                        onClick={() => setShowPartitionForm(!showPartitionForm)}
                     >
-                        Списати
-                    </button> */}
-                    {/* <Button color="default" onClick={handleDisposalFormButton}>
-                        Списати
+                        Вилов
                     </Button> */}
+                    
 
                     <Button onPress={onOpen} color="default">Списати</Button>
                     <Modal 
@@ -173,7 +156,9 @@ export default function StockPoolPage({location, locations, batches, poolInfo, d
                     </> : ''
                     }
                     
-                    
+                    <Button color="default">
+                        Актуалізація стану
+                    </Button>
                 </div>
                 
                 {formState && formState.message && (
@@ -184,6 +169,10 @@ export default function StockPoolPage({location, locations, batches, poolInfo, d
             </div>
             
         </form>
+        <div className="flex justify-end mb-4">
+        <FetchingForm location={location} poolInfo={poolInfo}/>
+        </div>
+        
         {showPartitionForm && <PartitionForm location={location} poolInfo={poolInfo} locations={locations}/>} 
         {/* {showDisposalForm && <DisposalForm location={location} poolInfo={poolInfo} reasons={disposal_reasons} setShowDisposalForm={setShowDisposalForm}/>} */}
         </div>

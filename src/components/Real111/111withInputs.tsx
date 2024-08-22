@@ -12,15 +12,24 @@ import FormButton from "../common/form-button";
 interface FilterableTableProps {
     date: string,
     poolIndex: number,
-    aggregatedData: poolInfoType
+    aggregatedData?: DataItem
 }
+export type DataItem = {
+    poolName: string;
+    batchName?: string;
+    quantity?: number; 
+    planWeight?: number; 
+    factWeight?: number; 
+    feed?: string; 
+    updated?: string; 
+  };
 
 export default function SelectDay({date, poolIndex, aggregatedData }: FilterableTableProps) {
-    const {isOpen, onOpen, onClose} = useDisclosure();
+    
     const todayDate = new Date()
     const today = todayDate.toISOString().split("T")[0]
 
-    const initialFishWeight = aggregatedData.fishWeight
+    const initialFishWeight = aggregatedData?.factWeight
 
     const [fishWeight, setFishWeight] = useState<number | undefined>(initialFishWeight)
 
@@ -37,14 +46,14 @@ export default function SelectDay({date, poolIndex, aggregatedData }: Filterable
 
 
     const [formState, action] = useFormState(actions.updateSmth, { message: '' })
-    const color = getDiff(aggregatedData.plan_weight, aggregatedData.fishWeight)
+    const color = getDiff(aggregatedData?.planWeight, aggregatedData?.factWeight)
 
     return (
         <>
-            <td className="px-4 py-2 border text-center border-gray-400"> {aggregatedData.batch?.name}</td>
-            <td className="px-4 py-2 border text-center border-gray-400"> {aggregatedData.qty}</td>
+            <td className="px-4 py-2 border text-center border-gray-400"> {aggregatedData?.batchName}</td>
+            <td className="px-4 py-2 border text-center border-gray-400"> {aggregatedData?.quantity}</td>
             
-            <td className="px-4 py-2 border text-center border-gray-400">{aggregatedData.plan_weight?.toFixed(1)}</td>
+            <td className="px-4 py-2 border text-center border-gray-400">{aggregatedData?.planWeight?.toFixed(1)}</td>
             <td className={`px-4 py-2 border text-center border-gray-400 ${fishWeight != initialFishWeight && 'bg-yellow-100'} bg-${color}-200`}>
                 <input
                     type="number"
@@ -52,11 +61,11 @@ export default function SelectDay({date, poolIndex, aggregatedData }: Filterable
                     value={fishWeight !== undefined ? fishWeight.toString() : ''}
                     onChange={handleFishWeightChange}
                     className="px-2 py-1 rounded-md text-center"
-                    disabled={!aggregatedData.batch?.name || date != today}
+                    disabled={!aggregatedData?.batchName || date != today}
                 />
             </td>
-            <td className="px-4 py-2 border text-center border-gray-400"> {aggregatedData.feedType?.name}</td>
-            <td className="px-4 py-2 border text-center border-gray-400"> {aggregatedData.updateDate}</td>
+            <td className="px-4 py-2 border text-center border-gray-400"> {aggregatedData?.feed}</td>
+            <td className="px-4 py-2 border text-center border-gray-400"> {aggregatedData?.updated}</td>
             <td>
                 <form action={action}>
                     <input type="hidden" name="location_id_to" value={poolIndex} />

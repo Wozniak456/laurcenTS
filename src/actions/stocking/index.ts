@@ -121,17 +121,17 @@ export const poolInfo = async (location_id: number, date: string) => {
       feedType = await getFeedType(lastStocking?.stocking[0].average_weight)
   }
 
-  const batch = lastStocking?.itemtransactions[0].itembatches
-  const qty = lastStocking?.itemtransactions[0].quantity
+  const batch = lastStocking?.itemtransactions[0]?.itembatches
+  const qty = lastStocking?.itemtransactions[0]?.quantity
   const fishWeight = lastStocking?.stocking[0].average_weight
   const updateDate = lastStocking?.date_time.toISOString().split("T")[0];
 
   let allowedToEdit = false
 
-  if (lastStocking?.itemtransactions[0].parent_transaction){
+  if (lastStocking?.itemtransactions[0]?.parent_transaction){
     const connectedTran = await db.itemtransactions.findFirst({
       where:{
-        id: lastStocking?.itemtransactions[0].parent_transaction
+        id: lastStocking?.itemtransactions[0]?.parent_transaction
       }
     })
 
@@ -397,6 +397,8 @@ export async function createCalcBelow25(fishAmount: number, averageFishMass: num
 }
 
 export async function createCalcOver25(fishAmount: number, averageFishMass: number, percentage: number, docId: bigint) {
+  console.log('createCalcOver25')
+  console.log(`${fishAmount}, ${averageFishMass}, ${percentage}, ${docId}`)
   try {
 
       const numberOfRecords = 10;
