@@ -2,6 +2,7 @@ import { db } from "@/db"
 import Link from "next/link";
 import * as actions from '@/actions'
 import  LeftoversTable  from '@/components/leftovers-table'
+import ExportButton from "@/components/leftoversTableToPrint";
 
 interface LeftoversPerPeriodProps {
     params: {
@@ -99,6 +100,7 @@ export default async function LeftoversPerPeriod(props: LeftoversPerPeriodProps)
                     </tbody>
                 </table>  */}
                 <LeftoversTable data={data}/>
+                <ExportButton  />
 
                 
             </div>

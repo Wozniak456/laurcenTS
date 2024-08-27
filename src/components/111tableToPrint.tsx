@@ -2,6 +2,7 @@
 
 import React from 'react';
 import ExcelJS from 'exceljs';
+import { Button } from '@nextui-org/react';
 
 export type DataItem = {
     poolName: string;
@@ -211,7 +212,13 @@ const ExportButton: React.FC<ExportButtonProps> = ({ date, sections }) => {
         window.URL.revokeObjectURL(url);
     };
 
-    return <button onClick={handleExport}>Export to Excel</button>;
+    return (
+        <div className=''>
+            <Button onClick={handleExport}>Export to Excel</Button>
+        </div>
+        
+    )
+    
 };
 
 export default ExportButton;

@@ -42,6 +42,11 @@ type feedArray = {
   qty: string | undefined
 }
 
+type itemAndTime ={
+  item: string | undefined; 
+  time?: string;
+} | null
+
 export default function DaySummaryContent({
   location,
   today, 
@@ -58,29 +63,39 @@ export default function DaySummaryContent({
     
     const transitionDay = todayCalculation?.calc?.transition_day
 
-    let initialValues = times.map(() => 
+    let initialValues : itemAndTime[] = times.map((timeValue) => 
       transitionDay && todayCalculation?.calc?.feed_per_feeding
-        ? (todayCalculation.calc.feed_per_feeding * (1 - transitionDay * 0.2)).toFixed(1) ?? "0"
-        : todayCalculation?.calc?.feed_per_feeding.toFixed(1) ?? "0"
+        ? {
+          item: (todayCalculation.calc.feed_per_feeding * (1 - transitionDay * 0.2)).toFixed(1),
+          time: timeValue.time
+        } ?? null
+        : {item: todayCalculation?.calc?.feed_per_feeding.toFixed(1),
+          time: timeValue.time
+        } ?? null
     );
 
     if (transitionDay && prevCalculation?.calc){
       initialValues = [
         ...initialValues,
-        ...times.map(() =>
+        ...times.map((timeValue) =>
           todayCalculation?.calc?.feed_per_feeding
-            ? (todayCalculation?.calc?.feed_per_feeding * (transitionDay * 0.2)).toFixed(1) ?? "0"
-            : "0"
+            ? {item: (todayCalculation?.calc?.feed_per_feeding * (transitionDay * 0.2)).toFixed(1),
+              time: timeValue.time
+            } ?? null
+            : null
         )
       ];
 
     }
   
-  const [inputValues, setInputValues] = useState<string[]>(initialValues);
+  const [inputValues, setInputValues] = useState<itemAndTime[]>(initialValues);
   
   const handleInputChange = (index: number) => (event: ChangeEvent<HTMLInputElement>) => {
     const newValues = [...inputValues];
-    newValues[index] = event.target.value;
+    newValues[index] = {
+      ...newValues[index], // зберігаємо попередні значення (включаючи `time`)
+      item: event.target.value, // оновлюємо тільки `item`
+    };
     setInputValues(newValues);
   };
 
@@ -125,7 +140,7 @@ export default function DaySummaryContent({
                 name={`feed_given`}
                 className="border border-black w-full bg-blue-100 text-center"
                 id={`feed_given_${index}`}
-                value={inputValues[index]}
+                value={inputValues[index]?.item}
                 onChange={handleInputChange(index)}
               />
               </div>
@@ -152,7 +167,7 @@ export default function DaySummaryContent({
         <form action={action}>
           <input type="hidden" name="location_id" value={location.location_id} />
           <input type="hidden" name="executed_by" value={3} />
-          <input type="hidden" name="date_time" value={today}/> 
+          
 
           {!transitionDay ?
             <input type="hidden" name="item_0" value={todayFeed?.id}/> 
@@ -163,6 +178,7 @@ export default function DaySummaryContent({
           {/* <input type="hidden" name="item_0" value={todayFeed?.id}/> */}
           
           <input type="hidden" name="batch_id" value={Number(location.batch_id)} />
+          <input type="hidden" name="date_time" value={today}/> 
 
           {transitionDay && prevCalculation?.calc &&
             <input type="hidden" name="item_1" value={todayFeed?.id} />
@@ -170,7 +186,11 @@ export default function DaySummaryContent({
 
           {
             inputValues.map((value, index) => (
-              <input key={index} type="hidden" name={`input_${index}`} value={value} />
+              <>
+                <input key={index} type="hidden" name={`input_${index}`} value={value?.item} />
+                <input type="hidden" name={`time_${index}`} value={value?.time}/> 
+              </>
+              
             ))
           }
           
@@ -234,7 +254,7 @@ export default function DaySummaryContent({
                 name={`feed_given`}
                 className="border border-black w-full bg-blue-100 text-center"
                 id={`feed_given_${index+times.length}`}
-                value={inputValues[index+times.length]}
+                value={inputValues[index + times.length]?.item}
                 onChange={handleInputChange(index+times.length)}
               />
             </div>

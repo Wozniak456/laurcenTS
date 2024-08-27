@@ -9,6 +9,7 @@ import * as actions from '@/actions'
 
 import DaySummaryContent from "@/components/day-summary"
 import { start } from "repl";
+import ExportButton from "@/components/dayFeedingTableToPrint";
 
 interface DayFeedingProps {
   params: {
@@ -23,9 +24,28 @@ interface LocationInfo {
     fed_today?: boolean 
   }
 
+interface feedingInfo{
+    date: string,
+    poolId: number,
+    rowCount?: number
+    feedType?: string,
+    feedName?: string,
+    feeding6?: string,
+    editing6: string,
+    feeding10?: string,
+    editing10: string,
+    feeding14?: string,
+    editing14: string,
+    feeding18?: string,
+    editing18: string,
+    feeding22?: string,
+    editing22: string,
+}
+
 export default async function DayFeeding(props: DayFeedingProps) {
     const today = props.params.index;
-    console.log(today)
+
+    // console.log('today', today)
 
     const currentDate: Date = new Date();
     
@@ -43,6 +63,7 @@ export default async function DayFeeding(props: DayFeedingProps) {
             name: true,
             pools:{
                 select:{
+                    name: true,
                     id: true,
                     locations:{
                         select:{
@@ -83,9 +104,132 @@ export default async function DayFeeding(props: DayFeedingProps) {
                 location_id: locationId
             }
         })
-        if(feedingDocument.length > 0)
-            console.log('date_time: ', startOfDay, 'locationId', locationId, ' feedingDocument', feedingDocument.length);
+        // if(feedingDocument.length > 0)
+        //     console.log('date_time: ', startOfDay, 'locationId', locationId, ' feedingDocument', feedingDocument.length);
         return feedingDocument.length >= 1;
+    }
+
+    // Змінна для зберігання масиву даних
+    let data : feedingInfo[] = [];
+
+    for (const line of lines) {
+        for (const pool of line.pools) {
+            for (const loc of pool.locations) {
+                const isPoolFilled = await actions.isFilled(loc.id);
+                let prevCalc = null;
+
+                let locationInfo: LocationInfo = {
+                    location_id: loc.id,
+                    location_name: loc.name,
+                    fed_today: await feedingForLocation(loc.id)
+                };
+
+                let todayCalc = null;
+
+                if (isPoolFilled) {
+                    todayCalc = await stockingActions.calculationForLocation(loc.id, today);
+
+                    if (todayCalc.calc?.transition_day !== null) {
+                        prevCalc = await stockingActions.getPrevCalc(loc.id, todayCalc);
+                    }
+
+                    const batchInfo = await stockingActions.poolInfo(loc.id, today);
+
+                    if (batchInfo) {
+                        locationInfo = {
+                            ...locationInfo,
+                            batch_id: batchInfo.batch?.id
+                        };
+                    }
+                }
+
+                const getEdited = async (hours: number) => {
+
+                    const todayDate = new Date(today)
+
+                    todayDate.setUTCHours(hours, 0, 0, 0);
+                    const fedAlready = await db.documents.findMany({
+                        select:{
+                            itemtransactions:{
+                                select:{
+                                    quantity: true
+                                },
+                                where:{
+                                    location_id: loc.id
+                                }
+                            },
+                            location_id: true
+                        },
+                        where:{
+                            location_id: loc.id,
+                            doc_type_id: 9,
+                            date_time: todayDate
+                        }
+                    })  
+
+                    return(fedAlready)
+                }
+
+                const editing6 = await getEdited(6)
+                const editing10 = await getEdited(10)
+                const editing14 = await getEdited(14)
+                const editing18 = await getEdited(18)
+                const editing22 = await getEdited(22)
+
+                const transition = todayCalc?.calc?.transition_day
+
+                const feedingAmount = transition && todayCalc?.calc?.feed_per_feeding && todayCalc?.calc?.feed_per_feeding * (1 - transition * 0.2)
+                
+                data.push(
+                    {
+                        date: today,
+                        poolId: pool.id,
+                        rowCount: todayCalc?.calc?.transition_day ? 2 : 1,
+                        feedType: transition ? prevCalc?.feed.type_name : todayCalc?.feed.type_name,
+                        feedName: transition ? prevCalc?.feed.item_name : todayCalc?.feed.item_name,
+                        feeding6: transition ? feedingAmount?.toFixed(1) : todayCalc?.calc?.feed_per_feeding.toFixed(1),
+                        editing6: editing6[0]?.itemtransactions[0]?.quantity ? (editing6[0]?.itemtransactions[0]?.quantity * 1000).toFixed(1) : '',
+                        feeding10: transition ? feedingAmount?.toFixed(1) : todayCalc?.calc?.feed_per_feeding.toFixed(1),
+                        editing10: editing10[0]?.itemtransactions[0]?.quantity ? (editing10[0]?.itemtransactions[0]?.quantity * 1000).toFixed(1) : '',
+                        feeding14: transition ? feedingAmount?.toFixed(1) : todayCalc?.calc?.feed_per_feeding.toFixed(1),
+                        editing14: editing14[0]?.itemtransactions[0]?.quantity ? (editing14[0]?.itemtransactions[0]?.quantity * 1000).toFixed(1) : '',
+                        feeding18: transition ? feedingAmount?.toFixed(1) : todayCalc?.calc?.feed_per_feeding.toFixed(1),
+                        editing18: editing18[0]?.itemtransactions[0]?.quantity ? (editing18[0]?.itemtransactions[0]?.quantity * 1000).toFixed(1) : '',
+                        feeding22: transition ? feedingAmount?.toFixed(1) : todayCalc?.calc?.feed_per_feeding.toFixed(1),
+                        editing22: editing22[0]?.itemtransactions[0]?.quantity ? (editing22[0]?.itemtransactions[0]?.quantity * 1000).toFixed(1) : '',
+                    }
+                );
+
+                if(transition) {
+                    const feedingAmount = todayCalc?.calc?.feed_per_feeding && todayCalc?.calc?.feed_per_feeding * (transition * 0.2)
+               
+                    data.push(
+                        {
+                            date: today,
+                            poolId: pool.id,
+                            rowCount: todayCalc?.calc?.transition_day ? 2 : 1,
+                            feedType: todayCalc?.feed.type_name,
+                            feedName: todayCalc?.feed.item_name,
+                            feeding6: feedingAmount?.toFixed(1),
+                            editing6: editing6[1]?.itemtransactions[0]?.quantity ? (editing6[1]?.itemtransactions[0]?.quantity * 1000).toFixed(1) : '',
+                            feeding10: feedingAmount?.toFixed(1),
+                            editing10: editing10[1]?.itemtransactions[0]?.quantity ? (editing10[1]?.itemtransactions[0]?.quantity * 1000).toFixed(1) : '',
+                            feeding14: feedingAmount?.toFixed(1),
+                            editing14: editing14[1]?.itemtransactions[0]?.quantity ? (editing14[1]?.itemtransactions[0]?.quantity * 1000).toFixed(1) : '',
+                            feeding18: feedingAmount?.toFixed(1),
+                            editing18: editing18[1]?.itemtransactions[0]?.quantity ? (editing18[1]?.itemtransactions[0]?.quantity * 1000).toFixed(1) : '',
+                            feeding22: feedingAmount?.toFixed(1),
+                            editing22: editing22[1]?.itemtransactions[0]?.quantity ? (editing22[1]?.itemtransactions[0]?.quantity * 1000).toFixed(1) : '',
+                        }
+                    );
+                }
+                
+
+
+
+                // console.log(todayCalc?.feed.item_name)
+            }
+        }
     }
 
     return (
@@ -101,6 +245,8 @@ export default async function DayFeeding(props: DayFeedingProps) {
                     </div>
                 ))}
             </div>
+
+            <ExportButton times={times} lines={lines} data={data} />
 
             {lines.map(line => (
                 <table key={line.id} className="border-collapse border w-full mb-4 text-sm w-5/6">
@@ -170,8 +316,8 @@ export default async function DayFeeding(props: DayFeedingProps) {
                             key={loc.id}
                             location={locationInfo} 
                             today={today}
-                            todayCalculation={todayCalc} //калькуляція на сьогодні
-                            prevCalculation={prevCalc} // попередня калькуляція
+                            todayCalculation={todayCalc} 
+                            prevCalculation={prevCalc} 
                             times={times}
                             items={items}
                             />

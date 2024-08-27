@@ -170,7 +170,7 @@ export default function StockPoolPage({location, locations, batches, poolInfo, d
             
         </form>
         <div className="flex justify-end mb-4">
-        <FetchingForm location={location} poolInfo={poolInfo}/>
+            <FetchingForm location={location} poolInfo={poolInfo}/>
         </div>
         
         {showPartitionForm && <PartitionForm location={location} poolInfo={poolInfo} locations={locations}/>} 

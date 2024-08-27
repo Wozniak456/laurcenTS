@@ -24,6 +24,16 @@ import {
 
 import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Checkbox, Input, Link} from "@nextui-org/react";
 
+type Item = {
+    id: number;
+    name: string;
+    description: string | null;
+    item_type_id: number | null;
+    feed_type_id: number | null;
+    default_unit_id: number | null;
+    parent_item: number | null;
+    vendor_id: number | null;
+}
 
 interface PurchTableComponentProps {
     purchtables: {
@@ -36,6 +46,7 @@ interface PurchTableComponentProps {
             id: number;
             name: string;
             description: string | null;
+            items: Item[]
         };
         purchaselines: {
             id: number;
@@ -89,8 +100,6 @@ export default function PurchTableComponent({ purchtables, vendors, items }: Pur
     // const [formState, action] = useFormState(CRUDactions.createPurchTable, { message: '' });
     const [selectedRow, setSelectedRow] = useState<bigint | undefined>(undefined);
     
-
-
     const [showCreatePurchHeaderModal, setShowCreatePurchHeaderModal] = useState<boolean>(false);
     
 
@@ -139,16 +148,7 @@ export default function PurchTableComponent({ purchtables, vendors, items }: Pur
         <div className="flex flex-col gap-4 my-4">
             <div className="flex justify-between items-center mb-2 w-full">
                 <h1 className="text-xl font-bold">Прибуткові накладні</h1>
-                {/* <Popover placement="left-start">
-                    <PopoverTrigger>
-                        <Button color="primary">
-                            Нова накладна
-                        </Button>
-                    </PopoverTrigger>
-                    <PopoverContent>
-                        <CreateEditPurchHeaderForm vendors={vendors} setShowForm={setShowCreatePurchHeaderModal}/>
-                    </PopoverContent>
-                </Popover> */}
+                
                 <Button onPress={onOpen} color="primary">Нова накладна</Button>
                 <Modal 
                     isOpen={isOpen} 
@@ -160,7 +160,7 @@ export default function PurchTableComponent({ purchtables, vendors, items }: Pur
                         <>
                         <ModalHeader className="flex flex-col gap-1"></ModalHeader>
                         <ModalBody>
-                        <CreateEditPurchHeaderForm vendors={vendors} setShowForm={setShowCreatePurchHeaderModal}/>
+                            <CreateEditPurchHeaderForm vendors={vendors} setShowForm={setShowCreatePurchHeaderModal}/>
                         </ModalBody>
                         <ModalFooter>
                             

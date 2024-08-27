@@ -45,3 +45,11 @@ export { updateSmth } from './crutial/updateSmth'
 export { updatePoolManaging } from './crutial/updatePoolManaging'
 
 export { fishFetching } from './crutial/fishFetching'
+
+export { createVendor } from './CRUD/vendors/createVendor'
+export { editVendor } from './CRUD/vendors/editVendor'
+export { deleteVendor } from './CRUD/vendors/deleteVendor'
+
+export { createItem } from './CRUD/items/createItem'
+export { editItem } from './CRUD/items/editItem'
+export { deleteItem } from './CRUD/items/deleteItem'

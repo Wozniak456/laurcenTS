@@ -112,6 +112,7 @@ export default async function LeftoversPerPeriod(props: LeftoversPerPeriodProps)
 
           return (
             <div className="my-4 flex flex-col gap-4">
+              <ExportButton date={date} sections={sections} />
               <table className="mb-4">
                 <thead>
                   <tr>
@@ -152,7 +153,7 @@ export default async function LeftoversPerPeriod(props: LeftoversPerPeriodProps)
                   ))}
                 </tbody>
               </table>
-              <ExportButton date={date} sections={sections} />
+              
             </div>
           );
       

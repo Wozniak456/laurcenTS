@@ -17,21 +17,18 @@ import {
 import line from "next-auth/providers/line";
 import PurchLineDeleteForm from "./delete-message";
 
+type Item = {
+    id: number;
+    name: string;
+    description: string | null;
+    item_type_id: number | null;
+    feed_type_id: number | null;
+    default_unit_id: number | null;
+    parent_item: number | null;
+    vendor_id: number | null;
+}
+
 interface PurchLinesComponentProps {
-    // lines: {
-    //     id: number;
-    //     items: {
-    //         id: number;
-    //         name: string;
-    //         feed_type_id: number | null;
-    //     };
-    //     quantity: number;
-    //     units: {
-    //         id: number;
-    //         name: string;
-    //     };
-    //     item_id: number;
-    // }[] | undefined,
 
     purchHeader: {
         id: bigint;
@@ -43,6 +40,7 @@ interface PurchLinesComponentProps {
             id: number;
             name: string;
             description: string | null;
+            items: Item[]
         };
         purchaselines: {
             id: number;
@@ -70,35 +68,8 @@ interface PurchLinesComponentProps {
     }[]
 }
 
-interface line {
-    id: number;
-    items: {
-        id: number;
-        name: string;
-        feed_type_id: number | null;
-    };
-    quantity: number;
-    units: {
-        id: number;
-        name: string;
-    };
-    item_id: number;
-}
 
 export default function PurchLinesList( {purchHeader, items} : PurchLinesComponentProps){
-    // const [showModal, setShowModal] = useState<boolean>(false);
-
-    const [selectedLine, setSelectedLine] = useState<number | undefined>(undefined);
-    // const [linesList, setLinesList] = useState<line[] | undefined>(lines);
-
-    // const handleCreateNewPurchLine = () => {
-    //     setShowModal(true);
-    // };
-
-    // useEffect(() => {
-    //     setLinesList(lines);
-    //     console.log('lines changed, ', lines)
-    // }, [lines]);
 
     return(
         <div className="mt-2">
@@ -140,15 +111,6 @@ export default function PurchLinesList( {purchHeader, items} : PurchLinesCompone
                     purchHeader.purchaselines
                     .sort((a, b) => a.id - b.id)
                     .map((line, index) => (
-                        // <PurchLineItem 
-                        //   key={line.id}
-                        //   purch_header={purchHeader} 
-                        //   line={line} 
-                        //   index={index} 
-                        //   items={items} 
-                        //   setSelectedLine={setSelectedLine}
-                        //   selectedLine={selectedLine}
-                        // />
                         <TableRow key={index}>
                             <TableCell className="text-center">{index + 1}</TableCell>
                             <TableCell className="text-center">{line?.item_id}</TableCell>

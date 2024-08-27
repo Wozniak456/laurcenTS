@@ -10,7 +10,14 @@ export default async function PurchtableHome() {
       date_time: true,
       vendor_doc_number: true,
       vendor_id: true,
-      vendors: true,
+      vendors: {
+        select:{
+          id: true,
+          name: true,
+          description: true,
+          items: true
+        }
+      },
       purchaselines: {
         select:{
           id: true,

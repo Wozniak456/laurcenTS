@@ -15,6 +15,7 @@ export default function Header() {
         { label: 'Тижневий звіт', href: '/summary-feeding-table/week' },
         { label: 'Годування', href: `/summary-feeding-table/day/${today.toISOString().split("T")[0]}` },
         { label: 'Реєстрація приходу', href: '/purchtable/view' },
+        { label: 'Постачальники та корми', href: '/vendors/view' },
         // { label: 'Реєстрація відвантаження', href: '/realization/headers/view' },
         { label: 'Собівартість', href: '/accumulation/view' },
         { label: 'Склад', href: '/leftovers/view' },

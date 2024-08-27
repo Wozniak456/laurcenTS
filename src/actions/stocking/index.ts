@@ -66,6 +66,7 @@ export async function calculationForLocation(location_id : number, date: string)
     type_id: feed_type?.id,
     type_name: feed_type?.name,
     item_id: item?.item_id,
+    item_name: item?.item_name,
     definedPrio: item?.definedPrio
   }
 
@@ -519,6 +520,7 @@ export async function getPrevCalc(location_id : number, calc : calculationAndFee
             type_id: feed_type?.id,
             type_name: feed_type?.name,
             item_id: item?.item_id,
+            item_name: item?.item_name,
             definedPrio: item?.definedPrio
           }
         }
