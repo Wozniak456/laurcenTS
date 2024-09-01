@@ -33,11 +33,11 @@ export async function updatePrevPool({info, formData, formState} : updatePrevPoo
 
     const fetchTran = await db.itemtransactions.create({
         data:{
-            doc_id: info.divDocId,
+            doc_id: stockDoc.id,
             location_id: location_id,
             batch_id: batch_id,
             quantity: - info.amount_in_pool,
-            unit_id: 2
+            unit_id: 1
         }
     })
     console.log('транзакція витягування що там є за документом розподілу', fetchTran)
@@ -50,7 +50,7 @@ export async function updatePrevPool({info, formData, formState} : updatePrevPoo
             location_id: location_id,
             batch_id: batch_id,
             quantity: info.amount_in_pool,
-            unit_id: 2
+            unit_id: 1
         }
     })
     console.log('транзакція зариблення тої ж кількості за документом зариблення', stockTran)
@@ -73,5 +73,10 @@ export async function updatePrevPool({info, formData, formState} : updatePrevPoo
 
     console.log('МИ ОНОВИЛИ fish_amount', info.amount_in_pool)
     
+    formData.delete(`average_fish_mass`);
+    formData.delete(`old_average_fish_mass`);
+
+    formData.set('average_fish_mass', String(av_weight)) // новий басейн
+            
     createCalcTable(formState, formData)
 }

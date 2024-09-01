@@ -26,8 +26,8 @@ export async function batchDivision(
         const location_from : number = parseInt(formData.get('location_id_from') as string);
         const batch_id_from : number = parseInt(formData.get('batch_id_from') as string);
         const fish_qty_in_location_from : number = parseInt(formData.get('fish_qty_in_location_from') as string);
-        const average_fish_mass : number = parseFloat(formData.get('average_fish_mass') as string);
-      
+        // const average_fish_mass : number = parseFloat(formData.get('average_fish_mass') as string);
+        
         let sum = 0
         let index1 = 0
         while(true){
@@ -146,9 +146,10 @@ export async function batchDivision(
         }
         console.log('СКІЛЬКИ МИ БУДЕМО ВКИДАТИ В СТАРИЙ БАСЕЙН', fish_qty_in_location_from - sum)
 
+
+        console.log('що ми передаємо в updatePrevPool', info)
         await updatePrevPool(info)
 
-        
 
     } catch (err: unknown) {
         if (err instanceof Error) {

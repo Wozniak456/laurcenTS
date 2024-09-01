@@ -53,3 +53,5 @@ export { deleteVendor } from './CRUD/vendors/deleteVendor'
 export { createItem } from './CRUD/items/createItem'
 export { editItem } from './CRUD/items/editItem'
 export { deleteItem } from './CRUD/items/deleteItem'
+
+export { getWeekOfYear } from './crutial/getWeekOfTheYear'

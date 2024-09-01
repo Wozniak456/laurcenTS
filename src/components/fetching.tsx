@@ -5,6 +5,8 @@ import FormButton from "./common/form-button";
 import { useFormState } from "react-dom";
 import * as actions from '@/actions';
 import { useState } from "react";
+import { FetchingReasons } from "@/types/fetching-reasons";
+import { poolManagingType } from "@/types/app_types";
 
 interface FetchingFormProps{
     location: {
@@ -28,14 +30,38 @@ interface FetchingFormProps{
         updateDate: string | undefined;
         allowedToEdit: boolean;
     },
+    locations: {
+        id: number;
+        name: string;
+        location_type_id: number;
+    }[],
+    weekNum: number
 }
 
-export default function FetchingForm({location, poolInfo } : FetchingFormProps) {
+export default function FetchingForm({location, poolInfo, locations, weekNum } : FetchingFormProps) {
     const {isOpen, onOpen, onClose} = useDisclosure();
     const [formState, action] = useFormState(actions.fishFetching, { message: '' });
 
-    const [amount, setAmount] = useState<number | undefined>(undefined)
-    const [averageWeight, setAverageWeight] = useState<number | undefined>(undefined)
+    // const [amount, setAmount] = useState<number | undefined>(undefined)
+    // const [averageWeight, setAverageWeight] = useState<number | undefined>(undefined)
+
+    const [commercialFishingAmount, setCommercialFishingAmount] = useState<number | undefined>(undefined)
+    const [commercialFishingWeight, setCommercialFishingWeight] = useState<number | undefined>(undefined)
+
+    const [sortedAmount, setSortedAmount] = useState<number | undefined>(undefined)
+    const [sortedWeight, setSortedWeight] = useState<number | undefined>(undefined)
+
+    const [growOutAmount, setGrowOutAmount] = useState<number | undefined>(undefined)
+    const [growOutWeight, setGrowOutWeight] = useState<number | undefined>(undefined)
+
+    const [moreThan500Amount, setMoreThan500Amount] = useState<number | undefined>(undefined)
+    const [moreThan500Weight, setMoreThan500Weight] = useState<number | undefined>(undefined)
+
+    const [lessThan500Amount, setLessThan500Amount] = useState<number | undefined>(undefined)
+    const [lessThan500Weight, setLessThan500Weight] = useState<number | undefined>(undefined)
+
+    // console.log('FetchingReasons', FetchingReasons)
+    // const weekNum = getWeekOfYear(new Date())
 
     return(
         <div >
@@ -44,75 +70,193 @@ export default function FetchingForm({location, poolInfo } : FetchingFormProps) 
             isOpen={isOpen} 
             onClose={onClose} 
             placement="top-center"
-            size="2xl"
+            size="4xl"
         >
             <ModalContent className="w-1/2">
             {(onClose) => (
                 <>
-                <ModalHeader className="flex flex-col gap-1">Вилов</ModalHeader>
+                <ModalHeader className="flex flex-col gap-1">
+                    <h1>Вилов для {location.name}</h1>
+                    <p>Тиждень: {weekNum}</p>
+                </ModalHeader>
                 <ModalBody>
                     <form action={action}>
                         <div className="flex gap-4 mb-8 flex-wrap w-full justify-around">
-                            <Input
-                                label="Басейн:"
-                                value={location.name}
-                                readOnly // Забороняємо користувачеві змінювати значення
-                                className="flex-grow w-full sm:w-auto"
-                            />
-                            <input
-                                type="hidden"
-                                name="location_id_from"
-                                value={location.id} 
-                            />
 
-                            <input
-                                type="hidden"
-                                name="batch_id"
-                                value={Number(poolInfo.batch?.id)} 
-                            />
+                            <input type="hidden" name="location_id_from" value={location.id} /> 
+                            <input type="hidden" name="batch_id" value={Number(poolInfo.batch?.id)}  /> 
+                            <input type="hidden" name="fish_qty_in_location_from" value={poolInfo.qty} /> 
+                            <input type="hidden" name="average_fish_mass" value={poolInfo.fishWeight} />
+                            <input type="hidden" name="week_num" value={weekNum} />
 
-                            <input
-                                type="hidden"
-                                name="fish_qty_in_location_from"
-                                value={poolInfo.qty} 
-                            />
+                            <div className="w-full my-4 flex flex-col gap-4">
+                                <div>
+                                    <label>{FetchingReasons.CommercialFishing}</label>
+                                    <div className="flex gap-2">
+                                        <Input
+                                            name="commercial_fishing_amount"
+                                            placeholder={`Кількість`}
+                                            fullWidth
+                                            onChange={(e) => {setCommercialFishingAmount(Number(e.target.value))}}
+                                            type='number'
+                                            min={1}
+                                            max={poolInfo.qty}
+                                            defaultValue="15"
+                                        />
+                                        <Input
+                                            name="commercial_fishing_total_weight"
+                                            placeholder={`Загальна маса`}
+                                            fullWidth
+                                            onChange={(e) => {setCommercialFishingWeight(Number(e.target.value))}}
+                                            type='number'
+                                            min={0.0001}
+                                            step="any"
+                                            defaultValue="150"
+                                        />
+                                        {commercialFishingAmount && commercialFishingWeight && 
+                                            <p>Середня вага: {(commercialFishingWeight / commercialFishingAmount).toFixed(1)}</p>}
+                                        
+                                    </div>
+                                    
+                                </div>
+                                <div>
+                                    <label>{FetchingReasons.Sorted}</label>
+                                    <div className="flex gap-2">
+                                        <Input
+                                            name="sorted_fishing_amount"
+                                            placeholder={`Кількість`}
+                                            fullWidth
+                                            onChange={(e) => {setSortedAmount(Number(e.target.value))}}
+                                            type='number'
+                                            min={1}
+                                            max={poolInfo.qty}
+                                            defaultValue="15"
+                                        />
+                                        <Input
+                                            name="sorted_fishing_total_weight"
+                                            placeholder={`Загальна маса`}
+                                            fullWidth
+                                            onChange={(e) => {setSortedWeight(Number(e.target.value))}}
+                                            type='number'
+                                            min={0.0001}
+                                            step="any"
+                                            defaultValue="150"
+                                        />
+                                       {sortedAmount && sortedWeight && 
+                                            <p>Середня вага: {(sortedWeight / sortedAmount).toFixed(1)}</p>}
+                                     
+                                    </div>
+                                    
+                                </div>
+                                <div>
+                                    <label>{FetchingReasons.GrowOut}</label>
+                                    <div className="flex gap-2">
+                                        <Input
+                                            name="growout_fishing_amount"
+                                            placeholder={`Кількість`}
+                                            fullWidth
+                                            onChange={(e) => {setGrowOutAmount(Number(e.target.value))}}
+                                            type='number'
+                                            min={1}
+                                            max={poolInfo.qty}
+                                            defaultValue="15"
+                                        />
+                                        <Input
+                                            name="growout_fishing_total_weight"
+                                            placeholder={`Загальна маса`}
+                                            fullWidth
+                                            onChange={(e) => {setGrowOutWeight(Number(e.target.value))}}
+                                            type='number'
+                                            min={0.0001}
+                                            step="any"
+                                            defaultValue="150"
+                                        />
+                                        <Select 
+                                            label="Басейн" 
+                                            name="location_id"
+                                            // isInvalid={!!formState.errors?.unit_id}
+                                            // errorMessage={formState.errors?.unit_id}
+                                           
+                                        >
+                                            {locations
+                                            .map(loc => (
+                                                <SelectItem key={Number(loc.id)} value={Number(loc.id)}>{loc.name}</SelectItem>
+                                            ))}
+                                        </Select>
+                                     {growOutAmount && growOutWeight && 
+                                            <label>Середня вага: {(growOutWeight / growOutAmount).toFixed(1)}</label>}
+                                 
+                    
+                                    </div>
+                                    
+                                </div>
 
-                            <input
-                                type="hidden"
-                                name="average_fish_mass"
-                                value={poolInfo.fishWeight} 
-                            />
+                                <div>
+                                    <label>{FetchingReasons.MoreThan500}</label>
+                                    <div className="flex gap-2">
+                                        <Input
+                                            name="more500_fishing_amount"
+                                            placeholder={`Кількість`}
+                                            fullWidth
+                                            onChange={(e) => {setMoreThan500Amount(Number(e.target.value))}}
+                                            type='number'
+                                            min={1}
+                                            max={poolInfo.qty}
+                                            defaultValue="15"
+                                        />
+                                        <Input
+                                            name="more500_fishing_total_weight"
+                                            placeholder={`Загальна маса`}
+                                            fullWidth
+                                            onChange={(e) => {setMoreThan500Weight(Number(e.target.value))}}
+                                            type='number'
+                                            min={0.0001}
+                                            step="any"
+                                            defaultValue="150"
+                                        />
+                                        {moreThan500Amount && moreThan500Weight && 
+                                            <label>Середня вага: {(moreThan500Weight / moreThan500Amount).toFixed(1)}</label>}
+                                      
+                                    </div>
+                                    
+                                </div>
 
-                            <Input 
-                                label="Кількість:" 
-                                name="fetch_amount"
-                                type='number'
-                                min={1}
-                                max={poolInfo.qty}
-                                onChange={(e) => {setAmount(Number(e.target.value))}}
-                                // isInvalid={!!formState.errors?.quantity}
-                                // errorMessage={formState.errors?.quantity}
-                                isRequired
-                                className="flex-grow w-full sm:w-auto "
-                            />
-                            <Input 
-                                label="Середня вага:" 
-                                name="fish_weight"
-                                type='number'
-                                min={0.0001}
-                                step="any"
-                                onChange={(e) => {setAverageWeight(Number(e.target.value))}}
-                                // isInvalid={!!formState.errors?.quantity}
-                                // errorMessage={formState.errors?.quantity}
-                                isRequired
-                                className="flex-grow w-full sm:w-auto "
-                            />
+                                <div>
+                                    <label>{FetchingReasons.LessThan500}</label>
+                                    <div className="flex gap-2">
+                                        <Input
+                                            name="less500_fishing_amount"
+                                            placeholder={`Кількість`}
+                                            fullWidth
+                                            onChange={(e) => {setLessThan500Amount(Number(e.target.value))}}
+                                            type='number'
+                                            min={1}
+                                            max={poolInfo.qty}
+                                            defaultValue="15"
+                                        />
+                                        <Input
+                                            name="less500_fishing_total_weight"
+                                            placeholder={`Загальна маса`}
+                                            fullWidth
+                                            onChange={(e) => {setLessThan500Weight(Number(e.target.value))}}
+                                            type='number'
+                                            min={0.0001}
+                                            step="any"
+                                            defaultValue="150"
+                                        />
+                                        {lessThan500Amount && lessThan500Weight && <label>Середня вага: {(lessThan500Weight / lessThan500Amount).toFixed(1)}</label>}
+                                        
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                            
+
                             
                         </div>
-                        {amount && averageWeight && <p>Загальна вага: {(amount*averageWeight).toFixed(1)}</p>}
                         
                         <div className="flex justify-end">
-                        <FormButton color="danger">Забрати з басейна</FormButton>
+                            <FormButton color="danger">Забрати з басейна</FormButton>
                         </div>
                     </form>
                 </ModalBody>
@@ -127,4 +271,6 @@ export default function FetchingForm({location, poolInfo } : FetchingFormProps) 
     )
 }
     
-    
+
+
+

@@ -2,7 +2,7 @@
 import { db } from "@/db";
 import { calculation_table } from "@prisma/client";
 import * as actions from '@/actions'
-import { calculationAndFeed } from "@/types/app_types";
+import { calculationAndFeed, poolManagingType } from "@/types/app_types";
 
 export async function calculationForLocation(location_id : number, date: string){
 
@@ -73,9 +73,13 @@ export async function calculationForLocation(location_id : number, date: string)
   return{batch, calc, feed, location_id, allowedToEdit}
 }
 
-export const poolInfo = async (location_id: number, date: string) => {
+
+
+export const poolInfo = async (location_id: number, date: string)
+: Promise<poolManagingType> => {
   const dateValue = new Date(date)
-  dateValue.setHours(23, 59, 59, 999);
+
+  dateValue.setUTCHours(23, 59, 59, 999);
 
   const lastStocking = await db.documents.findFirst({
       select:{
@@ -115,6 +119,7 @@ export const poolInfo = async (location_id: number, date: string) => {
       },
       take: 1
   })
+
 
   let feedType
 

@@ -88,6 +88,23 @@ export type poolInfo = {
     cost?: number | undefined
 }
 
+export type poolManagingType = {
+    batch: {
+        id: bigint;
+        name: string;
+    } | undefined;
+    qty: number | undefined;
+    fishWeight: number | undefined;
+    feedType: {
+        id: number;
+        name: string;
+        feedconnection_id: number | null;
+    } | null | undefined;
+    updateDate: string | undefined;
+    allowedToEdit: boolean;
+    wasFetchedThisWeek? : boolean
+  }
+
 export interface calculationAndFeed{
     batch?: {
         batch_name: string | undefined;

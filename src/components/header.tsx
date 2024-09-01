@@ -19,7 +19,8 @@ export default function Header() {
         // { label: 'Реєстрація відвантаження', href: '/realization/headers/view' },
         { label: 'Собівартість', href: '/accumulation/view' },
         { label: 'Склад', href: '/leftovers/view' },
-        { label: '111', href: '/general-summary/day-selection' }
+        { label: '111', href: '/general-summary/day-selection' },
+        { label: 'Вилов', href: '/fetching/view' }
     ];
 
     return (

@@ -6,11 +6,12 @@ import PartitionForm from "@/components/batch-partition";
 import { useState } from "react";
 import { itembatches } from "@prisma/client";
 import PoolInfo from "@/components/Pools/pool-info"
-import { disposalItem } from '@/types/app_types'
+import { disposalItem, poolManagingType } from '@/types/app_types'
 import DisposalForm from '@/components/Stocking/disposal-form'
 import { Input, Select, SelectItem, Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/react";
 import FormButton from "./common/form-button";
 import FetchingForm from "./fetching";
+import ActualizationPage from "./Pools/actualization-form";
 
 interface StockPoolProps {
     locations: {
@@ -25,25 +26,12 @@ interface StockPoolProps {
         pool_id: number | null;
     },
     batches: itembatches[],
-    poolInfo: {
-        batch: {
-            id: bigint;
-            name: string;
-        } | undefined;
-        qty: number | undefined;
-        fishWeight: number | undefined;
-        feedType: {
-            id: number;
-            name: string;
-            feedconnection_id: number | null;
-        } | null | undefined;
-        updateDate: string | undefined;
-        allowedToEdit: boolean;
-    },
-    disposal_reasons: disposalItem[]
+    poolInfo: poolManagingType,
+    disposal_reasons: disposalItem[],
+    weekNum: number
 }
 
-export default function StockPoolPage({location, locations, batches, poolInfo, disposal_reasons}: StockPoolProps) {
+export default function StockPoolPage({location, locations, batches, poolInfo, disposal_reasons, weekNum}: StockPoolProps) {
     const [showPartitionForm, setShowPartitionForm] = useState(false);
     const [showDisposalForm, setShowDisposalForm] = useState(false);
     const {isOpen, onOpen, onClose} = useDisclosure();
@@ -156,9 +144,7 @@ export default function StockPoolPage({location, locations, batches, poolInfo, d
                     </> : ''
                     }
                     
-                    <Button color="default">
-                        Актуалізація стану
-                    </Button>
+                    <ActualizationPage />
                 </div>
                 
                 {formState && formState.message && (
@@ -169,9 +155,12 @@ export default function StockPoolPage({location, locations, batches, poolInfo, d
             </div>
             
         </form>
+        {!poolInfo.wasFetchedThisWeek && 
         <div className="flex justify-end mb-4">
-            <FetchingForm location={location} poolInfo={poolInfo}/>
+            <FetchingForm location={location} poolInfo={poolInfo} locations={locations} weekNum={weekNum} />
         </div>
+        }
+        
         
         {showPartitionForm && <PartitionForm location={location} poolInfo={poolInfo} locations={locations}/>} 
         {/* {showDisposalForm && <DisposalForm location={location} poolInfo={poolInfo} reasons={disposal_reasons} setShowDisposalForm={setShowDisposalForm}/>} */}

@@ -73,6 +73,9 @@ export default function PartitionFormPage({location, poolInfo, locations} : Part
                     <p className="font-semibold text-base mb-8">Басейни для розподілу:</p>
                     <input type="hidden" name="batch_id_from" value={String(poolInfo.batch?.id)} />
                     <input type="hidden" name="fish_qty_in_location_from" value={poolInfo.qty} />
+                    {/* яка попередня сер вага */}
+                    <input type="hidden" name="old_average_fish_mass" value={poolInfo.fishWeight} /> 
+                    
                     {selectedPools.map((selectedPoolId, index) => {
                         
                         return (
