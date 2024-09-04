@@ -130,6 +130,7 @@ export default function RegisteringGoods({
                                                         isRequired
                                                         type="number"
                                                         min={0}
+                                                        step="0.01"
                                                         // isInvalid={!!formState?.errors?.delivery_date}
                                                         // errorMessage={formState?.errors?.delivery_date?.join(', ') || ''}
                                                     />

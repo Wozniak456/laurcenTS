@@ -107,19 +107,19 @@ export default function CreateEditLineForm({
                 <div className="flex flex-row gap-2 justify-between items-start flex-wrap">
                    
                     <Select 
-                            label="Призначення:" 
-                            name="item_id"
-                            labelPlacement="outside"
-                            placeholder="Призначення:"
-                            isRequired
-                            // isInvalid={!!formState?.errors?.vendor_id}
-                            // errorMessage={formState?.errors?.vendor_id?.join(', ')}
-                            onChange={(e) => handleSelectedItem(Number(e.target.value)) }
-                            defaultSelectedKeys={
-                                line && line.items && line.items.name ? 
-                                [items.filter(item => item.name === line.items.name).map(item => String(item.id))[0]]
-                                : undefined
-                            }
+                        label="Призначення:" 
+                        name="item_id"
+                        labelPlacement="outside"
+                        placeholder="Призначення:"
+                        isRequired
+                        // isInvalid={!!formState?.errors?.vendor_id}
+                        // errorMessage={formState?.errors?.vendor_id?.join(', ')}
+                        onChange={(e) => handleSelectedItem(Number(e.target.value)) }
+                        defaultSelectedKeys={
+                            line && line.items && line.items.name ? 
+                            [items.filter(item => item.name === line.items.name).map(item => String(item.id))[0]]
+                            : undefined
+                        }
 
                         >
                             {purchHeader 
@@ -138,6 +138,9 @@ export default function CreateEditLineForm({
                             labelPlacement="outside"
                             placeholder="Кількість:"
                             isRequired
+                            type="number"
+                            min={0}
+                            step="0.01"
                             // isInvalid={!!formState?.errors?.delivery_date}
                             // errorMessage={formState?.errors?.delivery_date?.join(', ') || ''}
                             defaultValue={line ? line.quantity.toString() : ''}
