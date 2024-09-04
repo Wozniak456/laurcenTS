@@ -39,11 +39,12 @@ export async function updateAccumulation(
             items.forEach(async item => {
 
                 const qty : number = parseFloat(formData.get(`item_${item.id}`) as string)
+                console.log('qty from updateAccu', qty)
                 const prev_qty : number = parseFloat(formData.get(`prev_item_${item.id}`) as string)
                 
                 // prev_qty може бути NaN
 
-                if(qty){
+                if(!isNaN(qty)){
 
                     console.log('ПРАЦЮЄМО З item: ', item)
                     

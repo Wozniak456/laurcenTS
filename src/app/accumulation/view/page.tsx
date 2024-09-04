@@ -91,7 +91,7 @@ export default async function StockingHome() {
         const qty = generationData?.amount || 0;
 
         if (qty > 0) {
-          const feedTypeName = item.feedtypes?.name;
+          // const feedTypeName = item.feedtypes?.name;
           const feedItem: Item = {
             item_id: item.id,
             qty,
@@ -117,8 +117,6 @@ export default async function StockingHome() {
       }
     }
   })
-
-  // console.log(pools)
 
   return (
     <div className="">

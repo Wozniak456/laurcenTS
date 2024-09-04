@@ -131,8 +131,6 @@ const StockingTable: React.FC<StockingTableProps> = ({ pools, vendors, batches }
     return [qtyRowData, priceRowData];
   });
 
-  console.log('rows', rows)
-
   const handleRowClick = (row: RowData) => {
     setSelectedRow(row);
     setModalOpen(true);
