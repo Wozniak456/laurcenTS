@@ -83,6 +83,9 @@ export default function FetchingForm({location, poolInfo, locations, weekNum } :
                             <input type="hidden" name="batch_id" value={Number(poolInfo.batch?.id)}  /> 
                             <input type="hidden" name="fish_qty_in_location_from" value={poolInfo.qty} /> 
                             <input type="hidden" name="average_fish_mass" value={poolInfo.fishWeight} />
+
+                            <input type="hidden" name="old_average_fish_mass" value={poolInfo.fishWeight} />
+
                             <input type="hidden" name="week_num" value={weekNum} />
 
                             <div className="w-full my-4 flex flex-col gap-4">

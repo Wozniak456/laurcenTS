@@ -72,26 +72,71 @@ export default async function FetchingPage(){
                     tran.fetching.forEach(fetch => {
                         switch (fetch.fetching_reason) {
                             case FetchingReasons.CommercialFishing:
-                                locationFetchingInfo[loc.name].commercialFishingAmount = tran.quantity;
-                                locationFetchingInfo[loc.name].commercialFishingWeight = fetch.total_weight;
+                                if (!isNaN(tran.quantity)) {
+                                    locationFetchingInfo[loc.name].commercialFishingAmount = tran.quantity;
+                                } else {
+                                    locationFetchingInfo[loc.name].commercialFishingAmount = 0; // або інше значення
+                                }
+                                if (!isNaN(fetch.total_weight)) {
+                                    locationFetchingInfo[loc.name].commercialFishingWeight = fetch.total_weight;
+                                } else {
+                                    locationFetchingInfo[loc.name].commercialFishingWeight = 0; // або інше значення
+                                }
                                 break;
+                        
                             case FetchingReasons.Sorted:
-                                locationFetchingInfo[loc.name].sortedAmount = tran.quantity;
-                                locationFetchingInfo[loc.name].sortedWeight = fetch.total_weight;
+                                if (!isNaN(tran.quantity)) {
+                                    locationFetchingInfo[loc.name].sortedAmount = tran.quantity;
+                                } else {
+                                    locationFetchingInfo[loc.name].sortedAmount = 0; // або інше значення
+                                }
+                                if (!isNaN(fetch.total_weight)) {
+                                    locationFetchingInfo[loc.name].sortedWeight = fetch.total_weight;
+                                } else {
+                                    locationFetchingInfo[loc.name].sortedWeight = 0; // або інше значення
+                                }
                                 break;
+                        
                             case FetchingReasons.GrowOut:
-                                locationFetchingInfo[loc.name].growOutAmount = tran.quantity;
-                                locationFetchingInfo[loc.name].growOutWeight = fetch.total_weight;
+                                if (!isNaN(tran.quantity)) {
+                                    locationFetchingInfo[loc.name].growOutAmount = tran.quantity;
+                                } else {
+                                    locationFetchingInfo[loc.name].growOutAmount = 0; // або інше значення
+                                }
+                                if (!isNaN(fetch.total_weight)) {
+                                    locationFetchingInfo[loc.name].growOutWeight = fetch.total_weight;
+                                } else {
+                                    locationFetchingInfo[loc.name].growOutWeight = 0; // або інше значення
+                                }
                                 break;
+                        
                             case FetchingReasons.MoreThan500:
-                                locationFetchingInfo[loc.name].moreThan500Amount = tran.quantity;
-                                locationFetchingInfo[loc.name].moreThan500Weight = fetch.total_weight;
+                                if (!isNaN(tran.quantity)) {
+                                    locationFetchingInfo[loc.name].moreThan500Amount = tran.quantity;
+                                } else {
+                                    locationFetchingInfo[loc.name].moreThan500Amount = 0; // або інше значення
+                                }
+                                if (!isNaN(fetch.total_weight)) {
+                                    locationFetchingInfo[loc.name].moreThan500Weight = fetch.total_weight;
+                                } else {
+                                    locationFetchingInfo[loc.name].moreThan500Weight = 0; // або інше значення
+                                }
                                 break;
+                        
                             case FetchingReasons.LessThan500:
-                                locationFetchingInfo[loc.name].lessThan500Amount = tran.quantity;
-                                locationFetchingInfo[loc.name].lessThan500Weight = fetch.total_weight;
+                                if (!isNaN(tran.quantity)) {
+                                    locationFetchingInfo[loc.name].lessThan500Amount = tran.quantity;
+                                } else {
+                                    locationFetchingInfo[loc.name].lessThan500Amount = 0; // або інше значення
+                                }
+                                if (!isNaN(fetch.total_weight)) {
+                                    locationFetchingInfo[loc.name].lessThan500Weight = fetch.total_weight;
+                                } else {
+                                    locationFetchingInfo[loc.name].lessThan500Weight = 0; // або інше значення
+                                }
                                 break;
                         }
+                        
                     });
                 }
             });

@@ -57,6 +57,8 @@ export async function updatePrevPool({info, formData, formState} : updatePrevPoo
 
     //створення запису в stocking
 
+    console.log('av_weight', av_weight)
+
     const stocking = await db.stocking.create({
         data:{
             doc_id: stockDoc.id,

@@ -146,6 +146,10 @@ export async function fishFetching(
                     unit_id: 1,
                 }
             });
+
+            console.log('growoutfetchTran', growoutfetchTran)
+
+            // console.log(`дані для growoutpushTran: ${}`)
     
             const growoutpushTran = await db.itemtransactions.create({
                 data: {
@@ -157,6 +161,9 @@ export async function fishFetching(
                     parent_transaction: growoutfetchTran.id
                 }
             });
+            
+            console.log('growoutpushTran', growoutpushTran)
+    
     
             const GrowOutFetching = await db.fetching.create({
                 data:{
@@ -166,6 +173,8 @@ export async function fishFetching(
                     weekNumber: week_num
                 }
             })
+
+            console.log('GrowOutFetching', GrowOutFetching)
 
             // зариблюємо басейн з причиною доріст
 
@@ -181,6 +190,8 @@ export async function fishFetching(
                     id: 'desc'
                 }
             })
+
+            console.log('last_stocking', last_stocking)
 
             formData.delete('location_id_to')
             formData.set('location_id_to', String(location_id_to))

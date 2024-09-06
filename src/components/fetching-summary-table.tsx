@@ -69,23 +69,51 @@ export default function FetchingInfoTable({summary, weekNum} : FetchingInfoTable
 
                 <TableCell className="bg-blue-100" >{info.commercialFishingAmount}</TableCell>
                 <TableCell className="bg-blue-100">{info.commercialFishingWeight}</TableCell>
-                <TableCell className="bg-blue-100">{(info.commercialFishingWeight / info.commercialFishingAmount).toFixed(1)}</TableCell>
+                {/* <TableCell className="bg-blue-100">{(info.commercialFishingWeight / info.commercialFishingAmount).toFixed(1)}</TableCell> */}
+                <TableCell className="bg-blue-100">
+                {info.commercialFishingAmount !== 0 
+                    ? (info.commercialFishingWeight / info.commercialFishingAmount).toFixed(1)
+                    : '0'}
+                </TableCell>
+
+
 
                 <TableCell>{info.sortedAmount}</TableCell>
                 <TableCell>{info.sortedWeight}</TableCell>
-                <TableCell>{info.sortedWeight / info.sortedAmount}</TableCell>
+                {/* <TableCell>{info.sortedWeight / info.sortedAmount}</TableCell> */}
+                <TableCell>
+                {info.sortedAmount !== 0 
+                    ? (info.sortedWeight / info.sortedAmount).toFixed(1)
+                    : '0'}
+                </TableCell>
 
                 <TableCell className="bg-blue-100">{info.growOutAmount}</TableCell>
                 <TableCell className="bg-blue-100">{info.growOutWeight}</TableCell>
-                <TableCell className="bg-blue-100">{(info.growOutWeight / info.growOutAmount).toFixed(1)}</TableCell>
+                {/* <TableCell className="bg-blue-100">{(info.growOutWeight / info.growOutAmount).toFixed(1)}</TableCell> */}
+                <TableCell className="bg-blue-100">
+                {info.growOutAmount !== 0 
+                    ? (info.growOutWeight / info.growOutAmount).toFixed(1)
+                    : '0'}
+                </TableCell>
 
                 <TableCell>{info.moreThan500Amount}</TableCell>
                 <TableCell>{info.moreThan500Weight}</TableCell>
-                <TableCell>{info.moreThan500Weight / info.moreThan500Amount}</TableCell>
+                {/* <TableCell>{info.moreThan500Weight / info.moreThan500Amount}</TableCell> */}
+                <TableCell>
+                {info.moreThan500Amount !== 0 
+                    ? (info.moreThan500Weight / info.moreThan500Amount).toFixed(1)
+                    : '0'}
+                </TableCell>
+
 
                 <TableCell className="bg-blue-100">{info.lessThan500Amount}</TableCell>
                 <TableCell className="bg-blue-100">{info.lessThan500Weight}</TableCell>
-                <TableCell className="bg-blue-100">{(info.lessThan500Weight / info.lessThan500Amount).toFixed(1)}</TableCell>
+                {/* <TableCell className="bg-blue-100">{(info.lessThan500Weight / info.lessThan500Amount).toFixed(1)}</TableCell> */}
+                <TableCell className="bg-blue-100">
+                {info.lessThan500Amount !== 0 
+                    ? (info.lessThan500Weight / info.lessThan500Amount).toFixed(1)
+                    : '0'}
+                </TableCell>
             </TableRow>
             ))}
         </TableBody>
