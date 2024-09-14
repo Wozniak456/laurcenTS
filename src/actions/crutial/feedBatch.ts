@@ -25,16 +25,10 @@ export async function feedBatch(
                 const qty: number = parseFloat(formData.get(`input_${index}`) as string);
                 const time = formData.get(`time_${index}`) as string;
 
-                console.log('Time sofiia', time)
-
                 const date = new Date(date_time);
                 const [hours, minutes] = time?.split(':').map(Number);
 
-                console.log('hours sofiia', hours)
-
                 date.setUTCHours(hours, minutes, 0, 0);
-
-                console.log('date sofiia', hours)
 
                 const feedDoc = await db.documents.create({
                     data:{
@@ -44,8 +38,6 @@ export async function feedBatch(
                         executed_by: executed_by
                     }
                 })
-
-                console.log('feedDoc sofiia', feedDoc)
 
                 const batches_id = await getFeedBatchByItemId(today_item_id, qty)
 

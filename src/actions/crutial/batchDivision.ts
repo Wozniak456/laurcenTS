@@ -169,7 +169,8 @@ export async function batchDivision(
     
 
     revalidatePath('/pool-managing/view') 
+    revalidatePath('/summary-feeding-table/week')
     revalidatePath(`/accumulation/view`)
-    revalidatePath('/leftovers/view')
+    // revalidatePath('/leftovers/view')
     redirect('/pool-managing/view')
 }

@@ -2,6 +2,7 @@
 import { db } from "@/db";
 
 export async function getFeedBatchByItemId(item_id: number, quantity: number) {
+    
     const batches = await db.itembatches.findMany({
         include:{
             items: true

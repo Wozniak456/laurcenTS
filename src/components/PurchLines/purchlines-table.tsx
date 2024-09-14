@@ -1,9 +1,6 @@
 'use client'
 
 import React, { useEffect, useState } from "react";
-import Image from 'next/image';
-import newFileButton from '../../../public/icons/create.svg'
-import PurchLineItem from '@/components/PurchLines/purch-line-element'
 import CreateEditLineForm from '../PurchLines/create-edit-form'
 import { Button, Popover, PopoverContent, PopoverTrigger } from "@nextui-org/react";
 import {

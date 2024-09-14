@@ -3,58 +3,76 @@ import { useFormState } from 'react-dom';
 import * as actions from '@/actions';
 import { calculationAndFeedExtended } from '@/types/app_types'
 
-type PriorityFormType = {
-    date: string,
-    location: { 
-        id: number; 
-        name: string;
+type subRow = {
+    qty?: number ,
+    feed:{
+        id?: number,
+        name?: string
     },
-    calculation: calculationAndFeedExtended | undefined,
-    setShowForm: React.Dispatch<React.SetStateAction<boolean>>,
+    item:{
+        id?: number,
+        name?: string
+    }
 }
 
-export default function PriorityForm({date, location, calculation, setShowForm} : PriorityFormType) { 
-    
-    const priority = calculation?.feed?.item_id
+type PriorityFormType = {
+    location?: {
+        id: number;
+        name: string;
+    };
+    items: {
+        id: number;
+        name: string;
+        description: string | null;
+        item_type_id: number | null;
+        feed_type_id: number | null;
+        default_unit_id: number | null;
+        parent_item: number | null;
+        vendor_id: number | null;
+    }[],
+    item?: subRow;
+}
+
+export default function PriorityForm(props : PriorityFormType) { 
+    console.log('props.item?.feed.id', props.item?.feed.id)
+
+    const priority = props.item?.item.id
           
-    function handleCloseModal() {
-        setShowForm(prev => !prev);
-    }
+    // function handleCloseModal() {
+    //     setShowForm(prev => !prev);
+    // }
 
     const [formState, action] = useFormState(actions.managePriorities, { message: '' });
 
     return( 
-        <div className="fixed top-0 left-0 w-full h-full bg-gray-800 bg-opacity-75 flex justify-center items-center">
-            <div className="bg-white p-8 rounded shadow-lg w-1/3">
+        <div className="">
                 <h2 className="text-lg font-semibold mb-4">Редагування пріоритетності</h2>
                 
-                <form  className="mb-4 flex flex-col gap-4" action={action} onSubmit={handleCloseModal}>
+                <form  className="mb-4 flex flex-col gap-4" action={action}>
 
                 <div className="flex gap-2 items-center justify-center">
                     <h1 className="text-lg font-semibold min-w-24" >
-                        {location.name} 
+                        {props.location?.name} 
                     </h1>
                     <div className="flex flex-col gap-1">
-                        {calculation?.allItems
+                        {props.items
+                        .filter((item) => item.feed_type_id == props.item?.feed.id)
                         ?.map((item, index) => (
                             <div key={index} className="flex items-center">
                                 <input 
                                     type="radio" 
-                                    id={`feed_${item.item_id}_${index}`} 
+                                    id={`feed_${item.id}_${index}`} 
                                     name={`feed`} 
-                                    value={item.item_id} 
+                                    value={item.id} 
                                     className="mr-2"
-                                    defaultChecked={item.item_id == priority ? true : false}
+                                    defaultChecked={item.id == priority ? true : false}
                                 />
-                                <label htmlFor={`feed_${item.item_id}_${index}`} className="text-sm">{item.item_name}</label>
+                                <label htmlFor={`feed_${item.id}_${index}`} className="text-sm">{item.name}</label>
                             </div>
                         ))}
                     </div>
-                    <input type="hidden" name={`location`} value={location.id} />
-                </div>
-
-                <input type="hidden" name={`date`} value={date} />
-                            
+                    <input type="hidden" name={`location`} value={props.location?.id} />
+                </div>                            
                 
                 <div className="flex justify-between mt-4">
                     <button 
@@ -63,15 +81,14 @@ export default function PriorityForm({date, location, calculation, setShowForm} 
                         >
                         Зберегти
                     </button>
-                    <button className="hover:bg-blue-500 hover:text-white border font-bold py-2 px-4 rounded" 
+                    {/* <button className="hover:bg-blue-500 hover:text-white border font-bold py-2 px-4 rounded" 
                         onClick={handleCloseModal}>
                         Скасувати
-                    </button>
+                    </button> */}
                 </div>
                 
                 </form>
                 
-            </div>
         </div>
     )
 }

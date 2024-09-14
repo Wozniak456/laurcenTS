@@ -86,11 +86,10 @@ export default async function DayFeeding(props: DayFeedingProps) {
 
     const summary = await feedingActions.getAllSummary(lines, currentDate)
 
+    
+
     const feedingForLocation = async (locationId: number) => {
         const startOfDay = new Date(today);
-        // console.log(startOfDay)
-        // startOfDay.setHours(0, 0, 0, 0); // Встановлює час на початок дня (00:00:00.000)
-
         const endOfDay = new Date(today);
         endOfDay.setHours(23, 59, 59, 999); // Встановлює час на кінець дня (23:59:59.999)
 
@@ -104,8 +103,6 @@ export default async function DayFeeding(props: DayFeedingProps) {
                 location_id: locationId
             }
         })
-        // if(feedingDocument.length > 0)
-        //     console.log('date_time: ', startOfDay, 'locationId', locationId, ' feedingDocument', feedingDocument.length);
         return feedingDocument.length >= 1;
     }
 
@@ -245,8 +242,11 @@ export default async function DayFeeding(props: DayFeedingProps) {
                     </div>
                 ))}
             </div>
-
-            <ExportButton times={times} lines={lines} data={data} />
+            <div className="flex justify-end my-2">
+                <ExportButton times={times} lines={lines} data={data} />
+            </div>
+            <div>*Кількість вказана у грамах</div>
+            
 
             {lines.map(line => (
                 <table key={line.id} className="border-collapse border w-full mb-4 text-sm w-5/6">

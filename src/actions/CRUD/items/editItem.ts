@@ -41,6 +41,9 @@ export async function editItem(
         catch(err: unknown){
             return{errors:{}}
         }
-    revalidatePath('/vendors/view')
+        revalidatePath('/vendors/view')
+        revalidatePath('/summary-feeding-table/week')
+        revalidatePath('/purchtable/view')
+        revalidatePath('/accumulation/view')
     redirect('/vendors/view');
 }

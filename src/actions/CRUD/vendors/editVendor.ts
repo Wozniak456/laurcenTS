@@ -34,5 +34,7 @@ export async function editVendor(
             return{errors:{}}
         }
     revalidatePath('/vendors/view')
+    revalidatePath('/purchtable/view')
+    revalidatePath('/accumulation/view')
     redirect('/vendors/view');
 }

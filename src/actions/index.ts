@@ -55,3 +55,6 @@ export { editItem } from './CRUD/items/editItem'
 export { deleteItem } from './CRUD/items/deleteItem'
 
 export { getWeekOfYear } from './crutial/getWeekOfTheYear'
+export { initialStocking } from './stocking/initialStocking'
+
+export { updateAccumulation } from './CRUD/accumulation/updateAccumulation'

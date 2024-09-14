@@ -8,6 +8,7 @@ import { useState } from "react";
 import { FetchingReasons } from "@/types/fetching-reasons";
 import { poolManagingType } from "@/types/app_types";
 
+
 interface FetchingFormProps{
     location: {
         id: number;
@@ -42,9 +43,6 @@ export default function FetchingForm({location, poolInfo, locations, weekNum } :
     const {isOpen, onOpen, onClose} = useDisclosure();
     const [formState, action] = useFormState(actions.fishFetching, { message: '' });
 
-    // const [amount, setAmount] = useState<number | undefined>(undefined)
-    // const [averageWeight, setAverageWeight] = useState<number | undefined>(undefined)
-
     const [commercialFishingAmount, setCommercialFishingAmount] = useState<number | undefined>(undefined)
     const [commercialFishingWeight, setCommercialFishingWeight] = useState<number | undefined>(undefined)
 
@@ -60,8 +58,6 @@ export default function FetchingForm({location, poolInfo, locations, weekNum } :
     const [lessThan500Amount, setLessThan500Amount] = useState<number | undefined>(undefined)
     const [lessThan500Weight, setLessThan500Weight] = useState<number | undefined>(undefined)
 
-    // console.log('FetchingReasons', FetchingReasons)
-    // const weekNum = getWeekOfYear(new Date())
 
     return(
         <div >
@@ -101,7 +97,6 @@ export default function FetchingForm({location, poolInfo, locations, weekNum } :
                                             type='number'
                                             min={1}
                                             max={poolInfo.qty}
-                                            defaultValue="15"
                                         />
                                         <Input
                                             name="commercial_fishing_total_weight"
@@ -111,7 +106,6 @@ export default function FetchingForm({location, poolInfo, locations, weekNum } :
                                             type='number'
                                             min={0.0001}
                                             step="any"
-                                            defaultValue="150"
                                         />
                                         {commercialFishingAmount && commercialFishingWeight && 
                                             <p>Середня вага: {(commercialFishingWeight / commercialFishingAmount).toFixed(1)}</p>}
@@ -130,7 +124,6 @@ export default function FetchingForm({location, poolInfo, locations, weekNum } :
                                             type='number'
                                             min={1}
                                             max={poolInfo.qty}
-                                            defaultValue="15"
                                         />
                                         <Input
                                             name="sorted_fishing_total_weight"
@@ -140,7 +133,6 @@ export default function FetchingForm({location, poolInfo, locations, weekNum } :
                                             type='number'
                                             min={0.0001}
                                             step="any"
-                                            defaultValue="150"
                                         />
                                        {sortedAmount && sortedWeight && 
                                             <p>Середня вага: {(sortedWeight / sortedAmount).toFixed(1)}</p>}
@@ -159,7 +151,6 @@ export default function FetchingForm({location, poolInfo, locations, weekNum } :
                                             type='number'
                                             min={1}
                                             max={poolInfo.qty}
-                                            defaultValue="15"
                                         />
                                         <Input
                                             name="growout_fishing_total_weight"
@@ -169,13 +160,10 @@ export default function FetchingForm({location, poolInfo, locations, weekNum } :
                                             type='number'
                                             min={0.0001}
                                             step="any"
-                                            defaultValue="150"
                                         />
                                         <Select 
                                             label="Басейн" 
                                             name="location_id"
-                                            // isInvalid={!!formState.errors?.unit_id}
-                                            // errorMessage={formState.errors?.unit_id}
                                            
                                         >
                                             {locations
@@ -183,7 +171,7 @@ export default function FetchingForm({location, poolInfo, locations, weekNum } :
                                                 <SelectItem key={Number(loc.id)} value={Number(loc.id)}>{loc.name}</SelectItem>
                                             ))}
                                         </Select>
-                                     {growOutAmount && growOutWeight && 
+                                        {growOutAmount && growOutWeight && 
                                             <label>Середня вага: {(growOutWeight / growOutAmount).toFixed(1)}</label>}
                                  
                     
@@ -202,7 +190,6 @@ export default function FetchingForm({location, poolInfo, locations, weekNum } :
                                             type='number'
                                             min={1}
                                             max={poolInfo.qty}
-                                            defaultValue="15"
                                         />
                                         <Input
                                             name="more500_fishing_total_weight"
@@ -212,7 +199,6 @@ export default function FetchingForm({location, poolInfo, locations, weekNum } :
                                             type='number'
                                             min={0.0001}
                                             step="any"
-                                            defaultValue="150"
                                         />
                                         {moreThan500Amount && moreThan500Weight && 
                                             <label>Середня вага: {(moreThan500Weight / moreThan500Amount).toFixed(1)}</label>}
@@ -232,7 +218,6 @@ export default function FetchingForm({location, poolInfo, locations, weekNum } :
                                             type='number'
                                             min={1}
                                             max={poolInfo.qty}
-                                            defaultValue="15"
                                         />
                                         <Input
                                             name="less500_fishing_total_weight"
@@ -242,7 +227,6 @@ export default function FetchingForm({location, poolInfo, locations, weekNum } :
                                             type='number'
                                             min={0.0001}
                                             step="any"
-                                            defaultValue="150"
                                         />
                                         {lessThan500Amount && lessThan500Weight && <label>Середня вага: {(lessThan500Weight / lessThan500Amount).toFixed(1)}</label>}
                                         

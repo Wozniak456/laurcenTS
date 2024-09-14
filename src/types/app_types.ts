@@ -103,7 +103,14 @@ export type poolManagingType = {
     updateDate: string | undefined;
     allowedToEdit: boolean;
     wasFetchedThisWeek? : boolean
-  }
+}
+
+export interface poolManagingTypeExtended extends poolManagingType {
+    location?:{
+        id: number,
+        name: string
+    }
+}
 
 export interface calculationAndFeed{
     batch?: {

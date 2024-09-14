@@ -77,6 +77,8 @@ export default async function WeekSummary() {
 
                           const calc = await stockingActions.calculationForLocation(pool.locations[0].id, date.toISOString().split("T")[0])
 
+                          // console.log(calc)
+
                           return(
                             <td key={poolIndex} className="px-4 py-2 border border-gray-400 text-center font-normal text-sm">
                               {calc.calc?.feed_per_feeding.toFixed(0)}

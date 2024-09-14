@@ -76,5 +76,7 @@ export async function disposal(
         }
     }
     revalidatePath('/pool-managing/view')
+    revalidatePath('/summary-feeding-table/week')
+    // revalidatePath(`/accumulation/view`)
     redirect('/pool-managing/view')
 }

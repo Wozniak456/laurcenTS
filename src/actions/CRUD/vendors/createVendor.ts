@@ -37,6 +37,9 @@ export async function createVendor(
             return{errors:{}}
         }
     revalidatePath('/vendors/view')
+    revalidatePath('/purchtable/view')
+    revalidatePath('/accumulation/view')
+    // revalidatePath('/pool-managing/view')
     
     redirect('/vendors/view');
 }
