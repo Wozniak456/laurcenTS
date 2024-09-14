@@ -31,8 +31,7 @@ export default async function LeftoversPerPeriod(props: LeftoversPerPeriodProps)
 
         const EndSaldoDate: Date = new Date(EndSaldoDate1);
         EndSaldoDate.setDate(EndSaldoDate.getDate() + 1 );
-        
-        
+    
         const end_saldo = await actions.calculateSaldo(undefined, undefined, undefined)
         const start_saldo = await actions.calculateSaldo(undefined, StartSaldoDate, undefined)
         const incoming = await actions.calculateSaldo(StartSaldoDate, EndSaldoDate, { gt: 0 })
@@ -69,37 +68,9 @@ export default async function LeftoversPerPeriod(props: LeftoversPerPeriodProps)
                     <h1>Початок: {StartSaldoDate.toISOString().split("T")[0]}</h1>
                     <h1>Кінець: {EndSaldoDate1.toISOString().split("T")[0]}</h1>
                 </div>
-                {/* <table className="table-auto border-collapse w-full">
-                    <thead className="bg-gray-200">
-                    <tr className="bg-blue-100">
-                    <th className="px-2 py-2 border-gray-400">ID партії</th>
-                        <th className="px-2 py-2 border-gray-400">Назва партії</th>
-                        <th className="px-2 py-2 border-gray-400">Тип корму</th>
-                        <th className="px-2 py-2 border-gray-400">Назва товару</th>
-                        <th className="px-2 py-2 border-gray-400 w-32">На початку розрахунку</th>
-                        <th className="px-2 py-2 border-gray-400 w-32">Прибуло</th>
-                        <th className="px-2 py-2 border-gray-400 w-32">Списано</th>
-                        <th className="px-2 py-2 border-gray-400 w-32">Зараз на складі</th>
-                    </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                    {data
-                    .sort((a, b) => a.feed_type_name.localeCompare(b.feed_type_name))
-                    .map((item, index) => (
-                        <tr key={index}>
-                        <td className="px-2 py-2 border border-gray-400 text-center">{item.batch_id}</td>
-                        <td className="px-2 py-2 border border-gray-400 text-center">{item.batch_name}</td>
-                        <td className="px-2 py-2 border border-gray-400 text-center">{item.feed_type_name}</td>
-                        <td className="px-2 py-2 border border-gray-400 text-center">{item.item_name}</td>
-                        <td className="px-2 py-2 border border-gray-400 text-center">{item.start_saldo.toFixed(2)}</td>
-                        <td className="px-2 py-2 border border-gray-400 text-center">{item.incoming.toFixed(2)}</td>
-                        <td className="px-2 py-2 border border-gray-400 text-center">{item.outcoming.toFixed(2)}</td>
-                        <td className="px-2 py-2 border border-gray-400 text-center">{item.end_saldo.toFixed(2)}</td>
-                        </tr>
-                    ))}
-                    </tbody>
-                </table>  */}
+
                 <LeftoversTable data={data}/>
+
                 <ExportButton  />
 
                 

@@ -16,7 +16,7 @@ export async function updatePrevPool({info, formData, formState} : updatePrevPoo
     console.log('оновлюємо попередній басейн')
     const location_id: number = parseInt(formData.get('location_id_from') as string); 
     const batch_id: number = parseInt(formData.get('batch_id') as string); 
-    const av_weight: number = parseFloat(formData.get('average_fish_mass') as string); 
+    const av_weight: number = parseFloat(formData.get('old_average_fish_mass') as string); 
 
     //створити документ зариблення залишком
     const stockDoc = await db.documents.create({

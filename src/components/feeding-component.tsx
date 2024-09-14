@@ -148,10 +148,10 @@ export default function StockPoolPage({location, locations, batches, poolInfo, d
         }
         
 
-        {!poolInfo.wasFetchedThisWeek && 
-        <div className="flex justify-end mb-4">
-            <FetchingForm location={location} poolInfo={poolInfo} locations={locations} weekNum={weekNum} />
-        </div>
+        {!poolInfo.wasFetchedThisWeek && poolInfo.qty && poolInfo.qty > 0 && 
+            <div className="flex justify-end mb-4">
+                <FetchingForm location={location} poolInfo={poolInfo} locations={locations} weekNum={weekNum} />
+            </div>
         }
         
         
