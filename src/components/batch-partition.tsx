@@ -28,8 +28,7 @@ type location = {
 export default function PartitionFormPage({location, poolInfo, locations} : PartitionFormPageProps) {
     const [selectedPools, setSelectedPools] = useState<(number | null)[]>([]);
     const [formState, action] = useFormState(actions.batchDivision, { message: '' });
-    // const [updateFormState, updateFormStateAction] = useFormState(actions.updatePoolManaging, { message: '' });
-    
+  
     const handleDeleteButton = (index: number) => {
         setSelectedPools(selectedPools.filter(item => item !== index))
     };
@@ -46,8 +45,6 @@ export default function PartitionFormPage({location, poolInfo, locations} : Part
             });
         };
     };
-
-    useEffect(() => {console.log('selectedPools changed', selectedPools)}, [selectedPools])
 
     return (
         <form className="" action={action} onSubmit={() => {actions.updatePoolManaging}}>

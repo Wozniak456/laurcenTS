@@ -79,53 +79,56 @@ export async function calculationForLocation(location_id : number, date: string)
   return{batch, calc, feed, location_id, allowedToEdit}
 }
 
-
-
 export const poolInfo = async (location_id: number, date: string)
 : Promise<poolManagingType | undefined> => {
   const dateValue = new Date(date)
 
   dateValue.setUTCHours(23, 59, 59, 999);
 
-  // console.log('data for lastStocking:', `location_id:${location_id}, date: ${date}`)
   const lastStocking = await db.documents.findFirst({
-      select:{
-          date_time: true,
-          stocking:{
-              select:{
-                  average_weight: true
-              }
-          },
-          itemtransactions:{
-              select:{
-                  itembatches:{
-                      select:{
-                        id: true,
-                        name: true
-                      }
-                  },
-                  quantity: true,
-                  parent_transaction: true
-              },
-              where:{
-                  quantity:{
-                      gte: 0
-                  }
-              }
-          },
-      },
-      where:{
+    select:{
+      id: true,
+      date_time: true,
+      itemtransactions:{
+        select:{
+          id: true,
+          parent_transaction: true,
+          itembatches: true,
+          quantity: true,
+          location_id: true
+        },
+        where:{
           location_id: location_id,
-          doc_type_id: 1,
-          date_time:{
-              lte: dateValue
+          quantity:{
+            gte: 0
           }
-      },
-      orderBy:{
+        },
+        orderBy: {
           id: 'desc'
+        }
       },
-      take: 1
-  })
+      stocking: true
+    },
+    where:{
+      location_id: location_id,
+      date_time:{
+        lte: dateValue
+      },
+      itemtransactions:{
+        some:{
+          itembatches:{
+            items:{
+              item_type_id: 1
+            }
+          },
+        }
+      }
+    },
+    orderBy:{
+      date_time: 'desc'
+    }
+  });
+
 
   let feedType
 

@@ -3,13 +3,14 @@ import { notFound } from "next/navigation";
 import ActualizationPage from "@/components/Pools/actualization-form";
 import * as stockingActions from '@/actions/stocking'
 import { poolManagingTypeExtended } from "@/types/app_types";
+import * as actions from '@/actions'
 
 interface PoolManagingShowPageProps {
     params: {
         id: string
     }
 }
-// poolInfo, location, batches
+
 export default async function PoolManagingShowPage(props: PoolManagingShowPageProps){
     try{
         let location = await db.locations.findFirst({
@@ -32,22 +33,9 @@ export default async function PoolManagingShowPage(props: PoolManagingShowPagePr
             }
         }
 
-        const batches = await db.itembatches.findMany({
-            include:{
-              items: true
-            },
-            where:{
-              items:{
-                item_type_id: 1
-              }
-            }
-          })
+        const batches = await actions.getCatfishBatches()
 
-        const feeds = await db.items.findMany({
-            where:{
-                item_type_id: 3
-            }
-        })
+        const feeds = await actions.getFeeds()
 
         return( 
            <>

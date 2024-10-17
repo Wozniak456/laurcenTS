@@ -6,11 +6,7 @@ import FormButton from '../common/form-button';
 
 import {
     Input,
-    Button, 
-    Select, 
-    SelectItem,
 } from '@nextui-org/react'
-import { format } from 'path';
 
 type ItemBatchCreateFormProps = {
     items: items[],
@@ -22,8 +18,6 @@ export default function ItemBatchCreateForm({items, units} : ItemBatchCreateForm
     const [formState, action] = useFormState(actions.createItemBatch, {
         errors: {}
     });
-
-    // const [UpdateActionState, UpdateAction] = useFormState(actions.updateBatches, {message: ''});
 
     return(
         <div className="p-2 w-full">
@@ -77,33 +71,10 @@ export default function ItemBatchCreateForm({items, units} : ItemBatchCreateForm
                                 isDisabled
                             />
                             <input type="hidden" name="unit_id" value={1} />
-                            {/* <Select 
-                                label="Одиниця виміру:" 
-                                name="unit_id"
-                                defaultValue={units.find(unit => unit.id === 13)?.name}
-                                required
-                                isInvalid={!!formState.errors?.unit_id}
-                                errorMessage={formState.errors?.unit_id}
-                                isRequired
-                                // placeholder="Призначення партії:" 
-                            >
-                                {units.map(unit => (
-                                    <SelectItem key={unit.id} value={unit.id}>
-                                        {unit.name}
-                                    </SelectItem>
-                                ))}
-                            </Select> */}
+                          
                         </div>
                         <input type="hidden" name="created_by" value={3} />
                         
-                        
-                        {/* {
-                            formState && formState.message ? (
-                                <div className={`my-2 p-2 border rounded ${formState.message.includes('успішно') ? 'bg-green-200 border-green-400' : 'bg-red-200 border-red-400'}`}>
-                                    {formState.message}
-                                </div>
-                            ) : null
-                        } */}
                         <div className='flex justify-center flex-wrap gap-2 inline-block'>
                             {formState.errors._form 
                             ?   <div className='p-2 bg-red-200 border rouded border-red-400'>
@@ -118,7 +89,6 @@ export default function ItemBatchCreateForm({items, units} : ItemBatchCreateForm
                         </div>
                     </div>
                 </form>
-            {/* </div> */}
         </div>
     )
 }

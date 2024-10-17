@@ -10,11 +10,6 @@ import * as actions from '@/actions';
 import { Input, Select, SelectItem } from '@nextui-org/react'
 import { poolManagingType } from '@/types/app_types'
 
-interface Pool {
-    id: number,
-    name: string
-}
-
 type PoolInfoProps = {
     location: {
         id: number;
@@ -24,7 +19,14 @@ type PoolInfoProps = {
     },
     poolInfo: poolManagingType,
     
-    batches: itembatches[]
+    batches: {
+        id: bigint;
+        name: string;
+        items: {
+            id: number;
+            name: string;
+        };
+    }[]
 }
 
 export default function PoolInfoComponent({location, poolInfo, batches} : PoolInfoProps){

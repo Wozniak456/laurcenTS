@@ -2,6 +2,7 @@ import { db } from "@/db"
 import { notFound } from "next/navigation";
 import ItemBatchComponent from '@/components/FishBatch/batch-element'
 import { BatchWithCreationInfo } from '@/types/app_types'
+import * as actions from '@/actions'
 
 interface BatchesShowPageProps {
     params: {
@@ -11,20 +12,7 @@ interface BatchesShowPageProps {
 
 export default async function BatchesShowPage(props: BatchesShowPageProps){
     try{
-        let batch : BatchWithCreationInfo | null = await db.itembatches.findFirst({
-            select:{
-                id: true,
-                name: true,
-                created: true,
-                items:{
-                    select:{
-                        id: true,
-                        name: true
-                    }
-                }
-            },
-            where: { id: parseInt(props.params.id) }
-        })
+        let batch : BatchWithCreationInfo | undefined | null = await actions.getFishBatch(parseInt(props.params.id))
 
         if (!batch){
             notFound()

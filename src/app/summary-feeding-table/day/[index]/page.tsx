@@ -8,9 +8,9 @@ import * as stockingActions from "@/actions/stocking"
 import * as actions from '@/actions'
 
 import DaySummaryContent from "@/components/day-summary"
-import { start } from "repl";
+
 import ExportButton from "@/components/dayFeedingTableToPrint";
-import { badge } from "@nextui-org/react";
+
 
 interface DayFeedingProps {
   params: {

@@ -58,3 +58,13 @@ export { getWeekOfYear } from './crutial/getWeekOfTheYear'
 export { initialStocking } from './stocking/initialStocking'
 
 export { updateAccumulation } from './CRUD/accumulation/updateAccumulation'
+
+export { getAreas } from './crutial/getAreas'
+export { getPools } from './crutial/getPools'
+export { getCatfishBatches } from './crutial/getCatfishBatches'
+export { getFeeds } from './crutial/getFeedItems'
+export { getFeedBatches } from './crutial/getFeedBatches'
+export { getGenerations } from './crutial/getGenerations'
+export { getVendors } from './crutial/getVendors'
+
+export { getFishBatch } from './crutial/getFishBatch'

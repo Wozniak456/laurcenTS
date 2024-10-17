@@ -4,68 +4,28 @@ import { db } from "@/db"
 import * as actions from "@/actions"
 import * as stockingActions from '@/actions/stocking'
 
-
 //акумуляція по зїдженому корму та ціною корму
 export const getTotalAmount = async (generationId : bigint, itemId: number) => {
-    const data = await actions.getFeedAmountsAndNames(generationId);
+  
+  //дані про генерацію і всі корми  
+  const data = await actions.getFeedAmountsAndNames(generationId);
 
-    const amount =  data
-      .filter((entry) => entry.item_id === itemId)
-      .reduce((total, entry) => total + entry.total_amount, 0);
+  let amount = 0;
+  let price = 0;
+  
+  data.forEach((entry) => {
+    if (entry.item_id === itemId) {
+        amount += entry.total_amount;
 
-    const price = data
-      .filter((entry) => entry.item_id === itemId && entry.price !== null)
-      .reduce((total, entry) => total + (entry.price ?? 0) / 1000 * entry.total_amount, 0);
-
+        // Додаємо до ціни, якщо вона не null
+        if (entry.price !== null) {
+            price += (entry.price / 1000) * entry.total_amount;
+        }
+    }
+  });
+  
     return { amount, price };
 };
-
-//замінити на calculationForLocation
-// export async function getTodayCalculation(location_id : number, today : Date) : Promise<calculationAndFeed> {
-//   try{
-//     const calculation = await db.calculation_table.findFirst({
-//       where:{
-//         documents:{
-//           location_id: location_id
-//         },
-//         date: today
-//       },
-//       orderBy: {
-//         id: 'desc'
-//       }
-//     })
-  
-//     let feed_type
-//     let item
-    
-//     if (calculation){
-//       feed_type = await getFeedType(calculation.fish_weight)
-  
-//       if (feed_type){
-//         item = await getItemPerType(feed_type.id, location_id)
-//       }
-//     }
-
-//     return {
-//       calculation: calculation,
-//       feed: {
-//         type_id: feed_type?.id,
-//         type_name: feed_type?.name,
-//         item_id: item?.item_id,
-//         definedPrio: item?.definedPrio
-//       }
-//     }
-
-//   }
-//   catch(error){
-//     console.error("Error fetching batch data:", error);
-//     return {
-//       calculation: null,
-//       feed: undefined
-//   };
-//   }
-  
-// }
 
 const getLocationSummary = (async (location_id: number, today: Date) => {
   const todayCalc = await stockingActions.calculationForLocation(location_id, today.toISOString().split("T")[0]) 

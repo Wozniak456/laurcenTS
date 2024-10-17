@@ -2,8 +2,10 @@ import { db } from "@/db"
 import {calculationForLocation, poolInfo} from '@/actions/stocking'
 import React from "react";
 import Component111 from '@/components/Real111/111withInputs' 
-import {poolInfoType, poolManagingType} from '@/types/app_types'
+import { poolManagingType} from '@/types/app_types'
 import ExportButton from '@/components/111tableToPrint';
+
+import * as actions from '@/actions'
 
 interface LeftoversPerPeriodProps {
     params: {
@@ -26,19 +28,7 @@ export default async function LeftoversPerPeriod(props: LeftoversPerPeriodProps)
     try{
         const date = props.params.date
 
-        const areas = await db.productionareas.findMany({
-            include:{
-                productionlines:{
-                    include:{
-                        pools: {
-                            include:{
-                                locations: true
-                            }
-                        }
-                    }
-                }
-            }
-        })
+        const areas = await actions.getAreas()
 
         const data: DataItem[] = [];
 

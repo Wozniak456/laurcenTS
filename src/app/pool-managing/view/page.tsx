@@ -7,44 +7,14 @@ export const dynamic = 'force-dynamic'
 
 export default async function StockingHome() {
 
-  // await stockingActions.createCalcOver25(1230, 762, 0, BigInt(6658), '2024-09-20')
-  // await stockingActions.setTransitionDayForLocation(59)
-
-  // await stockingActions.createCalcOver25(1230, 762, 0, BigInt(6658), '2024-09-20')
-  // await stockingActions.setTransitionDayForLocation(59)
-
   const today = new Date()
-  const areas = await db.productionareas.findMany({
-    include:{
-      productionlines:{
-        include:{
-          pools: {
-            include:{
-              locations: true
-            }
-          }
-        }
-      }
-    }
-  })
 
-  const locations = await db.locations.findMany({
-    where:{
-      location_type_id: 2
-    }
-  })
+  const areas = await actions.getAreas()
 
-  const batches = await db.itembatches.findMany({
-    include:{
-      items: true
-    },
-    where:{
-      items:{
-        item_type_id: 1
-      }
-    }
-  })
+  const locations = await actions.getPools()
 
+  const batches = await actions.getCatfishBatches()
+  
   const disposal_reasons = await db.disposal_reasons.findMany()
 
   const weekNum = actions.getWeekOfYear(today)
@@ -67,14 +37,16 @@ export default async function StockingHome() {
                 const numB = parseInt(b.name.split('/')[0].slice(1)); // відкидаємо перший символ "Б" і перетворюємо на число
                 return numA - numB; 
               })
+
               .map(pool => (
                 pool.locations.map(async loc => {
 
+                  //інформація про басейн на момент дати на компютері
                   let poolInfo = await stockingActions.poolInfo(loc.id, today.toISOString().split("T")[0])
 
                   poolInfo = {
                     ...poolInfo,
-                    wasFetchedThisWeek : await getLastFetch(loc.id, weekNum)
+                    wasFetchedThisWeek : await wasFetchedThisWeek(loc.id, weekNum)
                   }
 
                   return(
@@ -94,7 +66,7 @@ export default async function StockingHome() {
 }
 
 
-async function getLastFetch (location_id: number, weekNum: number){
+async function wasFetchedThisWeek (location_id: number, weekNum: number){
   const fetch = await db.fetching.findMany({
     include:{
       itemtransactions:{

@@ -6,7 +6,6 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextu
 import EditAccumulation from "./accu-editing-modal";
 import ExportButton from "./accumulationTableToPrint";
 
-
 interface StockingTableProps {
   pools: PoolType[],
   vendors: Vendor[],

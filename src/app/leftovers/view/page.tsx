@@ -3,23 +3,6 @@ import Link from "next/link";
 import { ChangeEvent, useEffect, useState } from "react";
 import Header from '@/components/header'
 import { Button } from "@nextui-org/react";
-// interface DataItem{
-//   batch_id: string;
-//   batch_name: string;
-//   feed_type_name: string,
-//   item_name: string,
-//   start_saldo: number;
-//   incoming: number;
-//   outcoming: number;
-//   end_saldo: number;
-// }
-
-// interface FilterableTableProps {
-//    data: DataItem[],
-//    start: Date | undefined,
-//    end: Date | undefined
-// }
-
 
 export default function FilterableTable() {
     const [StartSaldoDate, setStartSaldoDate] = useState<string | undefined>(undefined);

@@ -8,15 +8,12 @@ import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDis
 interface BatchesComponentProps {
   batches: {
     id: bigint;
-    name: string,
+    name: string;
     items: {
         id: number;
-        units: {
-            name: string;
-        } | null;
         name: string;
     };
-  }[],
+}[]
   items: {
     id: number;
     name: string;
@@ -60,12 +57,6 @@ export default function BatchesComponent({batches, items, units} : BatchesCompon
         </ModalContent>
       </Modal>
       </div>
-
-      {/* <div className='flex justify-end'>
-        <Link href="/batches/new" className="border p-2 rounded">
-        Додати партію
-        </Link>
-      </div> */}
       
       <div className="p-6">
           <div>

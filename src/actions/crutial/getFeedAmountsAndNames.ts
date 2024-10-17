@@ -30,7 +30,10 @@ type feedAmounts = ({
 })[]
 
 export async function getFeedAmountsAndNames( ancestorId: bigint, prisma?: any): Promise<GroupedResult[]> {
+    
     const activeDb = prisma || db;
+
+    //витягнути дані про кількості та партії корму, що зїла генерація
     const feedAmounts : feedAmounts = await activeDb.generation_feed_amount.findMany({
         where: {
             batch_generation_id: ancestorId,

@@ -9,7 +9,14 @@ import { itembatches } from "@prisma/client";
 
 interface ActualizationPageProps{
     poolInfo: poolManagingTypeExtended,
-    batches: itembatches[],
+    batches: {
+        id: bigint;
+        name: string;
+        items: {
+            id: number;
+            name: string;
+        };
+    }[],
     feeds: {
         id: number;
         name: string;

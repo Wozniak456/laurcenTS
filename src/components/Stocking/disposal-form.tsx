@@ -15,16 +15,11 @@ interface DisposalFormPageProps {
         pool_id: number | null;
     },
     poolInfo: poolManagingType,
-    setShowDisposalForm : React.Dispatch<React.SetStateAction<boolean>>;
     reasons: disposalItem[]
 }
 
-export default function DisposalFormPage({location, poolInfo, setShowDisposalForm, reasons} : DisposalFormPageProps) {
+export default function DisposalFormPage({location, poolInfo, reasons} : DisposalFormPageProps) {
     const [selectedReason, setSelectedReason] = useState<number | undefined>(undefined)
-
-    const handleCloseForm = () => {
-        setShowDisposalForm(false)
-    }
 
     function handleReasonChange(reason_id: any){
         setSelectedReason(reason_id)

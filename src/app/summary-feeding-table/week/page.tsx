@@ -53,8 +53,6 @@ export default async function WeekSummary() {
 
                       const poolInfo = await stockingActions.calculationForLocation(pool.locations[0].id, now.toISOString().split("T")[0])
                       
-                      // console.log(`pool: ${pool.name}, poolInfo: ${poolInfo} `)
-
                       return(
                         <th key={pool.id} className="px-4 py-2 border border-gray-400 text-center bg-blue-100 text-sm">
                             {poolInfo?.feed.type_name}

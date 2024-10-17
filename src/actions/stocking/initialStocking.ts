@@ -15,17 +15,9 @@ export async function initialStocking(
         let location_id_from : number = parseInt(formData.get('location_id_from') as string);
       
         const location_id_to: number = parseInt(formData.get('location_id_to') as string);
-        const batch_id_from: number = parseInt(formData.get('batch_id') as string);
-        // let batch_id_to: number = parseInt(formData.get('batch_id_to') as string);
-        const stocking_quantity: number = parseInt(formData.get('fish_amount') as string);
-        // let quantity_in_location_to: number = parseInt(formData.get('fish_amount_in_location_to') as string);
-        // const fish_qty_in_location_from : number = parseInt(formData.get('fish_qty_in_location_from') as string);
-        const average_weight_str = formData.get('average_fish_mass') as string;
-        const average_weight = parseFloat(average_weight_str.replace(',', '.'));
-
+        
         const executed_by = 3 
-        const comments: string = formData.get('comments') as string;
-
+       
         await stockPool(formState, formData)
 
         const feeds = await db.items.findMany({
@@ -136,14 +128,6 @@ async function oneFeeding (props : feedingProps) {
                 })
 
                 console.log('latestGeneration', latestGeneration)
-
-                const record = await db.generation_feed_amount.create({
-                    data:{
-                        batch_generation_id: latestGeneration?.id as bigint,
-                        feed_batch_id: batch.batch_id,
-                        amount: props.qty
-                    }
-                })
 
                 console.log(`Витягнули зі складу: ${fetchTran.id} і вкинули в басейн: ${feedTran.id}`)
                 // console.log(`Собівартість змінилася, ${cost_record}`)

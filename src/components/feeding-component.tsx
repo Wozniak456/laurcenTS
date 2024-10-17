@@ -26,7 +26,14 @@ interface StockPoolProps {
         name: string;
         pool_id: number | null;
     },
-    batches: itembatches[],
+    batches: {
+        id: bigint;
+        name: string;
+        items: {
+            id: number;
+            name: string;
+        };
+    }[],
     poolInfo: poolManagingType | undefined,
     disposal_reasons: disposalItem[],
     weekNum: number
@@ -34,7 +41,6 @@ interface StockPoolProps {
 
 export default function StockPoolPage({location, locations, batches, poolInfo, disposal_reasons, weekNum}: StockPoolProps) {
     const [showPartitionForm, setShowPartitionForm] = useState(false);
-    const [showDisposalForm, setShowDisposalForm] = useState(false);
     const {isOpen, onOpen, onClose} = useDisclosure();
     
     const [formState, action] = useFormState(actions.stockPool, { message: '' });
@@ -119,7 +125,7 @@ export default function StockPoolPage({location, locations, batches, poolInfo, d
                                 <>
                                 <ModalHeader className="flex flex-col gap-1">Списання</ModalHeader>
                                 <ModalBody>
-                                    <DisposalForm location={location} poolInfo={poolInfo} reasons={disposal_reasons} setShowDisposalForm={setShowDisposalForm}/>
+                                    <DisposalForm location={location} poolInfo={poolInfo} reasons={disposal_reasons}/>
                                 </ModalBody>
                                 <ModalFooter>
                                     
