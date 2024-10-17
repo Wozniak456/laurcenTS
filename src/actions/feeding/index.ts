@@ -155,8 +155,6 @@ export const getAllSummary = async (lines: locationForFeedWeight, today: Date) =
     })
   );
 
-  console.log('locationSummary', locationSummary)
-
   return locationSummary;
 };
 

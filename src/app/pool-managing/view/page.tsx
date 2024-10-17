@@ -6,6 +6,13 @@ import * as actions from '@/actions'
 export const dynamic = 'force-dynamic'
 
 export default async function StockingHome() {
+
+  // await stockingActions.createCalcOver25(1230, 762, 0, BigInt(6658), '2024-09-20')
+  // await stockingActions.setTransitionDayForLocation(59)
+
+  // await stockingActions.createCalcOver25(1230, 762, 0, BigInt(6658), '2024-09-20')
+  // await stockingActions.setTransitionDayForLocation(59)
+
   const today = new Date()
   const areas = await db.productionareas.findMany({
     include:{

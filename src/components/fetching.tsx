@@ -16,21 +16,7 @@ interface FetchingFormProps{
         name: string;
         pool_id: number | null;
     },
-    poolInfo: {
-        batch: {
-            id: bigint;
-            name: string;
-        } | undefined;
-        qty: number | undefined;
-        fishWeight: number | undefined;
-        feedType: {
-            id: number;
-            name: string;
-            feedconnection_id: number | null;
-        } | null | undefined;
-        updateDate: string | undefined;
-        allowedToEdit: boolean;
-    },
+    poolInfo: poolManagingType,
     locations: {
         id: number;
         name: string;

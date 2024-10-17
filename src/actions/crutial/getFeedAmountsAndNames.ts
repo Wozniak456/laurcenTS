@@ -12,8 +12,26 @@ type GroupedResult = {
     price: number | null
 };
 
-export async function getFeedAmountsAndNames( ancestorId: bigint): Promise<GroupedResult[]> {
-    const feedAmounts = await db.generation_feed_amount.findMany({
+type feedAmounts = ({
+    feed_batches: {
+        items: {
+            id: number;
+            feed_type_id: number | null;
+            vendor_id: number | null;
+        };
+        name: string;
+        price: number | null;
+    };
+} & {
+    id: bigint;
+    batch_generation_id: bigint;
+    feed_batch_id: bigint;
+    amount: number;
+})[]
+
+export async function getFeedAmountsAndNames( ancestorId: bigint, prisma?: any): Promise<GroupedResult[]> {
+    const activeDb = prisma || db;
+    const feedAmounts : feedAmounts = await activeDb.generation_feed_amount.findMany({
         where: {
             batch_generation_id: ancestorId,
         },

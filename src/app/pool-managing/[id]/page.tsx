@@ -22,7 +22,7 @@ export default async function PoolManagingShowPage(props: PoolManagingShowPagePr
 
         const today = new Date()
 
-        let poolInfo : poolManagingTypeExtended = await stockingActions.poolInfo(parseInt(props.params.id), today.toISOString().split("T")[0])
+        let poolInfo : poolManagingTypeExtended | undefined = await stockingActions.poolInfo(parseInt(props.params.id), today.toISOString().split("T")[0])
 
         poolInfo = {
             ...poolInfo,

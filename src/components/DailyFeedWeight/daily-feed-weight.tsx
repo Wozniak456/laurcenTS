@@ -71,16 +71,16 @@ export default async function DailyFeedWeight({lines, summary, items, date}: Dai
                 let prevCalcExtended: calculationAndFeedExtended | undefined;
 
                 if (isPoolFilled) {
-                    const todayCalc: calculationAndFeed = await stockingActions.calculationForLocation(loc.id, date);
+                    const todayCalc: calculationAndFeed | undefined = await stockingActions.calculationForLocation(loc.id, date);
 
-                    if (todayCalc.feed && todayCalc.feed.type_id) {
+                    if (todayCalc?.feed && todayCalc.feed.type_id) {
                         todayCalcExtended = {
                             ...todayCalc,
                             allItems: await actions.getAllItemsForFeedType(todayCalc.feed.type_id)
                         };
                     }
 
-                    if (todayCalc.calc?.transition_day) {
+                    if (todayCalc?.calc?.transition_day) {
                         const prevCalc = await stockingActions.getPrevCalc(loc.id, todayCalc);
 
                         if (prevCalc && prevCalc.calc && prevCalc.feed?.type_id) {
@@ -170,8 +170,6 @@ export default async function DailyFeedWeight({lines, summary, items, date}: Dai
             }
         });
     });
-
-    console.log('aggregatedData', aggregatedData);
 
     return(
         <>

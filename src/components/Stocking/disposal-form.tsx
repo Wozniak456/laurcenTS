@@ -3,7 +3,7 @@
 import * as actions from '@/actions';
 import { useFormState } from 'react-dom';
 import { useState } from 'react';
-import { disposalItem } from '@/types/app_types'
+import { disposalItem, poolManagingType } from '@/types/app_types'
 import { Input, Select, SelectItem } from '@nextui-org/react';
 import FormButton from '../common/form-button';
 
@@ -14,21 +14,7 @@ interface DisposalFormPageProps {
         name: string;
         pool_id: number | null;
     },
-    poolInfo: {
-        batch: {
-            id: bigint;
-            name: string;
-        } | undefined;
-        qty: number | undefined;
-        fishWeight: number | undefined;
-        feedType: {
-            id: number;
-            name: string;
-            feedconnection_id: number | null;
-        } | null | undefined;
-        updateDate: string | undefined;
-        allowedToEdit: boolean;
-    },
+    poolInfo: poolManagingType,
     setShowDisposalForm : React.Dispatch<React.SetStateAction<boolean>>;
     reasons: disposalItem[]
 }

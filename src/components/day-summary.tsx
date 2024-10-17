@@ -63,30 +63,33 @@ export default function DaySummaryContent({
     
     const transitionDay = todayCalculation?.calc?.transition_day
 
-    let initialValues : itemAndTime[] = times.map((timeValue) => 
+    let initialValues: itemAndTime[] = times.map((timeValue) => 
       transitionDay && todayCalculation?.calc?.feed_per_feeding
         ? {
-          item: (todayCalculation.calc.feed_per_feeding * (1 - transitionDay * 0.2)).toFixed(1),
-          time: timeValue.time
-        } ?? null
-        : {item: todayCalculation?.calc?.feed_per_feeding.toFixed(1),
-          time: timeValue.time
-        } ?? null
+            item: (todayCalculation.calc.feed_per_feeding * (1 - transitionDay * 0.2)).toFixed(1),
+            time: timeValue.time
+          }
+        : {
+            item: todayCalculation?.calc?.feed_per_feeding.toFixed(1),
+            time: timeValue.time
+          }
     );
+    
 
-    if (transitionDay && prevCalculation?.calc){
+    if (transitionDay && prevCalculation?.calc) {
       initialValues = [
         ...initialValues,
         ...times.map((timeValue) =>
           todayCalculation?.calc?.feed_per_feeding
-            ? {item: (todayCalculation?.calc?.feed_per_feeding * (transitionDay * 0.2)).toFixed(1),
-              time: timeValue.time
-            } ?? null
+            ? {
+                item: (todayCalculation.calc.feed_per_feeding * (transitionDay * 0.2)).toFixed(1),
+                time: timeValue.time
+              }
             : null
         )
       ];
-
     }
+    
   
   const [inputValues, setInputValues] = useState<itemAndTime[]>(initialValues);
   

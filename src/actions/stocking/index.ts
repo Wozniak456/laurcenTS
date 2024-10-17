@@ -1,6 +1,6 @@
 'use server'
 import { db } from "@/db";
-import { calculation_table } from "@prisma/client";
+import { calculation_table, Prisma } from "@prisma/client";
 import * as actions from '@/actions'
 import { calculationAndFeed, poolManagingType } from "@/types/app_types";
 
@@ -10,7 +10,14 @@ export async function calculationForLocation(location_id : number, date: string)
   let calc = null
   let feed_type
   let item
-  
+
+  //знаходимо стан басейну. чи там щось є на цю дату
+
+  batch = await getBatchesInfo(location_id, date)
+
+  if (!batch.qty)
+      return
+
   calc = await db.calculation_table.findFirst({
     where:{
       documents:{
@@ -27,7 +34,6 @@ export async function calculationForLocation(location_id : number, date: string)
   //приймаємо рішення чи показуватимемо кнопку редагування на /pool-managing/view
 
   if(calc){
-    batch = await getBatchesInfo(location_id)
     feed_type = await getFeedType(calc.fish_weight)
 
     if (feed_type){
@@ -76,11 +82,12 @@ export async function calculationForLocation(location_id : number, date: string)
 
 
 export const poolInfo = async (location_id: number, date: string)
-: Promise<poolManagingType> => {
+: Promise<poolManagingType | undefined> => {
   const dateValue = new Date(date)
 
   dateValue.setUTCHours(23, 59, 59, 999);
 
+  // console.log('data for lastStocking:', `location_id:${location_id}, date: ${date}`)
   const lastStocking = await db.documents.findFirst({
       select:{
           date_time: true,
@@ -120,11 +127,10 @@ export const poolInfo = async (location_id: number, date: string)
       take: 1
   })
 
-
   let feedType
 
   if (lastStocking){
-      feedType = await getFeedType(lastStocking?.stocking[0].average_weight)
+      feedType = await getFeedType(lastStocking.stocking[0]?.average_weight)
   }
 
   const batch = lastStocking?.itemtransactions[0]?.itembatches
@@ -145,23 +151,26 @@ export const poolInfo = async (location_id: number, date: string)
       allowedToEdit = true
     }
   }
-  
-  return({batch, qty, fishWeight, feedType, updateDate, allowedToEdit})
+  if (qty){
+    return({batch, qty, fishWeight, feedType, updateDate, allowedToEdit})
+  }
+
 }
 
 //встановлюємо перехід на новий корм
-export async function setTransitionDayForLocation(location_id: number){
+export async function setTransitionDayForLocation(location_id: number, prisma?: any){
+    const activeDb = prisma || db;
     
-    const records = await get14CalculationForPool(location_id)
+    const records = await get14CalculationForPool(location_id, prisma)
     
     if (records){
-      let currType = await getFeedType(records[0].fish_weight)
+      let currType = await getFeedType(records[0].fish_weight, prisma)
       let dayIndex = 0
 
       for (let i = 1; i < records.length; i++) {
 
         if (dayIndex > 0 && dayIndex <= 4){
-          await db.calculation_table.update({
+          await activeDb.calculation_table.update({
             where:{
               id: records[i].id
             },
@@ -174,12 +183,12 @@ export async function setTransitionDayForLocation(location_id: number){
           continue;
         }
 
-        const feedType = await getFeedType(records[i].fish_weight);
+        const feedType = await getFeedType(records[i].fish_weight, prisma);
         
         if (feedType?.id !== currType?.id){
             currType = feedType
 
-            await db.calculation_table.update({
+            await prisma.calculation_table.update({
               where:{
                 id: records[i].id
               },
@@ -195,10 +204,11 @@ export async function setTransitionDayForLocation(location_id: number){
   }  
 }
   
-export async function getFeedType(fish_weight : number | undefined) {
+export async function getFeedType(fish_weight : number | undefined, prisma?: any) {
+  const activeDb = prisma || db;
     if(fish_weight !== undefined){
       
-      const startFeedType = await db.feedtypes.findFirst({
+      const startFeedType = await activeDb.feedtypes.findFirst({
         where:{
           feedconnections:{
             from_fish_weight:{
@@ -215,8 +225,16 @@ export async function getFeedType(fish_weight : number | undefined) {
     }
 }
   
-export async function get14CalculationForPool(location_id : number) {
-    const calc_table_ids = await db.calculation_table.groupBy({
+type CalcTableIds = (Prisma.PickEnumerable<Prisma.Calculation_tableGroupByOutputType, "date"[]> & {
+  _max: {
+      id: number | null;
+  };
+})[]
+
+export async function get14CalculationForPool(location_id : number, prisma?: any) {
+  const activeDb = prisma || db;
+  
+    const calc_table_ids: CalcTableIds = await activeDb.calculation_table.groupBy({
       by: ['date'],
       _max: {
         id: true,
@@ -232,7 +250,7 @@ export async function get14CalculationForPool(location_id : number) {
       take: 14
     });
   
-    const calc_table14 = await db.calculation_table.findMany({
+    const calc_table14 : calculation_table[] = await activeDb.calculation_table.findMany({
       where:{
         id: {
           in: calc_table_ids.map(record => Number(record._max.id))
@@ -246,28 +264,42 @@ export async function get14CalculationForPool(location_id : number) {
     return calc_table14
 }
 
-export async function getBatchesInfo(location_id : number){
+export async function getBatchesInfo(location_id : number, date: string){
 
-  const batch  = await db.itemtransactions.findFirst({
-    include:{
-      itembatches: true
-    },
-    where:{
-      location_id : location_id,
-      documents:{
-        doc_type_id: 1
+  const batch = await db.documents.findFirst({
+      select:{
+          itemtransactions:{
+              select:{
+                  itembatches:{
+                      select:{
+                          id: true,
+                          name: true
+                      }
+                  },
+                  quantity: true
+              },
+              where:{
+                  location_id: location_id
+              }
+          },
+          
+      },
+      where:{
+          doc_type_id: 1,
+          date_time:{
+              lte: new Date(date)
+          },
+          itemtransactions: { some: { location_id: location_id } } // фільтрація транзакцій
+      },
+      orderBy: {
+          id: 'desc'
       }
-    },
-    orderBy:{
-      id: 'desc'
-    }
-  });
-  
+  })
 
   const result = {
-    batch_name: batch?.itembatches.name,
-    batch_id: batch?.batch_id,
-    qty: batch?.quantity as number
+    batch_name: batch?.itemtransactions[0].itembatches.name,
+    batch_id: batch?.itemtransactions[0].itembatches.id,
+    qty: batch?.itemtransactions[0].quantity
   }
 
   return result
@@ -275,7 +307,8 @@ export async function getBatchesInfo(location_id : number){
 
 //можливо обєднати stockingInfo і getBatchesInfo
 
-export async function createCalcBelow25(fishAmount: number, averageFishMass: number, percentage: number, docId: bigint) {
+export async function createCalcBelow25(fishAmount: number, averageFishMass: number, percentage: number, docId: bigint, prisma?: any) {
+  const activeDb = prisma || db;
     
   const numberOfRecords = 10;
   const day = Array.from({ length: numberOfRecords }, (_, i) => i + 1);
@@ -302,7 +335,7 @@ export async function createCalcBelow25(fishAmount: number, averageFishMass: num
   fishWeight[0] = generalWeight[0] / fishAmountInPool[0];
 
   for (let i = 0; i < day.length - 1; i++) {
-      const fcQuery = await db.datatable_below25.findFirst({
+      const fcQuery = await activeDb.datatable_below25.findFirst({
           where: {
               weight: {
                   lte: fishWeight[i],
@@ -318,7 +351,7 @@ export async function createCalcBelow25(fishAmount: number, averageFishMass: num
           totalWeight[i] = generalWeight[i] + feedQuantity[i] / vC[i];
           weightPerFish[i] = totalWeight[i] / fishAmountInPool[i];
 
-          const feedingLevelQuery = await db.datatable_below25.findFirst({
+          const feedingLevelQuery = await activeDb.datatable_below25.findFirst({
               where: {
                   weight: {
                       lte: weightPerFish[i],
@@ -338,9 +371,10 @@ export async function createCalcBelow25(fishAmount: number, averageFishMass: num
               feedQuantity[i + 1] = feedPerDay[i];
           }
       }
+      
   }
 
-  const fcQuery = await db.datatable_below25.findFirst({
+  const fcQuery = await activeDb.datatable_below25.findFirst({
       where: {
           weight: {
               lte: fishWeight[fishWeight.length - 1],
@@ -356,7 +390,7 @@ export async function createCalcBelow25(fishAmount: number, averageFishMass: num
       totalWeight[totalWeight.length - 1] = generalWeight[generalWeight.length - 1] + feedQuantity[feedQuantity.length - 1] / vC[vC.length - 1];
       weightPerFish[weightPerFish.length - 1] = totalWeight[totalWeight.length - 1] / fishAmountInPool[fishAmountInPool.length - 1];
 
-      const feedingLevelQuery = await db.datatable_below25.findFirst({
+      const feedingLevelQuery = await activeDb.datatable_below25.findFirst({
           where: {
               weight: {
                   lte: weightPerFish[weightPerFish.length - 1],
@@ -375,7 +409,7 @@ export async function createCalcBelow25(fishAmount: number, averageFishMass: num
   }
   let dataForTable: calculation_table[] = []
   for (let i = 0; i < day.length; i++) {
-      const record = await db.calculation_table.create({
+      const record = await activeDb.calculation_table.create({
           data: {
               day: day[i],
               date: date[i],
@@ -394,6 +428,7 @@ export async function createCalcBelow25(fishAmount: number, averageFishMass: num
       }); 
       dataForTable.push(record)
   }
+
   try {
       return dataForTable
   } catch (error) {
@@ -402,16 +437,17 @@ export async function createCalcBelow25(fishAmount: number, averageFishMass: num
   }
 }
 
-export async function createCalcOver25(fishAmount: number, averageFishMass: number, percentage: number, docId: bigint) {
-  console.log('createCalcOver25')
-  console.log(`${fishAmount}, ${averageFishMass}, ${percentage}, ${docId}`)
+export async function createCalcOver25(fishAmount: number, averageFishMass: number, percentage: number, docId: bigint, date?: string, prisma?: any) {
+  const activeDb = prisma || db;
+  const activeDate = date ? new Date(date) : new Date()
+  
   try {
 
       const numberOfRecords = 10;
       const day = Array.from({ length: numberOfRecords }, (_, i) => i + 1);
 
       const date = Array.from({ length: numberOfRecords }, (_, i) => {
-          const currentDate = new Date();
+          const currentDate = new Date(activeDate);;
           currentDate.setDate(currentDate.getDate() + i + 1);
           return currentDate;
       });
@@ -439,7 +475,7 @@ export async function createCalcOver25(fishAmount: number, averageFishMass: numb
 
           fishWeight[i] = generalWeight[i]/fishAmountInPool[i] * 1000
 
-          const fcrQuery = await db.datatable_over25.findFirst({
+          const fcrQuery = await activeDb.datatable_over25.findFirst({
               where: {
                   av_weight: {
                       lte: fishWeight[i],
@@ -458,7 +494,7 @@ export async function createCalcOver25(fishAmount: number, averageFishMass: numb
 
           gesch_gewicht[i] = gesch_bezetting[i] / ((100 - gesch_uitval[i])/100*fishAmountInPool[i])*1000
 
-          feedQuery = await db.datatable_over25.findFirst({
+          feedQuery = await activeDb.datatable_over25.findFirst({
               where: {
                   av_weight: {
                       lte: gesch_gewicht[i],
@@ -478,7 +514,7 @@ export async function createCalcOver25(fishAmount: number, averageFishMass: numb
       }    
 
       for (let i = 0; i < day.length; i++) {
-          const record = await db.calculation_table.create({
+          const record = await activeDb.calculation_table.create({
               data: {
                   day: day[i],
                   date: date[i],
@@ -492,17 +528,18 @@ export async function createCalcOver25(fishAmount: number, averageFishMass: numb
               },
           }); 
       }
+
   } catch (error) {
       throw new Error('Error creating calculation table');
   }
 }
 
 //отримання калькуляції до попереднього корму
-export async function getPrevCalc(location_id : number, calc : calculationAndFeed | null) {
+export async function getPrevCalc(location_id : number, calc : calculationAndFeed | undefined) {
   const records14 = await get14CalculationForPool(location_id)
 
   if (calc !== null){
-    let index = records14.findIndex(record => record.id === calc.calc?.id)
+    let index = records14.findIndex(record => record.id === calc?.calc?.id)
 
     while(true){
       if( index <= 0){

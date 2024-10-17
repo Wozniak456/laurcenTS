@@ -10,6 +10,7 @@ import * as actions from '@/actions'
 import DaySummaryContent from "@/components/day-summary"
 import { start } from "repl";
 import ExportButton from "@/components/dayFeedingTableToPrint";
+import { badge } from "@nextui-org/react";
 
 interface DayFeedingProps {
   params: {
@@ -43,13 +44,13 @@ interface feedingInfo{
 }
 
 export default async function DayFeeding(props: DayFeedingProps) {
-    const today = props.params.index;
 
-    // console.log('today', today)
+    const today = props.params.index;
 
     const currentDate: Date = new Date();
     
     let dates = [];
+
 
     for (let i = -6; i <= 2; i++) {
       let newDate = new Date();
@@ -86,8 +87,6 @@ export default async function DayFeeding(props: DayFeedingProps) {
 
     const summary = await feedingActions.getAllSummary(lines, currentDate)
 
-    
-
     const feedingForLocation = async (locationId: number) => {
         const startOfDay = new Date(today);
         const endOfDay = new Date(today);
@@ -112,7 +111,7 @@ export default async function DayFeeding(props: DayFeedingProps) {
     for (const line of lines) {
         for (const pool of line.pools) {
             for (const loc of pool.locations) {
-                const isPoolFilled = await actions.isFilled(loc.id);
+                const isPoolFilled = await actions.isFilled(loc.id, today);
                 let prevCalc = null;
 
                 let locationInfo: LocationInfo = {
@@ -126,7 +125,7 @@ export default async function DayFeeding(props: DayFeedingProps) {
                 if (isPoolFilled) {
                     todayCalc = await stockingActions.calculationForLocation(loc.id, today);
 
-                    if (todayCalc.calc?.transition_day !== null) {
+                    if (todayCalc?.calc?.transition_day !== null) {
                         prevCalc = await stockingActions.getPrevCalc(loc.id, todayCalc);
                     }
 
@@ -220,11 +219,6 @@ export default async function DayFeeding(props: DayFeedingProps) {
                         }
                     );
                 }
-                
-
-
-
-                // console.log(todayCalc?.feed.item_name)
             }
         }
     }
@@ -279,7 +273,7 @@ export default async function DayFeeding(props: DayFeedingProps) {
                 {line.pools.map(pool => {
                     return Promise.all(pool.locations.map(async loc => {
                     
-                    const isPoolFilled = await actions.isFilled(loc.id)
+                    const isPoolFilled = await actions.isFilled(loc.id, today)
 
                     let prevCalc = null;
 
@@ -289,14 +283,14 @@ export default async function DayFeeding(props: DayFeedingProps) {
                         fed_today: await feedingForLocation(loc.id)
                     };
 
-                    // console.log(locationInfo)
-
                     let todayCalc
 
                     if(isPoolFilled === true){
                         todayCalc = await stockingActions.calculationForLocation(loc.id, today);
+
+                        // console.log(loc.name, todayCalc)
                 
-                        if (todayCalc.calc?.transition_day !== null){
+                        if (todayCalc?.calc?.transition_day !== null){
                         prevCalc = await stockingActions.getPrevCalc(loc.id, todayCalc);
                         }
             
@@ -313,13 +307,13 @@ export default async function DayFeeding(props: DayFeedingProps) {
                     return (
                         <>
                             <DaySummaryContent
-                            key={loc.id}
-                            location={locationInfo} 
-                            today={today}
-                            todayCalculation={todayCalc} 
-                            prevCalculation={prevCalc} 
-                            times={times}
-                            items={items}
+                                key={loc.id}
+                                location={locationInfo} 
+                                today={today}
+                                todayCalculation={todayCalc} 
+                                prevCalculation={prevCalc} 
+                                times={times}
+                                items={items}
                             />
                             
                         </>

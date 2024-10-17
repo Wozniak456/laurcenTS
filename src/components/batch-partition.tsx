@@ -7,7 +7,7 @@ import deleteImg from '../../public/icons/delete.svg'
 import Image from 'next/image';
 import FormButton from './common/form-button';
 import { Button, Input, Select, SelectItem } from '@nextui-org/react';
-
+import { poolManagingType } from '@/types/app_types'
 interface PartitionFormPageProps {
     location: {
         id: number;
@@ -15,21 +15,7 @@ interface PartitionFormPageProps {
         name: string;
         pool_id: number | null;
     },
-    poolInfo: {
-        batch: {
-            id: bigint;
-            name: string;
-        } | undefined;
-        qty: number | undefined;
-        fishWeight: number | undefined;
-        feedType: {
-            id: number;
-            name: string;
-            feedconnection_id: number | null;
-        } | null | undefined;
-        updateDate: string | undefined;
-        allowedToEdit: boolean;
-    },
+    poolInfo: poolManagingType | undefined,
     locations: location[]
 }
 
@@ -71,10 +57,10 @@ export default function PartitionFormPage({location, poolInfo, locations} : Part
             <div className="mb-4 flex flex-col items-center">
                 <div className='flex flex-col my-4'>
                     <p className="font-semibold text-base mb-8">Басейни для розподілу:</p>
-                    <input type="hidden" name="batch_id_from" value={String(poolInfo.batch?.id)} />
-                    <input type="hidden" name="fish_qty_in_location_from" value={poolInfo.qty} />
+                    <input type="hidden" name="batch_id_from" value={String(poolInfo?.batch?.id)} />
+                    <input type="hidden" name="fish_qty_in_location_from" value={poolInfo?.qty} />
                     {/* яка попередня сер вага */}
-                    <input type="hidden" name="old_average_fish_mass" value={poolInfo.fishWeight} /> 
+                    <input type="hidden" name="old_average_fish_mass" value={poolInfo?.fishWeight} /> 
                     
                     {selectedPools.map((selectedPoolId, index) => {
                         

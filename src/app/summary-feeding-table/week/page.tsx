@@ -51,11 +51,13 @@ export default async function WeekSummary() {
                     <th className="px-4 py-2 border border-gray-400 text-center bg-blue-100 text-sm">Корм &rarr;</th>
                     {line.pools.map(async pool => {
 
-                      const poolInfo = await stockingActions.poolInfo(pool.locations[0].id, now.toISOString().split("T")[0])
+                      const poolInfo = await stockingActions.calculationForLocation(pool.locations[0].id, now.toISOString().split("T")[0])
+                      
+                      // console.log(`pool: ${pool.name}, poolInfo: ${poolInfo} `)
 
                       return(
                         <th key={pool.id} className="px-4 py-2 border border-gray-400 text-center bg-blue-100 text-sm">
-                            {poolInfo.feedType?.name}
+                            {poolInfo?.feed.type_name}
                         </th>
                       )
                         
@@ -75,13 +77,12 @@ export default async function WeekSummary() {
                         <td className="px-4 py-2 border border-gray-400 text-center font-normal whitespace-nowrap text-sm">{date.toISOString().split("T")[0]}</td>
                         {line.pools.map(async (pool, poolIndex) => {
 
+                          // console.log(pool.locations[0].id, date.toISOString().split("T")[0])
                           const calc = await stockingActions.calculationForLocation(pool.locations[0].id, date.toISOString().split("T")[0])
-
-                          // console.log(calc)
 
                           return(
                             <td key={poolIndex} className="px-4 py-2 border border-gray-400 text-center font-normal text-sm">
-                              {calc.calc?.feed_per_feeding.toFixed(0)}
+                              {calc?.calc?.feed_per_feeding.toFixed(0)}
                             </td>
                           )
                           

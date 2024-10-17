@@ -27,7 +27,7 @@ interface StockPoolProps {
         pool_id: number | null;
     },
     batches: itembatches[],
-    poolInfo: poolManagingType,
+    poolInfo: poolManagingType | undefined,
     disposal_reasons: disposalItem[],
     weekNum: number
 }
@@ -45,13 +45,13 @@ export default function StockPoolPage({location, locations, batches, poolInfo, d
                 <h2 className="font-bold">Локація: {location.name}</h2>
             </div> 
             
-            {poolInfo.qty && poolInfo.qty > 0 ? <PoolInfo location={location} poolInfo={poolInfo} batches={batches}/> : ''}
+            {poolInfo?.qty && poolInfo.qty > 0 ? <PoolInfo location={location} poolInfo={poolInfo} batches={batches}/> : ''}
             
             <form className="container mx-auto m-4 " action={action}>
                 <div className="flex justify-center flex-col gap-4 ">
                     <input type="hidden" name="location_id_from" value={87} />
                     <input type="hidden" name="location_id_to" value={location.id} />
-                    {(!poolInfo.batch || poolInfo.qty == 0) && 
+                    {(!poolInfo?.batch || poolInfo.qty == 0) && 
                     <div className="flex flex-wrap items-center gap-4 justify-between">
                     <div className='w-full sm:w-1/3'>
                         <Select 
@@ -93,13 +93,13 @@ export default function StockPoolPage({location, locations, batches, poolInfo, d
                         </div>
                     </div>}
                     <div className="flex flex-wrap gap-4 justify-end">
-                        {(!poolInfo.batch || poolInfo.qty==0) &&
+                        {(!poolInfo?.batch || poolInfo.qty==0) &&
                         <FormButton color="primary">
                             Зарибити зі складу
                         </FormButton>
                         }
 
-                        {poolInfo.qty && poolInfo.qty > 0 ?
+                        {poolInfo?.qty && poolInfo.qty > 0 ?
                         <>
                         <Button color="primary" 
                             onClick={() => setShowPartitionForm(!showPartitionForm)}
@@ -141,14 +141,14 @@ export default function StockPoolPage({location, locations, batches, poolInfo, d
                     )}
                 </div>
             </form>
-        {!poolInfo.batch &&
+        {!poolInfo?.batch &&
         <div className="flex justify-end mb-4">
             <Link href={`/pool-managing/${location.id}`}>Актуалізація стану басейна</Link>            
         </div>
         }
         
 
-        {!poolInfo.wasFetchedThisWeek && poolInfo.qty && poolInfo.qty > 0 && 
+        {!poolInfo?.wasFetchedThisWeek && poolInfo?.qty && poolInfo.qty > 0 && 
             <div className="flex justify-end mb-4">
                 <FetchingForm location={location} poolInfo={poolInfo} locations={locations} weekNum={weekNum} />
             </div>

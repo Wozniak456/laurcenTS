@@ -89,20 +89,21 @@ export type poolInfo = {
 }
 
 export type poolManagingType = {
-    batch: {
+    batch?: {
         id: bigint;
         name: string;
     } | undefined;
-    qty: number | undefined;
-    fishWeight: number | undefined;
-    feedType: {
+    qty?: number | undefined;
+    fishWeight?: number | undefined;
+    feedType?: {
         id: number;
         name: string;
         feedconnection_id: number | null;
     } | null | undefined;
-    updateDate: string | undefined;
-    allowedToEdit: boolean;
+    updateDate?: string | undefined;
+    allowedToEdit?: boolean;
     wasFetchedThisWeek? : boolean
+    plan_weight?: number
 }
 
 export interface poolManagingTypeExtended extends poolManagingType {
@@ -116,7 +117,7 @@ export interface calculationAndFeed{
     batch?: {
         batch_name: string | undefined;
         batch_id: bigint | undefined;
-        qty: number;
+        qty?: number;
     } | null;
     calc?: calculation_table | undefined  | null;
     feed?: {
@@ -157,3 +158,4 @@ export type poolInfoType = {
     allowedToEdit: boolean;
     plan_weight?: number
 }
+

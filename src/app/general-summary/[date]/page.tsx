@@ -2,7 +2,7 @@ import { db } from "@/db"
 import {calculationForLocation, poolInfo} from '@/actions/stocking'
 import React from "react";
 import Component111 from '@/components/Real111/111withInputs' 
-import {poolInfoType} from '@/types/app_types'
+import {poolInfoType, poolManagingType} from '@/types/app_types'
 import ExportButton from '@/components/111tableToPrint';
 
 interface LeftoversPerPeriodProps {
@@ -45,10 +45,12 @@ export default async function LeftoversPerPeriod(props: LeftoversPerPeriodProps)
         for (const area of areas) {
             for (const line of area.productionlines) {
               for (const pool of line.pools) {
-                let aggregatedInfo: poolInfoType = await poolInfo(pool.locations[0].id, date);
+
+                let aggregatedInfo: poolManagingType | undefined = await poolInfo(pool.locations[0].id, date);
+
                 const plan = await calculationForLocation(pool.locations[0].id, date);
-      
-                if (plan.calc != null) {
+                
+                if (plan?.calc != null && aggregatedInfo?.batch) {
                   aggregatedInfo = {
                     ...aggregatedInfo,
                     plan_weight: plan.calc.fish_weight
@@ -57,12 +59,12 @@ export default async function LeftoversPerPeriod(props: LeftoversPerPeriodProps)
       
                 data.push({
                   poolName: pool.name,
-                  batchName: aggregatedInfo.batch?.name,
-                  quantity: aggregatedInfo.qty,
-                  planWeight: aggregatedInfo.plan_weight,
-                  factWeight: aggregatedInfo.fishWeight,
-                  feed: aggregatedInfo.feedType?.name,
-                  updated: aggregatedInfo.updateDate
+                  batchName: aggregatedInfo?.batch?.name,
+                  quantity: aggregatedInfo?.qty,
+                  planWeight: aggregatedInfo?.plan_weight,
+                  factWeight: aggregatedInfo?.fishWeight,
+                  feed: aggregatedInfo?.feedType?.name,
+                  updated: aggregatedInfo?.updateDate
                 });
               }
             }
@@ -77,10 +79,10 @@ export default async function LeftoversPerPeriod(props: LeftoversPerPeriodProps)
                 const pools = [];
 
                 for (const pool of line.pools) {
-                    let aggregatedInfo: poolInfoType = await poolInfo(pool.locations[0].id, date);
+                    let aggregatedInfo: poolManagingType | undefined = await poolInfo(pool.locations[0].id, date);
                     const plan = await calculationForLocation(pool.locations[0].id, date);
 
-                    if (plan.calc != null) {
+                    if (plan?.calc != null) {
                         aggregatedInfo = {
                             ...aggregatedInfo,
                             plan_weight: plan.calc.fish_weight
@@ -89,12 +91,12 @@ export default async function LeftoversPerPeriod(props: LeftoversPerPeriodProps)
 
                     pools.push({
                         poolName: pool.name,
-                        batchName: aggregatedInfo.batch?.name,
-                        quantity: aggregatedInfo.qty,
-                        planWeight: aggregatedInfo.plan_weight,
-                        factWeight: aggregatedInfo.fishWeight,
-                        feed: aggregatedInfo.feedType?.name,
-                        updated: aggregatedInfo.updateDate
+                        batchName: aggregatedInfo?.batch?.name,
+                        quantity: aggregatedInfo?.qty,
+                        planWeight: aggregatedInfo?.plan_weight,
+                        factWeight: aggregatedInfo?.fishWeight,
+                        feed: aggregatedInfo?.feedType?.name,
+                        updated: aggregatedInfo?.updateDate
                     });
                 }
 

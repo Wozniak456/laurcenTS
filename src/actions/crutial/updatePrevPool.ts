@@ -9,17 +9,20 @@ type updatePrevPoolProps = {
     info : { 
         amount_in_pool: number,
         divDocId: bigint
-    }
+    },
+    prisma?: any
 }
 
-export async function updatePrevPool({info, formData, formState} : updatePrevPoolProps) {
+export async function updatePrevPool({info, formData, formState, prisma} : updatePrevPoolProps) {
+    const activeDb = prisma || db;
+
     console.log('оновлюємо попередній басейн')
     const location_id: number = parseInt(formData.get('location_id_from') as string); 
     const batch_id: number = parseInt(formData.get('batch_id') as string); 
     const av_weight: number = parseFloat(formData.get('old_average_fish_mass') as string); 
 
     //створити документ зариблення залишком
-    const stockDoc = await db.documents.create({
+    const stockDoc = await activeDb.documents.create({
         data:{
             location_id: location_id,
             doc_type_id: 1,
@@ -31,7 +34,7 @@ export async function updatePrevPool({info, formData, formState} : updatePrevPoo
 
     //транзакція витягування що там є за документом розподілу
 
-    const fetchTran = await db.itemtransactions.create({
+    const fetchTran = await activeDb.itemtransactions.create({
         data:{
             doc_id: stockDoc.id,
             location_id: location_id,
@@ -44,7 +47,7 @@ export async function updatePrevPool({info, formData, formState} : updatePrevPoo
 
     //транзакція зариблення тої ж кількості за документом зариблення
 
-    const stockTran = await db.itemtransactions.create({
+    const stockTran = await activeDb.itemtransactions.create({
         data:{
             doc_id: stockDoc.id,
             location_id: location_id,
@@ -59,7 +62,7 @@ export async function updatePrevPool({info, formData, formState} : updatePrevPoo
 
     console.log('av_weight', av_weight)
 
-    const stocking = await db.stocking.create({
+    const stocking = await activeDb.stocking.create({
         data:{
             doc_id: stockDoc.id,
             average_weight: av_weight
@@ -80,5 +83,5 @@ export async function updatePrevPool({info, formData, formState} : updatePrevPoo
 
     formData.set('average_fish_mass', String(av_weight)) // новий басейн
             
-    createCalcTable(formState, formData)
+    return await createCalcTable(formState, formData, prisma)
 }
