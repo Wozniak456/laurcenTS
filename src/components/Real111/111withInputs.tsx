@@ -4,9 +4,6 @@ import { useFormState } from "react-dom";
 import * as actions from '@/actions';
 import Image from "next/image";
 import SaveButton from '../../../public/icons/Save.svg'
-import {poolInfoType} from '@/types/app_types'
-import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from "@nextui-org/react";
-import SuccessForm from "../success-form";
 import FormButton from "../common/form-button";
 
 interface FilterableTableProps {
