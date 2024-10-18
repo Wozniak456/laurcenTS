@@ -295,7 +295,7 @@ export async function getBatchesInfo(location_id : number, date: string){
           itemtransactions: { some: { location_id: location_id } } // фільтрація транзакцій
       },
       orderBy: {
-          id: 'desc'
+          date_time: 'desc'
       }
   })
 

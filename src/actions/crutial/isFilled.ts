@@ -21,7 +21,7 @@ export const isFilled = async (location_id : number, date: string)  => {
             itemtransactions: { some: { location_id: location_id } }
         },
         orderBy: {
-            id: 'desc'
+            date_time: 'desc'
         }
     })
 
