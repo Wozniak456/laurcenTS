@@ -40,8 +40,22 @@ type Row = {
 } | undefined;
 
 export default function LocationComponent({row, items} : LocationComponentProps) {   
+    // console.log(row?.location?.name)
+    // row?.rows?.map(row => 
+    //     console.log(row.item)
+    // )
 
     const {isOpen, onOpen, onClose} = useDisclosure();
+
+    const [openItemIndex, setOpenItemIndex] = useState<number | null>(null);
+
+    const handleOpen = (index: number) => {
+        setOpenItemIndex(index);
+    };
+
+    const handleClose = () => {
+        setOpenItemIndex(null);
+    };
 
     return (
         <React.Fragment key={row?.location?.id}>
@@ -59,26 +73,26 @@ export default function LocationComponent({row, items} : LocationComponentProps)
                     <td className="px-4 h-10 border border-gray-400">{item.feed.name}</td>
                     <td className="px-4 h-10 border border-gray-400">
                         
-                        <button onClick={onOpen} color="default">{item.item.name}</button>
-                        <Modal 
-                            isOpen={isOpen} 
-                            onClose={onClose} 
-                            placement="top-center"
-                        >
+                    <button onClick={() => handleOpen(itemIndex)} color="default">
+                        {item.item.name}
+                    </button> 
+                    {openItemIndex === itemIndex && (
+                        <Modal isOpen={true} onClose={handleClose} placement="top-center">
                             <ModalContent>
-                            {(onClose) => (
-                                <>
-                                <ModalHeader className="flex flex-col gap-1">Списання</ModalHeader>
-                                <ModalBody>
-                                    <PriorityForm location={row.location} items={items} item={item} />
-                                </ModalBody>
-                                <ModalFooter>
-                                    
-                                </ModalFooter>
-                                </>
-                            )}
+                                {(onClose) => (
+                                    <>
+                                        <ModalHeader className="flex flex-col gap-1">Вибір корму</ModalHeader>
+                                        <ModalBody>
+                                            <PriorityForm location={row.location} items={items} item={item} />
+                                        </ModalBody>
+                                        <ModalFooter>
+                                            {/* Можливо, ви хочете додати додаткові дії */}
+                                        </ModalFooter>
+                                    </>
+                                )}
                             </ModalContent>
                         </Modal>
+                    )}
                     </td>
                 </tr>
             )

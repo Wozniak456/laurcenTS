@@ -10,6 +10,7 @@ import * as actions from '@/actions'
 import DaySummaryContent from "@/components/day-summary"
 
 import ExportButton from "@/components/dayFeedingTableToPrint";
+import { calculationAndFeed } from "@/types/app_types";
 
 
 interface DayFeedingProps {
@@ -44,6 +45,14 @@ interface feedingInfo{
 }
 
 export default async function DayFeeding(props: DayFeedingProps) {
+    // const debugLocId = 72
+    // const debugDate = '2024-09-26'
+    
+    // const isPoolFilled = await actions.isFilled(debugLocId, debugDate);
+    // const todayCalc = await stockingActions.calculationForLocation(debugLocId, debugDate)
+    // const prevCalc = await getPrevCalc1(debugLocId, todayCalc);
+
+    // console.log('todayCalc: ', prevCalc)
 
     const today = props.params.index;
 
@@ -104,6 +113,9 @@ export default async function DayFeeding(props: DayFeedingProps) {
         })
         return feedingDocument.length >= 1;
     }
+
+    // const result = await feedingForLocation(50)
+    // console.log('feedingForLocation: ', result)
 
     // Змінна для зберігання масиву даних
     let data : feedingInfo[] = [];
@@ -291,7 +303,7 @@ export default async function DayFeeding(props: DayFeedingProps) {
                         // console.log(loc.name, todayCalc)
                 
                         if (todayCalc?.calc?.transition_day !== null){
-                        prevCalc = await stockingActions.getPrevCalc(loc.id, todayCalc);
+                            prevCalc = await stockingActions.getPrevCalc(loc.id, todayCalc);
                         }
             
                         const batchInfo = await stockingActions.poolInfo(loc.id, today)
@@ -329,3 +341,116 @@ export default async function DayFeeding(props: DayFeedingProps) {
     );
 }
 
+
+
+
+
+
+
+export async function getPrevCalc1(location_id : number, calc : calculationAndFeed | undefined) {
+    const records14 = await stockingActions.get14CalculationForPool(location_id)
+  
+    if (calc !== null){
+      let index = records14.findIndex(record => record.id === calc?.calc?.id)
+  
+      while(true){
+        if( index <= 0){
+          return null
+        }
+        
+        if ( records14[index - 1].transition_day === null){
+  
+          const feed_type = await stockingActions.getFeedType(records14[index - 1].fish_weight)
+  
+          console.log('feed_type: ', feed_type)
+          let item
+          
+          if (feed_type){
+            item = await getItemPerType1(feed_type.id, location_id)
+            // console.log('item: ', item)
+          }
+           
+          return {
+            calc: records14[index - 1],
+            feed: {
+              type_id: feed_type?.id,
+              type_name: feed_type?.name,
+              item_id: item?.item_id,
+              item_name: item?.item_name,
+              definedPrio: item?.definedPrio
+            }
+          }
+        }
+  
+        index--
+      }
+    }
+  }
+
+
+
+  export async function getItemPerType1(feed_type_id : number, location_id : number) {
+
+    const items = await db.items.findMany({
+      where:{
+        feed_type_id : feed_type_id
+      }
+    })
+
+    console.log('items: ', items)
+  
+    //якщо немає колізій, то повертаємо єдиний корм для виду
+    if(items.length == 1){
+      return{
+        item_id: items[0].id,
+        item_name: items[0].name,
+        definedPrio: true
+      }
+    }
+  
+    //якщо колізія є, то обираємо корм
+    if (items.length > 1){
+      const prio = await db.priorities.findFirst({
+        select:{
+          id: true,
+          item_id: true,
+          items:{
+            select:{
+              name: true
+            }
+          },
+          batch_id:true,
+          location_id: true,
+          priority: true
+        },
+        where:{
+          location_id: location_id,
+          items:{
+            feed_type_id: feed_type_id
+          }
+        },
+        orderBy:{
+          id: 'desc'
+        }
+      })
+
+      console.log('prio: ', prio)
+  
+      //якщо для басейну обрано корм, повертаємо його
+      if (prio){
+        return{
+          item_id: prio.item_id,
+          item_name: prio.items?.name,
+          definedPrio: true
+        }
+      }
+      //якщо для басейну не обрано корм, повертаємо перший елемент
+      else{
+        return{
+          item_id: items[0].id,
+          item_name: items[0].name,
+          definedPrio: false
+        }
+      }
+    }
+}

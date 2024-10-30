@@ -57,6 +57,13 @@ export default function DaySummaryContent({
 }
   : DaySummaryProps) {
 
+    // const props = {
+    //   location,
+    //   today,
+    //   todayCalculation,
+    //   prevCalculation,
+    // }
+
     const actualDate = new Date()
 
     const [formState, action] = useFormState(actions.feedBatch, { message: '' });

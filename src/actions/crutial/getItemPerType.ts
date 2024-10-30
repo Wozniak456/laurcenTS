@@ -34,7 +34,10 @@ export async function getItemPerType(feed_type_id : number, location_id : number
           priority: true
         },
         where:{
-          location_id: location_id
+          location_id: location_id,
+          items:{
+            feed_type_id: feed_type_id
+          }
         },
         orderBy:{
           id: 'desc'
@@ -53,6 +56,7 @@ export async function getItemPerType(feed_type_id : number, location_id : number
       else{
         return{
           item_id: items[0].id,
+          item_name: items[0].name,
           definedPrio: false
         }
       }

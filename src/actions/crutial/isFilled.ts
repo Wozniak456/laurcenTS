@@ -18,14 +18,18 @@ export const isFilled = async (location_id : number, date: string)  => {
             date_time:{
                 lte: new Date (date)
             },
-            itemtransactions: { some: { location_id: location_id } }
+            itemtransactions: { 
+                some: { location_id: location_id}
+            }
         },
         orderBy: {
             date_time: 'desc'
         }
     })
+    const stock = lastStock?.itemtransactions.filter(tran => tran.quantity > 0)
+    // console.log(location_id, stock)
 
-    if (lastStock?.itemtransactions[0] && lastStock?.itemtransactions[0].quantity > 0){
+    if (stock?.length && stock?.length > 0){
         return true
     }else{
         return false
