@@ -164,10 +164,10 @@ export const poolInfo = async (location_id: number, date: string)
 export async function setTransitionDayForLocation(location_id: number, prisma?: any){
     const activeDb = prisma || db;
     
-    const records = await get14CalculationForPool(location_id, prisma)
+    const records = await get14CalculationForPool(location_id, activeDb)
     
     if (records){
-      let currType = await getFeedType(records[0].fish_weight, prisma)
+      let currType = await getFeedType(records[0].fish_weight, activeDb)
       let dayIndex = 0
 
       for (let i = 1; i < records.length; i++) {
@@ -186,12 +186,12 @@ export async function setTransitionDayForLocation(location_id: number, prisma?: 
           continue;
         }
 
-        const feedType = await getFeedType(records[i].fish_weight, prisma);
+        const feedType = await getFeedType(records[i].fish_weight, activeDb);
         
         if (feedType?.id !== currType?.id){
             currType = feedType
 
-            await prisma.calculation_table.update({
+            await activeDb.calculation_table.update({
               where:{
                 id: records[i].id
               },
@@ -234,37 +234,90 @@ type CalcTableIds = (Prisma.PickEnumerable<Prisma.Calculation_tableGroupByOutput
   };
 })[]
 
-export async function get14CalculationForPool(location_id : number, prisma?: any) {
+// export async function get14CalculationForPool(location_id : number, prisma?: any) {
+//   const activeDb = prisma || db;
+  
+//     const calc_table_ids: CalcTableIds = await activeDb.calculation_table.groupBy({
+//       by: ['date'],
+//       _max: {
+//         id: true,
+//       },
+//       where:{
+//         documents:{
+//           location_id: location_id
+//         }
+//       },
+//       orderBy:{
+//         date: 'asc'
+//       },
+//       take: 14
+//     });
+  
+//     const calc_table14 : calculation_table[] = await activeDb.calculation_table.findMany({
+//       where:{
+//         id: {
+//           in: calc_table_ids.map(record => Number(record._max.id))
+//         }
+//       },
+//       orderBy:{
+//         id: 'asc'
+//       }
+//     }) 
+  
+//     return calc_table14
+// }
+export async function get14CalculationForPool(location_id: number, prisma?: any) {
   const activeDb = prisma || db;
-  
-    const calc_table_ids: CalcTableIds = await activeDb.calculation_table.groupBy({
-      by: ['date'],
-      _max: {
-        id: true,
-      },
-      where:{
-        documents:{
-          location_id: location_id
-        }
-      },
-      orderBy:{
-        date: 'asc'
-      },
-      take: 14
+
+  const calc_table_ids: CalcTableIds = await activeDb.calculation_table.groupBy({
+    by: ['date'],
+    _max: { id: true },
+    where: { documents: { location_id } },
+    orderBy: { date: 'desc' },
+    take: 14,
+  });
+
+  // Масив для збереження відповідних записів з calculation_table
+  const relatedCalculations: calculation_table[] = [];
+  let previousBatchId: bigint | null = null;
+
+  for (const { _max } of calc_table_ids) {
+    if (!_max.id) continue;
+
+    // Знаходимо запис у calculation_table за ID
+    const calcResult = await db.calculation_table.findFirst({
+      where: { id: _max.id },
     });
-  
-    const calc_table14 : calculation_table[] = await activeDb.calculation_table.findMany({
-      where:{
-        id: {
-          in: calc_table_ids.map(record => Number(record._max.id))
-        }
+
+    if (!calcResult?.doc_id) continue;
+
+    // Знаходимо документ, що є батьківським для calcResult
+    const parentDoc = await db.documents.findFirst({
+      where: { id: calcResult.doc_id },
+    });
+
+    if (!parentDoc?.parent_document) continue;
+
+    // Знаходимо транзакцію з позитивною кількістю, пов'язану з parent_document
+    const stockingTransaction = await db.itemtransactions.findFirst({
+      where: {
+        doc_id: parentDoc.parent_document,
+        quantity: { gte: 0 },
       },
-      orderBy:{
-        id: 'asc'
-      }
-    }) 
+    });
+
+    if (!stockingTransaction) continue;
+
+    // Перевіряємо batch_id транзакції
+    if (previousBatchId === null || stockingTransaction.batch_id === previousBatchId) {
+      relatedCalculations.unshift(calcResult); // Додаємо запис calculation_table
+      previousBatchId = stockingTransaction.batch_id;
+    } else {
+      break; // Зупиняємо цикл, якщо batch_id змінився
+    }
+  }
   
-    return calc_table14
+  return relatedCalculations;
 }
 
 export async function getBatchesInfo(location_id : number, date: string){
