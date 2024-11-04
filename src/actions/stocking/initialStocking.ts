@@ -15,11 +15,19 @@ export async function initialStocking(
         let location_id_from : number = parseInt(formData.get('location_id_from') as string);
       
         const location_id_to: number = parseInt(formData.get('location_id_to') as string);
+
+
+        const batch_id = formData.get('batch_id') as string;
+        const fish_amount: number = parseInt(formData.get('fish_amount') as string);
+        const average_fish_mass: number = parseInt(formData.get('average_fish_mass') as string);
+
         
         const executed_by = 3 
-       
-        await stockPool(formState, formData)
 
+        if(!batch_id){
+            await stockPool(formState, formData)
+        }
+       
         const feeds = await db.items.findMany({
             where:{
                 item_type_id: 3 // корм

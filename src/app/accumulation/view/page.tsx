@@ -35,6 +35,8 @@ export default async function StockingHome() {
 
   const filteredGenerations = await getFilteredGenerations();
 
+  // console.log('filteredGenerations: ', filteredGenerations)
+
   // Process each generation to form pools
   for (const generation of filteredGenerations) {
     const pool: PoolType = {
@@ -42,6 +44,8 @@ export default async function StockingHome() {
       location_name: generation.location.name,
       vendors: [] // Initialize an empty array for vendors
     };
+
+    // console.log('pool: ', pool)
 
     // Process vendors in parallel
     for (const vendor of vendors) {
@@ -84,6 +88,8 @@ export default async function StockingHome() {
   }
 
   const batches = await actions.getFeedBatches()
+
+  console.log('pools: ', pools)
 
   return (
     <div className="">

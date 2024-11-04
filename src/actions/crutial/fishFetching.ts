@@ -21,7 +21,7 @@ export async function fishFetching(
     formData: FormData
 ): Promise<{ message: string } | undefined> {
 
-    try {
+    
         console.log('fishFetching');
         console.log(formData);
 
@@ -173,12 +173,8 @@ export async function fishFetching(
         },{timeout: 20000});
 
         console.log('Операція пройшла успішно');
+        revalidatePath('/fetching/view')
         return { message: 'Операція завершена успішно' };
-        
-    } catch (err) {
-        console.error('Помилка виконання fishFetching:', err);
-        return { message: 'Помилка при виконанні операції' }; // Повертаємо помилку користувачу
-    }
 }
 
 

@@ -71,8 +71,30 @@ export async function feedBatch(
                                 }
                             });
 
+                            //Знайти останню собівартість і останнє покоління
+                            const latestGeneration = await db.batch_generation.findFirst({
+                                include:{
+                                    itemtransactions: true
+                                },
+                                where:{
+                                    location_id: location_id
+                                },
+                                orderBy: {
+                                    id: 'desc'
+                                },
+                                take: 1
+                            })
+
+                            const record = await db.generation_feed_amount.create({
+                                data:{
+                                    batch_generation_id: latestGeneration?.id as bigint,
+                                    feed_batch_id: batch.batch_id,
+                                    amount: qty
+                                }
+                            })
+
                             console.log(`Витягнули зі складу: ${fetchTran.id} і вкинули в басейн: ${feedTran.id}`)
-                            // console.log(`Собівартість змінилася, ${cost_record}`)
+                            console.log(`Собівартість змінилася, ${record}`)
 
                             left_to_feed = 0;
                             break; // Виходимо з циклу, бо всю необхідну кількість взято
@@ -98,7 +120,31 @@ export async function feedBatch(
                                 }
                             });
 
+                            //Знайти останню собівартість і останнє покоління
+                            const latestGeneration = await db.batch_generation.findFirst({
+                                include:{
+                                    itemtransactions: true
+                                },
+                                where:{
+                                    location_id: location_id
+                                },
+                                orderBy: {
+                                    id: 'desc'
+                                },
+                                take: 1
+                            })
+
+                            const record = await db.generation_feed_amount.create({
+                                data:{
+                                    batch_generation_id: latestGeneration?.id as bigint,
+                                    feed_batch_id: batch.batch_id,
+                                    amount: qty
+                                }
+                            })
+
                             console.log(`Витягнули зі складу: ${fetchTran.id} і вкинули в басейн: ${feedTran.id}`)
+                            console.log(`Собівартість змінилася, ${record}`)
+
                             left_to_feed -= batch._sum.quantity; // Віднімаємо використану кількість
                             console.log('left_to_feed = ', left_to_feed)
                         }
@@ -167,7 +213,6 @@ export async function feedBatch(
                                 });
 
                                 //Знайти останню собівартість і останнє покоління
-
                                 const latestGeneration = await db.batch_generation.findFirst({
                                     include:{
                                         itemtransactions: true
@@ -181,8 +226,16 @@ export async function feedBatch(
                                     take: 1
                                 })
 
+                                const record = await db.generation_feed_amount.create({
+                                    data:{
+                                        batch_generation_id: latestGeneration?.id as bigint,
+                                        feed_batch_id: batch.batch_id,
+                                        amount: qty
+                                    }
+                                })
+
                                 console.log(`Витягнули зі складу: ${fetchTran.id} і вкинули в басейн: ${feedTran.id}`)
-                                // console.log(`Собівартість змінилася, ${cost_record}`)
+                                console.log(`Собівартість змінилася, ${record}`)
 
                                 left_to_feed = 0;
                                 break; // Виходимо з циклу, бо всю необхідну кількість взято
@@ -208,7 +261,30 @@ export async function feedBatch(
                                     }
                                 });
 
+                                //Знайти останню собівартість і останнє покоління
+                                const latestGeneration = await db.batch_generation.findFirst({
+                                    include:{
+                                        itemtransactions: true
+                                    },
+                                    where:{
+                                        location_id: location_id
+                                    },
+                                    orderBy: {
+                                        id: 'desc'
+                                    },
+                                    take: 1
+                                })
+
+                                const record = await db.generation_feed_amount.create({
+                                    data:{
+                                        batch_generation_id: latestGeneration?.id as bigint,
+                                        feed_batch_id: batch.batch_id,
+                                        amount: qty
+                                    }
+                                })
+
                                 console.log(`Витягнули зі складу: ${fetchTran.id} і вкинули в басейн: ${feedTran.id}`)
+                                console.log(`Собівартість змінилася, ${record}`)
                                 left_to_feed -= batch._sum.quantity; // Віднімаємо використану кількість
                                 console.log('left_to_feed = ', left_to_feed)
                         }

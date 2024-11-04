@@ -1,14 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from "react";
-import { useFormState } from "react-dom";
-import * as CRUDactions from '@/actions'
 import PurchLinesList from '@/components/PurchLines/purchlines-table'
-import Image from 'next/image';
-import deleteButton from '../../../public/icons/delete.svg'
-import newFileButton from '../../../public/icons/create.svg'
-import editButton from '../../../public/icons/edit.svg'
-import registerGoodsButton from '../../../public/icons/goods-in.svg'
 import CreateEditPurchHeaderForm from '../PurchHeaders/create-edit-header-form'
 import PurchHeaderDeleteForm from '../PurchHeaders/delete-message'
 import RegisteringGoods from '../PurchHeaders/registering-form'

@@ -41,6 +41,16 @@ export default function ActualizationPage({poolInfo, batches, feeds} : Actualiza
                     {/* Основні поля форми */}
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                         <div>
+                            {poolInfo.batch ? 
+                            <Input 
+                                label="Партія" 
+                                name="batch_id"
+                                readOnly
+                                // isRequired
+                                className="w-full"
+                                value={poolInfo.batch.name}
+                            />
+                            :
                             <Select 
                                 label="Партія" 
                                 name="batch_id"
@@ -53,8 +63,19 @@ export default function ActualizationPage({poolInfo, batches, feeds} : Actualiza
                                     </SelectItem>
                                 ))}
                             </Select>
+                            }
+                            
                         </div>
                         <div>
+                            {poolInfo.batch && poolInfo.qty ? 
+                            <Input 
+                                label="Кількість:" 
+                                name="fish_amount"
+                                readOnly
+                                className="w-full"
+                                value={String(poolInfo.qty)}
+                            />
+                            :
                             <Input 
                                 label="Кількість:" 
                                 name="fish_amount"
@@ -63,8 +84,17 @@ export default function ActualizationPage({poolInfo, batches, feeds} : Actualiza
                                 isRequired
                                 className="w-full"
                             />
+                            }
                         </div>
-                        <div>
+                        <div>{poolInfo.batch && poolInfo.fishWeight ? 
+                            <Input 
+                                label="Сер. вага, г" 
+                                name="average_fish_mass"
+                                readOnly
+                                className="w-full"
+                                value={String(poolInfo.fishWeight)}
+                            />
+                            :
                             <Input 
                                 label="Сер. вага, г" 
                                 name="average_fish_mass"
@@ -74,6 +104,8 @@ export default function ActualizationPage({poolInfo, batches, feeds} : Actualiza
                                 isRequired
                                 className="w-full"
                             />
+                        }
+                            
                         </div>
                     </div>
 

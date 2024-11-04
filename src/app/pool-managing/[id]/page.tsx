@@ -23,6 +23,8 @@ export default async function PoolManagingShowPage(props: PoolManagingShowPagePr
 
         const today = new Date()
 
+        // let poolInfo = await stockingActions.poolInfo(props.params.id, today.toISOString().split("T")[0])
+
         let poolInfo : poolManagingTypeExtended | undefined = await stockingActions.poolInfo(parseInt(props.params.id), today.toISOString().split("T")[0])
 
         poolInfo = {
@@ -36,6 +38,8 @@ export default async function PoolManagingShowPage(props: PoolManagingShowPagePr
         const batches = await actions.getCatfishBatches()
 
         const feeds = await actions.getFeeds()
+
+        // console.log('poolInfo: ', poolInfo)
 
         return( 
            <>

@@ -26,8 +26,9 @@ export default async function StockingHome() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen  text-sm">
-      <div className="flex justify-end w-full">
+      <div className="flex flex-col  items-end w-full">
         <p>Тиждень: {weekNum}</p>
+        <p>Сьогодні: {today.toISOString().split("T")[0]}</p>
       </div>
       {areas.map(area => (
         <div key={area.id} className="w-full">

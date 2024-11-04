@@ -27,6 +27,7 @@ export async function registerGoodsInProduction(
                 doc_id: document.id
             }
         });
+        
         console.log('оновився doc_id')
 
         const lines = await db.purchaselines.findMany({

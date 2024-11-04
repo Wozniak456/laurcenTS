@@ -147,12 +147,14 @@ export default function StockPoolPage({location, locations, batches, poolInfo, d
                     )}
                 </div>
             </form>
-        {!poolInfo?.batch &&
+        {/* {!poolInfo?.batch &&
         <div className="flex justify-end mb-4">
             <Link href={`/pool-managing/${location.id}`}>Актуалізація стану басейна</Link>            
         </div>
-        }
-        
+        } */}
+        <div className="flex justify-end mb-4">
+            <Link href={`/pool-managing/${location.id}`}>Актуалізація стану басейна</Link>            
+        </div>
 
         {!poolInfo?.wasFetchedThisWeek && poolInfo?.qty && poolInfo.qty > 0 && 
             <div className="flex justify-end mb-4">

@@ -153,6 +153,8 @@ export default async function FetchingPage(){
 
     const summaryArray: FetchingInfo[] = Object.values(summary);
 
+    // console.log('summaryArray: ', summaryArray)
+
     return(
         <>
           <FetchingInfoTable summary={summaryArray} weekNum={weekNum} /> 

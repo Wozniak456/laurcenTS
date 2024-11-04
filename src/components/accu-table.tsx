@@ -78,8 +78,11 @@ const StockingTable: React.FC<StockingTableProps> = ({ pools, vendors, batches }
     { key: "total", label: "Total" }
   ];
 
+  // console.log('pools: ', pools)
+
   // Генерація рядків для qty та price без форматування
   const rows = pools.flatMap(pool => {
+    console.log('hello')
     const totalQty = pool.vendors.reduce(
       (acc, vendor) =>
         acc + vendor.items.reduce((vendorAcc, item) => vendorAcc + item.qty, 0),
@@ -94,6 +97,8 @@ const StockingTable: React.FC<StockingTableProps> = ({ pools, vendors, batches }
         }, 0),
       0
     );
+
+    console.log('totalPrice: ', totalPrice)
 
     const qtyRowData: RowData = {
       key: `${pool.location_id}-qty`,
@@ -129,6 +134,8 @@ const StockingTable: React.FC<StockingTableProps> = ({ pools, vendors, batches }
 
     return [qtyRowData, priceRowData];
   });
+
+  // console.log('rows: ', rows)
 
   const handleRowClick = (row: RowData) => {
     setSelectedRow(row);
