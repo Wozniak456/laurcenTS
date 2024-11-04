@@ -143,6 +143,7 @@ export default function DaySummaryContent({
         
       {times.map((time, index) => {
         if(todayCalculation?.calc){ 
+          const feedQty = location?.fed_today?.find(row => row.time = time.time)?.quantity ?? 0
           return(
             <React.Fragment key={index}>
             <td className="px-4 py-2 border border-gray-400">{transitionDay ? (todayCalculation?.calc?.feed_per_feeding * (1 - transitionDay * 0.2)).toFixed(1) : todayCalculation?.calc?.feed_per_feeding.toFixed(1)}</td>
@@ -153,9 +154,10 @@ export default function DaySummaryContent({
                 {location.fed_today?.length && location.fed_today?.length > 0 ? 
                 <input
                   name={`feed_given`}
-                  className="border border-black w-full bg-blue-100 text-center"
+                  className="border border-black w-full text-center"
                   id={`feed_given_${index}`}
-                  value={location?.fed_today?.find(row => row.time = time.time)?.quantity}
+                  value={feedQty * 1000}
+
                   // onChange={handleInputChange(index)}
                 />
                 :
