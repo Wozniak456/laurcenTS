@@ -15,7 +15,10 @@ interface DaySummaryProps{
     location_id: number;
     location_name: string;
     batch_id?: bigint; // batch_id є необов'язковим
-    fed_today?: boolean
+    fed_today?: {
+      time: string;
+      quantity: number;
+  }[]
   },
   today: string,
   todayCalculation: calculationAndFeed | null | undefined,
@@ -56,6 +59,7 @@ export default function DaySummaryContent({
   items
 }
   : DaySummaryProps) {
+
 
     // const props = {
     //   location,
@@ -146,13 +150,23 @@ export default function DaySummaryContent({
             <form>
               
               <div className="flex justify-center">
-              <input
-                name={`feed_given`}
-                className="border border-black w-full bg-blue-100 text-center"
-                id={`feed_given_${index}`}
-                value={inputValues[index]?.item}
-                onChange={handleInputChange(index)}
-              />
+                {location.fed_today?.length && location.fed_today?.length > 0 ? 
+                <input
+                  name={`feed_given`}
+                  className="border border-black w-full bg-blue-100 text-center"
+                  id={`feed_given_${index}`}
+                  value={location?.fed_today?.find(row => row.time = time.time)?.quantity}
+                  // onChange={handleInputChange(index)}
+                />
+                :
+                  <input
+                  name={`feed_given`}
+                  className="border border-black w-full bg-blue-100 text-center"
+                  id={`feed_given_${index}`}
+                  value={inputValues[index]?.item}
+                  onChange={handleInputChange(index)}
+                />
+                }
               </div>
             </form>
             </td>
@@ -206,7 +220,7 @@ export default function DaySummaryContent({
           
         {
          today <= actualDate.toISOString().split("T")[0] && 
-         !location.fed_today &&
+         location.fed_today?.length == 0 &&
           <div className="flex justify-center">
           <button 
             type="submit" 

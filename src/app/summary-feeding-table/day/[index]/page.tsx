@@ -23,7 +23,10 @@ interface LocationInfo {
     location_id: number;
     location_name: string;
     batch_id?: bigint;
-    fed_today?: boolean
+    fed_today?: {
+        time: string;
+        quantity: number;
+    }[]
 }
 
 interface feedingInfo {
@@ -96,23 +99,75 @@ export default async function DayFeeding(props: DayFeedingProps) {
 
     const summary = await feedingActions.getAllSummary(lines, currentDate)
 
+    //return an array with eaten feed and not bool
     const feedingForLocation = async (locationId: number) => {
         const startOfDay = new Date(today);
         const endOfDay = new Date(today);
 
         endOfDay.setHours(23, 59, 59, 999); // Встановлює час на кінець дня (23:59:59.999)
 
-        const feedingDocument = await db.documents.findMany({
-            where: {
+        // const feedingDocument = await db.documents.findMany({
+        //     where: {
+        //         doc_type_id: 9,
+        //         date_time: {
+        //             gte: startOfDay, // Більше або дорівнює початку дня
+        //             lte: endOfDay,   // Менше або дорівнює кінцю дня
+        //         },
+        //         location_id: locationId
+        //     }
+        // })
+
+        const query = await db.documents.findMany({
+            select:{
+                date_time: true,
+                itemtransactions: {
+                    select:{
+                        location_id: true,
+                        quantity: true
+                    },
+                    where:{
+                        location_id: locationId
+                    }
+                }
+            },
+            where:{
                 doc_type_id: 9,
-                date_time: {
-                    gte: startOfDay, // Більше або дорівнює початку дня
-                    lte: endOfDay,   // Менше або дорівнює кінцю дня
+                date_time:{
+                    lte: endOfDay,
+                    gte: startOfDay
                 },
-                location_id: locationId
+                itemtransactions: {
+                    some: {
+                        location_id: locationId
+                    }
+                }
             }
-        })
-        return feedingDocument.length >= 1;
+        });
+
+        const timeQtyArray: { time: string; quantity: number }[] = [];
+
+        for (const record of query) {
+            const time = record.date_time.toISOString().split('T')[1].split(':').slice(0, 2).join(':'); // Форматуємо час: HH:MM
+            let totalQuantity = 0;
+
+            // Обчислюємо загальну кількість для цього часу
+            for (const transaction of record.itemtransactions) {
+                totalQuantity += transaction.quantity;
+            }
+
+            // Перевіряємо, чи вже існує такий час в масиві
+            const existingTime = timeQtyArray.find(item => item.time === time);
+            
+            if (existingTime) {
+                existingTime.quantity += totalQuantity; // Оновлюємо кількість для цього часу
+            } else {
+                // Додаємо новий запис для цього часу
+                timeQtyArray.push({ time, quantity: totalQuantity });
+            }
+        }
+        // console.log(`location ${locationId}: `, timeQtyArray);
+
+        return timeQtyArray;
     }
 
     // const result = await feedingForLocation(50)
