@@ -1,27 +1,73 @@
-import BatchesComponent from '@/components/filter-batch'
-import { db } from '@/db';
+'use client'
+import BatchCreatePage from '@/components/FishBatch/create-batch-form'
+
+import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Checkbox, Input, Link} from "@nextui-org/react";
+import { useEffect, useState } from 'react';
+import { itembatches } from '@prisma/client';
 import * as actions from '@/actions'
 
-export default async function FishBatchesComponent() {
+export default function BatchesComponent() {  
+  const {isOpen, onOpen, onOpenChange} = useDisclosure();
 
-    const batches = await actions.getCatfishBatches()
+  const [batches, setBatches] = useState<null | itembatches[]>(null)
 
-    const items = await db.items.findMany({
-        where:{
-            item_type_id: {
-                not: 3
+    useEffect(() => {
+        const fetchBatches = async () => {
+            try {
+                const batches = await actions.getBatches(1);
+                setBatches(batches);
+            } catch (error) {
+                console.error('Error fetching content:', error);
             }
-        }
-    })
+        };
     
-    const units = await db.units.findMany()
+        fetchBatches();
+    }, []);
 
-    return (
-    <div>
-        <h1 className="text-xl font-bold m-2">Партії</h1>
-        <div>
-            <BatchesComponent batches={batches} items={items} units={units}/>
-        </div>      
+
+  return (
+    <div className="container p-4 w-full bg-gray-100 rounded-lg mt-4">
+      <div className='flex justify-end'>
+
+        <Button onPress={onOpen} color="primary">Нова партія</Button>
+        <Modal 
+          isOpen={isOpen} 
+          onOpenChange={onOpenChange}
+          placement="top-center"
+        >
+          <ModalContent>
+            {(onClose) => (
+              <>
+                <ModalHeader className="flex flex-col gap-1">Нова партія</ModalHeader>
+                <ModalBody>
+                  <BatchCreatePage />
+                </ModalBody>
+                <ModalFooter>
+                  
+                </ModalFooter>
+              </>
+            )}
+          </ModalContent>
+        </Modal>
+      </div>
+      
+      <div className="p-6">
+          <div>
+            {batches
+            ?.sort((a, b) => Number(b.id) - Number(a.id))
+            .map((batch, batchIndex) => (
+              <Link 
+              key={batchIndex}
+              href={`/batches/${batch.id}`}
+              className="flex justify-between items-center p-2 hover:bg-gray-200 border-b border-gray-300 pb-2"
+              >
+                <div>{batch.name}</div>
+                <div className='text-sm text-gray-400'>Перегляд</div>
+              </Link>
+            ))}
+          </div>
+     
+      </div>
     </div>
   );
-}
+};

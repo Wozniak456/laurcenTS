@@ -26,7 +26,6 @@ export default async function RegisteringComponent(props: RegisteringComponentPr
         }
     })
 
-    const saleslines = await db.items.findMany()
     return(
         <>
             <Registering header={salesheader}/>

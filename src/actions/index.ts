@@ -2,6 +2,7 @@ export { createItemBatch } from './CRUD/itemBatch/createItemBatch'
 export { deleteItemBatch } from './CRUD/itemBatch/deleteItemBatch'
 export { editItemBatch } from './CRUD/itemBatch/editItemBatch'
 export { updateBatches } from './CRUD/itemBatch/updateBatches'
+export { getBatches } from './CRUD/itemBatch/getBatchesByTypeId'
 
 export { createPool } from './CRUD/pool/createPool'
 export { editPool } from './CRUD/pool/editPool'
@@ -53,6 +54,10 @@ export { deleteVendor } from './CRUD/vendors/deleteVendor'
 export { createItem } from './CRUD/items/createItem'
 export { editItem } from './CRUD/items/editItem'
 export { deleteItem } from './CRUD/items/deleteItem'
+export { getItems } from './CRUD/items/getItems'
+export { getItemById } from './CRUD/items/getItemById'
+
+export { getUnits } from './CRUD/units/getUnits'
 
 export { getWeekOfYear } from './crutial/getWeekOfTheYear'
 export { initialStocking } from './stocking/initialStocking'
