@@ -58,7 +58,7 @@ export default function RowForFeeding({ locInfo, rowData, times, rowCount, today
             const initialValues: { [key: string]: string } = {};
 
             times.forEach(({ time }) => {
-                const feedingTime = time.split(':')[0]; // Година (без хвилин)
+                const feedingTime = parseInt(time.split(':')[0]); // Година (без хвилин)
                 const feeding = rowData.feedings ? rowData.feedings[feedingTime]?.feeding : ''; // Значення для конкретної години
 
                 if (feeding) {
@@ -97,7 +97,6 @@ export default function RowForFeeding({ locInfo, rowData, times, rowCount, today
             {/* Рендеримо для кожного часу */}
             {times.map((time, index) => {
                 const feedingTime = parseInt(time.time.split(':')[0]); // Отримуємо тільки годину (наприклад, "10" з "10:00")
-                console.log(`Time: ${feedingTime}, Feeding:`, rowData.feedings?.[feedingTime]);
                 const key = `${locInfo.id}-${feedingTime}`; // Створюємо унікальний ключ для цього часу
 
                 return (

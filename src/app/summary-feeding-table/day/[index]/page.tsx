@@ -96,7 +96,6 @@ export default async function DayFeeding(props: DayFeedingProps) {
     //     data1.feedings?.map(feeding => {
     //         console.log(feeding)
     //     })
-
     // })
 
     return (
@@ -423,6 +422,8 @@ const setData = async (today: string, times: { id: number, time: string }[]) => 
                     Object.keys(extraFilledRows).forEach(feedId => {
                         const feedRows = extraFilledRows[Number(feedId)];
 
+                        // console.log('loc: ', loc.id, feedRows)
+
                         // Створюємо об'єкт для зберігання feedings для кожного часу
                         const feedingsForFeedId: Record<string, { feeding: string; editing: string }> = {};
 
@@ -461,9 +462,6 @@ const setData = async (today: string, times: { id: number, time: string }[]) => 
                             feedings: feedingsForFeedId      // Зберігаємо feedings по годинах
                         }
 
-                        // if (loc.id === 47) {
-                        //     console.log('hello bitches ', valueToPush)
-                        // }
                         // Додаємо цей корм до основного масиву feedings
                         feedings.push(valueToPush);
                     });
@@ -515,8 +513,10 @@ const setLines = async () => {
 async function getExtraData(locId: number, today: string, prevItemId?: number, todayItemId?: number) {
 
     const startOfDay = new Date(today);
-    const endOfDay = new Date(today);
+    let endOfDay = new Date(today);
     endOfDay.setHours(23, 59, 59, 999);
+
+    endOfDay.setHours(endOfDay.getHours() + 2);
 
     const query = await db.documents.findMany({
         select: {
@@ -552,8 +552,8 @@ async function getExtraData(locId: number, today: string, prevItemId?: number, t
     });
 
 
-    // if (locId === 47) {
-    //     console.log('hello bitches')
+    // if (locId === 40) {
+    //     console.log('hello')
     //     query.map(qu => {
     //         qu.itemtransactions.map(tran => {
     //             console.log(tran)

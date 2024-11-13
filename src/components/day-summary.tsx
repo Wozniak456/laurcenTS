@@ -157,7 +157,6 @@ export default function DaySummaryContent({
               pool.locations.map((loc, index) => {
                 const dataForPool = feedingsData.find((row) => row.locId === loc.id); // Використовуємо локальний стан
                 const feedings = dataForPool?.feedings;
-                // console.log(`loc: ${loc.id}, ${feedings}`)
                 return (
                   <React.Fragment key={index}>
                     {feedings?.map((feeding, feedingIndex) => (

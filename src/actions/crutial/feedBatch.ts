@@ -18,10 +18,17 @@ export async function feedBatch(
         const item_id: number = parseInt(formData.get('item_id') as string);
 
 
-        const times = await db.time_table.findMany();
+        const times = await db.time_table.findMany({
+            orderBy:{
+                id: 'asc'
+            }
+        });
+
+        let index = 0;
 
         for (const time of times) {
-            const hours = Number(time.time.split(':')[0])
+
+            const hours = parseInt(time.time.split(':')[0])
             const qty: number = parseFloat(formData.get(`time_${hours}`) as string);
             const date = new Date(date_time);
             date.setHours(date.getHours() + hours);
@@ -29,10 +36,10 @@ export async function feedBatch(
             //ПЕРЕВІРИТИ НА ПЕРШІЙ ІТЕРАЦІЇ ЧИ ДОСТАТНЬО НА СКЛАДІ КОРМУ НА ВЕСЬ ДЕНЬ
             let qtyForWholeDay = qty;
 
-            if (hours === 6) {
+            if (index === 0) {
                 qtyForWholeDay = 0
                 times.forEach(time => {
-                    const howMuchToAdd = parseFloat(formData.get(`time_${time.time.split(':')[0]}`) as string)
+                    const howMuchToAdd = parseFloat(formData.get(`time_${parseInt(time.time.split(':')[0])}`) as string)
                     console.log('ми додали: ', howMuchToAdd)
                     qtyForWholeDay += howMuchToAdd
                 })
@@ -163,6 +170,8 @@ export async function feedBatch(
             }
 
             console.log('Витягнули зі складу ')
+
+            index++;
         };
     }
     catch (err: unknown) {
