@@ -38,6 +38,9 @@ type itemAndTime = {
 } | null
 
 export default function RowForFeeding({ locInfo, rowData, times, rowCount, today, batch }: RowForFeedingProps) {
+    // useEffect(() => {
+    //     console.log('loc: ', locInfo.id, 'Row Data:', rowData);
+    // }, [rowData]);
 
     const fed = rowData.feedings
         ? Object.values(rowData.feedings).some(
@@ -80,10 +83,6 @@ export default function RowForFeeding({ locInfo, rowData, times, rowCount, today
 
     const [buttonMode, setButtonMode] = useState(false);
 
-    // useEffect(() => {
-    //     console.log('formState: ', formState)
-    // }, [formState])
-
     return (
         <tr>
             {rowCount && rowCount > 0 ? (
@@ -97,7 +96,8 @@ export default function RowForFeeding({ locInfo, rowData, times, rowCount, today
 
             {/* Рендеримо для кожного часу */}
             {times.map((time, index) => {
-                const feedingTime = time.time.split(':')[0]; // Отримуємо тільки годину (наприклад, "10" з "10:00")
+                const feedingTime = parseInt(time.time.split(':')[0]); // Отримуємо тільки годину (наприклад, "10" з "10:00")
+                console.log(`Time: ${feedingTime}, Feeding:`, rowData.feedings?.[feedingTime]);
                 const key = `${locInfo.id}-${feedingTime}`; // Створюємо унікальний ключ для цього часу
 
                 return (
@@ -123,7 +123,7 @@ export default function RowForFeeding({ locInfo, rowData, times, rowCount, today
                                             : rowData.feedings?.[feedingTime]?.feeding || ''
                                     }
                                     onChange={(e) =>
-                                        handleInputChange(feedingTime, locInfo.id, e.target.value)
+                                        handleInputChange(String(feedingTime), locInfo.id, e.target.value)
                                     }
                                 />
                             </td>

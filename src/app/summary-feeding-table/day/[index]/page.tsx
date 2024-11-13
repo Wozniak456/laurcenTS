@@ -277,7 +277,9 @@ const setData = async (today: string, times: { id: number, time: string }[]) => 
                 } = {};
 
                 await Promise.all(
-                    times.map(async (time) => {
+                    times
+                    .sort((a, b) => Number(a.time.split(':')[0]) - Number(b.time.split(':')[0]))
+                    .map(async (time) => {
                         const hours = Number(time.time.split(':')[0]);
 
                         const itemIds = [

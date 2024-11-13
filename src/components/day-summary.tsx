@@ -64,8 +64,8 @@ export default function DaySummaryContent({
 
   // useEffect(() => {
   //   data.map(data1 => {
-  //     console.log(data1.locId)
-  //     console.log(data1.feedings?.length)
+  //     console.log("loc: ", data1.locId, data1.feedings)
+  //     // console.log(data1.feedings?.length)
   //   })
   // }, [data])
 
@@ -157,6 +157,7 @@ export default function DaySummaryContent({
               pool.locations.map((loc, index) => {
                 const dataForPool = feedingsData.find((row) => row.locId === loc.id); // Використовуємо локальний стан
                 const feedings = dataForPool?.feedings;
+                // console.log(`loc: ${loc.id}, ${feedings}`)
                 return (
                   <React.Fragment key={index}>
                     {feedings?.map((feeding, feedingIndex) => (
