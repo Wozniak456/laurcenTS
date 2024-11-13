@@ -20,7 +20,7 @@ interface Saldos {
 export const calculateSaldo = async (startDate: Date | undefined, endDate: Date | undefined, quantityFilter: FilterSpecifier | undefined)
 : Promise<Saldos> => {
 
-    console.log('endDate', endDate)
+    // console.log('endDate', endDate)
     const result = await db.itemtransactions.groupBy({
         by: ['batch_id'],
         where: {

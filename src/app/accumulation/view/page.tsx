@@ -45,8 +45,6 @@ export default async function StockingHome() {
       vendors: [] // Initialize an empty array for vendors
     };
 
-    // console.log('pool: ', pool)
-
     // Process vendors in parallel
     for (const vendor of vendors) {
       const vendorData: vendorType = {
@@ -89,7 +87,7 @@ export default async function StockingHome() {
 
   const batches = await actions.getFeedBatches()
 
-  console.log('pools: ', pools)
+
 
   return (
     <div className="">

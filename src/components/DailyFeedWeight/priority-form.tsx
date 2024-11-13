@@ -32,7 +32,7 @@ type PriorityFormType = {
 }
 
 export default function PriorityForm(props: PriorityFormType) {
-    console.log('props.item?.feed.id', props.item?.item.name)
+    // console.log('props.item?.feed.id', props.item?.item.name)
 
     const priority = props.item?.item.id
 

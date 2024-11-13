@@ -165,7 +165,7 @@ export default function ExportButton(props: ExportButtonProps) {
                             // Якщо це перший запис для басейна, запам'ятовуємо початковий рядок
                             if (startRow === null) {
                                 startRow = newRow.number; // Номер рядка в таблиці
-                                console.log(`start of merging: ${startRow}. count = ${count}`)
+                                // console.log(`start of merging: ${startRow}. count = ${count}`)
                             }
                         })
                     })
@@ -173,11 +173,11 @@ export default function ExportButton(props: ExportButtonProps) {
                     // Якщо є більше ніж один запис, виконуємо об'єднання комірок
                     if (startRow !== null && count > 1) {
                         const endRow = worksheet.lastRow?.number || startRow; // Останній рядок для об'єднання
-                        console.log(`startRow !== null && poolItems.length > 1. маємо змерджити A${startRow}:A${endRow}`)
+                        // console.log(`startRow !== null && poolItems.length > 1. маємо змерджити A${startRow}:A${endRow}`)
                         worksheet.mergeCells(`A${startRow}:A${endRow}`);
                     } else {
                         // console.log(poolItems)
-                        console.log(`не попали у блок мердження. startRow = ${startRow}, poolItems.length = ${poolItems.length}`)
+                        // console.log(`не попали у блок мердження. startRow = ${startRow}, poolItems.length = ${poolItems.length}`)
                     }
 
                     startRow = null;
