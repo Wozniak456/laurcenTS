@@ -2,13 +2,13 @@
 import { db } from "@/db";
 
 export async function getFeedBatchByItemId(item_id: number, quantity: number) {
-    
+
     const batches = await db.itembatches.findMany({
-        include:{
+        include: {
             items: true
         },
         where: {
-            item_id: item_id            
+            item_id: item_id
         },
     })
 
@@ -58,16 +58,17 @@ export async function getFeedBatchByItemId(item_id: number, quantity: number) {
         if (totalQuantity >= quantity) {
             break;
         }
-    
+
         const minIndex = batches_quantity_with_price.indexOf(minBatch); // Знаходимо індекс поточної партії
         batches_quantity_with_price.splice(minIndex, 1); // Видаляємо поточну партію з масиву
     }
-    
+
     // Перевірка, чи було знайдено необхідну кількість корму
     if (totalQuantity < quantity) {
+        console.log('Немає достатньо корму');
         throw new Error('Немає достатньо корму');
     }
-    else{
+    else {
         return batches_array;
     }
 }

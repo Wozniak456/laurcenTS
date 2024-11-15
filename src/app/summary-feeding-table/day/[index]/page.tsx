@@ -14,19 +14,19 @@ import { calculationAndFeed } from "@/types/app_types";
 
 
 interface DayFeedingProps {
-  params: {
-    index: string;
-  };
+    params: {
+        index: string;
+    };
 }
 
 interface LocationInfo {
     location_id: number;
     location_name: string;
     batch_id?: bigint;
-    fed_today?: boolean 
-  }
+    fed_today?: boolean
+}
 
-interface feedingInfo{
+interface feedingInfo {
     date: string,
     poolId: number,
     rowCount?: number
@@ -47,7 +47,7 @@ interface feedingInfo{
 export default async function DayFeeding(props: DayFeedingProps) {
     // const debugLocId = 72
     // const debugDate = '2024-09-26'
-    
+
     // const isPoolFilled = await actions.isFilled(debugLocId, debugDate);
     // const todayCalc = await stockingActions.calculationForLocation(debugLocId, debugDate)
     // const prevCalc = await getPrevCalc1(debugLocId, todayCalc);
@@ -57,26 +57,26 @@ export default async function DayFeeding(props: DayFeedingProps) {
     const today = props.params.index;
 
     const currentDate: Date = new Date();
-    
+
     let dates = [];
 
 
     for (let i = -6; i <= 2; i++) {
-      let newDate = new Date();
-      newDate.setDate(currentDate.getDate() + i);
-      dates.push(newDate.toISOString().split("T")[0]);
+        let newDate = new Date();
+        newDate.setDate(currentDate.getDate() + i);
+        dates.push(newDate.toISOString().split("T")[0]);
     }
 
     const lines = await db.productionlines.findMany({
-        select:{
+        select: {
             id: true,
             name: true,
-            pools:{
-                select:{
+            pools: {
+                select: {
                     name: true,
                     id: true,
-                    locations:{
-                        select:{
+                    locations: {
+                        select: {
                             id: true,
                             name: true
                         }
@@ -87,11 +87,11 @@ export default async function DayFeeding(props: DayFeedingProps) {
     })
 
     const times = await db.time_table.findMany();
-  
+
     const items = await db.items.findMany({
-      where:{
-        item_type_id: 3
-      }
+        where: {
+            item_type_id: 3
+        }
     })
 
     const summary = await feedingActions.getAllSummary(lines, currentDate)
@@ -99,10 +99,11 @@ export default async function DayFeeding(props: DayFeedingProps) {
     const feedingForLocation = async (locationId: number) => {
         const startOfDay = new Date(today);
         const endOfDay = new Date(today);
+
         endOfDay.setHours(23, 59, 59, 999); // Встановлює час на кінець дня (23:59:59.999)
 
         const feedingDocument = await db.documents.findMany({
-            where:{
+            where: {
                 doc_type_id: 9,
                 date_time: {
                     gte: startOfDay, // Більше або дорівнює початку дня
@@ -118,7 +119,7 @@ export default async function DayFeeding(props: DayFeedingProps) {
     // console.log('feedingForLocation: ', result)
 
     // Змінна для зберігання масиву даних
-    let data : feedingInfo[] = [];
+    let data: feedingInfo[] = [];
 
     for (const line of lines) {
         for (const pool of line.pools) {
@@ -157,25 +158,25 @@ export default async function DayFeeding(props: DayFeedingProps) {
 
                     todayDate.setUTCHours(hours, 0, 0, 0);
                     const fedAlready = await db.documents.findMany({
-                        select:{
-                            itemtransactions:{
-                                select:{
+                        select: {
+                            itemtransactions: {
+                                select: {
                                     quantity: true
                                 },
-                                where:{
+                                where: {
                                     location_id: loc.id
                                 }
                             },
                             location_id: true
                         },
-                        where:{
+                        where: {
                             location_id: loc.id,
                             doc_type_id: 9,
                             date_time: todayDate
                         }
-                    })  
+                    })
 
-                    return(fedAlready)
+                    return (fedAlready)
                 }
 
                 const editing6 = await getEdited(6)
@@ -187,7 +188,7 @@ export default async function DayFeeding(props: DayFeedingProps) {
                 const transition = todayCalc?.calc?.transition_day
 
                 const feedingAmount = transition && todayCalc?.calc?.feed_per_feeding && todayCalc?.calc?.feed_per_feeding * (1 - transition * 0.2)
-                
+
                 data.push(
                     {
                         date: today,
@@ -208,9 +209,9 @@ export default async function DayFeeding(props: DayFeedingProps) {
                     }
                 );
 
-                if(transition) {
+                if (transition) {
                     const feedingAmount = todayCalc?.calc?.feed_per_feeding && todayCalc?.calc?.feed_per_feeding * (transition * 0.2)
-               
+
                     data.push(
                         {
                             date: today,
@@ -252,88 +253,88 @@ export default async function DayFeeding(props: DayFeedingProps) {
                 <ExportButton times={times} lines={lines} data={data} />
             </div>
             <div>*Кількість вказана у грамах</div>
-            
+
 
             {lines.map(line => (
                 <table key={line.id} className="border-collapse border w-full mb-4 text-sm w-5/6">
-                <thead>
-                    <tr>
-                        <th
-                        colSpan={2 * times.length + 3}
-                        className="px-4 py-2 bg-blue-100">
-                        {line.name}
-                        </th>
-                        <th
-                        className="px-4 py-2 bg-blue-100">
-                        {today.slice(5)}
-                        </th>
-                    </tr>
-                    <tr>
-                        <th className="border p-2">Басейн</th>
-                        <th className="border p-2 ">Вид корму</th>
-                        <th className="border p-2 w-24">Назва корму</th>
-                        {times.map((time, index) => (
-                        <React.Fragment key={index}>
-                            <th className="border p-2">{time.time}</th>
-                            <th className="border">Коригування</th>
-                        </React.Fragment>
-                        ))}
-                        <th className="border p-2">Годувати</th>
-                    </tr>
+                    <thead>
+                        <tr>
+                            <th
+                                colSpan={2 * times.length + 3}
+                                className="px-4 py-2 bg-blue-100">
+                                {line.name}
+                            </th>
+                            <th
+                                className="px-4 py-2 bg-blue-100">
+                                {today.slice(5)}
+                            </th>
+                        </tr>
+                        <tr>
+                            <th className="border p-2">Басейн</th>
+                            <th className="border p-2 ">Вид корму</th>
+                            <th className="border p-2 w-24">Назва корму</th>
+                            {times.map((time, index) => (
+                                <React.Fragment key={index}>
+                                    <th className="border p-2">{time.time}</th>
+                                    <th className="border">Коригування</th>
+                                </React.Fragment>
+                            ))}
+                            <th className="border p-2">Годувати</th>
+                        </tr>
                     </thead>
-                <tbody>
-                {line.pools.map(pool => {
-                    return Promise.all(pool.locations.map(async loc => {
-                    
-                    const isPoolFilled = await actions.isFilled(loc.id, today)
+                    <tbody>
+                        {line.pools.map(pool => {
+                            return Promise.all(pool.locations.map(async loc => {
 
-                    let prevCalc = null;
+                                const isPoolFilled = await actions.isFilled(loc.id, today)
 
-                    let locationInfo : LocationInfo = {
-                        location_id: loc.id,
-                        location_name: loc.name,
-                        fed_today: await feedingForLocation(loc.id)
-                    };
+                                let prevCalc = null;
 
-                    let todayCalc
+                                let locationInfo: LocationInfo = {
+                                    location_id: loc.id,
+                                    location_name: loc.name,
+                                    fed_today: await feedingForLocation(loc.id)
+                                };
 
-                    if(isPoolFilled === true){
-                        todayCalc = await stockingActions.calculationForLocation(loc.id, today);
+                                let todayCalc
 
-                        // console.log(loc.name, todayCalc)
-                
-                        if (todayCalc?.calc?.transition_day !== null){
-                            prevCalc = await stockingActions.getPrevCalc(loc.id, todayCalc);
-                        }
-            
-                        const batchInfo = await stockingActions.poolInfo(loc.id, today)
-            
-                        if (batchInfo) {
-                        locationInfo = {
-                            ...locationInfo,
-                            batch_id: batchInfo.batch?.id
-                        };
-                        }
-                    }
-                    
-                    return (
-                        <>
-                            <DaySummaryContent
-                                key={loc.id}
-                                location={locationInfo} 
-                                today={today}
-                                todayCalculation={todayCalc} 
-                                prevCalculation={prevCalc} 
-                                times={times}
-                                items={items}
-                            />
-                            
-                        </>
-                        
-                    );  
-                    }));
-                })}
-                </tbody>
+                                if (isPoolFilled === true) {
+                                    todayCalc = await stockingActions.calculationForLocation(loc.id, today);
+
+                                    // console.log(loc.name, todayCalc)
+
+                                    if (todayCalc?.calc?.transition_day !== null) {
+                                        prevCalc = await stockingActions.getPrevCalc(loc.id, todayCalc);
+                                    }
+
+                                    const batchInfo = await stockingActions.poolInfo(loc.id, today)
+
+                                    if (batchInfo) {
+                                        locationInfo = {
+                                            ...locationInfo,
+                                            batch_id: batchInfo.batch?.id
+                                        };
+                                    }
+                                }
+
+                                return (
+                                    <>
+                                        <DaySummaryContent
+                                            key={loc.id}
+                                            location={locationInfo}
+                                            today={today}
+                                            todayCalculation={todayCalc}
+                                            prevCalculation={prevCalc}
+                                            times={times}
+                                            items={items}
+                                        />
+
+                                    </>
+
+                                );
+                            }));
+                        })}
+                    </tbody>
                 </table>
             ))}
             <DailyFeedWeightPage lines={lines} summary={summary} items={items} date={today} />

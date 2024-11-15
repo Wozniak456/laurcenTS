@@ -1,7 +1,7 @@
 import { db } from "@/db"
 import Link from "next/link";
 import * as actions from '@/actions'
-import  LeftoversTable  from '@/components/leftovers-table'
+import LeftoversTable from '@/components/leftovers-table'
 import ExportButton from "@/components/leftoversTableToPrint";
 
 interface LeftoversPerPeriodProps {
@@ -10,7 +10,7 @@ interface LeftoversPerPeriodProps {
     }
 }
 
-interface DataItem{
+interface DataItem {
     batch_id: string;
     batch_name: string;
     feed_type_name: string,
@@ -21,25 +21,25 @@ interface DataItem{
     end_saldo: number;
 }
 
-export default async function LeftoversPerPeriod(props: LeftoversPerPeriodProps){
+export default async function LeftoversPerPeriod(props: LeftoversPerPeriodProps) {
     const parts = props.params.period.split('_');
-    
-    try{
-        
+
+    try {
+
         let StartSaldoDate = new Date(parts[0])
         const EndSaldoDate1 = new Date(parts[1])
 
         const EndSaldoDate: Date = new Date(EndSaldoDate1);
-        EndSaldoDate.setDate(EndSaldoDate.getDate() + 1 );
-    
-        const end_saldo = await actions.calculateSaldo(undefined, undefined, undefined)
+        EndSaldoDate.setDate(EndSaldoDate.getDate() + 1);
+
+        const end_saldo = await actions.calculateSaldo(undefined, EndSaldoDate, undefined)
         const start_saldo = await actions.calculateSaldo(undefined, StartSaldoDate, undefined)
         const incoming = await actions.calculateSaldo(StartSaldoDate, EndSaldoDate, { gt: 0 })
         const outcoming = await actions.calculateSaldo(StartSaldoDate, EndSaldoDate, { lt: 0 })
 
         let data: DataItem[] = []
 
-        for (const batch_id in end_saldo){
+        for (const batch_id in end_saldo) {
             if (Object.prototype.hasOwnProperty.call(end_saldo, batch_id)) {
                 data.push({
                     batch_id: batch_id,
@@ -54,33 +54,33 @@ export default async function LeftoversPerPeriod(props: LeftoversPerPeriodProps)
             }
         }
 
-        return( 
-           <div className="my-4 flex flex-col gap-4">
-            <div className="flex justify-end w-full ">
-                <Link 
-                    href={`/leftovers/view`}
-                    className="py-2 w-40 text-center font-bold text-blue-500 hover:underline underline-offset-2">
-                    Назад
-                </Link>
-            </div>
-            <div>
-                <div className="flex justify-between p-2 text-lg font-bold">
-                    <h1>Початок: {StartSaldoDate.toISOString().split("T")[0]}</h1>
-                    <h1>Кінець: {EndSaldoDate1.toISOString().split("T")[0]}</h1>
+        return (
+            <div className="my-4 flex flex-col gap-4">
+                <div className="flex justify-end w-full ">
+                    <Link
+                        href={`/leftovers/view`}
+                        className="py-2 w-40 text-center font-bold text-blue-500 hover:underline underline-offset-2">
+                        Назад
+                    </Link>
                 </div>
+                <div>
+                    <div className="flex justify-between p-2 text-lg font-bold">
+                        <h1>Початок: {StartSaldoDate.toISOString().split("T")[0]}</h1>
+                        <h1>Кінець: {EndSaldoDate1.toISOString().split("T")[0]}</h1>
+                    </div>
 
-                <LeftoversTable data={data}/>
+                    <LeftoversTable data={data} />
 
-                <ExportButton  />
+                    <ExportButton />
 
-                
+
+                </div>
             </div>
-           </div>
         )
 
-        
+
     }
-    catch(error){
+    catch (error) {
         console.error("Error fetching batch data:", error);
     }
     finally {
