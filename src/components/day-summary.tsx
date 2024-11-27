@@ -1,309 +1,221 @@
 'use client'
 
-import React, { ChangeEvent, use, useEffect, useState } from "react";
-import { useFormState } from "react-dom";
-import * as actions from '@/actions';
-import { calculationAndFeed } from '@/types/app_types'
-import Image from 'next/image';
-import feedButton from '../../public/icons/typcn_arrow-up-outline.svg'
-import SuccessButton from'../../public/icons/SuccessFeeding.svg'
-import CrossButton from'../../public/icons/UnsuccessfulFeeding.svg'
+import React, { ChangeEvent, ChangeEventHandler, use, useEffect, useMemo, useState } from "react";
+import RowForFeeding from "./RowForFeeding";
+import { Popover, PopoverTrigger, PopoverContent, Button, Input, Select, SelectItem } from "@nextui-org/react";
 
 
-interface DaySummaryProps{
-  location: {
-    location_id: number;
-    location_name: string;
-    batch_id?: bigint; // batch_id є необов'язковим
-    fed_today?: {
-      time: string;
-      quantity: number;
+interface DaySummaryProps {
+  data: FeedingInfo[]
+  lines: {
+    id: number;
+    name: string;
+    pools: {
+      id: number;
+      name: string;
+      locations: {
+        id: number;
+        name: string;
+      }[];
+    }[];
   }[]
-  },
   today: string,
-  todayCalculation: calculationAndFeed | null | undefined,
-  prevCalculation: calculationAndFeed | null | undefined,
   times: {
     id: number;
     time: string;
   }[],
-  items: itemType[]
+  feeds: {
+    id: number;
+    name: string;
+    feedtypes: {
+      id: number;
+      name: string;
+    } | null;
+  }[]
 }
 
-interface itemType{
-    id: number | undefined;
-    name: string | undefined;
-    description: string | null;
-    item_type_id: number | null;
-    feed_type_id: number | null;
-    default_unit_id: number | null;
-    parent_item: number | null;
+interface FeedingInfo {
+  date: string;
+  locId: number;
+  locName: string,
+  rowCount?: number;
+  feedings?: Feeding[]
+  batch?: {
+    id: number,
+    name: string
+  }
 }
 
-type feedArray = {
-  item_id: number | undefined,
-  qty: string | undefined
+interface Feeding {
+  feedType: string;
+  feedName?: string;
+  feedId?: number,
+  feedings?: { [time: string]: { feeding?: string; editing?: string } };
 }
-
-type itemAndTime ={
-  item: string | undefined; 
-  time?: string;
-} | null
 
 export default function DaySummaryContent({
-  location,
-  today, 
-  todayCalculation, 
-  prevCalculation, 
+  data,
+  lines,
+  today,
   times,
-  items
+  feeds
 }
   : DaySummaryProps) {
 
+  // useEffect(() => {
+  //   data.map(data1 => {
+  //     console.log(data1.locId)
+  //     console.log(data1.feedings?.length)
+  //   })
+  // }, [data])
 
-    // const props = {
-    //   location,
-    //   today,
-    //   todayCalculation,
-    //   prevCalculation,
-    // }
+  const getRowCount = (() => {
+    const renderedRows = new Map<number, number>();
 
-    const actualDate = new Date()
+    return (data: { feedings?: Array<any> }, locId: number) => {
+      const rowCount = data.feedings?.length; // Отримуємо кількість рядків з data.feedings
 
-    const [formState, action] = useFormState(actions.feedBatch, { message: '' });
-    
-    const transitionDay = todayCalculation?.calc?.transition_day
-
-    let initialValues: itemAndTime[] = times.map((timeValue) => 
-      transitionDay && todayCalculation?.calc?.feed_per_feeding
-        ? {
-            item: (todayCalculation.calc.feed_per_feeding * (1 - transitionDay * 0.2)).toFixed(1),
-            time: timeValue.time
-          }
-        : {
-            item: todayCalculation?.calc?.feed_per_feeding.toFixed(1),
-            time: timeValue.time
-          }
-    );
-    
-
-    if (transitionDay && prevCalculation?.calc) {
-      initialValues = [
-        ...initialValues,
-        ...times.map((timeValue) =>
-          todayCalculation?.calc?.feed_per_feeding
-            ? {
-                item: (todayCalculation.calc.feed_per_feeding * (transitionDay * 0.2)).toFixed(1),
-                time: timeValue.time
-              }
-            : null
-        )
-      ];
-    }
-    
-  
-  const [inputValues, setInputValues] = useState<itemAndTime[]>(initialValues);
-  
-  const handleInputChange = (index: number) => (event: ChangeEvent<HTMLInputElement>) => {
-    const newValues = [...inputValues];
-    newValues[index] = {
-      ...newValues[index], // зберігаємо попередні значення (включаючи `time`)
-      item: event.target.value, // оновлюємо тільки `item`
+      if (rowCount && rowCount > 1) {
+        if (!renderedRows.has(locId)) {
+          renderedRows.set(locId, rowCount);
+          return rowCount; // Повертаємо кількість рядків
+        }
+        return 0; // Вже відрендерено
+      }
+      return 1; // Якщо тільки один рядок, повертаємо 1
     };
-    setInputValues(newValues);
+  })();
+
+  const [showTextForPool, setShowTextForPool] = useState<number | null>(null);
+  const [addedNewFeed, setAddedNewFeed] = useState<number | undefined>(undefined);
+  const [feedingsData, setFeedingsData] = useState(data); // Локальний стан для збереження даних кормів
+
+  // Функція для додавання нового корму до feedings
+  const handleAddFeedClick = (locId: number, feedId: number) => {
+    const newFeed = feeds.find(feed => feed.id === feedId);
+    if (newFeed) {
+      const updatedData = feedingsData.map((feedingInfo) => {
+        if (feedingInfo.locId === locId) {
+          const updatedFeedings = [...(feedingInfo.feedings || [])];
+          updatedFeedings.push({
+            feedType: newFeed.feedtypes?.name ?? "",
+            feedName: newFeed.name,
+            feedId: newFeed.id,
+            feedings: Object.fromEntries(
+              times.map(({ time }) => {
+                const hours = Number(time.split(':')[0]);
+                return [
+                  hours.toString(),
+                  { feeding: '0', editing: '' },
+                ];
+              })
+            ),
+          });
+          return {
+            ...feedingInfo,
+            feedings: updatedFeedings,
+            rowCount: updatedFeedings.length, // Оновлюємо rowCount
+          };
+        }
+        return feedingInfo;
+      });
+
+      setFeedingsData(updatedData);
+      setShowTextForPool(locId);
+      setAddedNewFeed(undefined);
+    }
   };
-
-  const todayFeed = items.find(item => item.id === todayCalculation?.feed?.item_id);  
-
-  let prevFeed 
-  if(transitionDay && prevCalculation?.calc){
-    prevFeed = items.find(item => item.id === prevCalculation?.feed?.item_id);
-  }
-
-  const [buttonMode, setButtonMode] = useState(false);
-
 
   return (
     <>
-     <tr key={`${location.location_id}`}>
-     {/* <tr key={`${pool.id}-1`}> */}
-      <td rowSpan={transitionDay ? 2 : 1} className="px-4 py-2 border border-gray-400 w-14">{location.location_name}</td>
-      {todayCalculation?.calc ? 
-        <React.Fragment>
-          <td className="px-4 py-2 border border-gray-400">{transitionDay ? prevCalculation?.feed?.type_name : todayCalculation?.feed?.type_name}</td>
-          <td className="px-4 py-2 border border-gray-400 w-40">{transitionDay && prevCalculation ? items.find(item => item.id === prevCalculation.feed?.item_id)?.name : items.find(item => item.id === todayCalculation.feed?.item_id)?.name}</td>
-        
-        </React.Fragment>
-         : 
-         <React.Fragment>
-          <td className="px-4 py-2 border border-gray-400"></td>
-          <td className="px-4 py-2 border border-gray-400"></td>
-         </React.Fragment>
-        }
-        
-      {times.map((time, index) => {
-        if(todayCalculation?.calc){ 
-          const feedQty = location?.fed_today?.find(row => row.time = time.time)?.quantity ?? 0
-          return(
-            <React.Fragment key={index}>
-            <td className="px-4 py-2 border border-gray-400">{transitionDay ? (todayCalculation?.calc?.feed_per_feeding * (1 - transitionDay * 0.2)).toFixed(1) : todayCalculation?.calc?.feed_per_feeding.toFixed(1)}</td>
-            <td className="px-4 py-2 border border-gray-400">
-            <form>
-              
-              <div className="flex justify-center">
-                {location.fed_today?.length && location.fed_today?.length > 0 ? 
-                <input
-                  name={`feed_given`}
-                  className="border border-black w-full text-center"
-                  id={`feed_given_${index}`}
-                  value={feedQty * 1000}
+      {lines.map(line => (
+        <table key={line.id} className="border-collapse border w-full mb-4 text-sm w-5/6">
+          <thead>
+            <tr>
+              <th colSpan={2 * times.length + 3} className="px-4 py-2 bg-blue-100">
+                {line.name}
+              </th>
+              <th className="px-4 py-2 bg-blue-100">
+                {today.slice(5)}
+              </th>
+            </tr>
+            <tr>
+              <th className="border p-2">Басейн</th>
+              <th className="border p-2">Вид корму</th>
+              <th className="border p-2 w-24">Назва корму</th>
+              {times.map((time, index) => (
+                <React.Fragment key={index}>
+                  <th className="border p-2">{time.time}</th>
+                  <th className="border">Коригування</th>
+                </React.Fragment>
+              ))}
+              <th className="border p-2">Годувати</th>
+            </tr>
+          </thead>
+          <tbody>
+            {line.pools.map(pool =>
+              pool.locations.map((loc, index) => {
+                const dataForPool = feedingsData.find((row) => row.locId === loc.id); // Використовуємо локальний стан
+                const feedings = dataForPool?.feedings;
+                return (
+                  <React.Fragment key={index}>
+                    {feedings?.map((feeding, feedingIndex) => (
+                      <RowForFeeding
+                        key={feedingIndex}
+                        locInfo={{ id: loc.id, name: loc.name }}
+                        rowData={feeding}
+                        times={times}
+                        rowCount={feedingIndex === 0 && dataForPool ? getRowCount(dataForPool, loc.id) : 0} // Перевірка на undefined перед викликом
+                        today={today}
+                        batch={dataForPool?.batch}
+                      />
+                    ))}
 
-                  // onChange={handleInputChange(index)}
-                />
-                :
-                  <input
-                  name={`feed_given`}
-                  className="border border-black w-full bg-blue-100 text-center"
-                  id={`feed_given_${index}`}
-                  value={inputValues[index]?.item}
-                  onChange={handleInputChange(index)}
-                />
-                }
-              </div>
-            </form>
-            </td>
-            
-            </React.Fragment >
-          )
-          
-        }
-        else{
-          return(
-            <>
-            <td className="px-4 py-2 border border-gray-400"></td>
-            <td className="px-4 py-2 border border-gray-400"></td>
-            
-            </>
-          )
-        }
-      
-      })}
-      <td rowSpan={transitionDay ? 2 : 1} className="px-4 py-2 border border-gray-400">
-      {todayCalculation?.calc && 
-        <form action={action}>
-          <input type="hidden" name="location_id" value={location.location_id} />
-          <input type="hidden" name="executed_by" value={3} />
-          
+                    {feedings?.length && feedings.length > 0 ? (
+                      <tr>
+                        <td className="text-center text-md bg-gray-100">
+                          <Popover placement="bottom" showArrow offset={10}>
+                            <PopoverTrigger>
+                              <button className="py-0" color="primary">Додати корм</button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-[240px]">
+                              <div className="my-2 flex flex-col gap-2 w-full">
+                                {/* <div className="my-2 flex flex-col gap-2 w-full"> */}
+                                <Select
+                                  label="Корм"
+                                  placeholder="Оберіть корм"
+                                  className="max-w-xs"
+                                  onChange={(e) => setAddedNewFeed(Number(e.target.value))}
+                                >
+                                  {feeds.map((feed) => (
+                                    <SelectItem key={feed.id} value={feed.id}>
+                                      {feed.name}
+                                    </SelectItem>
+                                  ))}
+                                </Select>
+                                {/* </div> */}
+                                {addedNewFeed ?
+                                  <Button onClick={() => handleAddFeedClick(loc.id, addedNewFeed)}>
+                                    Додати
+                                  </Button>
+                                  : null
+                                }
 
-          {!transitionDay ?
-            <input type="hidden" name="item_0" value={todayFeed?.id}/> 
-            :
-            <input type="hidden" name="item_0" value={prevFeed?.id}/> 
-          }
+                              </div>
+                            </PopoverContent>
+                          </Popover>
 
-          {/* <input type="hidden" name="item_0" value={todayFeed?.id}/> */}
-          
-          <input type="hidden" name="batch_id" value={Number(location.batch_id)} />
-          <input type="hidden" name="date_time" value={today}/> 
+                        </td>
+                      </tr>
+                    ) : null}
+                  </React.Fragment>
+                );
+              })
+            )}
+          </tbody>
 
-          {transitionDay && prevCalculation?.calc &&
-            <input type="hidden" name="item_1" value={todayFeed?.id} />
-          }
-
-          {
-            inputValues.map((value, index) => (
-              <>
-                <input key={index} type="hidden" name={`input_${index}`} value={value?.item} />
-                <input type="hidden" name={`time_${index}`} value={value?.time}/> 
-              </>
-              
-            ))
-          }
-          
-        {
-         today <= actualDate.toISOString().split("T")[0] && 
-         location.fed_today?.length == 0 &&
-          <div className="flex justify-center">
-          <button 
-            type="submit" 
-            className=""
-            onClick={() => { setButtonMode(true); }}
-          >
-            {!buttonMode && <Image src={feedButton} alt="feeding icon" height={35} />}
-            {formState.message && 
-            <>
-            {buttonMode && <Image 
-                src={formState.message.includes('успішно') ? SuccessButton : CrossButton} 
-                alt="status icon" 
-                height={30}/>}
-            </>
-              
-            }
-
-            {/* {formState.message && 
-            <div className="fixed left-10 bg-gray-100 top-1/2 transform -translate-y-1/2 ml-4">
-              <p>{formState.message}</p>
-            </div>
-            } */}
-          </button>
-        </div>
-        }
-        
-        </form>
-      }
-      </td>
-    </tr>
-    {transitionDay &&
-    <tr key={location.location_id}> 
-    {/* <tr key={`${pool.id}-1`}></tr> */}
-    {todayCalculation?.calc ? 
-      <React.Fragment>
-        <td className="px-4 py-2 border border-gray-400">{todayCalculation?.feed?.type_name}</td>
-        <td className="px-4 py-2 border border-gray-400">{items.find(item => item.id === todayCalculation.feed?.item_id)?.name}</td>
-      
-      </React.Fragment>
-       : 
-    <td className="px-4 py-2 border border-gray-400"></td>
-      }
-      
-    {times.map((time, index) => {
-      if(todayCalculation?.calc){ 
-        return(
-          <React.Fragment key={index}> 
-          <td className="px-4 py-2 border border-gray-400">{(todayCalculation?.calc?.feed_per_feeding * (transitionDay * 0.2)).toFixed(1)}</td>
-          
-          <td className="px-4 py-2 border border-gray-400">
-          <form action={action}>
-            
-            <div className="flex justify-between">
-              <input
-                name={`feed_given`}
-                className="border border-black w-full bg-blue-100 text-center"
-                id={`feed_given_${index+times.length}`}
-                value={inputValues[index + times.length]?.item}
-                onChange={handleInputChange(index+times.length)}
-              />
-            </div>
-          </form>
-          </td>
-          </React.Fragment>
-        )
-        
-      }
-      else{
-        return(
-          <>
-          <td className="px-4 py-2 border border-gray-400"></td>
-          <td className="px-4 py-2 border border-gray-400"></td>
-          </>
-        )
-      }
-    
-    })}
-  </tr>
-    }
-        </>
+        </table>
+      ))}
+    </>
   );
 }
-
-

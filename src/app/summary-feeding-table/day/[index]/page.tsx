@@ -3,14 +3,11 @@ import React from "react";
 import { db } from "@/db";
 import DailyFeedWeightPage from '@/components/DailyFeedWeight/daily-feed-weight'
 import * as feedingActions from "@/actions/feeding"
-
 import * as stockingActions from "@/actions/stocking"
 import * as actions from '@/actions'
-
 import DaySummaryContent from "@/components/day-summary"
-
 import ExportButton from "@/components/dayFeedingTableToPrint";
-import { calculationAndFeed } from "@/types/app_types";
+import { request } from "http";
 
 
 interface DayFeedingProps {
@@ -29,69 +26,62 @@ interface LocationInfo {
     }[]
 }
 
-interface feedingInfo {
-    date: string,
-    poolId: number,
-    rowCount?: number
-    feedType?: string,
-    feedName?: string,
-    feeding6?: string,
-    editing6: string,
-    feeding10?: string,
-    editing10: string,
-    feeding14?: string,
-    editing14: string,
-    feeding18?: string,
-    editing18: string,
-    feeding22?: string,
-    editing22: string,
+interface FeedingInfo {
+    date: string;
+    locId: number;
+    locName: string,
+    rowCount?: number;
+    feedings?: Feeding[]
+    batch?: {
+        id: number,
+        name: string
+    }
+}
+
+type editingType = {
+    itemtransactions: {
+        quantity: number;
+    }[];
+}
+
+interface Feeding {
+    feedType: string;
+    feedName?: string;
+    feedId?: number,
+    feedings?: { [time: string]: { feeding?: string; editing?: string } };
+}
+
+type extraData = {
+    feedType: string,
+    feedName: string,
+    date_time: string,
+    item_id: number,
+    quantity: number,
+    location_id: number
 }
 
 export default async function DayFeeding(props: DayFeedingProps) {
-    // const debugLocId = 72
-    // const debugDate = '2024-09-26'
-
-    // const isPoolFilled = await actions.isFilled(debugLocId, debugDate);
-    // const todayCalc = await stockingActions.calculationForLocation(debugLocId, debugDate)
-    // const prevCalc = await getPrevCalc1(debugLocId, todayCalc);
-
-    // console.log('todayCalc: ', prevCalc)
-
     const today = props.params.index;
 
-    const currentDate: Date = new Date();
+    const currentDate: Date = new Date(today);
 
-    let dates = [];
+    const dates = datesArray(currentDate);
 
-
-    for (let i = -6; i <= 2; i++) {
-        let newDate = new Date();
-        newDate.setDate(currentDate.getDate() + i);
-        dates.push(newDate.toISOString().split("T")[0]);
-    }
-
-    const lines = await db.productionlines.findMany({
-        select: {
-            id: true,
-            name: true,
-            pools: {
-                select: {
-                    name: true,
-                    id: true,
-                    locations: {
-                        select: {
-                            id: true,
-                            name: true
-                        }
-                    }
-                }
-            }
-        }
-    })
+    const lines = await setLines();
 
     const times = await db.time_table.findMany();
 
     const items = await db.items.findMany({
+        select: {
+            id: true,
+            name: true,
+            feedtypes: {
+                select: {
+                    id: true,
+                    name: true
+                }
+            }
+        },
         where: {
             item_type_id: 3
         }
@@ -99,197 +89,15 @@ export default async function DayFeeding(props: DayFeedingProps) {
 
     const summary = await feedingActions.getAllSummary(lines, currentDate)
 
-    //return an array with eaten feed and not bool
-    const feedingForLocation = async (locationId: number) => {
-        const startOfDay = new Date(today);
-        const endOfDay = new Date(today);
+    const data = await setData(today, times);
 
-        endOfDay.setHours(23, 59, 59, 999); // Встановлює час на кінець дня (23:59:59.999)
+    // data.map(data1 => {
+    //     console.log('loc: ', data1.locId)
+    //     data1.feedings?.map(feeding => {
+    //         console.log(feeding)
+    //     })
 
-        // const feedingDocument = await db.documents.findMany({
-        //     where: {
-        //         doc_type_id: 9,
-        //         date_time: {
-        //             gte: startOfDay, // Більше або дорівнює початку дня
-        //             lte: endOfDay,   // Менше або дорівнює кінцю дня
-        //         },
-        //         location_id: locationId
-        //     }
-        // })
-
-        const query = await db.documents.findMany({
-            select:{
-                date_time: true,
-                itemtransactions: {
-                    select:{
-                        location_id: true,
-                        quantity: true
-                    },
-                    where:{
-                        location_id: locationId
-                    }
-                }
-            },
-            where:{
-                doc_type_id: 9,
-                date_time:{
-                    lte: endOfDay,
-                    gte: startOfDay
-                },
-                itemtransactions: {
-                    some: {
-                        location_id: locationId
-                    }
-                }
-            }
-        });
-
-        const timeQtyArray: { time: string; quantity: number }[] = [];
-
-        for (const record of query) {
-            const time = record.date_time.toISOString().split('T')[1].split(':').slice(0, 2).join(':'); // Форматуємо час: HH:MM
-            let totalQuantity = 0;
-
-            // Обчислюємо загальну кількість для цього часу
-            for (const transaction of record.itemtransactions) {
-                totalQuantity += transaction.quantity;
-            }
-
-            // Перевіряємо, чи вже існує такий час в масиві
-            const existingTime = timeQtyArray.find(item => item.time === time);
-            
-            if (existingTime) {
-                existingTime.quantity += totalQuantity; // Оновлюємо кількість для цього часу
-            } else {
-                // Додаємо новий запис для цього часу
-                timeQtyArray.push({ time, quantity: totalQuantity });
-            }
-        }
-        // console.log(`location ${locationId}: `, timeQtyArray);
-
-        return timeQtyArray;
-    }
-
-    // const result = await feedingForLocation(50)
-    // console.log('feedingForLocation: ', result)
-
-    // Змінна для зберігання масиву даних
-    let data: feedingInfo[] = [];
-
-    for (const line of lines) {
-        for (const pool of line.pools) {
-            for (const loc of pool.locations) {
-                const isPoolFilled = await actions.isFilled(loc.id, today);
-                let prevCalc = null;
-
-                let locationInfo: LocationInfo = {
-                    location_id: loc.id,
-                    location_name: loc.name,
-                    fed_today: await feedingForLocation(loc.id)
-                };
-
-                let todayCalc = null;
-
-                if (isPoolFilled) {
-                    todayCalc = await stockingActions.calculationForLocation(loc.id, today);
-
-                    if (todayCalc?.calc?.transition_day !== null) {
-                        prevCalc = await stockingActions.getPrevCalc(loc.id, todayCalc);
-                    }
-
-                    const batchInfo = await stockingActions.poolInfo(loc.id, today);
-
-                    if (batchInfo) {
-                        locationInfo = {
-                            ...locationInfo,
-                            batch_id: batchInfo.batch?.id
-                        };
-                    }
-                }
-
-                const getEdited = async (hours: number) => {
-
-                    const todayDate = new Date(today)
-
-                    todayDate.setUTCHours(hours, 0, 0, 0);
-                    const fedAlready = await db.documents.findMany({
-                        select: {
-                            itemtransactions: {
-                                select: {
-                                    quantity: true
-                                },
-                                where: {
-                                    location_id: loc.id
-                                }
-                            },
-                            location_id: true
-                        },
-                        where: {
-                            location_id: loc.id,
-                            doc_type_id: 9,
-                            date_time: todayDate
-                        }
-                    })
-
-                    return (fedAlready)
-                }
-
-                const editing6 = await getEdited(6)
-                const editing10 = await getEdited(10)
-                const editing14 = await getEdited(14)
-                const editing18 = await getEdited(18)
-                const editing22 = await getEdited(22)
-
-                const transition = todayCalc?.calc?.transition_day
-
-                const feedingAmount = transition && todayCalc?.calc?.feed_per_feeding && todayCalc?.calc?.feed_per_feeding * (1 - transition * 0.2)
-
-                data.push(
-                    {
-                        date: today,
-                        poolId: pool.id,
-                        rowCount: todayCalc?.calc?.transition_day ? 2 : 1,
-                        feedType: transition ? prevCalc?.feed.type_name : todayCalc?.feed.type_name,
-                        feedName: transition ? prevCalc?.feed.item_name : todayCalc?.feed.item_name,
-                        feeding6: transition ? feedingAmount?.toFixed(1) : todayCalc?.calc?.feed_per_feeding.toFixed(1),
-                        editing6: editing6[0]?.itemtransactions[0]?.quantity ? (editing6[0]?.itemtransactions[0]?.quantity * 1000).toFixed(1) : '',
-                        feeding10: transition ? feedingAmount?.toFixed(1) : todayCalc?.calc?.feed_per_feeding.toFixed(1),
-                        editing10: editing10[0]?.itemtransactions[0]?.quantity ? (editing10[0]?.itemtransactions[0]?.quantity * 1000).toFixed(1) : '',
-                        feeding14: transition ? feedingAmount?.toFixed(1) : todayCalc?.calc?.feed_per_feeding.toFixed(1),
-                        editing14: editing14[0]?.itemtransactions[0]?.quantity ? (editing14[0]?.itemtransactions[0]?.quantity * 1000).toFixed(1) : '',
-                        feeding18: transition ? feedingAmount?.toFixed(1) : todayCalc?.calc?.feed_per_feeding.toFixed(1),
-                        editing18: editing18[0]?.itemtransactions[0]?.quantity ? (editing18[0]?.itemtransactions[0]?.quantity * 1000).toFixed(1) : '',
-                        feeding22: transition ? feedingAmount?.toFixed(1) : todayCalc?.calc?.feed_per_feeding.toFixed(1),
-                        editing22: editing22[0]?.itemtransactions[0]?.quantity ? (editing22[0]?.itemtransactions[0]?.quantity * 1000).toFixed(1) : '',
-                    }
-                );
-
-                if (transition) {
-                    const feedingAmount = todayCalc?.calc?.feed_per_feeding && todayCalc?.calc?.feed_per_feeding * (transition * 0.2)
-
-                    data.push(
-                        {
-                            date: today,
-                            poolId: pool.id,
-                            rowCount: todayCalc?.calc?.transition_day ? 2 : 1,
-                            feedType: todayCalc?.feed.type_name,
-                            feedName: todayCalc?.feed.item_name,
-                            feeding6: feedingAmount?.toFixed(1),
-                            editing6: editing6[1]?.itemtransactions[0]?.quantity ? (editing6[1]?.itemtransactions[0]?.quantity * 1000).toFixed(1) : '',
-                            feeding10: feedingAmount?.toFixed(1),
-                            editing10: editing10[1]?.itemtransactions[0]?.quantity ? (editing10[1]?.itemtransactions[0]?.quantity * 1000).toFixed(1) : '',
-                            feeding14: feedingAmount?.toFixed(1),
-                            editing14: editing14[1]?.itemtransactions[0]?.quantity ? (editing14[1]?.itemtransactions[0]?.quantity * 1000).toFixed(1) : '',
-                            feeding18: feedingAmount?.toFixed(1),
-                            editing18: editing18[1]?.itemtransactions[0]?.quantity ? (editing18[1]?.itemtransactions[0]?.quantity * 1000).toFixed(1) : '',
-                            feeding22: feedingAmount?.toFixed(1),
-                            editing22: editing22[1]?.itemtransactions[0]?.quantity ? (editing22[1]?.itemtransactions[0]?.quantity * 1000).toFixed(1) : '',
-                        }
-                    );
-                }
-            }
-        }
-    }
+    // })
 
     return (
         <div className="flex flex-col justify-center ">
@@ -308,91 +116,496 @@ export default async function DayFeeding(props: DayFeedingProps) {
                 <ExportButton times={times} lines={lines} data={data} />
             </div>
             <div>*Кількість вказана у грамах</div>
-
-
-            {lines.map(line => (
-                <table key={line.id} className="border-collapse border w-full mb-4 text-sm w-5/6">
-                    <thead>
-                        <tr>
-                            <th
-                                colSpan={2 * times.length + 3}
-                                className="px-4 py-2 bg-blue-100">
-                                {line.name}
-                            </th>
-                            <th
-                                className="px-4 py-2 bg-blue-100">
-                                {today.slice(5)}
-                            </th>
-                        </tr>
-                        <tr>
-                            <th className="border p-2">Басейн</th>
-                            <th className="border p-2 ">Вид корму</th>
-                            <th className="border p-2 w-24">Назва корму</th>
-                            {times.map((time, index) => (
-                                <React.Fragment key={index}>
-                                    <th className="border p-2">{time.time}</th>
-                                    <th className="border">Коригування</th>
-                                </React.Fragment>
-                            ))}
-                            <th className="border p-2">Годувати</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {line.pools.map(pool => {
-                            return Promise.all(pool.locations.map(async loc => {
-
-                                const isPoolFilled = await actions.isFilled(loc.id, today)
-
-                                let prevCalc = null;
-
-                                let locationInfo: LocationInfo = {
-                                    location_id: loc.id,
-                                    location_name: loc.name,
-                                    fed_today: await feedingForLocation(loc.id)
-                                };
-
-                                let todayCalc
-
-                                if (isPoolFilled === true) {
-                                    todayCalc = await stockingActions.calculationForLocation(loc.id, today);
-
-                                    // console.log(loc.name, todayCalc)
-
-                                    if (todayCalc?.calc?.transition_day !== null) {
-                                        prevCalc = await stockingActions.getPrevCalc(loc.id, todayCalc);
-                                    }
-
-                                    const batchInfo = await stockingActions.poolInfo(loc.id, today)
-
-                                    if (batchInfo) {
-                                        locationInfo = {
-                                            ...locationInfo,
-                                            batch_id: batchInfo.batch?.id
-                                        };
-                                    }
-                                }
-
-                                return (
-                                    <>
-                                        <DaySummaryContent
-                                            key={loc.id}
-                                            location={locationInfo}
-                                            today={today}
-                                            todayCalculation={todayCalc}
-                                            prevCalculation={prevCalc}
-                                            times={times}
-                                            items={items}
-                                        />
-
-                                    </>
-
-                                );
-                            }));
-                        })}
-                    </tbody>
-                </table>
-            ))}
+            <DaySummaryContent data={data} lines={lines} times={times} today={today} feeds={items} />
             <DailyFeedWeightPage lines={lines} summary={summary} items={items} date={today} />
         </div>
     );
+}
+
+//set dates to show on page
+const datesArray = (currentDate: Date) => {
+    let dates = [];
+    for (let i = -6; i <= 2; i++) {
+        let newDate = new Date();
+        newDate.setDate(currentDate.getDate() + i);
+        dates.push(newDate.toISOString().split("T")[0]);
+    }
+    return dates
+}
+
+
+//return an array with eaten feed and not bool
+const feedingForLocation = async (locationId: number, today: Date) => {
+    const startOfDay = new Date(today);
+    const endOfDay = new Date(today);
+
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const query = await db.documents.findMany({
+        select: {
+            date_time: true,
+            itemtransactions: {
+                select: {
+                    location_id: true,
+                    quantity: true
+                },
+                where: {
+                    location_id: locationId
+                }
+            }
+        },
+        where: {
+            doc_type_id: 9,
+            date_time: {
+                lte: endOfDay,
+                gte: startOfDay
+            },
+            itemtransactions: {
+                some: {
+                    location_id: locationId
+                }
+            }
+        }
+    });
+
+    const timeQtyArray: { time: string; quantity: number }[] = [];
+
+    for (const record of query) {
+        const time = record.date_time.toISOString().split('T')[1].split(':').slice(0, 2).join(':'); // Форматуємо час: HH:MM
+        let totalQuantity = 0;
+
+        // Обчислюємо загальну кількість для цього часу
+        for (const transaction of record.itemtransactions) {
+            totalQuantity += transaction.quantity;
+        }
+
+        // Перевіряємо, чи вже існує такий час в масиві
+        const existingTime = timeQtyArray.find(item => item.time === time);
+
+        if (existingTime) {
+            existingTime.quantity += totalQuantity; // Оновлюємо кількість для цього часу
+        } else {
+            // Додаємо новий запис для цього часу
+            timeQtyArray.push({ time, quantity: totalQuantity });
+        }
+    }
+    return timeQtyArray;
+}
+
+
+const setData = async (today: string, times: { id: number, time: string }[]) => {
+
+    const currentDate = new Date(today);
+
+    const lines = await setLines();
+
+    let data: FeedingInfo[] = [];
+
+    const getEdited = async (hours: number, locId: number, itemId: number) => {
+
+        const todayDate = new Date(today)
+
+        todayDate.setUTCHours(hours, 0, 0, 0);
+        const fedAlready = await db.documents.findMany({
+            select: {
+                itemtransactions: {
+                    select: {
+                        quantity: true
+                    },
+                    where: {
+                        location_id: locId,
+                        itembatches: {
+                            items: {
+                                id: itemId
+                            }
+                        }
+                    }
+                }
+            },
+            where: {
+                location_id: locId,
+                doc_type_id: 9,
+                date_time: todayDate
+            }
+        })
+
+        return (fedAlready)
+    }
+
+    for (const line of lines) {
+        for (const pool of line.pools) {
+            for (const loc of pool.locations) {
+                const isPoolFilled = await actions.isFilled(loc.id, today);
+
+                let locationInfo: LocationInfo = {
+                    location_id: loc.id,
+                    location_name: loc.name,
+                    fed_today: await feedingForLocation(loc.id, currentDate),
+                };
+
+                let todayCalc = null;
+                let prevCalc = null;
+
+                let extraFilledRows: Record<number, extraData[]> = {}
+
+                if (isPoolFilled) {
+                    todayCalc = await stockingActions.calculationForLocation(loc.id, today);
+
+                    if (todayCalc?.calc?.transition_day !== null) {
+                        prevCalc = await stockingActions.getPrevCalc(loc.id, todayCalc);
+                    }
+
+                    const batchInfo = await stockingActions.poolInfo(loc.id, today);
+
+                    if (batchInfo) {
+                        locationInfo = {
+                            ...locationInfo,
+                            batch_id: batchInfo.batch?.id,
+                        };
+                    }
+
+                    extraFilledRows = await getExtraData(loc.id, today, prevCalc?.feed.item_id, todayCalc?.feed.item_id)
+
+                }
+
+                let editings: {
+                    [locId: number]: {
+                        [itemId: number]: {
+                            [time: string]: editingType[]
+                        }
+                    }
+                } = {};
+
+                await Promise.all(
+                    times.map(async (time) => {
+                        const hours = Number(time.time.split(':')[0]);
+
+                        const itemIds = [
+                            todayCalc?.feed.item_id,
+                            prevCalc?.feed.item_id,
+                        ].filter((itemId): itemId is number => !!itemId); // Фільтруємо `undefined`
+
+                        for (const itemId of itemIds) {
+                            const editing = await getEdited(hours, loc.id, itemId);
+
+                            // Ініціалізуємо вкладені об'єкти, якщо їх немає
+                            if (!editings[loc.id]) {
+                                editings[loc.id] = {};
+                            }
+                            if (!editings[loc.id][itemId]) {
+                                editings[loc.id][itemId] = {};
+                            }
+                            if (!editings[loc.id][itemId][time.time]) {
+                                editings[loc.id][itemId][time.time] = [];
+                            }
+
+                            // Додаємо значення до editings
+                            editings[loc.id][itemId][time.time] = editing;
+                        }
+                    })
+                );
+
+                const transition = todayCalc?.calc?.transition_day;
+
+                const feedingAmountForPrev =
+                    transition && todayCalc?.calc?.feed_per_feeding
+                        ? todayCalc.calc.feed_per_feeding * (1 - transition * 0.2)
+                        : undefined;
+
+                const feedingAmountForToday =
+                    transition && todayCalc?.calc?.feed_per_feeding
+                        ? todayCalc.calc.feed_per_feeding * (transition * 0.2)
+                        : undefined;
+
+                // Створення загального об'єкта для басейна
+                const feedings: Feeding[] = [];
+
+                let feedingsCount = 0;
+
+                if (transition && prevCalc) {
+                    feedings.push({
+                        feedType: prevCalc.feed.type_name,
+                        feedName: prevCalc.feed.item_name,
+                        feedId: prevCalc.feed.item_id,
+                        feedings: Object.fromEntries(
+                            times.map(({ time }) => {
+                                // Парсимо години з часу
+                                const hours = Number(time.split(':')[0]);
+                                const itemId = prevCalc.feed.item_id; // Отримуємо itemId
+
+                                const editing = editings[loc.id]?.[itemId!]?.[time] || [];
+
+                                return [
+                                    hours.toString(), // Ключ - години у вигляді рядка
+                                    {
+                                        feeding: feedingAmountForPrev?.toFixed(1), // Форматуємо feedingAmountForPrev
+                                        editing: editing[0]?.itemtransactions[0]?.quantity !== undefined
+                                            ? (editing[0].itemtransactions[0].quantity * 1000).toFixed(1)
+                                            : '', // Якщо значення є, множимо і форматуємо; якщо ні, повертаємо порожній рядок
+                                    },
+                                ];
+                            })
+                        )
+                    });
+                    feedingsCount++;
+                }
+
+                if (transition && todayCalc) {
+                    feedings.push({
+                        feedType: todayCalc.feed.type_name,
+                        feedName: todayCalc.feed.item_name,
+                        feedId: todayCalc.feed.item_id,
+                        feedings: Object.fromEntries(
+                            times.map(({ time }) => {
+                                const hours = Number(time.split(':')[0]);
+                                const itemId = todayCalc.feed.item_id; // Отримуємо itemId
+                                const editing = editings[loc.id]?.[itemId!]?.[time] || [];
+
+                                return [
+                                    hours.toString(),
+                                    {
+                                        feeding: feedingAmountForToday?.toFixed(1),
+                                        editing:
+                                            editing[0]?.itemtransactions[0]?.quantity !== undefined
+                                                ? (editing[0].itemtransactions[0].quantity * 1000).toFixed(1)
+                                                : '',
+                                    },
+                                ];
+                            })
+                        ),
+                    });
+                    feedingsCount++;
+                } else if (todayCalc) {
+                    feedings.push({
+                        feedType: todayCalc.feed.type_name,
+                        feedName: todayCalc.feed.item_name,
+                        feedId: todayCalc.feed.item_id,
+                        feedings: Object.fromEntries(
+                            times.map(({ time }) => {
+                                const hours = Number(time.split(':')[0]);
+
+                                const itemId = todayCalc.feed.item_id; // Отримуємо itemId
+                                const editing = editings[loc.id]?.[itemId!]?.[time] || [];
+
+                                // editing.map(data1 => {
+                                //     console.log(loc.id)
+                                //     data1.itemtransactions.map(feeding => {
+                                //         console.log(feeding)
+                                //     })
+                                // })
+
+                                // console.log(editing)
+
+                                const toReturn = [
+                                    hours.toString(),
+                                    {
+                                        feeding: todayCalc.calc?.feed_per_feeding?.toFixed(1),
+                                        editing:
+                                            editing[0]?.itemtransactions[0]?.quantity !== undefined
+                                                ? (editing[0].itemtransactions[0].quantity * 1000).toFixed(1)
+                                                : '',
+                                    },
+                                ];
+
+                                // console.log(`loc: ${loc.id}`, toReturn)
+
+                                return toReturn
+                            })
+                        ),
+                    });
+                    feedingsCount++;
+                }
+
+
+                if (Object.keys(extraFilledRows).length > 0) {
+                    Object.keys(extraFilledRows).forEach(feedId => {
+                        const feedRows = extraFilledRows[Number(feedId)];
+
+                        // Створюємо об'єкт для зберігання feedings для кожного часу
+                        const feedingsForFeedId: Record<string, { feeding: string; editing: string }> = {};
+
+                        // Спочатку додаємо існуючі записи з extraFilledRows
+                        feedRows.forEach(row => {
+                            const hours = parseInt(row.date_time.split(':')[0], 10);
+
+                            if (!feedingsForFeedId[hours]) {
+                                feedingsForFeedId[hours] = {
+                                    feeding: '0', // Початкова кількість корму
+                                    editing: '0'    // Початкове редагування
+                                };
+                            }
+
+                            const editingValue = row.quantity ? (row.quantity * 1000).toFixed(1) : '0';
+                            feedingsForFeedId[hours].editing = editingValue;
+                        });
+
+                        // Потім додаємо записи для годин з масиву times
+                        times.forEach(({ time }) => {
+                            const hours = parseInt(time, 10);
+
+                            if (!feedingsForFeedId[hours]) {
+                                // Якщо запис для цього часу не існує, створюємо його
+                                feedingsForFeedId[hours] = {
+                                    feeding: '0', // Значення за замовчуванням
+                                    editing: '0'    // Редагування за замовчуванням
+                                };
+                            }
+                        });
+
+                        const valueToPush = {
+                            feedType: feedRows[0].feedType, // Тип корму
+                            feedName: feedRows[0].feedName, // Назва корму
+                            feedId: feedRows[0].item_id,    // ID корму
+                            feedings: feedingsForFeedId      // Зберігаємо feedings по годинах
+                        }
+
+                        // if (loc.id === 47) {
+                        //     console.log('hello bitches ', valueToPush)
+                        // }
+                        // Додаємо цей корм до основного масиву feedings
+                        feedings.push(valueToPush);
+                    });
+                    feedingsCount++;
+                }
+
+                // console.log('feedings: ', feedings)
+
+                // Додати до загального масиву
+                data.push({
+                    locId: loc.id,
+                    locName: loc.name,
+                    date: today,
+                    batch: {
+                        id: Number(todayCalc?.batch.batch_id),
+                        name: String(todayCalc?.batch.batch_name)
+                    },
+                    rowCount: feedingsCount,
+                    feedings,
+                });
+            }
+        }
+    }
+
+    return data
+}
+
+const setLines = async () => {
+    return await db.productionlines.findMany({
+        select: {
+            id: true,
+            name: true,
+            pools: {
+                select: {
+                    name: true,
+                    id: true,
+                    locations: {
+                        select: {
+                            id: true,
+                            name: true
+                        }
+                    }
+                }
+            }
+        }
+    })
+}
+
+async function getExtraData(locId: number, today: string, prevItemId?: number, todayItemId?: number) {
+
+    const startOfDay = new Date(today);
+    const endOfDay = new Date(today);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const query = await db.documents.findMany({
+        select: {
+            date_time: true,
+            itemtransactions: {
+                select: {
+                    location_id: true,
+                    quantity: true,
+                    itembatches: {
+                        select: {
+                            items: {
+                                select: {
+                                    id: true,
+                                    name: true,
+                                    feedtypes: {
+                                        select: {
+                                            name: true
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                where: { location_id: locId }
+            },
+        },
+        where: {
+            doc_type_id: 9,
+            date_time: { lte: endOfDay, gte: startOfDay },
+            itemtransactions: { some: { location_id: locId } },
+        },
+    });
+
+
+    // if (locId === 47) {
+    //     console.log('hello bitches')
+    //     query.map(qu => {
+    //         qu.itemtransactions.map(tran => {
+    //             console.log(tran)
+    //         })
+    //     })
+    // }
+
+    // Фільтруємо записи, де є транзакції
+    const filteredQuery = query.filter(doc => doc.itemtransactions.length > 0);
+
+    // Масив з prevItemId та todayItemId
+    const prevAndTodayItemIds = [prevItemId, todayItemId].filter(Boolean);
+
+    // Масив унікальних item_id
+    const uniqueItemIds = filteredQuery.flatMap(doc =>
+        doc.itemtransactions.flatMap(tran =>
+            tran.itembatches.items.id // Доступ до item_id без використання map
+                ? [tran.itembatches.items.id] // Якщо item_id є, додаємо його в масив
+                : []
+        )
+    ).filter(itemId => !prevAndTodayItemIds.includes(itemId)); // Фільтруємо item_id, яких немає в prevItemId та todayItemId
+
+    // Групуємо записи по item_id
+    const groupedByItemId: Record<number, any[]> = {};
+
+    filteredQuery.forEach(doc => {
+        doc.itemtransactions.forEach(tran => {
+            const itemId = tran.itembatches.items.id;
+            if (uniqueItemIds.includes(itemId)) {
+                const record = {
+                    feedType: tran.itembatches.items.feedtypes?.name,
+                    feedName: tran.itembatches.items.name,
+                    date_time: doc.date_time.toISOString().split("T")[1],
+                    item_id: itemId,
+                    quantity: tran.quantity,
+                    location_id: tran.location_id
+                };
+
+                if (!groupedByItemId[itemId]) {
+                    groupedByItemId[itemId] = []; // Якщо ще немає такого item_id, ініціалізуємо масив
+                }
+
+                groupedByItemId[itemId].push(record); // Додаємо запис до масиву для цього item_id
+            }
+        });
+    });
+
+    // // Виведення результату
+    // console.log("Групування по item_id:");
+    // for (const [itemId, records] of Object.entries(groupedByItemId)) {
+    //     console.log(`для item_id = ${itemId}:`, records);
+    // }
+
+    // console.log(groupedByItemId)
+
+    return groupedByItemId;
 }

@@ -10,26 +10,26 @@ type LocationSummary = {
 };
 
 type subRow = {
-    qty?: number ,
-    feed:{
+    qty?: number,
+    feed: {
         id?: number,
         name?: string
     },
-    item:{
+    item: {
         id?: number,
         name?: string
     }
 }
 
 type Row = {
-    location?:{
-        id: number ,
+    location?: {
+        id: number,
         name: string
     },
     rows?: subRow[]
 };
 
-interface DailyFeedWeightProps{
+interface DailyFeedWeightProps {
     lines: {
         id: number;
         pools: {
@@ -46,17 +46,16 @@ interface DailyFeedWeightProps{
     items: {
         id: number;
         name: string;
-        description: string | null;
-        item_type_id: number | null;
-        feed_type_id: number | null;
-        default_unit_id: number | null;
-        parent_item: number | null;
-        vendor_id: number | null;
-    }[],
+        feedtypes: {
+            id: number;
+            name: string;
+        } | null;
+    }[]
+
     date: string
 }
 
-export default async function DailyFeedWeight({lines, summary, items, date}: DailyFeedWeightProps){
+export default async function DailyFeedWeight({ lines, summary, items, date }: DailyFeedWeightProps) {
 
 
     const data: Row[] = [];
@@ -111,7 +110,7 @@ export default async function DailyFeedWeight({lines, summary, items, date}: Dai
                                 },
                                 item: {
                                     id: prevCalcExtended?.feed?.item_id,
-                                    name: items.find(item => item.id === prevCalcExtended?.feed?.item_id)?.name 
+                                    name: items.find(item => item.id === prevCalcExtended?.feed?.item_id)?.name
                                 }
                             },
                             {
@@ -122,7 +121,7 @@ export default async function DailyFeedWeight({lines, summary, items, date}: Dai
                                 },
                                 item: {
                                     id: prevCalcExtended?.feed?.item_id,
-                                    name: items.find(item => item.id === todayCalcExtended?.feed?.item_id)?.name 
+                                    name: items.find(item => item.id === todayCalcExtended?.feed?.item_id)?.name
                                 }
                             },
                         ]
@@ -142,7 +141,7 @@ export default async function DailyFeedWeight({lines, summary, items, date}: Dai
                                 },
                                 item: {
                                     id: prevCalcExtended?.feed?.item_id,
-                                    name: items.find(item => item.id === todayCalcExtended?.feed?.item_id)?.name 
+                                    name: items.find(item => item.id === todayCalcExtended?.feed?.item_id)?.name
                                 }
                             }
                         ]
@@ -171,13 +170,13 @@ export default async function DailyFeedWeight({lines, summary, items, date}: Dai
         });
     });
 
-    return(
+    return (
         <>
             <div className="flex justify-between my-4 mx-8">
                 <h1 className="text-lg font-bold">Наважка на 1 годування</h1>
                 <h1 className="text-lg font-bold">Зведена таблиця</h1>
             </div>
-            
+
             <div className="flex justify-around min-h-screen content-start">
                 <table className="w-1/2 bg-white rounded-lg shadow-lg">
                     <thead>
@@ -192,9 +191,9 @@ export default async function DailyFeedWeight({lines, summary, items, date}: Dai
                         {lines.map(line => (
                             line.pools.map(pool => (
                                 pool.locations.flatMap(async loc => {
-                                   
+
                                     const row = data.find(row => (row.location?.id == loc.id))
-                                    
+
                                     return (
                                         <LocationComponent
                                             key={loc.id}
@@ -216,15 +215,15 @@ export default async function DailyFeedWeight({lines, summary, items, date}: Dai
                         </tr>
                     </thead>
                     <tbody>
-                    {Object.entries(aggregatedData).map(([itemName, qty]) => (
-                    <tr key={itemName}>
-                        <td className="px-4 h-10 border border-gray-400">{itemName}</td>
-                        <td className="px-4 h-10 border border-gray-400">{qty}</td>
-                    </tr>
-                    ))}
+                        {Object.entries(aggregatedData).map(([itemName, qty]) => (
+                            <tr key={itemName}>
+                                <td className="px-4 h-10 border border-gray-400">{itemName}</td>
+                                <td className="px-4 h-10 border border-gray-400">{qty}</td>
+                            </tr>
+                        ))}
                     </tbody>
                 </table>
             </div>
-            </>
+        </>
     )
 }
