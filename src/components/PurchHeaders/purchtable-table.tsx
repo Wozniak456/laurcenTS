@@ -132,10 +132,9 @@ export default function PurchTableComponent({ purchtables, vendors, items }: Pur
         setShowForm(true);
     };
 
-    useEffect(() => {
-        // setLinesList(purchtables.find(table => table.id === selectedRow)?.purchaselines);
-        console.log('selectedRow changed, ', selectedRow)
-    }, [selectedRow]);
+    // useEffect(() => {
+    //     console.log('selectedRow changed, ', selectedRow)
+    // }, [selectedRow]);
 
     return(
         <div className="flex flex-col gap-4 my-4">

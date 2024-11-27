@@ -81,9 +81,9 @@ export default function CreateEditLineForm({
 
     const [selectedItem, setSelectedItem] = useState<string | undefined>('');
 
-    useEffect(() => {
-        console.log('selectedItem: ', selectedItem)
-    }, [selectedItem]);
+    // useEffect(() => {
+    //     console.log('selectedItem: ', selectedItem)
+    // }, [selectedItem]);
 
     const [formState, action] = useFormState(line ? actions.editPurchline : actions.createPurchLine, { message: '' });
     
