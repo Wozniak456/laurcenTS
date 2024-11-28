@@ -2,29 +2,29 @@ import { db } from "@/db";
 import * as stockingActions from '@/actions/stocking'
 
 export default async function WeekSummary() {
-     
+
   const lines = await db.productionlines.findMany({
-    include:{
-        pools: {
+    include: {
+      pools: {
+        include: {
+          locations: {
             include: {
-              locations: {
+              itemtransactions: {
                 include: {
-                  itemtransactions: {
+                  itembatches: true,
+                  documents: {
                     include: {
-                      itembatches: true,
-                      documents: {
-                        include:{
-                          stocking : true,
-                        },
-                      }
-                    }
+                      stocking: true,
+                    },
                   }
                 }
               }
             }
           }
+        }
+      }
     }
-})
+  })
 
   const now = new Date();
   const datesArray: Date[] = [];
@@ -40,61 +40,102 @@ export default async function WeekSummary() {
     <div className="p-4">
       <h2 className="text-lg font-bold mb-4">Week Summary</h2>
       <div className="flex gap-4 flex-wrap">
-        {lines.map( line => (
-          <div key={line.id} className="mb-4">
-              <table className="mb-4">
-                <thead>
-                  <tr>
-                    <th colSpan={line.pools.filter(pool => pool.prod_line_id === line.id).length + 1} className="px-4 py-2 border border-gray-400 text-center bg-blue-100">{line.name}</th>
-                  </tr>
-                  <tr>
-                    <th className="px-4 py-2 border border-gray-400 text-center bg-blue-100 text-sm">Корм &rarr;</th>
-                    {line.pools.map(async pool => {
+        {await Promise.all(
+          lines.map(async (line) => {
+            // Отримання даних для всіх пулів лінії
+            const poolFeedInfo = await Promise.all(
+              line.pools.map(async (pool) => {
+                const poolInfo = await stockingActions.calculationForLocation(
+                  pool.locations[0].id,
+                  now.toISOString().split("T")[0]
+                );
+                return {
+                  id: pool.id,
+                  name: pool.name,
+                  feedType: poolInfo?.feed?.type_name || "",
+                };
+              })
+            );
 
-                      const poolInfo = await stockingActions.calculationForLocation(pool.locations[0].id, now.toISOString().split("T")[0])
-                      
-                      return(
-                        <th key={pool.id} className="px-4 py-2 border border-gray-400 text-center bg-blue-100 text-sm">
-                            {poolInfo?.feed.type_name}
-                        </th>
-                      )
-                        
-                    })}
-                  </tr>
-                  <tr>
-                    <th className="px-4 py-2 border border-gray-400 text-center bg-blue-100 text-sm">Дата</th>
-                    {line.pools.filter(pool => pool.prod_line_id === line.id).map(pool => (
-                      <th key={pool.id} className="px-4 py-2 border border-gray-400 text-center bg-blue-100 text-sm">{pool.name}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {datesArray.map((date, dateIndex) => {
-                    return(
-                      <tr key={dateIndex}>
-                        <td className="px-4 py-2 border border-gray-400 text-center font-normal whitespace-nowrap text-sm">{date.toISOString().split("T")[0]}</td>
-                        {line.pools.map(async (pool, poolIndex) => {
-
-                          // console.log(pool.locations[0].id, date.toISOString().split("T")[0])
-                          const calc = await stockingActions.calculationForLocation(pool.locations[0].id, date.toISOString().split("T")[0])
-
-                          return(
-                            <td key={poolIndex} className="px-4 py-2 border border-gray-400 text-center font-normal text-sm">
-                              {calc?.calc?.feed_per_feeding.toFixed(0)}
-                            </td>
-                          )
-                          
-                        })}
+            return (
+              <div key={line.id} className="mb-4">
+                <table className="mb-4">
+                  <thead>
+                    <tr>
+                      <th
+                        colSpan={poolFeedInfo.length + 1}
+                        className="px-4 py-2 border border-gray-400 text-center bg-blue-100"
+                      >
+                        {line.name}
+                      </th>
                     </tr>
-                    )
-                  })}
-                  
-                </tbody>
-              </table>
-          </div>
-        ))}
+
+                    <tr>
+                      <th className="px-4 py-2 border border-gray-400 text-center bg-blue-100 text-sm">
+                        Корм &rarr;
+                      </th>
+                      {poolFeedInfo.map((pool) => (
+                        <th
+                          key={pool.id}
+                          className="px-4 py-2 border border-gray-400 text-center bg-blue-100 text-sm"
+                        >
+                          {pool.feedType}
+                        </th>
+                      ))}
+                    </tr>
+
+                    <tr>
+                      <th className="px-4 py-2 border border-gray-400 text-center bg-blue-100 text-sm">
+                        Дата
+                      </th>
+                      {poolFeedInfo.map((pool) => (
+                        <th
+                          key={pool.id}
+                          className="px-4 py-2 border border-gray-400 text-center bg-blue-100 text-sm"
+                        >
+                          {pool.name}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {await Promise.all(
+                      datesArray.map(async (date, dateIndex) => {
+                        const calcData = await Promise.all(
+                          line.pools.map(async (pool) => {
+                            const calc = await stockingActions.calculationForLocation(
+                              pool.locations[0].id,
+                              date.toISOString().split("T")[0]
+                            );
+                            return calc?.calc?.feed_per_feeding?.toFixed(0) || "";
+                          })
+                        );
+
+                        return (
+                          <tr key={dateIndex}>
+                            <td className="px-4 py-2 border border-gray-400 text-center font-normal whitespace-nowrap text-sm">
+                              {date.toISOString().split("T")[0]}
+                            </td>
+                            {calcData.map((feedAmount, poolIndex) => (
+                              <td
+                                key={poolIndex}
+                                className="px-4 py-2 border border-gray-400 text-center font-normal text-sm"
+                              >
+                                {feedAmount}
+                              </td>
+                            ))}
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            );
+          })
+        )}
       </div>
     </div>
   );
-  
 }
