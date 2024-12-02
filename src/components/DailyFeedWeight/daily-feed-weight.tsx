@@ -237,7 +237,7 @@ export default async function DailyFeedWeight({
             {Object.entries(aggregatedData).map(([itemName, qty]) => (
               <tr key={itemName}>
                 <td className="px-4 h-10 border border-gray-400">{itemName}</td>
-                <td className="px-4 h-10 border border-gray-400">{qty}</td>
+                <td className="px-4 h-10 border border-gray-400  text-right">{qty.toFixed(2)}</td>
               </tr>
             ))}
           </tbody>

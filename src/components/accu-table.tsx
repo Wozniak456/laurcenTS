@@ -143,8 +143,8 @@ const StockingTable: React.FC<StockingTableProps> = ({ pools, vendors, batches }
       <ExportButton columns={columns} rows={rows} />
 
       <form>
-        <Table 
-          className="min-w-full table-auto w-full my-8" 
+        <Table
+          className="min-w-full table-auto w-full my-8"
           selectionMode="single" color="primary"
           aria-label="table">
           <TableHeader columns={columns}>
@@ -158,7 +158,7 @@ const StockingTable: React.FC<StockingTableProps> = ({ pools, vendors, batches }
               <TableRow key={item.key} onClick={() => handleRowClick(item)}>
                 {(columnKey) => {
                   const value = item[columnKey];
-                  const displayValue = typeof value === 'number' ? value.toFixed(1) : value;
+                  const displayValue = typeof value === 'number' ? value.toFixed(2) : value;
                   return (
                     <TableCell className="border">
                       {displayValue}
@@ -171,9 +171,9 @@ const StockingTable: React.FC<StockingTableProps> = ({ pools, vendors, batches }
         </Table>
       </form>
 
-      <Modal 
+      <Modal
         backdrop="blur" // Додаємо розмиття для більш світлого фону
-        isOpen={isModalOpen} 
+        isOpen={isModalOpen}
         onOpenChange={setModalOpen}
         classNames={{
           backdrop: "bg-gradient-to-t from-white/80 to-white/50 backdrop-opacity-70" // Налаштування світлішого фону

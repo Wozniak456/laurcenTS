@@ -67,7 +67,7 @@ export default function LocationComponent({ row, items }: LocationComponentProps
             {row?.rows?.map((item, itemIndex) => {
                 return (
                     <tr key={itemIndex}>
-                        <td className="px-4 h-10 border border-gray-400">{item.qty}</td>
+                        <td className="px-4 h-10 border border-gray-400 text-right">{item.qty?.toFixed(2)}</td>
                         <td className="px-4 h-10 border border-gray-400">{item.feed.name}</td>
                         <td className="px-4 h-10 border border-gray-400">
 
