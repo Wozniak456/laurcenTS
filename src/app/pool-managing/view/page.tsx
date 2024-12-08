@@ -8,10 +8,6 @@ export const dynamic = 'force-dynamic'
 
 export default async function StockingHome() {
 
-  // const debugLocation = 72
-  // const debugResult = await setTransitionDayForLocation(debugLocation)
-  // console.log('debugResult: ', debugResult)
-
   const today = new Date()
 
   const areas = await actions.getAreas()
@@ -19,52 +15,85 @@ export default async function StockingHome() {
   const locations = await actions.getPools()
 
   const batches = await actions.getCatfishBatches()
-  
+
   const disposal_reasons = await db.disposal_reasons.findMany()
 
   const weekNum = actions.getWeekOfYear(today)
 
+  // Збір інформації про басейни
+  const poolsData = await Promise.all(
+    areas.flatMap((area) =>
+      area.productionlines.flatMap((line) =>
+        line.pools
+          .sort((a, b) => {
+            const numA = parseInt(a.name.split("/")[0].slice(1));
+            const numB = parseInt(b.name.split("/")[0].slice(1));
+            return numA - numB;
+          })
+          .flatMap((pool) =>
+            pool.locations.map(async (loc) => {
+              const poolInfo = await stockingActions.poolInfo(
+                loc.id,
+                today.toISOString().split("T")[0]
+              );
+
+              const wasFetchedThisWeek = await db.fetching.findMany({
+                where: {
+                  itemtransactions: {
+                    documents: {
+                      location_id: loc.id,
+                    },
+                  },
+                  weekNumber: weekNum,
+                },
+              });
+
+              return {
+                key: `${pool.id}-${loc.id}`,
+                poolInfo: {
+                  ...poolInfo,
+                  wasFetchedThisWeek: wasFetchedThisWeek.length > 0,
+                },
+                loc,
+                pool,
+              };
+            })
+          )
+      )
+    )
+  );
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen  text-sm">
-      <div className="flex flex-col  items-end w-full">
+    <div className="flex flex-col items-center justify-center min-h-screen text-sm">
+      <div className="flex flex-col items-end w-full">
         <p>Тиждень: {weekNum}</p>
         <p>Сьогодні: {today.toISOString().split("T")[0]}</p>
       </div>
-      {areas.map(area => (
+
+      {areas.map((area) => (
         <div key={area.id} className="w-full">
           <div className="text-3xl font-bold">{area.name}</div>
-          {area.productionlines.map(line => (
-            <div key={line.id} className="">
-              <div className="text-xl font-bold my-4">{line.name}</div>
-              {line.pools
-              
-              .sort((a, b) => {
-                const numA = parseInt(a.name.split('/')[0].slice(1)); // відкидаємо перший символ "Б" і перетворюємо на число
-                const numB = parseInt(b.name.split('/')[0].slice(1)); // відкидаємо перший символ "Б" і перетворюємо на число
-                return numA - numB; 
-              })
 
-              .map(pool => (
-                pool.locations.map(async loc => {
-
-                  //інформація про басейн на момент дати на компютері
-                  let poolInfo = await stockingActions.poolInfo(loc.id, today.toISOString().split("T")[0])
-
-                  poolInfo = {
-                    ...poolInfo,
-                    wasFetchedThisWeek : await wasFetchedThisWeek(loc.id, weekNum)
-                  }
-
-                  return(
-                    <div key={pool.id} className="shadow-xl mb-4 px-4 py-0.5 bg-blue-100">
-                      <StockingComponent locations={locations} location={loc} batches={batches} poolInfo={poolInfo} disposal_reasons={disposal_reasons} weekNum={weekNum} />
-                    </div>
-                  )
-                })
-              ))
-              }
-            </div>
-          ))}
+          {poolsData
+            .filter((data) =>
+              area.productionlines.some((line) =>
+                line.pools.some((pool) =>
+                  pool.locations.some((loc) => loc.id === data.loc.id)
+                )
+              )
+            )
+            .map(({ key, poolInfo, loc, pool }) => (
+              <div key={key} className="shadow-xl mb-4 px-4 py-0.5 bg-blue-100">
+                <StockingComponent
+                  locations={locations}
+                  location={loc}
+                  batches={batches}
+                  poolInfo={poolInfo}
+                  disposal_reasons={disposal_reasons}
+                  weekNum={weekNum}
+                />
+              </div>
+            ))}
         </div>
       ))}
     </div>
@@ -72,18 +101,18 @@ export default async function StockingHome() {
 }
 
 
-async function wasFetchedThisWeek (location_id: number, weekNum: number){
+async function wasFetchedThisWeek(location_id: number, weekNum: number) {
   const fetch = await db.fetching.findMany({
-    include:{
-      itemtransactions:{
-        include:{
+    include: {
+      itemtransactions: {
+        include: {
           documents: true,
         }
       }
     },
-    where:{
-      itemtransactions:{
-        documents:{
+    where: {
+      itemtransactions: {
+        documents: {
           location_id: location_id
         }
       },
@@ -91,9 +120,9 @@ async function wasFetchedThisWeek (location_id: number, weekNum: number){
     }
   })
 
-  if(fetch.length > 0){
+  if (fetch.length > 0) {
     return true
-  } else{
+  } else {
     return false
   }
 }
