@@ -1,12 +1,26 @@
-'use client'
+"use client";
 
-import React, { ChangeEvent, ChangeEventHandler, use, useEffect, useMemo, useState } from "react";
+import React, {
+  ChangeEvent,
+  ChangeEventHandler,
+  use,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import RowForFeeding from "./RowForFeeding";
-import { Popover, PopoverTrigger, PopoverContent, Button, Input, Select, SelectItem } from "@nextui-org/react";
-
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  Button,
+  Input,
+  Select,
+  SelectItem,
+} from "@nextui-org/react";
 
 interface DaySummaryProps {
-  data: FeedingInfo[]
+  data: FeedingInfo[];
   lines: {
     id: number;
     name: string;
@@ -18,12 +32,12 @@ interface DaySummaryProps {
         name: string;
       }[];
     }[];
-  }[]
-  today: string,
+  }[];
+  today: string;
   times: {
     id: number;
     time: string;
-  }[],
+  }[];
   feeds: {
     id: number;
     name: string;
@@ -31,25 +45,25 @@ interface DaySummaryProps {
       id: number;
       name: string;
     } | null;
-  }[]
+  }[];
 }
 
 interface FeedingInfo {
   date: string;
   locId: number;
-  locName: string,
+  locName: string;
   rowCount?: number;
-  feedings?: Feeding[]
+  feedings?: Feeding[];
   batch?: {
-    id: number,
-    name: string
-  }
+    id: number;
+    name: string;
+  };
 }
 
 interface Feeding {
   feedType: string;
   feedName?: string;
-  feedId?: number,
+  feedId?: number;
   feedings?: { [time: string]: { feeding?: string; editing?: string } };
 }
 
@@ -58,16 +72,14 @@ export default function DaySummaryContent({
   lines,
   today,
   times,
-  feeds
-}
-  : DaySummaryProps) {
-
+  feeds,
+}: DaySummaryProps) {
   // useEffect(() => {
-  //   data.map(data1 => {
-  //     console.log("loc: ", data1.locId, data1.feedings)
+  //   data.map((data1) => {
+  //     console.log("loc: ", data1.locId, data1.feedings);
   //     // console.log(data1.feedings?.length)
-  //   })
-  // }, [data])
+  //   });
+  // }, [data]);
 
   const getRowCount = (() => {
     const renderedRows = new Map<number, number>();
@@ -87,12 +99,14 @@ export default function DaySummaryContent({
   })();
 
   const [showTextForPool, setShowTextForPool] = useState<number | null>(null);
-  const [addedNewFeed, setAddedNewFeed] = useState<number | undefined>(undefined);
+  const [addedNewFeed, setAddedNewFeed] = useState<number | undefined>(
+    undefined
+  );
   const [feedingsData, setFeedingsData] = useState(data); // Локальний стан для збереження даних кормів
 
   // Функція для додавання нового корму до feedings
   const handleAddFeedClick = (locId: number, feedId: number) => {
-    const newFeed = feeds.find(feed => feed.id === feedId);
+    const newFeed = feeds.find((feed) => feed.id === feedId);
     if (newFeed) {
       const updatedData = feedingsData.map((feedingInfo) => {
         if (feedingInfo.locId === locId) {
@@ -103,11 +117,8 @@ export default function DaySummaryContent({
             feedId: newFeed.id,
             feedings: Object.fromEntries(
               times.map(({ time }) => {
-                const hours = Number(time.split(':')[0]);
-                return [
-                  hours.toString(),
-                  { feeding: '0', editing: '' },
-                ];
+                const hours = Number(time.split(":")[0]);
+                return [hours.toString(), { feeding: "0", editing: "" }];
               })
             ),
           });
@@ -128,16 +139,20 @@ export default function DaySummaryContent({
 
   return (
     <>
-      {lines.map(line => (
-        <table key={line.id} className="border-collapse border w-full mb-4 text-sm w-5/6">
+      {lines.map((line) => (
+        <table
+          key={line.id}
+          className="border-collapse border w-full mb-4 text-sm w-5/6"
+        >
           <thead>
             <tr>
-              <th colSpan={2 * times.length + 3} className="px-4 py-2 bg-blue-100">
+              <th
+                colSpan={2 * times.length + 3}
+                className="px-4 py-2 bg-blue-100"
+              >
                 {line.name}
               </th>
-              <th className="px-4 py-2 bg-blue-100">
-                {today.slice(5)}
-              </th>
+              <th className="px-4 py-2 bg-blue-100">{today.slice(5)}</th>
             </tr>
             <tr>
               <th className="border p-2">Басейн</th>
@@ -153,9 +168,13 @@ export default function DaySummaryContent({
             </tr>
           </thead>
           <tbody>
-            {line.pools.map(pool =>
+            {line.pools.map((pool) =>
               pool.locations.map((loc, index) => {
-                const dataForPool = feedingsData.find((row) => row.locId === loc.id); // Використовуємо локальний стан
+                const dataForPool = feedingsData.find(
+                  (row) => row.locId === loc.id
+                );
+
+                // console.log(`dataForPool: ${loc.id}. ${dataForPool.}`);
                 const feedings = dataForPool?.feedings;
                 return (
                   <React.Fragment key={index}>
@@ -165,7 +184,11 @@ export default function DaySummaryContent({
                         locInfo={{ id: loc.id, name: loc.name }}
                         rowData={feeding}
                         times={times}
-                        rowCount={feedingIndex === 0 && dataForPool ? getRowCount(dataForPool, loc.id) : 0} // Перевірка на undefined перед викликом
+                        rowCount={
+                          feedingIndex === 0 && dataForPool
+                            ? getRowCount(dataForPool, loc.id)
+                            : 0
+                        } // Перевірка на undefined перед викликом
                         today={today}
                         batch={dataForPool?.batch}
                       />
@@ -176,7 +199,9 @@ export default function DaySummaryContent({
                         <td className="text-center text-md bg-gray-100">
                           <Popover placement="bottom" showArrow offset={10}>
                             <PopoverTrigger>
-                              <button className="py-0" color="primary">Додати корм</button>
+                              <button className="py-0" color="primary">
+                                Додати корм
+                              </button>
                             </PopoverTrigger>
                             <PopoverContent className="w-[240px]">
                               <div className="my-2 flex flex-col gap-2 w-full">
@@ -185,7 +210,9 @@ export default function DaySummaryContent({
                                   label="Корм"
                                   placeholder="Оберіть корм"
                                   className="max-w-xs"
-                                  onChange={(e) => setAddedNewFeed(Number(e.target.value))}
+                                  onChange={(e) =>
+                                    setAddedNewFeed(Number(e.target.value))
+                                  }
                                 >
                                   {feeds.map((feed) => (
                                     <SelectItem key={feed.id} value={feed.id}>
@@ -194,17 +221,18 @@ export default function DaySummaryContent({
                                   ))}
                                 </Select>
                                 {/* </div> */}
-                                {addedNewFeed ?
-                                  <Button onClick={() => handleAddFeedClick(loc.id, addedNewFeed)}>
+                                {addedNewFeed ? (
+                                  <Button
+                                    onClick={() =>
+                                      handleAddFeedClick(loc.id, addedNewFeed)
+                                    }
+                                  >
                                     Додати
                                   </Button>
-                                  : null
-                                }
-
+                                ) : null}
                               </div>
                             </PopoverContent>
                           </Popover>
-
                         </td>
                       </tr>
                     ) : null}
@@ -213,7 +241,6 @@ export default function DaySummaryContent({
               })
             )}
           </tbody>
-
         </table>
       ))}
     </>
