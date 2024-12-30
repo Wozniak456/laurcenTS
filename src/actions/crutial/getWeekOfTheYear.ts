@@ -1,13 +1,15 @@
 export function getWeekOfYear(date: Date): number {
+  //const startOfYear = new Date(Date.UTC(date.getFullYear(), 0, 1));
+  // console.log('startOfYear', startOfYear)
 
-    const startOfYear = new Date(Date.UTC(date.getFullYear(), 0, 1));
-    // console.log('startOfYear', startOfYear)
+  //const pastDaysOfYear = (date.getTime() - startOfYear.getTime()) / 86400000;
+  // console.log('pastDaysOfYear', pastDaysOfYear)
 
-    const pastDaysOfYear = (date.getTime() - startOfYear.getTime()) / 86400000;
-    // console.log('pastDaysOfYear', pastDaysOfYear)
+  //const weekNum = Math.ceil((pastDaysOfYear + startOfYear.getDay() + 1) / 7)
+  // console.log('сьогодні:', 'номер тижня:', weekNum)
 
-    const weekNum = Math.ceil((pastDaysOfYear + startOfYear.getDay() + 1) / 7)
-    // console.log('сьогодні:', 'номер тижня:', weekNum)
-    
-    return weekNum;
+  const moment = require("moment");
+  let date1 = moment(date);
+  let weekNum = date1.week();
+  return weekNum;
 }

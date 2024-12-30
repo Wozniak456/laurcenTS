@@ -1,70 +1,71 @@
-'use server'
+"use server";
 import { db } from "@/db";
 import { calculation_table, Prisma } from "@prisma/client";
-import * as actions from '@/actions'
+import * as actions from "@/actions";
 import { calculationAndFeed, poolManagingType } from "@/types/app_types";
 
-export async function calculationForLocation(location_id: number, date: string) {
-
-  let batch = null
-  let calc = null
-  let feed_type
-  let item
+export async function calculationForLocation(
+  location_id: number,
+  date: string
+) {
+  let batch = null;
+  let calc = null;
+  let feed_type;
+  let item;
 
   //знаходимо стан басейну. чи там щось є на цю дату
 
-  batch = await getBatchesInfo(location_id, date)
+  batch = await getBatchesInfo(location_id, date);
 
-  if (!batch.qty)
-    return
+  if (!batch.qty) return;
 
   calc = await db.calculation_table.findFirst({
     where: {
       documents: {
-        location_id: location_id
+        location_id: location_id,
       },
-      date: new Date(date)
+      date: new Date(date),
     },
     orderBy: {
-      id: 'desc'
+      id: "desc",
     },
-    take: 1
-  })
+    take: 1,
+  });
 
   //приймаємо рішення чи показуватимемо кнопку редагування на /pool-managing/view
 
   if (calc) {
-    feed_type = await getFeedType(calc.fish_weight)
+    feed_type = await getFeedType(calc.fish_weight);
 
     if (feed_type) {
-      item = await actions.getItemPerType(feed_type.id, location_id)
+      item = await actions.getItemPerType(feed_type.id, location_id);
     }
   }
 
   const lastTran = await db.itemtransactions.findFirst({
     where: {
       documents: {
-        location_id: location_id
+        location_id: location_id,
       },
-      batch_id: batch?.batch_id
+      batch_id: batch?.batch_id,
     },
     orderBy: {
-      id: 'desc'
+      id: "desc",
     },
-    take: 1
-  })
+    take: 1,
+  });
 
-  let allowedToEdit = false
+  let allowedToEdit = false;
 
   if (lastTran?.parent_transaction) {
     const connectedTran = await db.itemtransactions.findFirst({
       where: {
-        id: lastTran.parent_transaction
-      }
-    })
+        id: lastTran.parent_transaction,
+      },
+    });
 
     if (connectedTran?.location_id == 87) {
-      allowedToEdit = true
+      allowedToEdit = true;
     }
   }
 
@@ -73,15 +74,17 @@ export async function calculationForLocation(location_id: number, date: string) 
     type_name: feed_type?.name,
     item_id: item?.item_id,
     item_name: item?.item_name,
-    definedPrio: item?.definedPrio
-  }
+    definedPrio: item?.definedPrio,
+  };
 
-  return { batch, calc, feed, location_id, allowedToEdit }
+  return { batch, calc, feed, location_id, allowedToEdit };
 }
 
-export const poolInfo = async (location_id: number, date: string)
-  : Promise<poolManagingType | undefined> => {
-  const dateValue = new Date(date)
+export const poolInfo = async (
+  location_id: number,
+  date: string
+): Promise<poolManagingType | undefined> => {
+  const dateValue = new Date(date);
 
   dateValue.setUTCHours(23, 59, 59, 999);
 
@@ -95,144 +98,149 @@ export const poolInfo = async (location_id: number, date: string)
           parent_transaction: true,
           itembatches: true,
           quantity: true,
-          location_id: true
+          location_id: true,
         },
         where: {
           location_id: location_id,
           quantity: {
-            gte: 0
-          }
+            gte: 0,
+          },
         },
         orderBy: {
-          id: 'desc'
-        }
+          id: "desc",
+        },
       },
-      stocking: true
+      stocking: true,
     },
     where: {
       location_id: location_id,
+      doc_type_id: 1,
       date_time: {
-        lte: dateValue
+        lte: dateValue,
       },
       itemtransactions: {
         some: {
           itembatches: {
             items: {
-              item_type_id: 1
-            }
+              item_type_id: 1,
+            },
           },
-        }
-      }
+        },
+      },
     },
     orderBy: {
-      date_time: 'desc'
-    }
+      date_time: "desc",
+    },
   });
 
-
-  let feedType
+  let feedType;
 
   if (lastStocking) {
-    feedType = await getFeedType(lastStocking.stocking[0]?.average_weight)
+    feedType = await getFeedType(lastStocking.stocking[0]?.average_weight);
+    console.log("LastStocking = ", lastStocking);
   }
 
-  const batch = lastStocking?.itemtransactions[0]?.itembatches
-  const qty = lastStocking?.itemtransactions[0]?.quantity
-  const fishWeight = lastStocking?.stocking[0].average_weight
+  const batch = lastStocking?.itemtransactions[0]?.itembatches;
+  const qty = lastStocking?.itemtransactions[0]?.quantity;
+  const fishWeight = lastStocking?.stocking[0].average_weight;
   const updateDate = lastStocking?.date_time.toISOString().split("T")[0];
 
-  let allowedToEdit = false
+  let allowedToEdit = false;
 
   if (lastStocking?.itemtransactions[0]?.parent_transaction) {
     const connectedTran = await db.itemtransactions.findFirst({
       where: {
-        id: lastStocking?.itemtransactions[0]?.parent_transaction
-      }
-    })
+        id: lastStocking?.itemtransactions[0]?.parent_transaction,
+      },
+    });
 
     if (connectedTran?.location_id == 87) {
-      allowedToEdit = true
+      allowedToEdit = true;
     }
   }
   if (qty) {
-    return ({ batch, qty, fishWeight, feedType, updateDate, allowedToEdit })
+    return { batch, qty, fishWeight, feedType, updateDate, allowedToEdit };
   }
-
-}
+};
 
 //встановлюємо перехід на новий корм
-export async function setTransitionDayForLocation(location_id: number, prisma?: any) {
+export async function setTransitionDayForLocation(
+  location_id: number,
+  prisma?: any
+) {
   const activeDb = prisma || db;
 
-  const records = await get14CalculationForPool(location_id, activeDb)
+  const records = await get14CalculationForPool(location_id, activeDb);
 
   if (records) {
-    let currType = await getFeedType(records[0].fish_weight, activeDb)
-    let dayIndex = 0
+    let currType = await getFeedType(records[0].fish_weight, activeDb);
+    let dayIndex = 0;
 
     for (let i = 1; i < records.length; i++) {
-
       if (dayIndex > 0 && dayIndex <= 4) {
         await activeDb.calculation_table.update({
           where: {
-            id: records[i].id
+            id: records[i].id,
           },
           data: {
-            transition_day: dayIndex
-          }
-        })
+            transition_day: dayIndex,
+          },
+        });
 
-        dayIndex++
+        dayIndex++;
         continue;
       }
 
       const feedType = await getFeedType(records[i].fish_weight, activeDb);
 
       if (feedType?.id !== currType?.id) {
-        currType = feedType
+        currType = feedType;
 
         await activeDb.calculation_table.update({
           where: {
-            id: records[i].id
+            id: records[i].id,
           },
           data: {
-            transition_day: 1
-          }
-        })
+            transition_day: 1,
+          },
+        });
 
-        dayIndex = 2 // індекс наступного дня
+        dayIndex = 2; // індекс наступного дня
       }
-
     }
   }
 }
 
-export async function getFeedType(fish_weight: number | undefined, prisma?: any) {
+export async function getFeedType(
+  fish_weight: number | undefined,
+  prisma?: any
+) {
   const activeDb = prisma || db;
   if (fish_weight !== undefined) {
-
     const startFeedType = await activeDb.feedtypes.findFirst({
       where: {
         feedconnections: {
           from_fish_weight: {
-            lte: fish_weight
+            lte: fish_weight,
           },
           to_fish_weight: {
-            gte: fish_weight
-          }
-        }
-
-      }
-    })
-    return startFeedType
+            gte: fish_weight,
+          },
+        },
+      },
+    });
+    return startFeedType;
   }
 }
 
-type CalcTableIds = (Prisma.PickEnumerable<Prisma.Calculation_tableGroupByOutputType, "date"[]> & {
+type CalcTableIds = (Prisma.PickEnumerable<
+  Prisma.Calculation_tableGroupByOutputType,
+  "date"[]
+> & {
   _max: {
     id: number | null;
   };
-})[]
+})[];
 
 // export async function get14CalculationForPool(location_id : number, prisma?: any) {
 //   const activeDb = prisma || db;
@@ -262,20 +270,25 @@ type CalcTableIds = (Prisma.PickEnumerable<Prisma.Calculation_tableGroupByOutput
 //       orderBy:{
 //         id: 'asc'
 //       }
-//     }) 
+//     })
 
 //     return calc_table14
 // }
-export async function get14CalculationForPool(location_id: number, prisma?: any) {
+export async function get14CalculationForPool(
+  location_id: number,
+  prisma?: any
+) {
   const activeDb = prisma || db;
 
-  const calc_table_ids: CalcTableIds = await activeDb.calculation_table.groupBy({
-    by: ['date'],
-    _max: { id: true },
-    where: { documents: { location_id } },
-    orderBy: { date: 'desc' },
-    take: 14,
-  });
+  const calc_table_ids: CalcTableIds = await activeDb.calculation_table.groupBy(
+    {
+      by: ["date"],
+      _max: { id: true },
+      where: { documents: { location_id } },
+      orderBy: { date: "desc" },
+      take: 14,
+    }
+  );
 
   // Масив для збереження відповідних записів з calculation_table
   const relatedCalculations: calculation_table[] = [];
@@ -309,7 +322,10 @@ export async function get14CalculationForPool(location_id: number, prisma?: any)
     if (!stockingTransaction) continue;
 
     // Перевіряємо batch_id транзакції
-    if (previousBatchId === null || stockingTransaction.batch_id === previousBatchId) {
+    if (
+      previousBatchId === null ||
+      stockingTransaction.batch_id === previousBatchId
+    ) {
       relatedCalculations.unshift(calcResult); // Додаємо запис calculation_table
       previousBatchId = stockingTransaction.batch_id;
     } else {
@@ -321,7 +337,6 @@ export async function get14CalculationForPool(location_id: number, prisma?: any)
 }
 
 export async function getBatchesInfo(location_id: number, date: string) {
-
   const batch = await db.documents.findFirst({
     select: {
       itemtransactions: {
@@ -329,41 +344,46 @@ export async function getBatchesInfo(location_id: number, date: string) {
           itembatches: {
             select: {
               id: true,
-              name: true
-            }
+              name: true,
+            },
           },
-          quantity: true
+          quantity: true,
         },
         where: {
-          location_id: location_id
-        }
+          location_id: location_id,
+        },
       },
-
     },
     where: {
       doc_type_id: 1,
       date_time: {
-        lte: new Date(date)
+        lte: new Date(date),
       },
-      itemtransactions: { some: { location_id: location_id } } // фільтрація транзакцій
+      itemtransactions: { some: { location_id: location_id } }, // фільтрація транзакцій
     },
     orderBy: {
-      date_time: 'desc'
-    }
-  })
+      date_time: "desc",
+    },
+  });
 
   const result = {
     batch_name: batch?.itemtransactions[0].itembatches.name,
     batch_id: batch?.itemtransactions[0].itembatches.id,
-    qty: batch?.itemtransactions[0].quantity
-  }
+    qty: batch?.itemtransactions[0].quantity,
+  };
 
-  return result
+  return result;
 }
 
 //можливо обєднати stockingInfo і getBatchesInfo
 
-export async function createCalcBelow25(fishAmount: number, averageFishMass: number, percentage: number, docId: bigint, prisma?: any) {
+export async function createCalcBelow25(
+  fishAmount: number,
+  averageFishMass: number,
+  percentage: number,
+  docId: bigint,
+  prisma?: any
+) {
   const activeDb = prisma || db;
 
   const numberOfRecords = 10;
@@ -398,7 +418,7 @@ export async function createCalcBelow25(fishAmount: number, averageFishMass: num
         },
       },
       orderBy: {
-        weight: 'desc',
+        weight: "desc",
       },
     });
 
@@ -414,20 +434,19 @@ export async function createCalcBelow25(fishAmount: number, averageFishMass: num
           },
         },
         orderBy: {
-          weight: 'desc',
+          weight: "desc",
         },
       });
 
       if (feedingLevelQuery) {
         feedToday[i] = (feedingLevelQuery.feedingLevel / 100) * totalWeight[i];
-        feedPerDay[i] = feedToday[i] + (percentage * feedToday[i]);
+        feedPerDay[i] = feedToday[i] + percentage * feedToday[i];
         feedPerFeeding[i] = feedPerDay[i] / 5;
         generalWeight[i + 1] = totalWeight[i];
         fishWeight[i + 1] = weightPerFish[i];
         feedQuantity[i + 1] = feedPerDay[i];
       }
     }
-
   }
 
   const fcQuery = await activeDb.datatable_below25.findFirst({
@@ -437,14 +456,18 @@ export async function createCalcBelow25(fishAmount: number, averageFishMass: num
       },
     },
     orderBy: {
-      weight: 'desc',
+      weight: "desc",
     },
   });
 
   if (fcQuery) {
     vC[vC.length - 1] = fcQuery.fc;
-    totalWeight[totalWeight.length - 1] = generalWeight[generalWeight.length - 1] + feedQuantity[feedQuantity.length - 1] / vC[vC.length - 1];
-    weightPerFish[weightPerFish.length - 1] = totalWeight[totalWeight.length - 1] / fishAmountInPool[fishAmountInPool.length - 1];
+    totalWeight[totalWeight.length - 1] =
+      generalWeight[generalWeight.length - 1] +
+      feedQuantity[feedQuantity.length - 1] / vC[vC.length - 1];
+    weightPerFish[weightPerFish.length - 1] =
+      totalWeight[totalWeight.length - 1] /
+      fishAmountInPool[fishAmountInPool.length - 1];
 
     const feedingLevelQuery = await activeDb.datatable_below25.findFirst({
       where: {
@@ -453,17 +476,22 @@ export async function createCalcBelow25(fishAmount: number, averageFishMass: num
         },
       },
       orderBy: {
-        weight: 'desc',
+        weight: "desc",
       },
     });
 
     if (feedingLevelQuery) {
-      feedToday[feedToday.length - 1] = (feedingLevelQuery.feedingLevel / 100) * totalWeight[totalWeight.length - 1];
-      feedPerDay[feedPerDay.length - 1] = feedToday[feedToday.length - 1] + (percentage * feedToday[feedToday.length - 1]);
-      feedPerFeeding[feedPerFeeding.length - 1] = feedPerDay[feedPerDay.length - 1] / 5;
+      feedToday[feedToday.length - 1] =
+        (feedingLevelQuery.feedingLevel / 100) *
+        totalWeight[totalWeight.length - 1];
+      feedPerDay[feedPerDay.length - 1] =
+        feedToday[feedToday.length - 1] +
+        percentage * feedToday[feedToday.length - 1];
+      feedPerFeeding[feedPerFeeding.length - 1] =
+        feedPerDay[feedPerDay.length - 1] / 5;
     }
   }
-  let dataForTable: calculation_table[] = []
+  let dataForTable: calculation_table[] = [];
   for (let i = 0; i < day.length; i++) {
     const record = await activeDb.calculation_table.create({
       data: {
@@ -479,31 +507,37 @@ export async function createCalcBelow25(fishAmount: number, averageFishMass: num
         feed_today: feedToday[i],
         feed_per_day: feedPerDay[i],
         feed_per_feeding: feedPerFeeding[i],
-        doc_id: docId
+        doc_id: docId,
       },
     });
-    dataForTable.push(record)
+    dataForTable.push(record);
   }
 
   try {
-    return dataForTable
+    return dataForTable;
   } catch (error) {
-    console.error('Error creating calculation table:', error);
-    throw new Error('Error creating calculation table');
+    console.error("Error creating calculation table:", error);
+    throw new Error("Error creating calculation table");
   }
 }
 
-export async function createCalcOver25(fishAmount: number, averageFishMass: number, percentage: number, docId: bigint, date?: string, prisma?: any) {
+export async function createCalcOver25(
+  fishAmount: number,
+  averageFishMass: number,
+  percentage: number,
+  docId: bigint,
+  date?: string,
+  prisma?: any
+) {
   const activeDb = prisma || db;
-  const activeDate = date ? new Date(date) : new Date()
+  const activeDate = date ? new Date(date) : new Date();
 
   try {
-
     const numberOfRecords = 10;
     const day = Array.from({ length: numberOfRecords }, (_, i) => i + 1);
 
     const date = Array.from({ length: numberOfRecords }, (_, i) => {
-      const currentDate = new Date(activeDate);;
+      const currentDate = new Date(activeDate);
       currentDate.setDate(currentDate.getDate() + i + 1);
       return currentDate;
     });
@@ -519,17 +553,15 @@ export async function createCalcOver25(fishAmount: number, averageFishMass: numb
     let feedPerDay = Array(numberOfRecords).fill(0.0);
     let feedPerFeeding = Array(numberOfRecords).fill(0.0);
 
-
     let gesch_uitval: number[] = [
-      1.0000, 1.0000, 0.9903, 0.9846, 0.9806, 0.9775, 0.9749, 0.9728, 0.9709, 0.9692
+      1.0, 1.0, 0.9903, 0.9846, 0.9806, 0.9775, 0.9749, 0.9728, 0.9709, 0.9692,
     ];
 
-    generalWeight[0] = fishAmount * averageFishMass / 1000;
+    generalWeight[0] = (fishAmount * averageFishMass) / 1000;
 
-    let feedQuery
+    let feedQuery;
     for (let i = 0; i < day.length; i++) {
-
-      fishWeight[i] = generalWeight[i] / fishAmountInPool[i] * 1000
+      fishWeight[i] = (generalWeight[i] / fishAmountInPool[i]) * 1000;
 
       const fcrQuery = await activeDb.datatable_over25.findFirst({
         where: {
@@ -538,17 +570,20 @@ export async function createCalcOver25(fishAmount: number, averageFishMass: numb
           },
         },
         orderBy: {
-          weight: 'desc',
+          weight: "desc",
         },
       });
 
-      fcr[i] = fcrQuery?.voederconversie
+      fcr[i] = fcrQuery?.voederconversie;
 
-      gesch_bezetting[i] = generalWeight[i] + feedQuantity[i] / fcr[i]
+      gesch_bezetting[i] = generalWeight[i] + feedQuantity[i] / fcr[i];
 
-      generalWeight[i + 1] = gesch_bezetting[i]
+      generalWeight[i + 1] = gesch_bezetting[i];
 
-      gesch_gewicht[i] = gesch_bezetting[i] / ((100 - gesch_uitval[i]) / 100 * fishAmountInPool[i]) * 1000
+      gesch_gewicht[i] =
+        (gesch_bezetting[i] /
+          (((100 - gesch_uitval[i]) / 100) * fishAmountInPool[i])) *
+        1000;
 
       feedQuery = await activeDb.datatable_over25.findFirst({
         where: {
@@ -557,16 +592,16 @@ export async function createCalcOver25(fishAmount: number, averageFishMass: numb
           },
         },
         orderBy: {
-          weight: 'desc',
+          weight: "desc",
         },
       });
 
       if (feedQuery) {
-        feedPerDay[i] = feedQuery?.voederniveau / 100 * gesch_bezetting[i] / 1.11
-        feedPerFeeding[i] = feedPerDay[i] / 5
-        feedQuantity[i + 1] = feedPerDay[i]
+        feedPerDay[i] =
+          ((feedQuery?.voederniveau / 100) * gesch_bezetting[i]) / 1.11;
+        feedPerFeeding[i] = feedPerDay[i] / 5;
+        feedQuantity[i + 1] = feedPerDay[i];
       }
-
     }
 
     for (let i = 0; i < day.length; i++) {
@@ -580,36 +615,37 @@ export async function createCalcOver25(fishAmount: number, averageFishMass: numb
           feed_quantity: feedQuantity[i],
           feed_per_day: feedPerDay[i] * 1000,
           feed_per_feeding: feedPerFeeding[i] * 1000,
-          doc_id: docId
+          doc_id: docId,
         },
       });
     }
-
   } catch (error) {
-    throw new Error('Error creating calculation table');
+    throw new Error("Error creating calculation table");
   }
 }
 
 //отримання калькуляції до попереднього корму
-export async function getPrevCalc(location_id: number, calc: calculationAndFeed | undefined) {
-  const records14 = await get14CalculationForPool(location_id)
+export async function getPrevCalc(
+  location_id: number,
+  calc: calculationAndFeed | undefined
+) {
+  const records14 = await get14CalculationForPool(location_id);
 
   if (calc !== null) {
-    let index = records14.findIndex(record => record.id === calc?.calc?.id)
+    let index = records14.findIndex((record) => record.id === calc?.calc?.id);
 
     while (true) {
       if (index <= 0) {
-        return null
+        return null;
       }
 
       if (records14[index - 1].transition_day === null) {
+        const feed_type = await getFeedType(records14[index - 1].fish_weight);
 
-        const feed_type = await getFeedType(records14[index - 1].fish_weight)
-
-        let item
+        let item;
 
         if (feed_type) {
-          item = await actions.getItemPerType(feed_type.id, location_id)
+          item = await actions.getItemPerType(feed_type.id, location_id);
         }
 
         return {
@@ -619,13 +655,13 @@ export async function getPrevCalc(location_id: number, calc: calculationAndFeed 
             type_name: feed_type?.name,
             item_id: item?.item_id,
             item_name: item?.item_name,
-            definedPrio: item?.definedPrio
+            definedPrio: item?.definedPrio,
           },
-          location_id: location_id
-        }
+          location_id: location_id,
+        };
       }
 
-      index--
+      index--;
     }
   }
 }
