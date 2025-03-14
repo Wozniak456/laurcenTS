@@ -1,24 +1,26 @@
 import { db } from "@/db";
-import StockingComponent from "@/components/feeding-component"
-import * as stockingActions from '@/actions/stocking'
-import * as actions from '@/actions'
+import StockingComponent from "@/components/feeding-component";
+import * as stockingActions from "@/actions/stocking";
+import * as actions from "@/actions";
 import { calculation_table, itemtransactions, Prisma } from "@prisma/client";
 
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
 export default async function StockingHome() {
+  const today = new Date();
+  console.log(
+    "current date: ",
+    today.toLocaleString("uk-ua", { timeZone: "Europe/Kiev" })
+  );
+  const areas = await actions.getAreas();
 
-  const today = new Date()
+  const locations = await actions.getPools();
 
-  const areas = await actions.getAreas()
+  const batches = await actions.getCatfishBatches();
 
-  const locations = await actions.getPools()
+  const disposal_reasons = await db.disposal_reasons.findMany();
 
-  const batches = await actions.getCatfishBatches()
-
-  const disposal_reasons = await db.disposal_reasons.findMany()
-
-  const weekNum = actions.getWeekOfYear(today)
+  const weekNum = actions.getWeekOfYear(today);
 
   // Збір інформації про басейни
   const poolsData = await Promise.all(
@@ -67,7 +69,14 @@ export default async function StockingHome() {
     <div className="flex flex-col items-center justify-center min-h-screen text-sm">
       <div className="flex flex-col items-end w-full">
         <p>Тиждень: {weekNum}</p>
-        <p>Сьогодні: {today.toISOString().split("T")[0]}</p>
+        <p>
+          Сьогодні:{" "}
+          {
+            today
+              .toLocaleString("uk-ua", { timeZone: "Europe/Kiev" })
+              .split(",")[0]
+          }
+        </p>
       </div>
 
       {areas.map((area) => (
@@ -100,30 +109,28 @@ export default async function StockingHome() {
   );
 }
 
-
 async function wasFetchedThisWeek(location_id: number, weekNum: number) {
   const fetch = await db.fetching.findMany({
     include: {
       itemtransactions: {
         include: {
           documents: true,
-        }
-      }
+        },
+      },
     },
     where: {
       itemtransactions: {
         documents: {
-          location_id: location_id
-        }
+          location_id: location_id,
+        },
       },
-      weekNumber: weekNum
-    }
-  })
+      weekNumber: weekNum,
+    },
+  });
 
   if (fetch.length > 0) {
-    return true
+    return true;
   } else {
-    return false
+    return false;
   }
 }
-
