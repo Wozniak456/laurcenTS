@@ -84,6 +84,7 @@ model documents {
   location_id       Int?
   doc_type_id       Int?
   date_time         DateTime            @default(now()) @db.Timestamp(6)
+  date_time_posted  DateTime            @default(now()) @db.Timestamp(6)
   executed_by       Int
   comments          String?
   calculation_table calculation_table[]

@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "documents" ADD COLUMN     "date_time_posted" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP;

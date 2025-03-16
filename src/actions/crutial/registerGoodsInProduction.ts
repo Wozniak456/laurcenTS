@@ -3,6 +3,32 @@ import { db } from "@/db";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+function combineDateAndTime(datePart: Date, timePart: Date) {
+  if (!datePart || !timePart) return Date(); //Check for nulls.
+
+  const combinedDate = new Date(
+    datePart.getFullYear(),
+    datePart.getMonth(),
+    datePart.getDate(),
+    timePart.getHours(),
+    timePart.getMinutes(),
+    timePart.getSeconds(),
+    timePart.getMilliseconds()
+  );
+
+  return combinedDate;
+}
+
+function parseUkrainianDate(dateString: string) {
+  const parts = dateString.split(".").map(Number); //split by dots and convert to numbers.
+  if (parts.length === 3) {
+    const [day, month, year] = parts;
+    // Months in JavaScript Date objects are 0-indexed (January is 0)
+    return new Date(year, month - 1, day);
+  }
+  return null; // Handle invalid date strings
+}
+
 export async function registerGoodsInProduction(
   formState: { message: string },
   formData: FormData
@@ -11,16 +37,25 @@ export async function registerGoodsInProduction(
   try {
     const header_id: number = parseInt(formData.get("header_id") as string);
     const vendor_id: number = parseInt(formData.get("vendor_id") as string);
+    const purch_date_string: string = formData.get("purch_date") as string;
 
+    const datePart = parseUkrainianDate(purch_date_string);
+    const timePart = new Date();
+    const purch_date = combineDateAndTime(
+      datePart ? datePart : timePart,
+      timePart
+    );
     // Виконання транзакції
     const result = await db.$transaction(async (prisma) => {
       try {
+        console.log("Purch date: ", purch_date);
         // Створення документа
         const document = await prisma.documents.create({
           data: {
             location_id: 87, // склад
             doc_type_id: 8, // Реєстрація партії
             executed_by: 3,
+            date_time: purch_date,
           },
         });
 
