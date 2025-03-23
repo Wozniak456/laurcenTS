@@ -382,6 +382,7 @@ export async function createCalcBelow25(
   averageFishMass: number,
   percentage: number,
   docId: bigint,
+  today: string,
   prisma?: any
 ) {
   const activeDb = prisma || db;
@@ -390,7 +391,7 @@ export async function createCalcBelow25(
   const day = Array.from({ length: numberOfRecords }, (_, i) => i + 1);
 
   const date = Array.from({ length: numberOfRecords }, (_, i) => {
-    const currentDate = new Date();
+    const currentDate = new Date(today);
     currentDate.setDate(currentDate.getDate() + i + 1);
     return currentDate;
   });
@@ -526,18 +527,17 @@ export async function createCalcOver25(
   averageFishMass: number,
   percentage: number,
   docId: bigint,
-  date?: string,
+  today: string,
   prisma?: any
 ) {
   const activeDb = prisma || db;
-  const activeDate = date ? new Date(date) : new Date();
 
   try {
     const numberOfRecords = 10;
     const day = Array.from({ length: numberOfRecords }, (_, i) => i + 1);
 
     const date = Array.from({ length: numberOfRecords }, (_, i) => {
-      const currentDate = new Date(activeDate);
+      const currentDate = new Date(today);
       currentDate.setDate(currentDate.getDate() + i + 1);
       return currentDate;
     });
