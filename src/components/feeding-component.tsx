@@ -72,7 +72,12 @@ export default function StockPoolPage({
       </div>
 
       {poolInfo?.qty && poolInfo.qty > 0 ? (
-        <PoolInfo location={location} poolInfo={poolInfo} batches={batches} />
+        <PoolInfo
+          location={location}
+          poolInfo={poolInfo}
+          batches={batches}
+          today={today}
+        />
       ) : (
         ""
       )}
@@ -186,7 +191,7 @@ export default function StockPoolPage({
         </div>
         } */}
       <div className="flex justify-end mb-4">
-        <Link href={`/pool-managing/${location.id}`}>
+        <Link href={`/pool-managing/day/${today}/${location.id}`}>
           Актуалізація стану басейна
         </Link>
       </div>
@@ -198,6 +203,7 @@ export default function StockPoolPage({
             poolInfo={poolInfo}
             locations={locations}
             weekNum={weekNum}
+            today={today}
           />
         </div>
       )}

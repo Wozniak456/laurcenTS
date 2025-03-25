@@ -27,12 +27,14 @@ type PoolInfoProps = {
       name: string;
     };
   }[];
+  today: string;
 };
 
 export default function PoolInfoComponent({
   location,
   poolInfo,
   batches,
+  today,
 }: PoolInfoProps) {
   const [editionAllowed, setEditionAllowed] = useState<boolean>(false);
 
@@ -179,6 +181,7 @@ export default function PoolInfoComponent({
             <input type="hidden" name="fish_amount" value={count} />
             <input type="hidden" name="batch_id" value={batchId} />
             <input type="hidden" name="average_fish_mass" value={avMass} />
+            <input type="hidden" name="today" value={today} />
 
             <button
               className="hover:bg-blue-100 font-bold rounded transition duration-100 ease-in-out transform active:scale-75 active:shadow-none hover:shadow-lg"

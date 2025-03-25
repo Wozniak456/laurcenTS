@@ -5,9 +5,24 @@ import * as stockingActions from "@/actions/stocking";
 import { poolManagingTypeExtended } from "@/types/app_types";
 import * as actions from "@/actions";
 
+function addCurrentTimeToDate(date: Date) {
+  if (!(date instanceof Date)) {
+    throw new Error("Input must be a Date object.");
+  }
+
+  const now = new Date();
+
+  date.setHours(now.getHours());
+  date.setMinutes(now.getMinutes());
+  date.setSeconds(now.getSeconds());
+  date.setMilliseconds(now.getMilliseconds());
+
+  return date;
+}
+
 interface PoolManagingShowPageProps {
   params: {
-    day: string;
+    index: string;
     id: string;
   };
 }
@@ -24,7 +39,7 @@ export default async function PoolManagingShowPage(
       notFound();
     }
     console.log(props.params);
-    const today = new Date(props.params.day);
+    const today = addCurrentTimeToDate(new Date(props.params.index));
 
     // let poolInfo = await stockingActions.poolInfo(props.params.id, today.toISOString().split("T")[0])
 
@@ -54,6 +69,7 @@ export default async function PoolManagingShowPage(
           poolInfo={poolInfo}
           batches={batches}
           feeds={feeds}
+          today={props.params.index}
         />
       </>
     );
