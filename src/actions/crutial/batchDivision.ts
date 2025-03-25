@@ -14,10 +14,26 @@ type updatePrevPoolProps = {
   };
 };
 
+function addCurrentTimeToDate(date: Date) {
+  if (!(date instanceof Date)) {
+    throw new Error("Input must be a Date object.");
+  }
+
+  const now = new Date();
+
+  date.setHours(now.getHours());
+  date.setMinutes(now.getMinutes());
+  date.setSeconds(now.getSeconds());
+  date.setMilliseconds(now.getMilliseconds());
+
+  return date;
+}
+
 export async function batchDivision(
   formState: { message: string } | undefined,
   formData: FormData
 ): Promise<{ message: string } | undefined> {
+  const today: string = formData.get("today") as string;
   try {
     console.log("ми в batchDivision");
     console.log(formData);
@@ -31,7 +47,6 @@ export async function batchDivision(
     const fish_qty_in_location_from: number = parseInt(
       formData.get("fish_qty_in_location_from") as string
     );
-    const today: string = formData.get("today") as string;
     // const average_fish_mass : number = parseFloat(formData.get('average_fish_mass') as string);
 
     let sum = 0;
@@ -69,7 +84,7 @@ export async function batchDivision(
       data: {
         location_id: location_from,
         doc_type_id: 2, // розділення
-        date_time: new Date(today),
+        date_time: addCurrentTimeToDate(new Date(today)),
         executed_by: 3,
       },
     });
@@ -202,9 +217,9 @@ export async function batchDivision(
     }
   }
 
-  revalidatePath("/pool-managing/view");
+  revalidatePath(`/pool-managing/day/${today}`);
   revalidatePath("/summary-feeding-table/week");
   revalidatePath(`/accumulation/view`);
   // revalidatePath('/leftovers/view')
-  redirect("/pool-managing/view");
+  redirect(`/pool-managing/day/${today}`);
 }

@@ -4,11 +4,28 @@ import { revalidatePath } from "next/cache";
 import { getFeedAmountsAndNames } from "./getFeedAmountsAndNames";
 import { createCalcTable } from "./createCalcTable";
 
+function addCurrentTimeToDate(date: Date) {
+  if (!(date instanceof Date)) {
+    throw new Error("Input must be a Date object.");
+  }
+
+  const now = new Date();
+
+  date.setHours(now.getHours());
+  date.setMinutes(now.getMinutes());
+  date.setSeconds(now.getSeconds());
+  date.setMilliseconds(now.getMilliseconds());
+
+  return date;
+}
+
 export async function stockPool(
   formState: { message: string } | undefined,
   formData: FormData,
   prisma?: any // Приймаємо prisma тут
 ): Promise<{ message: string } | undefined> {
+  const today: string = formData.get("today") as string;
+
   try {
     console.log("stockPool");
     console.log(formData);
@@ -38,7 +55,6 @@ export async function stockPool(
 
     const executed_by = 3; //number = parseInt(formData.get('executed_by') as string);
     const comments: string = formData.get("comments") as string;
-    const today: string = formData.get("today") as string;
 
     // const p_tran: number = parseInt(formData.get('p_tran') as string);
 
@@ -79,7 +95,7 @@ export async function stockPool(
       data: {
         location_id: location_id_to, // Отримуємо id локації
         doc_type_id: 1,
-        date_time: new Date(today),
+        date_time: addCurrentTimeToDate(new Date(today)),
         executed_by: executed_by,
         comments: comments,
         // parent_document: p_doc
@@ -302,6 +318,6 @@ export async function stockPool(
     }
   }
 
-  revalidatePath("/pool-managing/view");
+  revalidatePath(`/pool-managing/day/${today}`);
   revalidatePath("/summary-feeding-table/week");
 }

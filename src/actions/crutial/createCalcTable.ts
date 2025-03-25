@@ -6,6 +6,21 @@ import {
   setTransitionDayForLocation,
 } from "@/actions/stocking";
 
+function addCurrentTimeToDate(date: Date) {
+  if (!(date instanceof Date)) {
+    throw new Error("Input must be a Date object.");
+  }
+
+  const now = new Date();
+
+  date.setHours(now.getHours());
+  date.setMinutes(now.getMinutes());
+  date.setSeconds(now.getSeconds());
+  date.setMilliseconds(now.getMilliseconds());
+
+  return date;
+}
+
 export async function createCalcTable(
   formState: { message: string } | undefined,
   formData: FormData,
@@ -32,7 +47,7 @@ export async function createCalcTable(
     const document_for_location_to = await activeDb.documents.create({
       data: {
         doc_type_id: 7, //просто виклик калькуляції
-        date_time: new Date(today),
+        date_time: addCurrentTimeToDate(new Date(today)),
         location_id: location_id_to,
         executed_by: 3,
         parent_document: parent_doc,

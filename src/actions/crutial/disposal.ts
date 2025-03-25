@@ -4,11 +4,27 @@ import { revalidatePath } from "next/cache";
 import { stockPool } from "./stockPool";
 import { redirect } from "next/navigation";
 
+function addCurrentTimeToDate(date: Date) {
+  if (!(date instanceof Date)) {
+    throw new Error("Input must be a Date object.");
+  }
+
+  const now = new Date();
+
+  date.setHours(now.getHours());
+  date.setMinutes(now.getMinutes());
+  date.setSeconds(now.getSeconds());
+  date.setMilliseconds(now.getMilliseconds());
+
+  return date;
+}
+
 // реєстрація списання
 export async function disposal(
   formState: { message: string } | undefined,
   formData: FormData
 ) {
+  const today: string = formData.get("today") as string;
   try {
     console.log("ми в disposal");
     console.log(formData);
@@ -23,14 +39,13 @@ export async function disposal(
     const reason_id: number = parseInt(formData.get("reason") as string);
     const qty: number = parseInt(formData.get("qty") as string);
     const average_weight_str = formData.get("average_fish_mass") as string;
-    const today: string = formData.get("today") as string;
 
     //створення документа списання
     const disposalDoc = await db.documents.create({
       data: {
         location_id: location_id_from,
         doc_type_id: 11,
-        date_time: new Date(today),
+        date_time: addCurrentTimeToDate(new Date(today)),
         executed_by: 3,
       },
     });
@@ -44,7 +59,7 @@ export async function disposal(
         reason_id: reason_id,
         qty: qty,
         batch_id: batch_id,
-        date: new Date(today),
+        date: addCurrentTimeToDate(new Date(today)),
         location_id: location_id_from,
       },
     });
@@ -77,8 +92,8 @@ export async function disposal(
       return { message: "Something went wrong!" };
     }
   }
-  revalidatePath("/pool-managing/view");
+  revalidatePath(`/pool-managing/day/${today}`);
   revalidatePath("/summary-feeding-table/week");
   // revalidatePath(`/accumulation/view`)
-  redirect("/pool-managing/view");
+  redirect(`/pool-managing/day/${today}`);
 }
