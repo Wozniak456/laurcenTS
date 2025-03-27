@@ -223,27 +223,31 @@ export async function stockPool(
         "fish_qty_in_location_from",
         fish_qty_in_location_from
       );
-      const part = stocking_quantity / fish_qty_in_location_from;
-      for (const record of grouped_first_ancestor) {
-        const fetch_record = await activeDb.generation_feed_amount.create({
-          data: {
-            batch_generation_id: record.batch_generation_id,
-            amount: -record.total_amount * part,
-            feed_batch_id: record.feed_batch_id,
-          },
-        });
-        // І вкидання у нову локацію
-        const push_record = await activeDb.generation_feed_amount.create({
-          data: {
-            batch_generation_id: generationOfTwoBatches.id,
-            amount: record.total_amount * part,
-            feed_batch_id: record.feed_batch_id,
-          },
-        });
+      if (!Number.isNaN(fish_qty_in_location_from)) {
+        if (fish_qty_in_location_from > 0) {
+          const part = stocking_quantity / fish_qty_in_location_from;
+          for (const record of grouped_first_ancestor) {
+            const fetch_record = await activeDb.generation_feed_amount.create({
+              data: {
+                batch_generation_id: record.batch_generation_id,
+                amount: -record.total_amount * part,
+                feed_batch_id: record.feed_batch_id,
+              },
+            });
+            // І вкидання у нову локацію
+            const push_record = await activeDb.generation_feed_amount.create({
+              data: {
+                batch_generation_id: generationOfTwoBatches.id,
+                amount: record.total_amount * part,
+                feed_batch_id: record.feed_batch_id,
+              },
+            });
 
-        console.log(
-          `витягнули частку з'їдженого: ${fetch_record.feed_batch_id}: ${fetch_record.amount}. І накинули на ${push_record.batch_generation_id}`
-        );
+            console.log(
+              `витягнули частку з'їдженого: ${fetch_record.feed_batch_id}: ${fetch_record.amount}. І накинули на ${push_record.batch_generation_id}`
+            );
+          }
+        }
       }
     }
 
