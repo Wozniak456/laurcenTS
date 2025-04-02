@@ -54,6 +54,7 @@ export default async function PoolManagingShowPage(
           poolInfo={poolInfo}
           batches={batches}
           feeds={feeds}
+          today={props.params.day}
         />
       </>
     );
