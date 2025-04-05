@@ -3,6 +3,8 @@ import Link from "next/link";
 import StockingComponent from "@/components/feeding-component";
 import * as stockingActions from "@/actions/stocking";
 import * as actions from "@/actions";
+import { addDays, format } from "date-fns";
+import { uk } from "date-fns/locale"; // If you need specific Ukrainian locale formatting
 import { calculation_table, itemtransactions, Prisma } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
@@ -49,7 +51,8 @@ export default async function StockingHome(props: StockingProps) {
             pool.locations.map(async (loc) => {
               const poolInfo = await stockingActions.poolInfo(loc.id, today);
 
-              const wasFetchedThisWeek = await db.fetching.findMany({
+              const wasFetchedThisWeek = false;
+              /*              await db.fetching.findMany({
                 where: {
                   itemtransactions: {
                     documents: {
@@ -59,12 +62,13 @@ export default async function StockingHome(props: StockingProps) {
                   weekNumber: weekNum,
                 },
               });
-
+*/
               return {
                 key: `${pool.id}-${loc.id}`,
                 poolInfo: {
                   ...poolInfo,
-                  wasFetchedThisWeek: wasFetchedThisWeek.length > 0,
+                  //                  wasFetchedThisWeek: wasFetchedThisWeek.length > 0,
+                  wasFetchedThisWeek: wasFetchedThisWeek,
                 },
                 loc,
                 pool,
@@ -136,13 +140,32 @@ export default async function StockingHome(props: StockingProps) {
   );
 }
 
+function formatDateInKiev(date: Date) {
+  const options: Intl.DateTimeFormatOptions = {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  };
+  const formattedMDY = new Intl.DateTimeFormat("uk-UA", options).format(date);
+  //console.log("converted ", date, "into super date ", formattedMDY);
+  const [day, month, year] = formattedMDY.split(".");
+  return `${year}-${month}-${day}`;
+}
+
 //set dates to show on page
 const datesArray = (currentDate: Date) => {
   let dates = [];
-  for (let i = -6; i <= 2; i++) {
-    let newDate = new Date();
-    newDate.setDate(currentDate.getDate() + i);
-    dates.push(newDate.toISOString().split("T")[0]);
+  let curDate: Date = new Date(currentDate);
+  //curDate.setUTCHours(10, 0, 0, 0);
+  //console.log("datez2 - calculate from ", formatDateInKiev(currentDate));
+  for (let i = -4; i <= 4; i++) {
+    let newDate = addDays(curDate, i);
+    //newDate.setDate(currentDate.getDate() + i);
+    dates.push(
+      formatDateInKiev(newDate)
+      //      newDate.toLocaleString("uk-ua", { timeZone: "Europe/Kiev" }).split(",")[0]
+    );
+    //console.log("datez2 - added", formatDateInKiev(newDate));
   }
   return dates;
 };

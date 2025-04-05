@@ -35,8 +35,22 @@ export async function feedBatch(
             formData.get(`time_${hours}`) as string
           );
           const date = new Date(date_time);
-          date.setHours(date.getHours() + hours);
-
+          date.setUTCHours(hours);
+          /*
+          console.log(
+            "we want to feed ",
+            location_id,
+            " on ",
+            date_time,
+            " at ",
+            hours,
+            " and system will save on ",
+            date,
+            " and current time ",
+            date.getHours()
+          );
+          let abra = 34 / 0;
+          */
           //ПЕРЕВІРИТИ НА ПЕРШІЙ ІТЕРАЦІЇ ЧИ ДОСТАТНЬО НА СКЛАДІ КОРМУ НА ВЕСЬ ДЕНЬ
           let qtyForWholeDay = qty;
 

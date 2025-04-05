@@ -120,6 +120,7 @@ export async function fishFetching(
     async (prisma) => {
       try {
         // Створення документа вилову
+        console.time("Create fetchDoc");
         const fetchDoc = await prisma.documents.create({
           data: {
             location_id: location_id_from,
@@ -129,6 +130,7 @@ export async function fishFetching(
             comments: comments,
           },
         });
+        console.timeEnd("Create fetchDoc");
 
         if (!fetchDoc) {
           throw new Error("Помилка при створенні документа вилову");
@@ -138,6 +140,7 @@ export async function fishFetching(
 
         for (const { amount, total_weight, reason } of fishingData) {
           if (amount) {
+            console.time(`createFishingTransaction - reason: ${reason}`);
             const result = await createFishingTransaction(
               prisma,
               Number(fetchDoc.id),
@@ -151,8 +154,11 @@ export async function fishFetching(
               week_num
             );
             console.log("Транзакція успішно завершена:", result);
+            console.timeEnd(`createFishingTransaction - reason: ${reason}`);
           }
+          console.log("Reason = ", reason);
           if (reason === FetchingReasons.GrowOut && amount) {
+            console.time("findFirst last_stocking");
             const last_stocking = await prisma.itemtransactions.findFirst({
               where: {
                 location_id: location_id_to,
@@ -164,6 +170,7 @@ export async function fishFetching(
                 id: "desc",
               },
             });
+            console.timeEnd("findFirst last_stocking");
 
             console.log("last_stocking", last_stocking);
 
@@ -181,15 +188,19 @@ export async function fishFetching(
               String(growout_fishing_total_weight / growout_fishing_amount)
             );
 
+            console.time("stockPool");
             await stockPool(formState, formData, prisma);
+            console.timeEnd("stockPool");
           }
         }
-
+        console.log("find batch generation - line 188");
+        console.time("findFirst prev_generation");
         const prev_generation = await prisma.batch_generation.findFirst({
           where: { location_id: location_id_from },
           orderBy: { id: "desc" },
           take: 1,
         });
+        console.timeEnd("findFirst prev_generation");
 
         console.log("prev_generation", prev_generation);
 
@@ -207,10 +218,12 @@ export async function fishFetching(
 
         if (first_parent_generation) {
           console.log("ми в if (first_parent_generation)");
+          console.time("getFeedAmountsAndNames");
           const grouped_first_ancestor = await getFeedAmountsAndNames(
             first_parent_generation?.id,
             prisma
           );
+          console.timeEnd("getFeedAmountsAndNames");
           console.log("grouped_first_ancestor", grouped_first_ancestor);
 
           const NEW_fish_qty_in_location_from =
@@ -229,6 +242,7 @@ export async function fishFetching(
             NEW_fish_qty_in_location_from;
           console.log("переміщаємо :", part, " %");
 
+          console.time("Promise.all - generation_feed_amount.create");
           await Promise.all(
             grouped_first_ancestor.map(async (record) => {
               const fetch_record = await prisma.generation_feed_amount.create({
@@ -244,6 +258,7 @@ export async function fishFetching(
               );
             })
           );
+          console.timeEnd("Promise.all - generation_feed_amount.create");
         }
 
         formData.set(
@@ -267,8 +282,9 @@ export async function fishFetching(
           },
           prisma,
         };
-
+        console.time("updatePrevPool");
         await updatePrevPool(info);
+        console.timeEnd("updatePrevPool");
       } catch (innerError: any) {
         // console.error('Помилка у транзакції:');
         throw new Error(

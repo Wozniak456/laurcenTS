@@ -337,6 +337,9 @@ export async function get14CalculationForPool(
 }
 
 export async function getBatchesInfo(location_id: number, date: string) {
+  const dateValue = new Date(date);
+
+  dateValue.setUTCHours(23, 59, 59, 999);
   const batch = await db.documents.findFirst({
     select: {
       itemtransactions: {
@@ -357,7 +360,7 @@ export async function getBatchesInfo(location_id: number, date: string) {
     where: {
       doc_type_id: 1,
       date_time: {
-        lte: new Date(date),
+        lte: dateValue,
       },
       itemtransactions: { some: { location_id: location_id } }, // фільтрація транзакцій
     },
