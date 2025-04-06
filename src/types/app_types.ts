@@ -1,5 +1,12 @@
 import { calculation_table } from "@prisma/client";
 
+export type FishBatch = {
+    batch_id: number;
+    batch_name: string;
+    item_id: number;
+    item_name: string;
+};
+
 export type BatchWithCreationInfo = {
     id: bigint;
     name: string;
@@ -23,7 +30,7 @@ export type TabContentType = {
 }
 
 export type getCurrentFeedCountType = {
-    batch_name : string | undefined;
+    batch_name: string | undefined;
     feed_type_id: {
         id: number;
         name: string;
@@ -32,7 +39,7 @@ export type getCurrentFeedCountType = {
     batch_id: bigint;
     _sum: {
         quantity: number | null;
-    } 
+    }
 }
 
 export type Feed = {
@@ -41,11 +48,11 @@ export type Feed = {
     feed_list: {
         item_id: number,
         feed_name: string
-    }[] 
+    }[]
 } | undefined
 
 export type Prio = {
-    item_id: number | undefined; 
+    item_id: number | undefined;
     item_name: string | undefined,
     priority: number | undefined;
 }
@@ -74,7 +81,7 @@ export type batchInfo = {
     batch_name: string | undefined,
     batch_id: bigint | undefined,
     qty: number
-  }
+}
 
 export type poolInfo = {
     batch: batchInfo | null | undefined;
@@ -102,24 +109,24 @@ export type poolManagingType = {
     } | null | undefined;
     updateDate?: string | undefined;
     allowedToEdit?: boolean;
-    wasFetchedThisWeek? : boolean
+    wasFetchedThisWeek?: boolean
     plan_weight?: number
 }
 
 export interface poolManagingTypeExtended extends poolManagingType {
-    location?:{
+    location?: {
         id: number,
         name: string
     }
 }
 
-export interface calculationAndFeed{
+export interface calculationAndFeed {
     batch?: {
         batch_name: string | undefined;
         batch_id: bigint | undefined;
         qty?: number;
     } | null;
-    calc?: calculation_table | undefined  | null;
+    calc?: calculation_table | undefined | null;
     feed?: {
         type_id: number | undefined;
         type_name: string | undefined;
@@ -130,12 +137,12 @@ export interface calculationAndFeed{
     allowedToEdit?: boolean;
 }
 
-export interface calculationAndFeedExtended extends calculationAndFeed{
+export interface calculationAndFeedExtended extends calculationAndFeed {
     allItems?: {
         item_id: number;
         item_name: string;
     }[] | undefined
-} 
+}
 
 export type disposalItem = {
     id: number,
