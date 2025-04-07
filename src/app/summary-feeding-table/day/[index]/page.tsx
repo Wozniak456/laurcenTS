@@ -94,7 +94,7 @@ export default async function DayFeeding(props: DayFeedingProps) {
   const data = await setData(today, times);
 
   data.map((data1) => {
-    if (data1.locId == 52) {
+    if (data1.locId == 65) {
       console.log("data1. loc: ", data1.locId);
       data1.feedings?.map((feeding) => {
         console.log(feeding);
@@ -342,9 +342,14 @@ const setData = async (
 
               for (const itemId of itemIds) {
                 const editing = await getEdited(hours, loc.id, itemId);
-
-                // console.log(`time: ${time.time}`);
-
+                if (loc.id === 65) {
+                  console.log(
+                    `hours: ${hours} location_id: ${loc.id} itemid: ${itemId}`
+                  );
+                  editing.map((editing1) => {
+                    console.log(editing1.itemtransactions);
+                  });
+                }
                 // Ініціалізуємо вкладені об'єкти, якщо їх немає
                 if (!editings[loc.id]) {
                   editings[loc.id] = {};
@@ -361,9 +366,6 @@ const setData = async (
               }
             })
         );
-
-        // if (loc.id == 52)
-        //   console.log(`locId: ${loc.id}`, JSON.stringify(editings, null, 2));
 
         const transition = todayCalc?.calc?.transition_day;
 
@@ -384,7 +386,9 @@ const setData = async (
 
         //якщо є перехід на новий корм і є попередній обрахунок
         if (transition && prevCalc) {
-          //   console.log(`${loc.id} 1 if`);
+          if (loc.id === 65) {
+            console.log(`${loc.id} 1 if65`);
+          }
           feedings.push({
             feedType: prevCalc.feed.type_name,
             feedName: prevCalc.feed.item_name,
@@ -396,7 +400,23 @@ const setData = async (
                 const itemId = prevCalc.feed.item_id; // Отримуємо itemId
 
                 const editing = editings[loc.id]?.[itemId!]?.[hours] || [];
-
+                if (loc.id === 65) {
+                  console.log(
+                    `today hourz: ${hours} locid: ${loc.id} itemId: ${itemId} 2 if65`
+                  );
+                  console.log(
+                    `locId: ${loc.id}`,
+                    JSON.stringify(
+                      editings[loc.id]?.[itemId!]?.[hours],
+                      (key, value) => {
+                        if (typeof value === "bigint") {
+                          return value.toString();
+                        }
+                        return value;
+                      }
+                    )
+                  );
+                }
                 return [
                   hours.toString(), // Ключ - години у вигляді рядка
                   {
@@ -416,7 +436,9 @@ const setData = async (
         }
 
         if (transition && todayCalc) {
-          //   console.log(`${loc.id} 2 if`);
+          if (loc.id === 65) {
+            console.log(`${loc.id} 2 if65`);
+          }
           feedings.push({
             feedType: todayCalc.feed.type_name,
             feedName: todayCalc.feed.item_name,
@@ -426,15 +448,31 @@ const setData = async (
                 const hours = Number(time.split(":")[0]);
                 const itemId = todayCalc.feed.item_id; // Отримуємо itemId
                 const editing = editings[loc.id]?.[itemId!]?.[hours] || [];
-
+                if (loc.id === 65) {
+                  console.log(
+                    `today hourz: ${hours} locid: ${loc.id} itemId: ${itemId} 2 if65`
+                  );
+                  console.log(
+                    `locId: ${loc.id}`,
+                    JSON.stringify(
+                      editings[loc.id]?.[itemId!]?.[hours],
+                      (key, value) => {
+                        if (typeof value === "bigint") {
+                          return value.toString();
+                        }
+                        return value;
+                      }
+                    )
+                  );
+                }
                 return [
                   hours.toString(),
                   {
                     feeding: feedingAmountForToday?.toFixed(1),
                     editing:
-                      editing[0]?.itemtransactions[0]?.quantity !== undefined
+                      editing[1]?.itemtransactions[0]?.quantity !== undefined
                         ? (
-                            editing[0].itemtransactions[0].quantity * 1000
+                            editing[1].itemtransactions[0].quantity * 1000
                           ).toFixed(1)
                         : "",
                   },
@@ -544,6 +582,17 @@ const setData = async (
         }
 
         // console.log('feedings: ', feedings)
+        if (loc.id === 65) {
+          console.log(
+            `locId: ${loc.id}`,
+            JSON.stringify(feedings, (key, value) => {
+              if (typeof value === "bigint") {
+                return value.toString();
+              }
+              return value;
+            })
+          );
+        }
 
         //що ми додаємо
         const pushResult = {
@@ -557,7 +606,17 @@ const setData = async (
           rowCount: feedingsCount,
           feedings,
         };
-
+        if (loc.id === 65) {
+          console.log(
+            `locId: ${loc.id}`,
+            JSON.stringify(pushResult, (key, value) => {
+              if (typeof value === "bigint") {
+                return value.toString();
+              }
+              return value;
+            })
+          );
+        }
         // Додати до загального масиву
         data.push(pushResult);
       }
