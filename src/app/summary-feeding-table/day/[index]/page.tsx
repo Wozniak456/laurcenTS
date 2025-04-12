@@ -62,6 +62,22 @@ type extraData = {
   location_id: number;
 };
 
+interface DailyFeedWeightProps {
+  lines: {
+    id: number;
+    pools: {
+      id: number;
+      name: string;
+      percent_feeding: number | null;
+      locations: {
+        name: string;
+        id: number;
+      }[];
+    }[];
+  }[];
+  // ... other props
+}
+
 export default async function DayFeeding(props: DayFeedingProps) {
   const today = props.params.index;
 
@@ -93,14 +109,15 @@ export default async function DayFeeding(props: DayFeedingProps) {
 
   const data = await setData(today, times);
 
-  data.map((data1) => {
+  /* data.map((data1) => {
     if (data1.locId == 65) {
       console.log("data1. loc: ", data1.locId);
       data1.feedings?.map((feeding) => {
         console.log(feeding);
       });
     }
-  });
+  } 
+);*/
 
   return (
     <div className="flex flex-col justify-center ">
@@ -126,8 +143,8 @@ export default async function DayFeeding(props: DayFeedingProps) {
       <DaySummaryContent
         data={data}
         lines={lines}
-        times={times}
         today={today}
+        times={times}
         feeds={items}
       />
       <DailyFeedWeightPage
@@ -342,14 +359,14 @@ const setData = async (
 
               for (const itemId of itemIds) {
                 const editing = await getEdited(hours, loc.id, itemId);
-                if (loc.id === 65) {
+                /* if (loc.id === 65) {
                   console.log(
                     `hours: ${hours} location_id: ${loc.id} itemid: ${itemId}`
                   );
                   editing.map((editing1) => {
                     console.log(editing1.itemtransactions);
                   });
-                }
+                } */
                 // Ініціалізуємо вкладені об'єкти, якщо їх немає
                 if (!editings[loc.id]) {
                   editings[loc.id] = {};
@@ -400,7 +417,7 @@ const setData = async (
                 const itemId = prevCalc.feed.item_id; // Отримуємо itemId
 
                 const editing = editings[loc.id]?.[itemId!]?.[hours] || [];
-                if (loc.id === 65) {
+                /*                 if (loc.id === 65) {
                   console.log(
                     `today hourz: ${hours} locid: ${loc.id} itemId: ${itemId} 2 if65`
                   );
@@ -416,7 +433,7 @@ const setData = async (
                       }
                     )
                   );
-                }
+                } */
                 return [
                   hours.toString(), // Ключ - години у вигляді рядка
                   {
@@ -436,9 +453,9 @@ const setData = async (
         }
 
         if (transition && todayCalc) {
-          if (loc.id === 65) {
-            console.log(`${loc.id} 2 if65`);
-          }
+          //if (loc.id === 65) {
+          //  console.log(`${loc.id} 2 if65`);
+          //}
           feedings.push({
             feedType: todayCalc.feed.type_name,
             feedName: todayCalc.feed.item_name,
@@ -448,7 +465,7 @@ const setData = async (
                 const hours = Number(time.split(":")[0]);
                 const itemId = todayCalc.feed.item_id; // Отримуємо itemId
                 const editing = editings[loc.id]?.[itemId!]?.[hours] || [];
-                if (loc.id === 65) {
+                /* if (loc.id === 65) {
                   console.log(
                     `today hourz: ${hours} locid: ${loc.id} itemId: ${itemId} 2 if65`
                   );
@@ -464,7 +481,7 @@ const setData = async (
                       }
                     )
                   );
-                }
+                } */
                 return [
                   hours.toString(),
                   {
@@ -582,7 +599,7 @@ const setData = async (
         }
 
         // console.log('feedings: ', feedings)
-        if (loc.id === 65) {
+        /* if (loc.id === 65) {
           console.log(
             `locId: ${loc.id}`,
             JSON.stringify(feedings, (key, value) => {
@@ -592,7 +609,7 @@ const setData = async (
               return value;
             })
           );
-        }
+        } */
 
         //що ми додаємо
         const pushResult = {
@@ -606,7 +623,7 @@ const setData = async (
           rowCount: feedingsCount,
           feedings,
         };
-        if (loc.id === 65) {
+        /* if (loc.id === 65) {
           console.log(
             `locId: ${loc.id}`,
             JSON.stringify(pushResult, (key, value) => {
@@ -616,7 +633,7 @@ const setData = async (
               return value;
             })
           );
-        }
+        } */
         // Додати до загального масиву
         data.push(pushResult);
       }
@@ -635,12 +652,19 @@ const setLines = async () => {
         select: {
           name: true,
           id: true,
+          percent_feeding: true,
           locations: {
             select: {
               id: true,
               name: true,
             },
+            orderBy: {
+              name: "asc",
+            },
           },
+        },
+        orderBy: {
+          name: "asc",
         },
       },
     },

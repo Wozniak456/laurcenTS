@@ -27,6 +27,7 @@ interface DaySummaryProps {
     pools: {
       id: number;
       name: string;
+      percent_feeding: number | null;
       locations: {
         id: number;
         name: string;
@@ -174,14 +175,20 @@ export default function DaySummaryContent({
                   (row) => row.locId === loc.id
                 );
 
-                // console.log(`dataForPool: ${loc.id}. ${dataForPool.}`);
+                console.log(
+                  `dataForPool: ${loc.id}. ${dataForPool?.feedings} and percent feeding ${pool?.percent_feeding}`
+                );
                 const feedings = dataForPool?.feedings;
                 return (
                   <React.Fragment key={index}>
                     {feedings?.map((feeding, feedingIndex) => (
                       <RowForFeeding
                         key={feedingIndex}
-                        locInfo={{ id: loc.id, name: loc.name }}
+                        locInfo={{
+                          id: loc.id,
+                          name: loc.name,
+                          percent_feeding: pool?.percent_feeding ?? 0,
+                        }}
                         rowData={feeding}
                         times={times}
                         rowCount={

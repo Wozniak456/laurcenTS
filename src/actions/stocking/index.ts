@@ -137,7 +137,7 @@ export const poolInfo = async (
 
   if (lastStocking) {
     feedType = await getFeedType(lastStocking.stocking[0]?.average_weight);
-    console.log("LastStocking = ", lastStocking);
+    //console.log("LastStocking = ", lastStocking);
   }
 
   const batch = lastStocking?.itemtransactions[0]?.itembatches;

@@ -28,6 +28,7 @@ type Row = {
   location?: {
     id: number;
     name: string;
+    percent_feeding?: number;
   };
   rows?: subRow[];
 };
@@ -37,6 +38,8 @@ interface DailyFeedWeightProps {
     id: number;
     pools: {
       id: number;
+      name: string;
+      percent_feeding: number | null;
       locations: {
         name: string;
         id: number;
@@ -78,7 +81,11 @@ export default async function DailyFeedWeight({
         if (isPoolFilled) {
           const todayCalc: calculationAndFeed | undefined =
             await stockingActions.calculationForLocation(loc.id, date);
-
+          if (loc.id === 48) {
+            console.log(
+              `pool-id: ${pool.id} pool-name: ${pool.name} percent-feeding: ${pool.percent_feeding}`
+            );
+          }
           if (todayCalc?.feed && todayCalc.feed.type_id) {
             todayCalcExtended = {
               ...todayCalc,
@@ -114,6 +121,11 @@ export default async function DailyFeedWeight({
             location: {
               id: loc.id,
               name: loc.name,
+              percent_feeding:
+                pool.percent_feeding === null ||
+                pool.percent_feeding === undefined
+                  ? 0
+                  : pool.percent_feeding,
             },
             rows: [
               {
@@ -153,6 +165,8 @@ export default async function DailyFeedWeight({
             location: {
               id: loc.id,
               name: loc.name,
+              percent_feeding:
+                pool.percent_feeding === null ? 0 : pool.percent_feeding,
             },
             rows: [
               {
@@ -180,15 +194,17 @@ export default async function DailyFeedWeight({
   const aggregatedData: { [key: string]: number } = {};
 
   data.forEach((row) => {
+    const pf_: number = row.location?.percent_feeding || 0;
     row.rows?.forEach((subRow) => {
       const itemName = subRow.item.name;
+      const qty_ = (subRow.qty || 0) * (1 + pf_ / 100);
       if (itemName !== undefined) {
         if (!aggregatedData[itemName]) {
           // Якщо item.name ще не існує, створюємо новий запис
-          aggregatedData[itemName] = subRow.qty || 0;
+          aggregatedData[itemName] = qty_;
         } else {
           // Якщо item.name вже існує, акумулюємо значення qty
-          aggregatedData[itemName] += subRow.qty || 0;
+          aggregatedData[itemName] += qty_;
         }
       }
     });
@@ -202,11 +218,13 @@ export default async function DailyFeedWeight({
       </div>
 
       <div className="flex justify-around min-h-screen content-start">
-        <table className="w-1/2 bg-white rounded-lg shadow-lg">
+        <table className="w-5/7 bg-white rounded-lg shadow-lg">
           <thead>
             <tr className="bg-gray-800 text-white">
-              <th className="border p-4">№ басейну</th>
-              <th className="border p-4">К-сть, г</th>
+              <th className="border p-4">Басейн</th>
+              <th className="border p-4">% відх.</th>
+              <th className="border p-4">Калк. к-сть, г</th>
+              <th className="border p-4">Розр. к-сть, г</th>
               <th className="border p-4">Тип корму</th>
               <th className="border p-4">Корм</th>
             </tr>
@@ -216,9 +234,17 @@ export default async function DailyFeedWeight({
               line.pools.map((pool) =>
                 pool.locations.flatMap((loc) => {
                   const row = data.find((row) => row.location?.id == loc.id);
-
+                  let outthisline = 0;
+                  row?.rows?.map((row_) => {
+                    if (row_.item.name) {
+                      //console.log(`super item: ${row_.item.name}`);
+                      outthisline = 1;
+                    }
+                  });
                   return (
-                    <LocationComponent key={loc.id} row={row} items={items} />
+                    outthisline === 1 && (
+                      <LocationComponent key={loc.id} row={row} items={items} />
+                    )
                   );
                 })
               )
@@ -226,7 +252,7 @@ export default async function DailyFeedWeight({
           </tbody>
         </table>
 
-        <table className="w-1/3 bg-white rounded-lg shadow-lg self-start">
+        <table className="w-2/9 bg-white rounded-lg shadow-lg self-start">
           <thead>
             <tr className="bg-gray-800 text-white">
               <th className="border p-4">Корм</th>
@@ -237,7 +263,9 @@ export default async function DailyFeedWeight({
             {Object.entries(aggregatedData).map(([itemName, qty]) => (
               <tr key={itemName}>
                 <td className="px-4 h-10 border border-gray-400">{itemName}</td>
-                <td className="px-4 h-10 border border-gray-400  text-right">{qty.toFixed(2)}</td>
+                <td className="px-4 h-10 border border-gray-400  text-right">
+                  {qty.toFixed(2)}
+                </td>
               </tr>
             ))}
           </tbody>

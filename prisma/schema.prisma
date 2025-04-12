@@ -21,8 +21,7 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -84,17 +83,20 @@ model documents {
   location_id       Int?
   doc_type_id       Int?
   date_time         DateTime            @default(now()) @db.Timestamp(6)
-  date_time_posted  DateTime            @default(now()) @db.Timestamp(6)
   executed_by       Int
   comments          String?
-  calculation_table calculation_table[]
   parent_document   BigInt?
+  date_time_posted  DateTime            @default(now()) @db.Timestamp(6)
+  calculation_table calculation_table[]
+  disposal_table    disposal_table[]
   doctype           doctype?            @relation(fields: [doc_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   employees         employees           @relation(fields: [executed_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
   locations         locations?          @relation(fields: [location_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   itemtransactions  itemtransactions[]
   stocking          stocking[]
-  disposal_table    disposal_table[]
+
+  @@index([date_time, doc_type_id], map: "idx_documents_date_doc_type")
+  @@index([doc_type_id, date_time], map: "idx_documents_doc_type_date")
 }
 
 model employeepositions {
@@ -106,10 +108,10 @@ model employeepositions {
 
 model employees {
   id                Int                @id @default(autoincrement())
-  individual_id     Int
   empl_position_id  Int?
   date_from         DateTime?          @db.Timestamp(6)
   date_to           DateTime?          @db.Timestamp(6)
+  individual_id     Int
   documents         documents[]
   employeepositions employeepositions? @relation(fields: [empl_position_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   individual        individuals        @relation(fields: [individual_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -136,43 +138,41 @@ model individuals {
 }
 
 model itembatches {
-  id              BigInt     @id @default(autoincrement())
-  name            String     @unique @db.VarChar
-  description     String?
-  item_id         Int
-  created         DateTime?  @default(now()) @db.Timestamp(6)
-  created_by      Int
-  expiration_date DateTime?
-  packing         Float?
-  price           Float?
-  employees       employees? @relation(fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
-
+  id                     BigInt                   @id @default(autoincrement())
+  name                   String                   @unique @db.VarChar
+  description            String?
+  item_id                Int
+  created                DateTime?                @default(now()) @db.Timestamp(6)
+  created_by             Int
+  expiration_date        DateTime?
+  packing                Float?
+  price                  Float?
+  batch_generation       batch_generation[]
+  disposal_table         disposal_table[]
+  generation_feed_amount generation_feed_amount[]
+  employees              employees                @relation(fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
   items                  items                    @relation(fields: [item_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   itemtransactions       itemtransactions[]
   priorities             priorities[]
-  disposal_table         disposal_table[]
-  batch_generation       batch_generation[]
-  generation_feed_amount generation_feed_amount[]
 }
 
 model items {
-  id              Int     @id @default(autoincrement())
-  name            String  @unique @db.VarChar
+  id              Int             @id @default(autoincrement())
+  name            String          @unique @db.VarChar
   description     String?
   item_type_id    Int?
-  feed_type_id    Int?
   default_unit_id Int?
   parent_item     Int?
+  feed_type_id    Int?
   vendor_id       Int?
-
-  vendors       vendors?        @relation(fields: [vendor_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  itembatches   itembatches[]
-  units         units?          @relation(fields: [default_unit_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  itemtypes     itemtypes?      @relation(fields: [item_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  feedtypes     feedtypes?      @relation(fields: [feed_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  purchaselines purchaselines[]
-  saleslines    saleslines[]
-  priorities    priorities[]
+  itembatches     itembatches[]
+  units           units?          @relation(fields: [default_unit_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  feedtypes       feedtypes?      @relation(fields: [feed_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  itemtypes       itemtypes?      @relation(fields: [item_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  vendors         vendors?        @relation(fields: [vendor_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  priorities      priorities[]
+  purchaselines   purchaselines[]
+  saleslines      saleslines[]
 }
 
 model priorities {
@@ -181,9 +181,9 @@ model priorities {
   batch_id    BigInt?
   location_id Int
   priority    Int
-  items       items?       @relation(fields: [item_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   itembatches itembatches? @relation(fields: [batch_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  locations   locations?   @relation(fields: [location_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  items       items        @relation(fields: [item_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  locations   locations    @relation(fields: [location_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model itemtransactions {
@@ -193,18 +193,19 @@ model itemtransactions {
   batch_id           BigInt
   quantity           Float
   unit_id            Int
-  status_id          Int                @default(3)
   parent_transaction BigInt?
+  status_id          Int                @default(3)
+  batch_generation   batch_generation[]
+  fetching           fetching[]
   itembatches        itembatches        @relation(fields: [batch_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   documents          documents          @relation(fields: [doc_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   locations          locations          @relation(fields: [location_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  units              units              @relation(fields: [unit_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   transactionsstate  transactionsstate  @relation(fields: [status_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  units              units              @relation(fields: [unit_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   purchaselines      purchaselines[]
   saleslines         saleslines[]
-  batch_generation   batch_generation[]
 
-  fetching fetching[]
+  @@index([location_id], map: "idx_itemtransactions_location")
 }
 
 model transactionsstate {
@@ -220,12 +221,11 @@ model itemtypes {
 }
 
 model feedtypes {
-  id                Int     @id @default(autoincrement())
-  name              String  @unique @db.VarChar
-  items             items[]
+  id                Int              @id @default(autoincrement())
+  name              String           @unique @db.VarChar
   feedconnection_id Int?
-
-  feedconnections feedconnections? @relation(fields: [feedconnection_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  feedconnections   feedconnections? @relation(fields: [feedconnection_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  items             items[]
 }
 
 model locations {
@@ -233,13 +233,13 @@ model locations {
   location_type_id Int
   name             String             @unique @db.VarChar
   pool_id          Int?
+  batch_generation batch_generation[]
+  disposal_table   disposal_table[]
   documents        documents[]
   itemtransactions itemtransactions[]
   locationtypes    locationtypes      @relation(fields: [location_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   pools            pools?             @relation(fields: [pool_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   priorities       priorities[]
-  disposal_table   disposal_table[]
-  batch_generation batch_generation[]
 }
 
 model locationtypes {
@@ -276,6 +276,7 @@ model pools {
   pool_height        Float?
   pool_width         Float?
   pool_length        Float?
+  percent_feeding    Float?
   locations          locations[]
   productionlines    productionlines @relation(fields: [prod_line_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
@@ -304,9 +305,9 @@ model purchaselines {
   quantity            Float
   unit_id             Int
   items               items             @relation(fields: [item_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  itemtransactions    itemtransactions? @relation(fields: [item_transaction_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   purchtable          purchtable        @relation(fields: [purchase_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   units               units             @relation(fields: [unit_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  itemtransactions    itemtransactions? @relation(fields: [item_transaction_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model purchtable {
@@ -336,9 +337,9 @@ model saleslines {
   quantity            Float
   unit_id             Int
   items               items             @relation(fields: [item_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  itemtransactions    itemtransactions? @relation(fields: [item_transaction_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   salestable          salestable        @relation(fields: [salestable_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   units               units             @relation(fields: [unit_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  itemtransactions    itemtransactions? @relation(fields: [item_transaction_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model stocking {
@@ -361,8 +362,8 @@ model vendors {
   id          Int          @id @default(autoincrement())
   name        String       @unique @db.VarChar
   description String?
-  purchtable  purchtable[]
   items       items[]
+  purchtable  purchtable[]
 }
 
 model customers {
@@ -387,8 +388,8 @@ model datatable_over25 {
   av_weight       Float
   weight          Float
   uitval          Float
-  voederniveau    Float
   voederconversie Float
+  voederniveau    Float
 }
 
 model time_table {
@@ -404,10 +405,10 @@ model disposal_table {
   batch_id    BigInt
   date        DateTime
   location_id Int
-  documents   documents        @relation(fields: [doc_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  reasons     disposal_reasons @relation(fields: [reason_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   itembatches itembatches      @relation(fields: [batch_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  documents   documents        @relation(fields: [doc_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   locations   locations        @relation(fields: [location_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  reasons     disposal_reasons @relation(fields: [reason_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model disposal_reasons {
@@ -417,33 +418,28 @@ model disposal_reasons {
 }
 
 model cost_table {
-  id                  Int      @id @default(autoincrement())
-  date_time           DateTime @default(now()) @db.Timestamp(6)
-  batch_generation_id BigInt?
+  id                  Int               @id @default(autoincrement())
+  date_time           DateTime          @default(now()) @db.Timestamp(6)
   cost                Float
-
-  batch_generation batch_generation? @relation(fields: [batch_generation_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  batch_generation_id BigInt?
+  batch_generation    batch_generation? @relation(fields: [batch_generation_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model batch_generation {
-  id               BigInt  @id @default(autoincrement())
-  location_id      Int
-  transaction_id   BigInt
-  initial_batch_id BigInt?
-
-  first_parent_id  BigInt?
-  second_parent_id BigInt?
-
-  firstParent  batch_generation? @relation("FirstParentRelation", fields: [first_parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  secondParent batch_generation? @relation("SecondParentRelation", fields: [second_parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-
-  firstNextBatches  batch_generation[] @relation("FirstParentRelation")
-  secondNextBatches batch_generation[] @relation("SecondParentRelation")
-
-  location               locations                @relation(fields: [location_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id                     BigInt                   @id @default(autoincrement())
+  location_id            Int
+  initial_batch_id       BigInt?
+  first_parent_id        BigInt?
+  second_parent_id       BigInt?
+  transaction_id         BigInt
+  firstParent            batch_generation?        @relation("FirstParentRelation", fields: [first_parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  firstNextBatches       batch_generation[]       @relation("FirstParentRelation")
   itembatches            itembatches?             @relation(fields: [initial_batch_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  cost_record            cost_table[]
+  location               locations                @relation(fields: [location_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  secondParent           batch_generation?        @relation("SecondParentRelation", fields: [second_parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  secondNextBatches      batch_generation[]       @relation("SecondParentRelation")
   itemtransactions       itemtransactions         @relation(fields: [transaction_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  cost_record            cost_table[]
   generation_feed_amount generation_feed_amount[]
 }
 
@@ -456,13 +452,11 @@ model generation_feed_amount {
   feed_batches        itembatches      @relation(fields: [feed_batch_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
-
-model fetching{
-  id              BigInt    @id @default(autoincrement())
-  tran_id         BigInt
-  fetching_reason String
-  total_weight    Float
-  weekNumber      Int
-
-  itemtransactions   itemtransactions @relation(fields: [tran_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+model fetching {
+  id               BigInt           @id @default(autoincrement())
+  fetching_reason  String
+  total_weight     Float
+  tran_id          BigInt
+  weekNumber       Int
+  itemtransactions itemtransactions @relation(fields: [tran_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }

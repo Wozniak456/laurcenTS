@@ -19,6 +19,7 @@ interface RowForFeedingProps {
   locInfo: {
     id: number;
     name: string;
+    percent_feeding?: number;
   };
   rowData: Feeding;
   times: {
@@ -50,11 +51,11 @@ export default function RowForFeeding({
   //     console.log("loc: ", locInfo.id, "Row Data:", rowData);
   //   }, [rowData]);
 
-  const fed = rowData.feedings
-    ? Object.values(rowData.feedings).some(
-        (feeding) => feeding.editing && feeding.editing.trim() !== ""
-      )
-    : false;
+  const [localFeedings, setLocalFeedings] = useState(rowData.feedings || {});
+
+  const fed = Object.values(localFeedings).some(
+    (feeding) => feeding.editing && feeding.editing.trim() !== ""
+  );
 
   const [formState, action] = useFormState(actions.feedBatch, { message: "" });
 
@@ -64,30 +65,36 @@ export default function RowForFeeding({
 
   useEffect(() => {
     if (rowData.feedings) {
-      const initialValues: { [key: string]: string } = {};
-
-      times.forEach(({ time }) => {
-        const feedingTime = parseInt(time.split(":")[0]); // Година (без хвилин)
-        const feeding = rowData.feedings
-          ? rowData.feedings[feedingTime]?.feeding
-          : ""; // Значення для конкретної години
-
-        if (feeding) {
-          const key = `${locInfo.id}-${feedingTime}`;
-          initialValues[key] = feeding; // Записуємо початкове значення в state
-        }
-      });
-
-      // Оновлюємо state з початковими значеннями
-      setEditingValue(initialValues);
+      setLocalFeedings(rowData.feedings);
     }
-  }, [rowData, times, locInfo.id]);
+  }, [rowData.feedings]);
+
+  useEffect(() => {
+    const initialValues: { [key: string]: string } = {};
+
+    times.forEach(({ time }) => {
+      const feedingTime = parseInt(time.split(":")[0]);
+      const feeding = localFeedings[feedingTime]?.feeding;
+
+      if (feeding) {
+        const key = `${locInfo.id}-${feedingTime}`;
+        const baseValue = parseFloat(feeding);
+        const percentFeeding = locInfo.percent_feeding || 0;
+        const adjustedValue = (baseValue * (1 + percentFeeding / 100)).toFixed(
+          2
+        );
+        initialValues[key] = adjustedValue;
+      }
+    });
+
+    setEditingValue(initialValues);
+  }, [localFeedings, times, locInfo.id, locInfo.percent_feeding]);
 
   function handleInputChange(time: string, poolId: number, target: string) {
-    const key = `${poolId}-${time}`; // Створюємо унікальний ключ для поєднання часу і poolId
+    const key = `${poolId}-${time}`;
     setEditingValue((prevState) => ({
       ...prevState,
-      [key]: target, // Оновлюємо значення для цього поєднання
+      [key]: target,
     }));
   }
 
@@ -98,6 +105,46 @@ export default function RowForFeeding({
   //       `pool: ${locInfo.name}. fed: ${fed}. buttonMode: ${buttonMode}`
   //     );
   //   }, [fed, buttonMode]);
+
+  console.log("Location info:", {
+    name: locInfo.name,
+    percent: locInfo.percent_feeding,
+  });
+
+  const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const formElement = e.currentTarget.closest("form") as HTMLFormElement;
+    if (formElement) {
+      // Create hidden inputs for any last-minute changes
+      Object.entries(editingValue).forEach(([key, value]) => {
+        const [poolId, time] = key.split("-");
+        if (!poolId || !time || !value) return;
+
+        let input = formElement.querySelector(
+          `input[name="time_${time}"]`
+        ) as HTMLInputElement;
+        if (!input) {
+          input = document.createElement("input");
+          input.type = "hidden";
+          input.name = `time_${time}`;
+          formElement.appendChild(input);
+        }
+        input.value = value;
+
+        // Update local feedings state
+        setLocalFeedings((prev) => ({
+          ...prev,
+          [time]: {
+            feeding: value,
+            editing: value,
+          },
+        }));
+      });
+
+      setButtonMode(true);
+      formElement.requestSubmit();
+    }
+  };
 
   return (
     <tr>
@@ -119,20 +166,29 @@ export default function RowForFeeding({
 
       {/* Рендеримо для кожного часу */}
       {times.map((time, index) => {
-        const feedingTime = parseInt(time.time.split(":")[0]); // Отримуємо тільки годину (наприклад, "10" з "10:00")
-        const key = `${locInfo.id}-${feedingTime}`; // Створюємо унікальний ключ для цього часу
+        const feedingTime = parseInt(time.time.split(":")[0]);
+        const key = `${locInfo.id}-${feedingTime}`;
+        const baseQuantity = localFeedings[feedingTime]?.feeding;
+        const percentFeeding = locInfo.percent_feeding || 0;
+        const editingValueFromFeedings = localFeedings[feedingTime]?.editing;
+
+        // Calculate the adjusted quantity with percentage
+        const calculatedQuantity = baseQuantity
+          ? (parseFloat(baseQuantity) * (1 + percentFeeding / 100)).toFixed(2)
+          : "";
 
         return (
           <React.Fragment key={index}>
             <td className="px-4 py-2 border border-gray-400 w-14">
-              {rowData.feedings ? rowData.feedings[feedingTime]?.feeding : null}
+              {calculatedQuantity}
             </td>
 
-            {fed && rowData.feedings ? (
+            {fed && localFeedings ? (
               <td className="px-4 py-2 border border-gray-400 w-14">
-                {rowData.feedings[feedingTime]?.editing?.trim()
-                  ? rowData.feedings[feedingTime].editing
-                  : "0"}
+                {editingValueFromFeedings === undefined ||
+                editingValueFromFeedings === null
+                  ? calculatedQuantity
+                  : editingValueFromFeedings}
               </td>
             ) : (
               <td className="px-4 py-2 border border-gray-400 w-14">
@@ -143,7 +199,7 @@ export default function RowForFeeding({
                   value={
                     editingValue[key] !== undefined
                       ? editingValue[key]
-                      : rowData.feedings?.[feedingTime]?.feeding || ""
+                      : calculatedQuantity
                   }
                   onChange={(e) =>
                     handleInputChange(
@@ -174,19 +230,13 @@ export default function RowForFeeding({
               <input
                 key={key}
                 type="hidden"
-                name={`time_${time}`} // Формуємо ім'я інпуту
-                value={value} // Відправляємо нове значення
+                name={`time_${time}`}
+                value={value}
               />
             );
           })}
           {!fed && (
-            <button
-              type="submit"
-              className=""
-              onClick={() => {
-                setButtonMode(true);
-              }}
-            >
+            <button type="submit" className="" onClick={handleSubmit}>
               {!buttonMode && (
                 <Image src={feedButton} alt="feeding icon" height={35} />
               )}
