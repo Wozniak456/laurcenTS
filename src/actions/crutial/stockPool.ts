@@ -88,17 +88,50 @@ export async function stockPool(
       batch_id_to = batch_id_from;
     }
 
-    // const transaction = await db.$transaction(async (tx) => {
     // документ зариблення
+    const date = addCurrentTimeToDate(new Date(today));
+
+    // Find all documents for this location and date, ordered by time
+    const startOfDay = new Date(today);
+    startOfDay.setUTCHours(0, 0, 0, 0);
+    const endOfDay = new Date(today);
+    endOfDay.setUTCHours(23, 59, 59, 999);
+
+    const existingDocs = await activeDb.documents.findMany({
+      where: {
+        location_id: location_id_to,
+        date_time: {
+          gte: startOfDay,
+          lt: endOfDay,
+        },
+      },
+      orderBy: {
+        date_time: "desc",
+      },
+    });
+
+    // Find any documents with the exact same timestamp or later
+    const conflictingDocs = existingDocs.filter(
+      (doc: { date_time: Date }) => doc.date_time.getTime() >= date.getTime()
+    );
+
+    // If there are any conflicts, set our time to 1ms after the latest one
+    if (conflictingDocs.length > 0) {
+      const latestTime = Math.max(
+        ...conflictingDocs.map((doc: { date_time: Date }) =>
+          doc.date_time.getTime()
+        )
+      );
+      date.setTime(latestTime + 1);
+    }
 
     const stockDoc = await activeDb.documents.create({
       data: {
-        location_id: location_id_to, // Отримуємо id локації
+        location_id: location_id_to,
         doc_type_id: 1,
-        date_time: addCurrentTimeToDate(new Date(today)),
+        date_time: date,
         executed_by: executed_by,
         comments: comments,
-        // parent_document: p_doc
       },
     });
 

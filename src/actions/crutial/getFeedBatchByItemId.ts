@@ -31,6 +31,8 @@ export async function getFeedBatchByItemId(
   quantity: number,
   prisma?: any
 ) {
+  console.warn("DEBUG - getFeedBatchByItemId called:", { item_id, quantity });
+
   const activeDb = prisma || db;
 
   const batches: batchType[] = await activeDb.itembatches.findMany({
@@ -42,7 +44,7 @@ export async function getFeedBatchByItemId(
     },
   });
 
-  console.log("усі batches", batches);
+  console.warn("DEBUG - Found batches:", batches);
 
   const batches_quantity_ = await activeDb.itemtransactions.groupBy({
     by: ["batch_id"],
@@ -53,9 +55,11 @@ export async function getFeedBatchByItemId(
       location_id: 87,
     },
     _sum: {
-      quantity: true, // Summing up the quantity per batch_id group
+      quantity: true,
     },
   });
+
+  console.warn("DEBUG - Batch quantities:", batches_quantity_);
 
   const batches_quantity: BatchQuantity[] = batches_quantity_;
 
@@ -63,23 +67,24 @@ export async function getFeedBatchByItemId(
     const batch = batches.find((batch) => batch.id === bq.batch_id);
     return {
       ...bq,
-      price: batch ? batch.price : null, // Add price if batch is found, otherwise null
+      price: batch ? batch.price : null,
       feed_type_id: batch ? batch.items.feed_type_id : null,
     };
   });
 
-  console.log("batches_quantity_with_price", batches_quantity_with_price);
-  // console.log('batches_quantity', batches_quantity)
+  console.warn("DEBUG - Batches with price:", batches_quantity_with_price);
 
   // Якщо в партії не вистачає корму на годування, то брати з іншої партії
-  const batches_array = []; // Масив для зберігання партій
-  let totalQuantity = 0; // Змінна для зберігання загальної кількості корму
+  const batches_array = [];
+  let totalQuantity = 0;
   quantity = quantity / 1000;
 
-  console.log("totalQuantity: ", totalQuantity, "quantity: ", quantity);
+  console.warn("DEBUG - Checking quantities:", {
+    totalQuantity,
+    neededQuantity: quantity,
+  });
 
   while (totalQuantity < quantity && batches_quantity_with_price.length > 0) {
-    //знаходимо партію з найменшим id (найстарішу)
     const minBatch = batches_quantity_with_price.reduce((min, current) =>
       min.batch_id < current.batch_id ? min : current
     );
@@ -89,19 +94,28 @@ export async function getFeedBatchByItemId(
     if (minBatch._sum?.quantity !== null) {
       totalQuantity += minBatch._sum.quantity;
     }
+
+    console.warn("DEBUG - Added batch:", {
+      batchId: minBatch.batch_id,
+      quantity: minBatch._sum?.quantity,
+      newTotal: totalQuantity,
+    });
+
     if (totalQuantity >= quantity) {
       break;
     }
 
-    const minIndex = batches_quantity_with_price.indexOf(minBatch); // Знаходимо індекс поточної партії
-    batches_quantity_with_price.splice(minIndex, 1); // Видаляємо поточну партію з масиву
+    const minIndex = batches_quantity_with_price.indexOf(minBatch);
+    batches_quantity_with_price.splice(minIndex, 1);
   }
 
-  // Перевірка, чи було знайдено необхідну кількість корму
   if (totalQuantity < quantity) {
-    console.log("Немає достатньо корму");
+    console.warn("DEBUG - Not enough feed:", {
+      available: totalQuantity,
+      needed: quantity,
+    });
     throw new Error("Немає достатньо корму");
-  } else {
-    return batches_array;
   }
+
+  return batches_array;
 }

@@ -86,6 +86,7 @@ export default async function DayFeeding(props: DayFeedingProps) {
   const dates = datesArray(currentDate);
 
   const lines = await setLines();
+  console.log("Lines data from setLines:", JSON.stringify(lines, null, 2));
 
   const times = await db.time_table.findMany();
 
@@ -667,6 +668,9 @@ const setLines = async () => {
           name: "asc",
         },
       },
+    },
+    orderBy: {
+      name: "asc",
     },
   });
 };

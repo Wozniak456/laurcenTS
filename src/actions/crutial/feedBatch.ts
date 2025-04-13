@@ -9,8 +9,9 @@ export async function feedBatch(
   formData: FormData
 ) {
   try {
-    console.log("feedBatch");
-    console.log(formData);
+    process.stdout.write(
+      "\n================== FEED BATCH STARTED ==================\n"
+    );
 
     const fish_batch_id: number = parseInt(formData.get("batch_id") as string);
     const executed_by: number = parseInt(formData.get("executed_by") as string);
@@ -18,11 +19,69 @@ export async function feedBatch(
     const location_id: number = parseInt(formData.get("location_id") as string);
     const item_id: number = parseInt(formData.get("item_id") as string);
 
+    process.stdout.write(
+      `Input parameters: ${JSON.stringify(
+        {
+          fish_batch_id,
+          executed_by,
+          date_time,
+          location_id,
+          item_id,
+        },
+        null,
+        2
+      )}\n`
+    );
+
     const times = await db.time_table.findMany({
       orderBy: {
         id: "asc",
       },
     });
+
+    process.stdout.write(`Time slots: ${JSON.stringify(times, null, 2)}\n`);
+
+    // Calculate total quantity needed for the day
+    let totalQtyNeeded = 0;
+    const timeQtyDebug: Record<string, number> = {};
+
+    times.forEach((time) => {
+      const hours = parseInt(time.time.split(":")[0]);
+      const qty = parseFloat(formData.get(`time_${hours}`) as string);
+      timeQtyDebug[`time_${hours}`] = qty;
+      if (!isNaN(qty)) {
+        totalQtyNeeded += qty;
+      }
+    });
+
+    process.stdout.write(
+      `Time quantities: ${JSON.stringify(timeQtyDebug, null, 2)}\n`
+    );
+    process.stdout.write(`Total quantity needed: ${totalQtyNeeded}\n`);
+
+    if (totalQtyNeeded <= 0) {
+      process.stdout.write("No valid quantities found - exiting\n");
+      return { message: "No valid feeding quantities provided" };
+    }
+
+    // Check if we have enough stock
+    const availableBatches = await getFeedBatchByItemId(
+      item_id,
+      totalQtyNeeded,
+      db
+    );
+    const totalAvailable = availableBatches.reduce(
+      (sum, batch) => sum + (batch._sum.quantity || 0),
+      0
+    );
+
+    if (totalAvailable < totalQtyNeeded / 1000) {
+      return {
+        message: `Not enough stock available. Required: ${totalQtyNeeded}kg, Available: ${
+          totalAvailable * 1000
+        }kg`,
+      };
+    }
 
     let index = 0;
 
@@ -34,24 +93,52 @@ export async function feedBatch(
           const qty: number = parseFloat(
             formData.get(`time_${hours}`) as string
           );
-          const date = new Date(date_time);
-          date.setUTCHours(hours);
-          /*
-          console.log(
-            "we want to feed ",
-            location_id,
-            " on ",
-            date_time,
-            " at ",
-            hours,
-            " and system will save on ",
-            date,
-            " and current time ",
-            date.getHours()
+          process.stdout.write(
+            `Processing time slot ${hours}:00 with qty: ${qty}\n`
           );
-          let abra = 34 / 0;
-          */
-          //ПЕРЕВІРИТИ НА ПЕРШІЙ ІТЕРАЦІЇ ЧИ ДОСТАТНЬО НА СКЛАДІ КОРМУ НА ВЕСЬ ДЕНЬ
+
+          if (isNaN(qty) || qty <= 0) {
+            process.stdout.write(
+              `Skipping time slot ${hours}:00 - invalid quantity: ${qty}\n`
+            );
+            continue;
+          }
+
+          const date = new Date(date_time);
+          // Format the date as YYYY-MM-DD HH:00:00 without milliseconds
+          const formattedDate = `${date.getFullYear()}-${String(
+            date.getMonth() + 1
+          ).padStart(2, "0")}-${String(date.getDate()).padStart(
+            2,
+            "0"
+          )}T${String(hours).padStart(2, "0")}:00:00.000Z`;
+
+          process.stdout.write(`\nProcessing time ${hours}:00\n`);
+
+          // Find the latest document for this location and date
+          const startOfDay = new Date(date_time);
+          startOfDay.setUTCHours(0, 0, 0, 0);
+          const endOfDay = new Date(date_time);
+          endOfDay.setUTCHours(23, 59, 59, 999);
+
+          const latestDoc = await prisma.documents.findFirst({
+            where: {
+              location_id: location_id,
+              date_time: {
+                gte: startOfDay,
+                lt: endOfDay,
+              },
+            },
+            orderBy: {
+              date_time: "desc",
+            },
+          });
+
+          // If a later document exists, use its time + 1ms
+          if (latestDoc && latestDoc.date_time > date) {
+            date.setTime(latestDoc.date_time.getTime() + 1);
+          }
+
           let qtyForWholeDay = qty;
 
           if (index === 0) {
@@ -62,7 +149,7 @@ export async function feedBatch(
                   `time_${parseInt(time.time.split(":")[0])}`
                 ) as string
               );
-              console.log("ми додали: ", howMuchToAdd);
+              process.stdout.write(`Adding quantity: ${howMuchToAdd}\n`);
               qtyForWholeDay += howMuchToAdd;
             });
           }
@@ -77,18 +164,28 @@ export async function feedBatch(
             data: {
               location_id: location_id,
               doc_type_id: 9,
-              date_time: date,
+              date_time: formattedDate,
               executed_by: executed_by,
+              comments: "Годівля",
             },
           });
-          console.log("DocId: ", feedDoc.id);
-          console.log("партія корму: ", batches_id);
+
+          process.stdout.write(
+            `Created document: ${JSON.stringify(
+              {
+                id: String(feedDoc.id),
+                date_time: feedDoc.date_time,
+                comments: feedDoc.comments,
+              },
+              null,
+              2
+            )}\n`
+          );
 
           let left_to_feed = qty / 1000;
 
           for (const batch of batches_id) {
             if (batch._sum.quantity) {
-              // Якщо вистачає корму в першій партії
               if (batch._sum.quantity >= left_to_feed) {
                 const fetchTran = await prisma.itemtransactions.create({
                   data: {
@@ -110,7 +207,6 @@ export async function feedBatch(
                   },
                 });
 
-                //Знайти останню собівартість і останнє покоління
                 const latestGeneration =
                   await prisma.batch_generation.findFirst({
                     include: {
@@ -133,13 +229,20 @@ export async function feedBatch(
                   },
                 });
 
-                console.log(
-                  `Витягнули зі складу: ${fetchTran.id} і вкинули в басейн: ${feedTran.id}`
+                process.stdout.write(
+                  `Created transactions: ${JSON.stringify(
+                    {
+                      fetchTransactionId: String(fetchTran.id),
+                      feedTransactionId: String(feedTran.id),
+                      recordId: String(record.id),
+                    },
+                    null,
+                    2
+                  )}\n`
                 );
-                console.log(`Собівартість змінилася, ${record}`);
 
                 left_to_feed = 0;
-                break; // Виходимо з циклу, бо всю необхідну кількість взято
+                break;
               } else {
                 // Якщо потрібно використовувати ще одну партію
                 const fetchTran = await prisma.itemtransactions.create({
@@ -185,38 +288,40 @@ export async function feedBatch(
                   },
                 });
 
-                console.log(
-                  `Витягнули зі складу: ${fetchTran.id} і вкинули в басейн: ${feedTran.id}`
+                process.stdout.write(
+                  `Витягнули зі складу: ${fetchTran.id} і вкинули в басейн: ${feedTran.id}\n`
                 );
-                console.log(`Собівартість змінилася, ${record}`);
+                process.stdout.write(`Собівартість змінилася, ${record}\n`);
 
                 left_to_feed -= batch._sum.quantity; // Віднімаємо використану кількість
-                console.log("left_to_feed = ", left_to_feed);
+                process.stdout.write(`left_to_feed = ${left_to_feed}\n`);
               }
             }
           }
 
           if (left_to_feed > 0) {
-            console.log(
-              `Не вдалося знайти достатню кількість корму для годування. Залишилося ${left_to_feed}.`
+            process.stdout.write(
+              `Не вдалося знайти достатню кількість корму для годування. Залишилося ${left_to_feed}.\n`
             );
           }
 
-          console.log("Витягнули зі складу ");
+          process.stdout.write("Витягнули зі складу \n");
 
           index++;
         }
       } catch (innerError: any) {
-        // console.error('Помилка у транзакції:');
+        process.stdout.write(
+          `Transaction error: ${innerError.message || "невідома помилка"}\n`
+        );
         throw new Error(
           `Транзакція не виконана: ${innerError.message || "невідома помилка"}`
-        ); // Кидаємо помилку для відкату
+        );
       }
     });
   } catch (err: unknown) {
     if (err instanceof Error) {
       {
-        console.log(err.message);
+        process.stdout.write(err.message + "\n");
         return { message: err.message };
       }
     } else {
