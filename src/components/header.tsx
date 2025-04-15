@@ -1,77 +1,198 @@
 "use client";
 
 import { useState } from "react";
-// import HeaderAuth from '@/components/header-auth'; // Ваш компонент авторизації
 import {
-  Button,
   Navbar,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
+  Button,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  NavbarContent,
+  NavbarItem,
 } from "@nextui-org/react";
-import HeaderList from "@/components/header-list";
+import { usePathname } from "next/navigation";
+import {
+  PoolIcon,
+  BatchIcon,
+  ReportIcon,
+  FeedingIcon,
+  PurchaseIcon,
+  VendorIcon,
+  CostIcon,
+  StockIcon,
+  SummaryIcon,
+  FishingIcon,
+} from "@/components/icons";
+
+const menuCategories = [
+  {
+    title: "Басейни",
+    items: [
+      {
+        label: "Керування басейнами (дні)",
+        href: "/pool-managing/day",
+        icon: <PoolIcon />,
+      },
+    ],
+  },
+  {
+    title: "Риба",
+    items: [
+      {
+        label: "Партії",
+        href: "/batches/view",
+        icon: <BatchIcon />,
+      },
+      {
+        label: "Годування (дні)",
+        href: "/summary-feeding-table/day",
+        icon: <FeedingIcon />,
+      },
+    ],
+  },
+  {
+    title: "Корми",
+    items: [
+      {
+        label: "Реєстрація приходу",
+        href: "/purchtable/view",
+        icon: <PurchaseIcon />,
+      },
+      {
+        label: "Постачальники та корми",
+        href: "/vendors/view",
+        icon: <VendorIcon />,
+      },
+      {
+        label: "Склад",
+        href: "/leftovers/view",
+        icon: <StockIcon />,
+      },
+    ],
+  },
+  {
+    title: "Звіти",
+    items: [
+      {
+        label: "Тижневий звіт",
+        href: "/summary-feeding-table/week",
+        icon: <ReportIcon />,
+      },
+      {
+        label: "Собівартість",
+        href: "/accumulation/view",
+        icon: <CostIcon />,
+      },
+      {
+        label: "Загальний звіт",
+        href: "/general-summary/day-selection",
+        icon: <SummaryIcon />,
+      },
+      {
+        label: "Вилов",
+        href: "/fetching/view",
+        icon: <FishingIcon />,
+      },
+      {
+        label: "Звіт по витратам",
+        href: "/cost-report",
+        icon: <CostIcon />,
+      },
+    ],
+  },
+];
 
 export default function Header() {
-  const today = new Date();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const menuItems = [
-    //  { label: "Керування басейнами", href: "/pool-managing/view" },
-    {
-      label: "Керування басейнами (дні)",
-      href: `/pool-managing/day/${today.toISOString().split("T")[0]}`,
-    },
-    { label: "Партії", href: "/batches/view" },
-    { label: "Тижневий звіт", href: "/summary-feeding-table/week" },
-    {
-      label: "Годування (дні)",
-      href: `/summary-feeding-table/day/${today.toISOString().split("T")[0]}`,
-    },
-    { label: "Реєстрація приходу", href: "/purchtable/view" },
-    { label: "Постачальники та корми", href: "/vendors/view" },
-    // { label: 'Реєстрація відвантаження', href: '/realization/headers/view' },
-    { label: "Собівартість", href: "/accumulation/view" },
-    { label: "Склад", href: "/leftovers/view" },
-    { label: "111", href: "/general-summary/day-selection" },
-    { label: "Вилов", href: "/fetching/view" },
-  ];
+  const pathname = usePathname();
+  const today = new Date().toISOString().split("T")[0];
 
   return (
-    <Navbar className="shadow mb-6 bg-white relative z-100">
-      <div className="flex gap-4 items-center">
-        <div className="font-bold text-inherit">LaursenAC</div>
+    <Navbar className="shadow mb-6 bg-white">
+      <NavbarContent>
+        <NavbarItem>
+          <div className="font-bold text-xl">LaursenAC</div>
+        </NavbarItem>
+      </NavbarContent>
 
-        <Popover placement="bottom-start" backdrop="blur">
-          <PopoverTrigger>
-            <Button color="primary" className="z-1">
-              Menu
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-full">
-            <HeaderList array={menuItems} />
-          </PopoverContent>
-        </Popover>
-      </div>
+      <NavbarContent className="hidden sm:flex gap-4" justify="center">
+        {menuCategories.map((category) => (
+          <Dropdown key={category.title}>
+            <DropdownTrigger>
+              <Button variant="light" className="text-medium">
+                {category.title}
+              </Button>
+            </DropdownTrigger>
+            <DropdownMenu
+              aria-label={`${category.title} menu`}
+              className="w-[300px]"
+              itemClasses={{
+                base: "gap-4",
+              }}
+            >
+              {category.items.map((item) => {
+                const href = item.href.includes("day")
+                  ? `${item.href}/${today}`
+                  : item.href;
+                const isActive = pathname.startsWith(item.href);
 
-      {/* <div className="flex justify-end p-4">
-                    <HeaderAuth />
-                </div> */}
+                return (
+                  <DropdownItem
+                    key={item.label}
+                    startContent={item.icon}
+                    href={href}
+                    className={isActive ? "bg-blue-50" : ""}
+                  >
+                    {item.label}
+                  </DropdownItem>
+                );
+              })}
+            </DropdownMenu>
+          </Dropdown>
+        ))}
+      </NavbarContent>
 
-      {isMenuOpen && (
-        <div className="absolute bg-white border border-gray-300 shadow-lg p-4 mt-2 rounded w-full top-full left-0 z-100">
-          <div className="grid grid-cols-3 gap-4">
-            {menuItems.map((item) => (
-              <a
-                key={item.href}
-                href={item.href}
-                className="text-blue-500 hover:underline"
+      <NavbarContent className="sm:hidden" justify="end">
+        <Dropdown>
+          <DropdownTrigger>
+            <Button variant="light">Меню</Button>
+          </DropdownTrigger>
+          <DropdownMenu
+            aria-label="Mobile menu"
+            className="w-[300px]"
+            itemClasses={{
+              base: "gap-4",
+            }}
+          >
+            {menuCategories.flatMap((category) => [
+              <DropdownItem
+                key={category.title}
+                className="font-bold"
+                isReadOnly
               >
-                {item.label}
-              </a>
-            ))}
-          </div>
-        </div>
-      )}
+                {category.title}
+              </DropdownItem>,
+              ...category.items.map((item) => {
+                const href = item.href.includes("day")
+                  ? `${item.href}/${today}`
+                  : item.href;
+                const isActive = pathname.startsWith(item.href);
+
+                return (
+                  <DropdownItem
+                    key={item.label}
+                    startContent={item.icon}
+                    href={href}
+                    className={isActive ? "bg-blue-50" : ""}
+                  >
+                    {item.label}
+                  </DropdownItem>
+                );
+              }),
+            ])}
+          </DropdownMenu>
+        </Dropdown>
+      </NavbarContent>
     </Navbar>
   );
 }

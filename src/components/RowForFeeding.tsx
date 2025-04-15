@@ -3,8 +3,13 @@ import Image from "next/image";
 import feedButton from "../../public/icons/typcn_arrow-up-outline.svg";
 import SuccessButton from "../../public/icons/SuccessFeeding.svg";
 import CrossButton from "../../public/icons/UnsuccessfulFeeding.svg";
+import cancelIcon from "../../public/icons/cancel-icon.svg";
 import { useFormState } from "react-dom";
 import * as actions from "@/actions";
+import {
+  checkLaterTransactions,
+  cancelFeeding,
+} from "@/actions/crutial/cancelFeeding";
 import FormButton from "./common/form-button";
 import { poolInfo } from "@/actions/stocking";
 import {
@@ -67,6 +72,28 @@ export default function RowForFeeding({
 
   const [localFeedings, setLocalFeedings] = useState(rowData.feedings || {});
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingStatus, setLoadingStatus] = useState<
+    "loading" | "success" | "error"
+  >("loading");
+  const [loadingMessage, setLoadingMessage] = useState<string>(
+    "Годування в процесі..."
+  );
+  const {
+    isOpen: isErrorOpen,
+    onOpen: onErrorOpen,
+    onClose: onErrorClose,
+  } = useDisclosure();
+  const {
+    isOpen: isLoadingOpen,
+    onOpen: onLoadingOpen,
+    onClose: onLoadingClose,
+  } = useDisclosure();
+  const {
+    isOpen: isConfirmOpen,
+    onOpen: onConfirmOpen,
+    onClose: onConfirmClose,
+  } = useDisclosure();
 
   const fed = Object.values(localFeedings).some(
     (feeding) => feeding.editing && feeding.editing.trim() !== ""
@@ -84,31 +111,33 @@ export default function RowForFeeding({
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
-    if (rowData.feedings) {
-      setLocalFeedings(rowData.feedings);
-    }
-  }, [rowData.feedings]);
-
-  useEffect(() => {
     const initialValues: { [key: string]: string } = {};
 
     times.forEach(({ time }) => {
       const feedingTime = parseInt(time.split(":")[0]);
-      const feeding = localFeedings[feedingTime]?.feeding;
+      const feeding =
+        localFeedings[feedingTime]?.feeding ||
+        rowData.feedings?.[feedingTime]?.feeding;
 
       if (feeding) {
         const key = `${locInfo.id}-${feedingTime}`;
         const baseValue = parseFloat(feeding);
         const percentFeeding = locInfo.percent_feeding || 0;
         const adjustedValue = (baseValue * (1 + percentFeeding / 100)).toFixed(
-          2
+          1
         );
         initialValues[key] = adjustedValue;
       }
     });
 
     setEditingValue(initialValues);
-  }, [localFeedings, times, locInfo.id, locInfo.percent_feeding]);
+  }, [
+    localFeedings,
+    rowData.feedings,
+    times,
+    locInfo.id,
+    locInfo.percent_feeding,
+  ]);
 
   useEffect(() => {
     if (formState?.message) {
@@ -121,13 +150,18 @@ export default function RowForFeeding({
     }
   }, [formState, onOpen]);
 
-  function handleInputChange(time: string, poolId: number, target: string) {
+  // Format number to always show one decimal place
+  const formatNumber = (value: string | number): string => {
+    return Number(value).toFixed(1);
+  };
+
+  const handleInputChange = (time: string, poolId: number, target: string) => {
     const key = `${poolId}-${time}`;
     setEditingValue((prevState) => ({
       ...prevState,
       [key]: target,
     }));
-  }
+  };
 
   const [buttonMode, setButtonMode] = useState(false);
 
@@ -146,30 +180,11 @@ export default function RowForFeeding({
     e.preventDefault();
     const formElement = e.currentTarget.closest("form") as HTMLFormElement;
     if (formElement) {
-      console.log("Submitting feed data:", {
-        feedId: rowData.feedId,
-        feedName: rowData.feedName,
-        feedType: rowData.feedType,
-        locationId: locInfo.id,
-        editingValues: editingValue,
-      });
-
-      // Create hidden inputs for any last-minute changes
-      Object.entries(editingValue).forEach(([key, value]) => {
-        const [poolId, time] = key.split("-");
-        if (!poolId || !time || !value) return;
-
-        let input = formElement.querySelector(
-          `input[name="time_${time}"]`
-        ) as HTMLInputElement;
-        if (!input) {
-          input = document.createElement("input");
-          input.type = "hidden";
-          input.name = `time_${time}`;
-          formElement.appendChild(input);
-        }
-        input.value = value;
-      });
+      // Reset states at the start of new submission
+      setErrorMessage(null);
+      setLoadingStatus("loading");
+      setIsLoading(true);
+      onLoadingOpen();
 
       try {
         setButtonMode(true);
@@ -184,30 +199,93 @@ export default function RowForFeeding({
           console.warn("Feed submission failed: Not enough feed");
           setButtonMode(false);
           setErrorMessage(response.message);
-          onOpen();
-          return; // Exit early to prevent UI update
+          setLoadingStatus("error");
+
+          await new Promise((resolve) => setTimeout(resolve, 500));
+          onLoadingClose();
+          onErrorOpen();
+          return;
         }
 
         // If we didn't get an error about insufficient feed, proceed with the update
         Object.entries(editingValue).forEach(([key, value]) => {
           const [_, time] = key.split("-");
           if (time && value) {
+            // Format the value to one decimal place only when storing the result
+            const formattedValue = Number(value).toFixed(1);
             setLocalFeedings((prev) => ({
               ...prev,
               [time]: {
-                feeding: value,
-                editing: value,
+                feeding: formattedValue,
+                editing: formattedValue,
               },
             }));
           }
         });
+
+        // Show success state for a moment before closing
+        setLoadingStatus("success");
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        onLoadingClose();
       } catch (error) {
         console.error("Feed submission failed:", error);
         setButtonMode(false);
         setErrorMessage("An error occurred while submitting the feed data");
-        onOpen();
+        setLoadingStatus("error");
+
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        onLoadingClose();
+        onErrorOpen();
+      } finally {
+        setIsLoading(false);
+        setButtonMode(false);
       }
     }
+  };
+
+  const startCancellation = async () => {
+    onConfirmClose();
+    try {
+      setLoadingStatus("loading");
+      setLoadingMessage("Перевірка можливості скасування...");
+      onLoadingOpen();
+
+      const canCancel = await checkLaterTransactions(locInfo.id, today);
+
+      if (!canCancel) {
+        setLoadingStatus("error");
+        setErrorMessage(
+          "Неможливо скасувати годування - існують пізніші транзакції"
+        );
+        onLoadingClose();
+        onErrorOpen();
+        return;
+      }
+
+      setLoadingMessage("Скасування годування...");
+      await cancelFeeding(locInfo.id, today);
+
+      setLoadingStatus("success");
+      setLoadingMessage("Годування успішно скасовано!");
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Only clear localFeedings, keep editingValue intact
+      setLocalFeedings({});
+      onLoadingClose();
+    } catch (error) {
+      console.error("Error canceling feeding:", error);
+      setLoadingStatus("error");
+      setErrorMessage("Помилка при скасуванні годування");
+      onLoadingClose();
+      onErrorOpen();
+    }
+  };
+
+  const closeLoadingModal = () => {
+    setLoadingStatus("loading");
+    setIsLoading(false);
+    setButtonMode(false);
+    onLoadingClose();
   };
 
   return (
@@ -270,7 +348,7 @@ export default function RowForFeeding({
               </td>
             ) : (
               <td className="px-4 py-2 border border-gray-400 w-14 relative">
-                {!fed && editingValue[key] && index < times.length - 1 && (
+                {editingValue[key] && index < times.length - 1 && (
                   <button
                     type="button"
                     onClick={copyValueToAllInputs}
@@ -282,7 +360,7 @@ export default function RowForFeeding({
                 )}
                 <input
                   name={`feed_given_${index}`}
-                  className="border border-black w-full bg-blue-100 text-center"
+                  className="border border-black w-full bg-blue-100 text-center no-spinners"
                   id={`feed_given_${index}`}
                   value={
                     editingValue[key] !== undefined
@@ -296,6 +374,8 @@ export default function RowForFeeding({
                       e.target.value
                     )
                   }
+                  type="number"
+                  disabled={fed}
                 />
               </td>
             )}
@@ -323,36 +403,113 @@ export default function RowForFeeding({
               />
             );
           })}
-          {!fed && (
             <div className="flex flex-col items-center">
-              <button type="submit" className="" onClick={handleSubmit}>
-                {!buttonMode && (
+            {!fed ? (
+              <button
+                type="submit"
+                className=""
+                onClick={handleSubmit}
+                disabled={isLoading}
+              >
+                {!buttonMode && !isLoading && (
                   <Image src={feedButton} alt="feeding icon" height={35} />
                 )}
-                {formState?.message && !errorMessage && (
+                {formState?.message && !errorMessage && !isLoading && (
                   <Image
                     src={formState.message && CrossButton}
                     alt="status icon"
                     height={30}
                   />
                 )}
-                {!formState && (
+                {!formState && !isLoading && (
                   <Image src={SuccessButton} alt="status icon" height={30} />
                 )}
               </button>
+            ) : (
+              <button
+                type="button"
+                onClick={onConfirmOpen}
+                className="hover:opacity-80"
+                disabled={isLoading}
+              >
+                <Image src={cancelIcon} alt="cancel feeding" height={35} />
+              </button>
+            )}
             </div>
-          )}
         </form>
-        {errorMessage && (
-          <Modal isOpen={isOpen} onClose={onClose} placement="center">
+
+        {/* Confirmation Modal */}
+        <Modal
+          isOpen={isConfirmOpen}
+          onClose={onConfirmClose}
+          placement="center"
+        >
+          <ModalContent>
+            {(onClose) => (
+              <>
+                <ModalHeader className="flex flex-col gap-1">
+                  Підтвердження скасування
+                </ModalHeader>
+                <ModalBody>
+                  <p>Ви впевнені, що хочете скасувати годування?</p>
+                  <p className="text-sm text-gray-500">
+                    Ця дія не може бути скасована.
+                  </p>
+                </ModalBody>
+                <ModalFooter>
+                  <Button color="danger" variant="light" onPress={onClose}>
+                    Відміна
+                  </Button>
+                  <Button color="primary" onPress={startCancellation}>
+                    Підтвердити
+                  </Button>
+                </ModalFooter>
+              </>
+            )}
+          </ModalContent>
+        </Modal>
+
+        {/* Loading Modal */}
+        <Modal
+          isOpen={isLoadingOpen}
+          onClose={closeLoadingModal}
+          hideCloseButton
+          isDismissable={false}
+          placement="center"
+        >
+          <ModalContent>
+            <ModalBody className="py-6">
+              <div className="flex flex-col items-center gap-4">
+                <h3 className="text-lg font-semibold">{loadingMessage}</h3>
+                <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700 overflow-hidden">
+                  {loadingStatus === "loading" && (
+                    <div className="bg-blue-600 h-2.5 rounded-full w-full animate-[progress_2s_ease-in-out_infinite]"></div>
+                  )}
+                  {loadingStatus === "success" && (
+                    <div className="bg-green-600 h-2.5 rounded-full w-full"></div>
+                  )}
+                  {loadingStatus === "error" && (
+                    <div className="bg-red-600 h-2.5 rounded-full w-full"></div>
+                  )}
+                </div>
+              </div>
+            </ModalBody>
+          </ModalContent>
+        </Modal>
+
+        {/* Error Modal */}
+        <Modal isOpen={isErrorOpen} onClose={onErrorClose} placement="center">
             <ModalContent>
               {(onClose) => (
                 <>
                   <ModalHeader className="flex flex-col gap-1 text-red-600">
-                    Insufficient Stock
+                  {errorMessage}
                   </ModalHeader>
                   <ModalBody>
-                    <p>{errorMessage}</p>
+                  <p>
+                    Неможливо скасувати годування, оскільки існують пізніші
+                    транзакції.
+                  </p>
                   </ModalBody>
                   <ModalFooter>
                     <Button color="primary" onPress={onClose}>
@@ -363,7 +520,6 @@ export default function RowForFeeding({
               )}
             </ModalContent>
           </Modal>
-        )}
       </td>
     </tr>
   );
