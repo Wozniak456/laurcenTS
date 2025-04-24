@@ -25,6 +25,7 @@ interface LocationInfo {
   fed_today?: {
     time: string;
     quantity: number;
+    hasDocument: boolean;
   }[];
 }
 
@@ -41,9 +42,11 @@ interface FeedingInfo {
 }
 
 type editingType = {
+  id: bigint;
   itemtransactions: {
     quantity: number;
   }[];
+  hasDocument: boolean;
 };
 
 interface Feeding {
@@ -197,11 +200,21 @@ const feedingForLocation = async (locationId: number, today: Date) => {
 
   const query = await db.documents.findMany({
     select: {
+      id: true,
       date_time: true,
       itemtransactions: {
         select: {
           location_id: true,
           quantity: true,
+          itembatches: {
+            select: {
+              items: {
+                select: {
+                  id: true,
+                },
+              },
+            },
+          },
         },
         where: {
           location_id: locationId,
@@ -214,15 +227,16 @@ const feedingForLocation = async (locationId: number, today: Date) => {
         lte: endOfDay,
         gte: startOfDay,
       },
-      itemtransactions: {
-        some: {
-          location_id: locationId,
-        },
-      },
+      location_id: locationId,
     },
   });
 
-  const timeQtyArray: { time: string; quantity: number }[] = [];
+  const timeQtyArray: {
+    time: string;
+    quantity: number;
+    hasDocument: boolean;
+    item_id: number;
+  }[] = [];
 
   for (const record of query) {
     const time = record.date_time
@@ -230,24 +244,42 @@ const feedingForLocation = async (locationId: number, today: Date) => {
       .split("T")[1]
       .split(":")
       .slice(0, 2)
-      .join(":"); // Форматуємо час: HH:MM
-    let totalQuantity = 0;
+      .join(":");
 
-    // Обчислюємо загальну кількість для цього часу
-    for (const transaction of record.itemtransactions) {
-      totalQuantity += transaction.quantity;
-    }
+    // Group transactions by item_id
+    const transactionsByItem = record.itemtransactions.reduce(
+      (acc: Record<number, number>, transaction) => {
+        const itemId = transaction.itembatches?.items?.id;
+        if (itemId) {
+          if (!acc[itemId]) {
+            acc[itemId] = 0;
+          }
+          acc[itemId] += transaction.quantity;
+        }
+        return acc;
+      },
+      {}
+    );
 
-    // Перевіряємо, чи вже існує такий час в масиві
-    const existingTime = timeQtyArray.find((item) => item.time === time);
+    // Create entries for each item
+    Object.entries(transactionsByItem).forEach(([itemId, quantity]) => {
+      const existingTime = timeQtyArray.find(
+        (item) => item.time === time && item.item_id === Number(itemId)
+      );
 
-    if (existingTime) {
-      existingTime.quantity += totalQuantity; // Оновлюємо кількість для цього часу
-    } else {
-      // Додаємо новий запис для цього часу
-      timeQtyArray.push({ time, quantity: totalQuantity });
-    }
+      if (existingTime) {
+        existingTime.quantity += quantity;
+      } else {
+        timeQtyArray.push({
+          time,
+          quantity,
+          hasDocument: true,
+          item_id: Number(itemId),
+        });
+      }
+    });
   }
+
   return timeQtyArray;
 };
 
@@ -263,11 +295,12 @@ const setData = async (
 
   const getEdited = async (hours: number, locId: number, itemId: number) => {
     const todayDate = new Date(today);
-
     todayDate.setUTCHours(hours, 0, 0, 0);
 
+    // Find documents for this specific item and time
     const fedAlready = await db.documents.findMany({
       select: {
+        id: true,
         itemtransactions: {
           select: {
             quantity: true,
@@ -281,16 +314,31 @@ const setData = async (
             },
           },
         },
-        id: true,
       },
       where: {
         location_id: locId,
         doc_type_id: 9,
         date_time: todayDate,
+        itemtransactions: {
+          some: {
+            itembatches: {
+              items: {
+                id: itemId,
+              },
+            },
+          },
+        },
       },
     });
 
-    return fedAlready;
+    // Only set hasDocument to true if we found documents with transactions for this specific item
+    return fedAlready.map((doc) => ({
+      ...doc,
+      hasDocument: doc.itemtransactions.length > 0,
+      itemtransactions: doc.itemtransactions.length
+        ? doc.itemtransactions
+        : [{ quantity: 0 }],
+    }));
   };
 
   for (const line of lines) {
@@ -360,14 +408,14 @@ const setData = async (
 
               for (const itemId of itemIds) {
                 const editing = await getEdited(hours, loc.id, itemId);
-                /* if (loc.id === 65) {
+                if (loc.id === 67) {
                   console.log(
                     `hours: ${hours} location_id: ${loc.id} itemid: ${itemId}`
                   );
                   editing.map((editing1) => {
                     console.log(editing1.itemtransactions);
                   });
-                } */
+                }
                 // Ініціалізуємо вкладені об'єкти, якщо їх немає
                 if (!editings[loc.id]) {
                   editings[loc.id] = {};
@@ -413,38 +461,21 @@ const setData = async (
             feedId: prevCalc.feed.item_id,
             feedings: Object.fromEntries(
               times.map(({ time }) => {
-                // Парсимо години з часу
                 const hours = Number(time.split(":")[0]);
-                const itemId = prevCalc.feed.item_id; // Отримуємо itemId
-
+                const itemId = prevCalc.feed.item_id;
                 const editing = editings[loc.id]?.[itemId!]?.[hours] || [];
-                /*                 if (loc.id === 65) {
-                  console.log(
-                    `today hourz: ${hours} locid: ${loc.id} itemId: ${itemId} 2 if65`
-                  );
-                  console.log(
-                    `locId: ${loc.id}`,
-                    JSON.stringify(
-                      editings[loc.id]?.[itemId!]?.[hours],
-                      (key, value) => {
-                        if (typeof value === "bigint") {
-                          return value.toString();
-                        }
-                        return value;
-                      }
-                    )
-                  );
-                } */
+
                 return [
-                  hours.toString(), // Ключ - години у вигляді рядка
+                  hours.toString(),
                   {
-                    feeding: feedingAmountForPrev?.toFixed(1), // Форматуємо feedingAmountForPrev
+                    feeding: feedingAmountForPrev?.toFixed(1),
                     editing:
                       editing[0]?.itemtransactions[0]?.quantity !== undefined
                         ? (
                             editing[0].itemtransactions[0].quantity * 1000
                           ).toFixed(1)
-                        : "", // Якщо значення є, множимо і форматуємо; якщо ні, повертаємо порожній рядок
+                        : "",
+                    hasDocument: editing[0]?.hasDocument || false,
                   },
                 ];
               })
@@ -454,9 +485,6 @@ const setData = async (
         }
 
         if (transition && todayCalc) {
-          //if (loc.id === 65) {
-          //  console.log(`${loc.id} 2 if65`);
-          //}
           feedings.push({
             feedType: todayCalc.feed.type_name,
             feedName: todayCalc.feed.item_name,
@@ -464,35 +492,20 @@ const setData = async (
             feedings: Object.fromEntries(
               times.map(({ time }) => {
                 const hours = Number(time.split(":")[0]);
-                const itemId = todayCalc.feed.item_id; // Отримуємо itemId
+                const itemId = todayCalc.feed.item_id;
                 const editing = editings[loc.id]?.[itemId!]?.[hours] || [];
-                /* if (loc.id === 65) {
-                  console.log(
-                    `today hourz: ${hours} locid: ${loc.id} itemId: ${itemId} 2 if65`
-                  );
-                  console.log(
-                    `locId: ${loc.id}`,
-                    JSON.stringify(
-                      editings[loc.id]?.[itemId!]?.[hours],
-                      (key, value) => {
-                        if (typeof value === "bigint") {
-                          return value.toString();
-                        }
-                        return value;
-                      }
-                    )
-                  );
-                } */
+
                 return [
                   hours.toString(),
                   {
                     feeding: feedingAmountForToday?.toFixed(1),
                     editing:
-                      editing[1]?.itemtransactions[0]?.quantity !== undefined
+                      editing[0]?.itemtransactions[0]?.quantity !== undefined
                         ? (
-                            editing[1].itemtransactions[0].quantity * 1000
+                            editing[0].itemtransactions[0].quantity * 1000
                           ).toFixed(1)
                         : "",
+                    hasDocument: editing[0]?.hasDocument || false,
                   },
                 ];
               })
@@ -500,20 +513,13 @@ const setData = async (
           });
           feedingsCount++;
         } else if (todayCalc) {
-          //   console.log(`${loc.id} 3 if`);
-
-          //що потрапляє до feedings
           const feedingsResult = Object.fromEntries(
             times.map(({ time }) => {
               const hours = Number(time.split(":")[0]);
-
-              const itemId = todayCalc.feed.item_id; // Отримуємо itemId
+              const itemId = todayCalc.feed.item_id;
               const editing = editings[loc.id]?.[itemId!]?.[hours] || [];
 
-              //   if (loc.id == 52)
-              //     console.log(`loc: 52`, JSON.stringify(editing, null, 2));
-
-              const toReturn = [
+              return [
                 hours.toString(),
                 {
                   feeding: todayCalc.calc?.feed_per_feeding?.toFixed(1),
@@ -523,23 +529,18 @@ const setData = async (
                           editing[0].itemtransactions[0].quantity * 1000
                         ).toFixed(1)
                       : "",
+                  hasDocument: editing[0]?.hasDocument || false,
                 },
               ];
-
-              return toReturn;
             })
           );
 
-          //що ми додаємо до feedings
-          const pushResult = {
+          feedings.push({
             feedType: todayCalc.feed.type_name,
             feedName: todayCalc.feed.item_name,
             feedId: todayCalc.feed.item_id,
             feedings: feedingsResult,
-          };
-
-          feedings.push(pushResult);
-
+          });
           feedingsCount++;
         }
 
@@ -553,7 +554,7 @@ const setData = async (
             // Створюємо об'єкт для зберігання feedings для кожного часу
             const feedingsForFeedId: Record<
               string,
-              { feeding: string; editing: string }
+              { feeding: string; editing: string; hasDocument: boolean }
             > = {};
 
             // Спочатку додаємо існуючі записи з extraFilledRows
@@ -564,6 +565,7 @@ const setData = async (
                 feedingsForFeedId[hours] = {
                   feeding: "0", // Початкова кількість корму
                   editing: "0", // Початкове редагування
+                  hasDocument: true, // Додаємо флаг, оскільки це дані з документів
                 };
               }
 
@@ -571,6 +573,7 @@ const setData = async (
                 ? (row.quantity * 1000).toFixed(1)
                 : "0";
               feedingsForFeedId[hours].editing = editingValue;
+              feedingsForFeedId[hours].hasDocument = true; // Встановлюємо флаг для існуючих записів
             });
 
             // Потім додаємо записи для годин з масиву times
@@ -582,6 +585,7 @@ const setData = async (
                 feedingsForFeedId[hours] = {
                   feeding: "0", // Значення за замовчуванням
                   editing: "0", // Редагування за замовчуванням
+                  hasDocument: true, // Додаємо флаг для всіх часових слотів цього item
                 };
               }
             });
@@ -600,7 +604,7 @@ const setData = async (
         }
 
         // console.log('feedings: ', feedings)
-        /* if (loc.id === 65) {
+        if (loc.id === 67) {
           console.log(
             `locId: ${loc.id}`,
             JSON.stringify(feedings, (key, value) => {
@@ -610,7 +614,7 @@ const setData = async (
               return value;
             })
           );
-        } */
+        }
 
         //що ми додаємо
         const pushResult = {
@@ -624,7 +628,7 @@ const setData = async (
           rowCount: feedingsCount,
           feedings,
         };
-        /* if (loc.id === 65) {
+        if (loc.id === 67) {
           console.log(
             `locId: ${loc.id}`,
             JSON.stringify(pushResult, (key, value) => {
@@ -634,7 +638,7 @@ const setData = async (
               return value;
             })
           );
-        } */
+        }
         // Додати до загального масиву
         data.push(pushResult);
       }

@@ -79,21 +79,22 @@ model doctype {
 }
 
 model documents {
-  id                BigInt              @id @default(autoincrement())
-  location_id       Int?
-  doc_type_id       Int?
-  date_time         DateTime            @default(now()) @db.Timestamp(6)
-  executed_by       Int
-  comments          String?
-  parent_document   BigInt?
-  date_time_posted  DateTime            @default(now()) @db.Timestamp(6)
-  calculation_table calculation_table[]
-  disposal_table    disposal_table[]
-  doctype           doctype?            @relation(fields: [doc_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  employees         employees           @relation(fields: [executed_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  locations         locations?          @relation(fields: [location_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  itemtransactions  itemtransactions[]
-  stocking          stocking[]
+  id                     BigInt                   @id @default(autoincrement())
+  location_id            Int
+  doc_type_id            Int
+  date_time             DateTime                 @default(now()) @db.Timestamp(6)
+  executed_by           Int
+  comments              String?
+  parent_document       BigInt?
+  date_time_posted      DateTime                 @default(now()) @db.Timestamp(6)
+  calculation_table     calculation_table[]
+  disposal_table        disposal_table[]
+  doctype               doctype?                 @relation(fields: [doc_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  employees             employees                @relation(fields: [executed_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  locations             locations[]
+  itemtransactions      itemtransactions[]
+  stocking               stocking[]
+  generation_feed_amount generation_feed_amount[]
 
   @@index([date_time, doc_type_id], map: "idx_documents_date_doc_type")
   @@index([doc_type_id, date_time], map: "idx_documents_doc_type_date")
@@ -448,8 +449,10 @@ model generation_feed_amount {
   batch_generation_id BigInt
   feed_batch_id       BigInt
   amount              Float
+  doc_id              BigInt
   batch_generation    batch_generation @relation(fields: [batch_generation_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   feed_batches        itembatches      @relation(fields: [feed_batch_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  documents           documents        @relation(fields: [doc_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model fetching {

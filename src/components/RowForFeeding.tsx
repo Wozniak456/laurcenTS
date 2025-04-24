@@ -26,7 +26,13 @@ interface Feeding {
   feedType: string;
   feedName?: string;
   feedId?: number;
-  feedings?: { [time: string]: { feeding?: string; editing?: string } };
+  feedings?: {
+    [time: string]: {
+      feeding?: string;
+      editing?: string;
+      hasDocument?: boolean;
+    };
+  };
 }
 
 interface RowForFeedingProps {
@@ -46,6 +52,8 @@ interface RowForFeedingProps {
     id: number;
     name: string;
   };
+  onRefresh?: () => void;
+  allLocationFeedings?: Feeding[];
 }
 
 type itemAndTime = {
@@ -65,6 +73,8 @@ export default function RowForFeeding({
   rowCount,
   today,
   batch,
+  onRefresh,
+  allLocationFeedings = [],
 }: RowForFeedingProps) {
   //   useEffect(() => {
   //     console.log("loc: ", locInfo.id, "Row Data:", rowData);
@@ -95,9 +105,140 @@ export default function RowForFeeding({
     onClose: onConfirmClose,
   } = useDisclosure();
 
-  const fed = Object.values(localFeedings).some(
-    (feeding) => feeding.editing && feeding.editing.trim() !== ""
+  // Debug log to see the actual data structure
+  // console.log(`${locInfo.name} data:`, {
+  //   localFeedings,
+  //   rowDataFeedings: rowData.feedings,
+  //   feedId: rowData.feedId,
+  //   feedType: rowData.feedType,
+  //   feedName: rowData.feedName,
+  // });
+
+  // Check if we have any registered feeding (including empty values with hasDocument)
+  const hasFeedings =
+    rowData.feedings && Object.keys(rowData.feedings).length > 0;
+
+  // Debug log for feeding data
+  if (locInfo.id === 67) {
+    console.log("Location 67 Detailed Feeding Data:", {
+      hasFeedings,
+      feedType: rowData.feedType,
+      feedName: rowData.feedName,
+      feedings: rowData.feedings,
+      times: times.map((t) => ({
+        time: t.time,
+        feedingData: rowData.feedings?.[parseInt(t.time.split(":")[0])],
+      })),
+    });
+  }
+
+  useEffect(() => {
+    // Debug log for newly added items
+    console.log(`[${locInfo.name}] Initial data:`, {
+      rowData,
+      hasFeedings,
+      feedings: rowData.feedings,
+      localFeedings,
+    });
+
+    const initialValues: { [key: string]: string } = {};
+    let hasAnyFeedingDocument = false;
+
+    times.forEach(({ time }) => {
+      const feedingTime = parseInt(time.split(":")[0]);
+      const feedingData = rowData.feedings?.[feedingTime];
+
+      // Debug log for each time slot
+      console.log(`[${locInfo.name}] Time ${feedingTime}:`, {
+        feedingData,
+        hasDocument: feedingData?.hasDocument,
+      });
+
+      // Check if this time has a feeding document
+      if (feedingData?.hasDocument) {
+        hasAnyFeedingDocument = true;
+      }
+
+      // Set values if we have feeding data
+      if (feedingData) {
+        const key = `${locInfo.id}-${feedingTime}`;
+        const editingVal = feedingData.editing
+          ? parseFloat(feedingData.editing)
+          : null;
+        const baseValue = feedingData.feeding
+          ? parseFloat(feedingData.feeding)
+          : 0;
+        const percentFeeding = locInfo.percent_feeding || 0;
+
+        // If we have an editing value, use it (even if it's 0)
+        if (editingVal !== null) {
+          initialValues[key] = editingVal.toFixed(1);
+        } else if (baseValue > 0) {
+          // If no editing value but we have a base value, calculate it
+          const adjustedValue = (
+            baseValue *
+            (1 + percentFeeding / 100)
+          ).toFixed(1);
+          initialValues[key] = adjustedValue;
+        }
+      }
+    });
+
+    // If we found any feeding documents, update localFeedings to reflect this
+    if (hasAnyFeedingDocument) {
+      const newLocalFeedings: { [key: string]: any } = {};
+      times.forEach(({ time }) => {
+        const feedingTime = parseInt(time.split(":")[0]);
+        const feedingData = rowData.feedings?.[feedingTime];
+        if (feedingData) {
+          newLocalFeedings[feedingTime] = {
+            ...feedingData,
+            hasDocument: true,
+          };
+        }
+      });
+
+      // Debug log final state
+      console.log(`[${locInfo.name}] Final state:`, {
+        hasAnyFeedingDocument,
+        initialValues,
+        newLocalFeedings,
+      });
+
+      setLocalFeedings(newLocalFeedings);
+    } else {
+      // Debug log final state when no documents
+      console.log(`[${locInfo.name}] Final state:`, {
+        hasAnyFeedingDocument,
+        initialValues,
+        newLocalFeedings: null,
+      });
+    }
+
+    setEditingValue(initialValues);
+  }, [
+    rowData.feedings,
+    times,
+    locInfo.id,
+    locInfo.percent_feeding,
+    rowData.feedId,
+    rowData.feedType,
+    locInfo.name,
+  ]);
+
+  // Check if this specific feeding item has a document
+  const hasDocumentForThisItem =
+    hasFeedings &&
+    Object.entries(rowData.feedings || {}).some(
+      ([time, feeding]) => feeding?.hasDocument
+    );
+
+  const hasLocalFed = Object.values(localFeedings).some(
+    (feeding) => feeding?.hasDocument
   );
+
+  // A feeding item is considered fed if it has a document
+  const fed = hasDocumentForThisItem || hasLocalFed;
 
   const [formState, action] = useFormState<FeedBatchResponse, FormData>(
     actions.feedBatch,
@@ -109,35 +250,6 @@ export default function RowForFeeding({
   );
 
   const { isOpen, onOpen, onClose } = useDisclosure();
-
-  useEffect(() => {
-    const initialValues: { [key: string]: string } = {};
-
-    times.forEach(({ time }) => {
-      const feedingTime = parseInt(time.split(":")[0]);
-      const feeding =
-        localFeedings[feedingTime]?.feeding ||
-        rowData.feedings?.[feedingTime]?.feeding;
-
-      if (feeding) {
-        const key = `${locInfo.id}-${feedingTime}`;
-        const baseValue = parseFloat(feeding);
-        const percentFeeding = locInfo.percent_feeding || 0;
-        const adjustedValue = (baseValue * (1 + percentFeeding / 100)).toFixed(
-          1
-        );
-        initialValues[key] = adjustedValue;
-      }
-    });
-
-    setEditingValue(initialValues);
-  }, [
-    localFeedings,
-    rowData.feedings,
-    times,
-    locInfo.id,
-    locInfo.percent_feeding,
-  ]);
 
   useEffect(() => {
     if (formState?.message) {
@@ -208,25 +320,43 @@ export default function RowForFeeding({
         }
 
         // If we didn't get an error about insufficient feed, proceed with the update
-        Object.entries(editingValue).forEach(([key, value]) => {
-          const [_, time] = key.split("-");
-          if (time && value) {
-            // Format the value to one decimal place only when storing the result
-            const formattedValue = Number(value).toFixed(1);
-            setLocalFeedings((prev) => ({
-              ...prev,
-              [time]: {
-                feeding: formattedValue,
+        const newFeedings: { [key: string]: any } = {};
+        times.forEach((time) => {
+          const feedingTime = parseInt(time.time.split(":")[0]);
+          const key = `${locInfo.id}-${feedingTime}`;
+          const value = formData.get(`time_${feedingTime}`) as string;
+          if (value !== null) {
+            const formattedValue = value ? Number(value).toFixed(1) : "0.0";
+            // Keep the original feeding value and add editing value separately
+            const originalFeeding = rowData.feedings?.[feedingTime]?.feeding;
+            newFeedings[feedingTime] = {
+              feeding: originalFeeding || formattedValue,
                 editing: formattedValue,
-              },
-            }));
+              hasDocument: true,
+            };
           }
         });
+
+        // Update local feedings with all values
+        setLocalFeedings(newFeedings);
 
         // Show success state for a moment before closing
         setLoadingStatus("success");
         await new Promise((resolve) => setTimeout(resolve, 1000));
         onLoadingClose();
+
+        // Update all feeding items for this location
+        if (allLocationFeedings) {
+          allLocationFeedings.forEach((feeding) => {
+            if (feeding.feedId === rowData.feedId) {
+              // Update the current feeding item while preserving original feeding values
+              feeding.feedings = {
+                ...feeding.feedings,
+                ...newFeedings,
+              };
+            }
+          });
+        }
       } catch (error) {
         console.error("Feed submission failed:", error);
         setButtonMode(false);
@@ -263,14 +393,53 @@ export default function RowForFeeding({
       }
 
       setLoadingMessage("Скасування годування...");
-      await cancelFeeding(locInfo.id, today);
+      await cancelFeeding(locInfo.id, today, rowData.feedId);
 
       setLoadingStatus("success");
       setLoadingMessage("Годування успішно скасовано!");
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // Only clear localFeedings, keep editingValue intact
+      // Reset states properly
+      const initialValues: { [key: string]: string } = {};
+      times.forEach(({ time }) => {
+        const feedingTime = parseInt(time.split(":")[0]);
+        const key = `${locInfo.id}-${feedingTime}`;
+        const baseValue = rowData.feedings?.[feedingTime]?.feeding;
+        const percentFeeding = locInfo.percent_feeding || 0;
+
+        if (baseValue) {
+          const adjustedValue = (
+            parseFloat(baseValue) *
+            (1 + percentFeeding / 100)
+          ).toFixed(1);
+          initialValues[key] = adjustedValue;
+        }
+      });
+
+      setEditingValue(initialValues);
       setLocalFeedings({});
+
+      // Update parent state directly
+      if (allLocationFeedings) {
+        allLocationFeedings.forEach((feeding) => {
+          if (feeding.feedId === rowData.feedId) {
+            // Clear all feeding data for this item but preserve base values
+            const baseFeedings = { ...feeding.feedings };
+            Object.keys(baseFeedings).forEach((time) => {
+              if (baseFeedings[time]) {
+                const baseValue = baseFeedings[time].feeding;
+                baseFeedings[time] = {
+                  feeding: baseValue,
+                  editing: undefined,
+                  hasDocument: false,
+                };
+              }
+            });
+            feeding.feedings = baseFeedings;
+          }
+        });
+      }
+
       onLoadingClose();
     } catch (error) {
       console.error("Error canceling feeding:", error);
@@ -287,6 +456,45 @@ export default function RowForFeeding({
     setButtonMode(false);
     onLoadingClose();
   };
+
+  const copyValueToAllInputs = (currentTime: string) => {
+    const currentTimeKey = `${locInfo.id}-${parseInt(
+      currentTime.split(":")[0]
+    )}`;
+    const valueToSpread = editingValue[currentTimeKey];
+    if (!valueToSpread) return;
+
+    const newEditingValues = { ...editingValue };
+    const currentTimeIndex = times.findIndex(
+      (t) =>
+        parseInt(t.time.split(":")[0]) === parseInt(currentTime.split(":")[0])
+    );
+
+    // Only copy to remaining columns to the right
+    times.slice(currentTimeIndex + 1).forEach((t) => {
+      const timeKey = `${locInfo.id}-${parseInt(t.time.split(":")[0])}`;
+      newEditingValues[timeKey] = valueToSpread;
+    });
+    setEditingValue(newEditingValues);
+  };
+
+  // Debug log for fed state calculation
+  useEffect(() => {
+    console.log(`[${locInfo.name}] Fed state calculation:`, {
+      hasDocumentForThisItem,
+      hasLocalFed,
+      fed,
+      rowDataFeedings: rowData.feedings,
+      localFeedings,
+    });
+  }, [
+    hasDocumentForThisItem,
+    hasLocalFed,
+    fed,
+    rowData.feedings,
+    localFeedings,
+    locInfo.name,
+  ]);
 
   return (
     <tr>
@@ -310,48 +518,48 @@ export default function RowForFeeding({
       {times.map((time, index) => {
         const feedingTime = parseInt(time.time.split(":")[0]);
         const key = `${locInfo.id}-${feedingTime}`;
-        const baseQuantity = rowData.feedings?.[feedingTime]?.feeding;
+        const feedingData = rowData.feedings?.[feedingTime];
+        const baseQuantity = feedingData?.feeding;
         const percentFeeding = locInfo.percent_feeding || 0;
-        const editingValueFromFeedings = localFeedings[feedingTime]?.editing;
+        const editingValueFromFeedings =
+          feedingData?.editing || localFeedings[feedingTime]?.editing;
 
         // Calculate the adjusted quantity with percentage
         const calculatedQuantity = baseQuantity
           ? (parseFloat(baseQuantity) * (1 + percentFeeding / 100)).toFixed(2)
           : "";
 
-        const copyValueToAllInputs = () => {
-          const valueToSpread = editingValue[key];
-          if (!valueToSpread) return;
-
-          const newEditingValues = { ...editingValue };
-          const currentTimeIndex = times.findIndex(
-            (t) => parseInt(t.time.split(":")[0]) === feedingTime
-          );
-
-          // Only copy to remaining columns (including current one)
-          times.slice(currentTimeIndex).forEach((t) => {
-            const timeKey = `${locInfo.id}-${parseInt(t.time.split(":")[0])}`;
-            newEditingValues[timeKey] = valueToSpread;
-          });
-          setEditingValue(newEditingValues);
-        };
-
         return (
           <React.Fragment key={index}>
-            <td className="px-4 py-2 border border-gray-400 w-14">
+            <td
+              className={`px-4 py-2 border border-gray-400 w-14 ${
+                (fed && editingValueFromFeedings === "0.0") ||
+                (!fed && editingValue[key] === "0.0")
+                  ? "bg-gray-100"
+                  : ""
+              }`}
+            >
               {calculatedQuantity}
             </td>
 
-            {fed && localFeedings ? (
-              <td className="px-4 py-2 border border-gray-400 w-14">
-                {editingValueFromFeedings}
+            {fed ? (
+              <td
+                className={`px-4 py-2 border border-gray-400 w-14 ${
+                  editingValueFromFeedings === "0.0" ? "bg-gray-100" : ""
+                }`}
+              >
+                {editingValueFromFeedings || "0.0"}
               </td>
             ) : (
-              <td className="px-4 py-2 border border-gray-400 w-14 relative">
+              <td
+                className={`px-4 py-2 border border-gray-400 w-14 relative ${
+                  editingValue[key] === "0.0" ? "bg-gray-100" : ""
+                }`}
+              >
                 {editingValue[key] && index < times.length - 1 && (
                   <button
                     type="button"
-                    onClick={copyValueToAllInputs}
+                    onClick={() => copyValueToAllInputs(time.time)}
                     className="absolute top-0 right-1 text-blue-500 hover:text-blue-700 z-10"
                     title="Copy to all inputs in row"
                   >
@@ -360,13 +568,11 @@ export default function RowForFeeding({
                 )}
                 <input
                   name={`feed_given_${index}`}
-                  className="border border-black w-full bg-blue-100 text-center no-spinners"
+                  className={`border border-black w-full text-center no-spinners ${
+                    editingValue[key] === "0.0" ? "bg-gray-100" : "bg-blue-100"
+                  }`}
                   id={`feed_given_${index}`}
-                  value={
-                    editingValue[key] !== undefined
-                      ? editingValue[key]
-                      : calculatedQuantity
-                  }
+                  value={editingValue[key] || calculatedQuantity || ""}
                   onChange={(e) =>
                     handleInputChange(
                       String(feedingTime),
@@ -376,6 +582,7 @@ export default function RowForFeeding({
                   }
                   type="number"
                   disabled={fed}
+                  placeholder="0.0"
                 />
               </td>
             )}
@@ -391,14 +598,17 @@ export default function RowForFeeding({
           <input type="hidden" name="batch_id" value={batch?.id} />
           <input type="hidden" name="date_time" value={today} />
 
-          {Object.entries(editingValue).map(([key, value]) => {
-            const [poolId, time] = key.split("-");
-            if (!poolId || !time || !value) return null;
+          {/* Submit all times with either their value or 0 */}
+          {times.map((time) => {
+            const feedingTime = parseInt(time.time.split(":")[0]);
+            const key = `${locInfo.id}-${feedingTime}`;
+            // Get the value from editingValue if it exists, otherwise use 0
+            const value = editingValue[key] || "0.0";
             return (
               <input
                 key={key}
                 type="hidden"
-                name={`time_${time}`}
+                name={`time_${feedingTime}`}
                 value={value}
               />
             );

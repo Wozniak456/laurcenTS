@@ -131,9 +131,11 @@ export default function Header() {
               }}
             >
               {category.items.map((item) => {
-                const href = item.href.includes("day")
-                  ? `${item.href}/${today}`
-                  : item.href;
+                const href =
+                  item.href.includes("day") &&
+                  !item.href.includes("general-summary")
+                    ? `${item.href}/${today}`
+                    : item.href;
                 const isActive = pathname.startsWith(item.href);
 
                 return (
@@ -173,9 +175,11 @@ export default function Header() {
                 {category.title}
               </DropdownItem>,
               ...category.items.map((item) => {
-                const href = item.href.includes("day")
-                  ? `${item.href}/${today}`
-                  : item.href;
+                const href =
+                  item.href.includes("day") &&
+                  !item.href.includes("general-summary")
+                    ? `${item.href}/${today}`
+                    : item.href;
                 const isActive = pathname.startsWith(item.href);
 
                 return (

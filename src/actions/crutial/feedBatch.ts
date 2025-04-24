@@ -123,28 +123,25 @@ export async function feedBatch(
     );
     process.stdout.write(`Total quantity needed: ${totalQtyNeeded}\n`);
 
-    if (totalQtyNeeded <= 0) {
-      process.stdout.write("No valid quantities found - exiting\n");
-      return { message: "No valid feeding quantities provided" };
-    }
+    // Check if we have enough stock only if we need some feed
+    if (totalQtyNeeded > 0) {
+      const availableBatches = await getFeedBatchByItemId(
+        item_id,
+        totalQtyNeeded,
+        db
+      );
+      const totalAvailable = availableBatches.reduce(
+        (sum, batch) => sum + (batch._sum.quantity || 0),
+        0
+      );
 
-    // Check if we have enough stock
-    const availableBatches = await getFeedBatchByItemId(
-      item_id,
-      totalQtyNeeded,
-      db
-    );
-    const totalAvailable = availableBatches.reduce(
-      (sum, batch) => sum + (batch._sum.quantity || 0),
-      0
-    );
-
-    if (totalAvailable < totalQtyNeeded / 1000) {
-      return {
-        message: `Not enough stock available. Required: ${totalQtyNeeded}kg, Available: ${
-          totalAvailable * 1000
-        }kg`,
-      };
+      if (totalAvailable < totalQtyNeeded / 1000) {
+        return {
+          message: `Not enough stock available. Required: ${totalQtyNeeded}kg, Available: ${
+            totalAvailable * 1000
+          }kg`,
+        };
+      }
     }
 
     let index = 0;
@@ -160,13 +157,6 @@ export async function feedBatch(
           process.stdout.write(
             `Processing time slot ${hours}:00 with qty: ${qty}\n`
           );
-
-          if (isNaN(qty) || qty <= 0) {
-            process.stdout.write(
-              `Skipping time slot ${hours}:00 - invalid quantity: ${qty}\n`
-            );
-            continue;
-          }
 
           const date = new Date(date_time);
           // Format the date as YYYY-MM-DD HH:00:00 without milliseconds
@@ -218,12 +208,6 @@ export async function feedBatch(
             });
           }
 
-          const batches_id = await getFeedBatchByItemId(
-            item_id,
-            qtyForWholeDay,
-            prisma
-          );
-
           const feedDoc = await prisma.documents.create({
             data: {
               location_id: location_id,
@@ -246,130 +230,72 @@ export async function feedBatch(
             )}\n`
           );
 
-          let left_to_feed = qty / 1000;
+          // Create transaction for any quantity (including zero)
+          const batches_id = await getFeedBatchByItemId(
+            item_id,
+            Math.max(qtyForWholeDay, 0.001), // Use a small positive number to get at least one batch
+            prisma
+          );
 
-          for (const batch of batches_id) {
-            if (batch._sum.quantity) {
-              if (batch._sum.quantity >= left_to_feed) {
-                const fetchTran = await prisma.itemtransactions.create({
-                  data: {
-                    doc_id: feedDoc.id,
-                    location_id: 87,
-                    batch_id: batch.batch_id,
-                    quantity: -left_to_feed,
-                    unit_id: 2,
-                  },
-                });
+          // Get the first available batch for zero quantity transactions
+          const batch = batches_id[0];
 
-                const feedTran = await prisma.itemtransactions.create({
-                  data: {
-                    doc_id: feedDoc.id,
-                    location_id: location_id,
-                    batch_id: batch.batch_id,
-                    quantity: left_to_feed,
-                    unit_id: 2,
-                  },
-                });
+          if (batch) {
+            // Create transactions with the actual quantity (can be zero)
+            const fetchTran = await prisma.itemtransactions.create({
+              data: {
+                doc_id: feedDoc.id,
+                location_id: 87,
+                batch_id: batch.batch_id,
+                quantity: -qty / 1000, // Convert to kg
+                unit_id: 2,
+              },
+            });
 
-                const latestGeneration =
-                  await prisma.batch_generation.findFirst({
-                    include: {
-                      itemtransactions: true,
-                    },
-                    where: {
-                      location_id: location_id,
-                    },
-                    orderBy: {
-                      id: "desc",
-                    },
-                    take: 1,
-                  });
+            const feedTran = await prisma.itemtransactions.create({
+              data: {
+                doc_id: feedDoc.id,
+                location_id: location_id,
+                batch_id: batch.batch_id,
+                quantity: qty / 1000, // Convert to kg
+                unit_id: 2,
+              },
+            });
 
-                const record = await prisma.generation_feed_amount.create({
-                  data: {
-                    batch_generation_id: latestGeneration?.id as bigint,
-                    feed_batch_id: batch.batch_id,
-                    amount: qty,
-                  },
-                });
+            const latestGeneration = await prisma.batch_generation.findFirst({
+              include: {
+                itemtransactions: true,
+              },
+              where: {
+                location_id: location_id,
+              },
+              orderBy: {
+                id: "desc",
+              },
+              take: 1,
+            });
 
-                process.stdout.write(
-                  `Created transactions: ${JSON.stringify(
-                    {
-                      fetchTransactionId: String(fetchTran.id),
-                      feedTransactionId: String(feedTran.id),
-                      recordId: String(record.id),
-                    },
-                    null,
-                    2
-                  )}\n`
-                );
+            const record = await prisma.generation_feed_amount.create({
+              data: {
+                batch_generation_id: latestGeneration?.id as bigint,
+                feed_batch_id: batch.batch_id,
+                amount: qty,
+                doc_id: feedDoc.id,
+              },
+            });
 
-                left_to_feed = 0;
-                break;
-              } else {
-                // Якщо потрібно використовувати ще одну партію
-                const fetchTran = await prisma.itemtransactions.create({
-                  data: {
-                    doc_id: feedDoc.id,
-                    location_id: 87,
-                    batch_id: batch.batch_id,
-                    quantity: -batch._sum.quantity,
-                    unit_id: 2,
-                  },
-                });
-
-                const feedTran = await prisma.itemtransactions.create({
-                  data: {
-                    doc_id: feedDoc.id,
-                    location_id: location_id,
-                    batch_id: batch.batch_id,
-                    quantity: batch._sum.quantity,
-                    unit_id: 2,
-                  },
-                });
-
-                //Знайти останню собівартість і останнє покоління
-                const latestGeneration =
-                  await prisma.batch_generation.findFirst({
-                    include: {
-                      itemtransactions: true,
-                    },
-                    where: {
-                      location_id: location_id,
-                    },
-                    orderBy: {
-                      id: "desc",
-                    },
-                    take: 1,
-                  });
-
-                const record = await prisma.generation_feed_amount.create({
-                  data: {
-                    batch_generation_id: latestGeneration?.id as bigint,
-                    feed_batch_id: batch.batch_id,
-                    amount: qty,
-                  },
-                });
-
-                process.stdout.write(
-                  `Витягнули зі складу: ${fetchTran.id} і вкинули в басейн: ${feedTran.id}\n`
-                );
-                process.stdout.write(`Собівартість змінилася, ${record}\n`);
-
-                left_to_feed -= batch._sum.quantity; // Віднімаємо використану кількість
-                process.stdout.write(`left_to_feed = ${left_to_feed}\n`);
-              }
-            }
-          }
-
-          if (left_to_feed > 0) {
             process.stdout.write(
-              `Не вдалося знайти достатню кількість корму для годування. Залишилося ${left_to_feed}.\n`
+              `Created transactions: ${JSON.stringify(
+                {
+                  fetchTransactionId: String(fetchTran.id),
+                  feedTransactionId: String(feedTran.id),
+                  recordId: String(record.id),
+                },
+                null,
+                2
+              )}\n`
             );
           }
-
-          process.stdout.write("Витягнули зі складу \n");
 
           index++;
         }
@@ -392,11 +318,10 @@ export async function feedBatch(
       return { message: "Something went wrong!" };
     }
   }
-  // revalidatePath(`/summary-feeding-table/day/${formData.get('date_time')}`)
   revalidatePath(`/accumulation/view`);
   revalidatePath("/leftovers/view");
-  // return { message: 'успішно' }
-  redirect(`/summary-feeding-table/day/${formData.get("date_time")}`);
+  revalidatePath(`/summary-feeding-table/day/${formData.get("date_time")}`);
+  return { message: "Success" };
 }
 
 export async function getCostReport(): Promise<FeedingMetrics[]> {

@@ -67,10 +67,10 @@ export default async function DailyFeedWeight({
   items,
   date,
 }: DailyFeedWeightProps) {
-  console.log(
+  /*console.log(
     "Lines data received in DailyFeedWeight:",
     JSON.stringify(lines, null, 2)
-  );
+  );*/
   const data: Row[] = [];
 
   for (const line of lines) {

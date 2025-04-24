@@ -75,6 +75,15 @@ export default function DaySummaryContent({
   times,
   feeds,
 }: DaySummaryProps) {
+  // Restore scroll position after reload
+  useEffect(() => {
+    const savedPosition = sessionStorage.getItem("scrollPosition");
+    if (savedPosition) {
+      window.scrollTo(0, parseInt(savedPosition));
+      sessionStorage.removeItem("scrollPosition"); // Clear after use
+    }
+  }, []);
+
   // useEffect(() => {
   //   data.map((data1) => {
   //     console.log("loc: ", data1.locId, data1.feedings);
@@ -111,6 +120,19 @@ export default function DaySummaryContent({
     if (newFeed) {
       const updatedData = feedingsData.map((feedingInfo) => {
         if (feedingInfo.locId === locId) {
+          // Check if this feed already exists in the location's feedings
+          const isDuplicate = feedingInfo.feedings?.some(
+            (feeding) =>
+              feeding.feedId === newFeed.id || // Check by feed ID
+              (feeding.feedType === newFeed.feedtypes?.name &&
+                feeding.feedName === newFeed.name) // Check by name and type as fallback
+          );
+
+          if (isDuplicate) {
+            // If duplicate found, don't add and keep existing feedings
+            return feedingInfo;
+          }
+
           const updatedFeedings = [...(feedingInfo.feedings || [])];
           updatedFeedings.push({
             feedType: newFeed.feedtypes?.name ?? "",
@@ -195,9 +217,18 @@ export default function DaySummaryContent({
                           feedingIndex === 0 && dataForPool
                             ? getRowCount(dataForPool, loc.id)
                             : 0
-                        } // Перевірка на undefined перед викликом
+                        }
                         today={today}
                         batch={dataForPool?.batch}
+                        allLocationFeedings={feedings}
+                        onRefresh={() => {
+                          // Save current scroll position to sessionStorage
+                          sessionStorage.setItem(
+                            "scrollPosition",
+                            window.scrollY.toString()
+                          );
+                          window.location.reload();
+                        }}
                       />
                     ))}
 
@@ -221,11 +252,24 @@ export default function DaySummaryContent({
                                     setAddedNewFeed(Number(e.target.value))
                                   }
                                 >
-                                  {feeds.map((feed) => (
-                                    <SelectItem key={feed.id} value={feed.id}>
-                                      {feed.name}
-                                    </SelectItem>
-                                  ))}
+                                  {feeds
+                                    .filter((feed) => {
+                                      // Get current location's feedings
+                                      const locationFeedings = feedings || [];
+                                      // Check if this feed is already used
+                                      return !locationFeedings.some(
+                                        (feeding) =>
+                                          feeding.feedId === feed.id ||
+                                          (feeding.feedType ===
+                                            feed.feedtypes?.name &&
+                                            feeding.feedName === feed.name)
+                                      );
+                                    })
+                                    .map((feed) => (
+                                      <SelectItem key={feed.id} value={feed.id}>
+                                        {feed.name}
+                                      </SelectItem>
+                                    ))}
                                 </Select>
                                 {/* </div> */}
                                 {addedNewFeed ? (
