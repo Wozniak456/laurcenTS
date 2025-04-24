@@ -250,6 +250,7 @@ export async function fishFetching(
                   batch_generation_id: record.batch_generation_id,
                   amount: -record.total_amount * part,
                   feed_batch_id: record.feed_batch_id,
+                  doc_id: fetchDoc.id,
                 },
               });
 
