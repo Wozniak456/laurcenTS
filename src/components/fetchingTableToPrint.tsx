@@ -1,270 +1,182 @@
-'use client'
+"use client";
 
-import React from 'react';
-import ExcelJS, { CellValue } from 'exceljs';
-import { Button } from '@nextui-org/react';
+import React from "react";
+import ExcelJS, { CellValue } from "exceljs";
+import { Button } from "@nextui-org/react";
 
 type FetchingInfo = {
-    locationName: string,
-    locationId: number,
-    commercialFishingAmount: number,
-    commercialFishingWeight: number,
-    sortedAmount: number,
-    sortedWeight: number,
-    growOutAmount: number,
-    growOutWeight: number,
-    moreThan500Amount: number,
-    moreThan500Weight: number,
-    lessThan500Amount: number,
-    lessThan500Weight: number,
-    weekNum: number
-}
+  locationName: string;
+  locationId: number;
+  commercialFishingAmount: number;
+  commercialFishingWeight: number;
+  sortedAmount: number;
+  sortedWeight: number;
+  growOutAmount: number;
+  growOutWeight: number;
+  moreThan500Amount: number;
+  moreThan500Weight: number;
+  lessThan500Amount: number;
+  lessThan500Weight: number;
+  weekNum: number;
+  weekPeriod?: string;
+};
 
 type ExportButtonProps = {
-    summary: FetchingInfo[]
+  summary: FetchingInfo[];
 };
 
-const sectionColor = 'c7c7c7';
-const lineColor = 'e0e0e0';
-const cellColor = 'ffffff';
-const summaryColor = 'd9e1f2'; 
+const sectionColor = "c7c7c7";
+const lineColor = "e0e0e0";
+const cellColor = "ffffff";
+const summaryColor = "d9e1f2";
 
-export default function ExportButton({summary} : ExportButtonProps){
-    
-    const handleExport = async () => {
-        const workbook = new ExcelJS.Workbook();
-        const worksheet = workbook.addWorksheet('Sheet1');
+export default function ExportButton({ summary }: ExportButtonProps) {
+  const handleExport = async () => {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Sheet1");
 
-        
-        const headerStyle = {
-            font: { bold: true, size: 10 },
-            fill: { 
-                type: 'pattern', 
-                pattern: 'solid', 
-                fgColor: { argb: 'ffffff' } 
-            }, 
-            border: { 
-                top: { style: 'thin', color: { argb: '000000' } },
-                left: { style: 'thin', color: { argb: '000000' } },
-                bottom: { style: 'thin', color: { argb: '000000' } },
-                right: { style: 'thin', color: { argb: '000000' } }
-            },
-            alignment: { horizontal: 'center', vertical: 'middle' } 
-        };
-
-    const cellStyle = {
-        font: { size: 8 },
-        border: { 
-            top: { style: 'thin', color: { argb: '000000' } },
-            left: { style: 'thin', color: { argb: '000000' } },
-            bottom: { style: 'thin', color: { argb: '000000' } },
-            right: { style: 'thin', color: { argb: '000000' } }
-        },
-        alignment: { horizontal: 'center', vertical: 'middle' } 
+    const headerStyle: Partial<ExcelJS.Style> = {
+      font: { bold: true, size: 10 },
+      fill: {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "ffffff" },
+      },
+      border: {
+        top: { style: "thin", color: { argb: "000000" } },
+        left: { style: "thin", color: { argb: "000000" } },
+        bottom: { style: "thin", color: { argb: "000000" } },
+        right: { style: "thin", color: { argb: "000000" } },
+      },
+      alignment: { horizontal: "center", vertical: "middle" },
     };
 
+    const cellStyle: Partial<ExcelJS.Style> = {
+      font: { size: 8 },
+      border: {
+        top: { style: "thin", color: { argb: "000000" } },
+        left: { style: "thin", color: { argb: "000000" } },
+        bottom: { style: "thin", color: { argb: "000000" } },
+        right: { style: "thin", color: { argb: "000000" } },
+      },
+      alignment: { horizontal: "center", vertical: "middle" },
+    };
 
     let headerValues: CellValue[] = [
-        "№ басейну", 
-        "Товарна", 
-        "кг",
-        "сер. вага",
-        "Відсортована",
-        "кг",
-        "сер. вага",
-        "Доріст",
-        "кг",
-        "сер. вага",
-        "500+",
-        "кг",
-        "сер. вага",
-        "-500",
-        "кг",
-        "сер. вага"]; // Масив для зберігання значень заголовка
+      "№ басейну",
+      "Товарна",
+      "кг",
+      "сер. вага",
+      "Відсортована",
+      "кг",
+      "сер. вага",
+      "Доріст",
+      "кг",
+      "сер. вага",
+      "500+",
+      "кг",
+      "сер. вага",
+      "-500",
+      "кг",
+      "сер. вага",
+    ];
 
-    const dateRow = worksheet.addRow([`Тиждень ${summary[0].weekNum}`]);
+    // Add week number and period
+    const weekRow = worksheet.addRow([`Тиждень ${summary[0].weekNum}`]);
+    weekRow.font = { bold: true, size: 12 };
+    worksheet.mergeCells(weekRow.number, 1, weekRow.number, 16);
+    weekRow.alignment = { horizontal: "center" as const };
 
-    dateRow.eachCell({ includeEmpty: true }, (cell) => {
-        cell.style.font = headerStyle.font;
-        cell.style.fill = headerStyle.fill as ExcelJS.Fill;
-        cell.style.border = headerStyle.border as ExcelJS.Borders;
-        cell.style.alignment = headerStyle.alignment as ExcelJS.Alignment;
-    });
+    if (summary[0].weekPeriod) {
+      const periodRow = worksheet.addRow([`Період: ${summary[0].weekPeriod}`]);
+      periodRow.font = { size: 10, color: { argb: "666666" } };
+      worksheet.mergeCells(periodRow.number, 1, periodRow.number, 16);
+      periodRow.alignment = { horizontal: "center" as const };
+    }
 
-    worksheet.mergeCells(dateRow.number, 1, dateRow.number, 16);
+    // Add empty row for spacing
+    worksheet.addRow([]);
 
-    let headerRow = worksheet.addRow(headerValues);
-    
+    // Add header row
+    const headerRow = worksheet.addRow(headerValues);
     headerRow.eachCell({ includeEmpty: true }, (cell) => {
-        cell.style.font = headerStyle.font;
-        cell.style.fill = headerStyle.fill as ExcelJS.Fill;
-        cell.style.border = headerStyle.border as ExcelJS.Borders;
-        cell.style.alignment = headerStyle.alignment as ExcelJS.Alignment;
+      cell.style = headerStyle;
     });
 
-    summary.forEach((pool) => {
-        const poolValues  = [
-            pool.locationName,
-            pool.commercialFishingAmount,
-            pool.commercialFishingWeight,
-            pool.commercialFishingAmount > 0 ? pool.commercialFishingWeight / pool.commercialFishingAmount : 0,
-    
-            pool.sortedAmount,
-            pool.sortedWeight,
-            pool.sortedAmount > 0 ? pool.sortedWeight / pool.sortedAmount : 0,
+    // Add data rows
+    summary.forEach((info) => {
+      const rowValues = [
+        info.locationName,
+        info.commercialFishingAmount,
+        info.commercialFishingWeight,
+        info.commercialFishingAmount !== 0
+          ? (
+              info.commercialFishingWeight / info.commercialFishingAmount
+            ).toFixed(1)
+          : "0",
+        info.sortedAmount,
+        info.sortedWeight,
+        info.sortedAmount !== 0
+          ? (info.sortedWeight / info.sortedAmount).toFixed(1)
+          : "0",
+        info.growOutAmount,
+        info.growOutWeight,
+        info.growOutAmount !== 0
+          ? (info.growOutWeight / info.growOutAmount).toFixed(1)
+          : "0",
+        info.moreThan500Amount,
+        info.moreThan500Weight,
+        info.moreThan500Amount !== 0
+          ? (info.moreThan500Weight / info.moreThan500Amount).toFixed(1)
+          : "0",
+        info.lessThan500Amount,
+        info.lessThan500Weight,
+        info.lessThan500Amount !== 0
+          ? (info.lessThan500Weight / info.lessThan500Amount).toFixed(1)
+          : "0",
+      ];
 
-            pool.growOutAmount,
-            pool.growOutWeight,
-            pool.growOutAmount > 0 ? pool.growOutWeight / pool.growOutAmount : 0,
+      const row = worksheet.addRow(rowValues);
+      row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+        cell.style = cellStyle;
+        // Add blue background to specific columns
+        if ([2, 3, 4, 8, 9, 10, 14, 15, 16].includes(colNumber)) {
+          cell.fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: "f0f8ff" },
+          };
+        }
+      });
+    });
 
-            pool.moreThan500Amount,
-            pool.moreThan500Weight,
-            pool.moreThan500Amount > 0 ? pool.moreThan500Weight / pool.moreThan500Amount : 0,
+    // Adjust column widths
+    worksheet.columns.forEach((column) => {
+      column.width = 12;
+    });
 
-            pool.lessThan500Amount,
-            pool.lessThan500Weight,
-            pool.lessThan500Amount > 0 ? pool.lessThan500Weight / pool.lessThan500Amount : 0,
-        ];
-
-        const poolRow = worksheet.addRow(poolValues );
-
-        poolRow.eachCell({ includeEmpty: true }, (cell) => {
-            cell.style.font = { bold: true, size: 10 };
-            cell.style.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: sectionColor } } as ExcelJS.Fill; 
-            cell.style.border = cellStyle.border as ExcelJS.Borders;
-            cell.style.alignment = cellStyle.alignment as ExcelJS.Alignment; 
-        });
-    })
-
-//     //     let currentRowNumber = 2; 
-
-//     //     const batchQuantities: { [batchName: string]: number } = {};
-
-//         props.lines.forEach((line) => {
-//             const lineRow = worksheet.addRow([line.name]);
-
-//             worksheet.mergeCells(lineRow.number, 1, lineRow.number, 13);
-
-//             lineRow.eachCell({ includeEmpty: true }, (cell) => {
-//                 cell.style.font = { bold: true, size: 10 };
-//                 cell.style.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: sectionColor } } as ExcelJS.Fill; 
-//                 cell.style.border = cellStyle.border as ExcelJS.Borders;
-//                 cell.style.alignment = cellStyle.alignment as ExcelJS.Alignment; 
-//             });
-
-        
-
-//             line.pools.forEach((pool) => {
-//                 // const poolRow = worksheet.addRow([pool.name]); 
-                
-
-//                 const poolItems = props.data.filter(poolItem => poolItem.poolId === pool.id);
-//                 const poolItem = poolItems[0]
-                
-//                 const firstRowValues  = [
-//                     pool.name,
-//                     poolItem?.feedType,
-//                     poolItem?.feedName,
-//                     poolItem?.feeding6,
-//                     poolItem?.editing6 ?? '',
-//                     poolItem?.feeding10,
-//                     poolItem?.editing10 ?? '',
-//                     poolItem?.feeding14,
-//                     poolItem?.editing14 ?? '',
-//                     poolItem?.feeding18,
-//                     poolItem?.editing18 ?? '',
-//                     poolItem?.feeding22,
-//                     poolItem?.editing22 ?? '',
-//                 ];
-
-//                 const firstRow = worksheet.addRow(firstRowValues );
-
-//                 firstRow.eachCell({ includeEmpty: true }, (cell) => {
-//                     cell.style.font = { bold: true, size: 10 };
-//                     cell.style.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: cellColor } } as ExcelJS.Fill; 
-//                     cell.style.border = cellStyle.border as ExcelJS.Borders;
-//                     cell.style.alignment = cellStyle.alignment as ExcelJS.Alignment; 
-//                 });
-
-//                 if (poolItem?.rowCount == 2){
-//                     const poolItem = poolItems[1]
-
-//                     const secondRowValues   = [
-//                         '',
-//                         poolItem?.feedType,
-//                         poolItem?.feedName,
-//                         poolItem?.feeding6,
-//                         poolItem?.editing6 ?? '',
-//                         poolItem?.feeding10,
-//                         poolItem?.editing10 ?? '',
-//                         poolItem?.feeding14,
-//                         poolItem?.editing14 ?? '',
-//                         poolItem?.feeding18,
-//                         poolItem?.editing18 ?? '',
-//                         poolItem?.feeding22,
-//                         poolItem?.editing22 ?? '',
-//                     ];
-
-//                     const secondRow = worksheet.addRow(secondRowValues );
-
-//                     secondRow.eachCell({ includeEmpty: true }, (cell) => {
-//                         cell.style.font = { bold: true, size: 10 };
-//                         cell.style.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: cellColor } } as ExcelJS.Fill; 
-//                         cell.style.border = cellStyle.border as ExcelJS.Borders;
-//                         cell.style.alignment = cellStyle.alignment as ExcelJS.Alignment; 
-//                     });
-
-//                     worksheet.mergeCells(firstRow.number, 1, secondRow.number, 1);
-//                 }
-
-//             })
-// })
-
-        worksheet.pageSetup = {
-            paperSize: 9, 
-            orientation: 'portrait', 
-            fitToPage: true,
-            fitToWidth: 1, 
-            fitToHeight: 2,
-        };
-
-        
-        worksheet.columns = [
-            { width: 12 }, 
-            { width: 12 }, 
-            { width: 20 }, 
-            { width: 8 }, 
-            { width: 12 }, 
-            { width: 8 }, 
-            { width: 12 }, 
-            { width: 8 }, 
-            { width: 12 },
-            { width: 8 }, 
-            { width: 12 },
-            { width: 8 }, 
-            { width: 12 }
-        ];
-
-        worksheet.views = [{ 
-            state: 'frozen', 
-            ySplit: 2 
-        }];
-
-        const buffer = await workbook.xlsx.writeBuffer();
-        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `fetching.xlsx`;
-        a.click();
-        window.URL.revokeObjectURL(url);
+    worksheet.pageSetup = {
+      orientation: "landscape",
+      paperSize: 9,
+      fitToPage: true,
     };
 
-    return (
-        <div className=''>
-            <Button onClick={handleExport}>Export to Excel</Button>
-        </div>
-        
-    )
-    
-};
+    // Generate Excel file
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `Вилов_тиждень_${summary[0].weekNum}.xlsx`;
+    link.click();
+    window.URL.revokeObjectURL(url);
+  };
+
+  return (
+    <Button color="primary" variant="ghost" onPress={handleExport}>
+      Експорт в Excel
+    </Button>
+  );
+}
