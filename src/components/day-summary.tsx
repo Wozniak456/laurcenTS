@@ -162,138 +162,161 @@ export default function DaySummaryContent({
 
   return (
     <>
-      {lines.map((line) => (
-        <table
-          key={line.id}
-          className="border-collapse border w-full mb-4 text-sm w-5/6"
-        >
-          <thead>
-            <tr>
-              <th
-                colSpan={2 * times.length + 3}
-                className="px-4 py-2 bg-blue-100"
-              >
-                {line.name}
-              </th>
-              <th className="px-4 py-2 bg-blue-100">{today.slice(5)}</th>
-            </tr>
-            <tr>
-              <th className="border p-2">Басейн</th>
-              <th className="border p-2">Вид корму</th>
-              <th className="border p-2 w-24">Назва корму</th>
-              {times.map((time, index) => (
-                <React.Fragment key={index}>
-                  <th className="border p-2">{time.time}</th>
-                  <th className="border">Коригування</th>
-                </React.Fragment>
-              ))}
-              <th className="border p-2">Годувати</th>
-            </tr>
-          </thead>
-          <tbody>
-            {line.pools.map((pool) =>
-              pool.locations.map((loc, index) => {
-                const dataForPool = feedingsData.find(
-                  (row) => row.locId === loc.id
-                );
-
-                console.log(
-                  `dataForPool: ${loc.id}. ${dataForPool?.feedings} and percent feeding ${pool?.percent_feeding}`
-                );
-                const feedings = dataForPool?.feedings;
-                return (
+      {lines
+        .filter((line) =>
+          line.pools.some((pool) =>
+            pool.locations.some((loc) =>
+              data.some((row) => row.locId === loc.id)
+            )
+          )
+        )
+        .map((line) => (
+          <table
+            key={line.id}
+            className="border-collapse border w-full mb-4 text-sm w-5/6"
+          >
+            <thead>
+              <tr>
+                <th
+                  colSpan={2 * times.length + 3}
+                  className="px-4 py-2 bg-blue-100"
+                >
+                  {line.name}
+                </th>
+                <th className="px-4 py-2 bg-blue-100">{today.slice(5)}</th>
+              </tr>
+              <tr>
+                <th className="border p-2">Басейн</th>
+                <th className="border p-2">Вид корму</th>
+                <th className="border p-2 w-24">Назва корму</th>
+                {times.map((time, index) => (
                   <React.Fragment key={index}>
-                    {feedings?.map((feeding, feedingIndex) => (
-                      <RowForFeeding
-                        key={feedingIndex}
-                        locInfo={{
-                          id: loc.id,
-                          name: loc.name,
-                          percent_feeding: pool?.percent_feeding ?? 0,
-                        }}
-                        rowData={feeding}
-                        times={times}
-                        rowCount={
-                          feedingIndex === 0 && dataForPool
-                            ? getRowCount(dataForPool, loc.id)
-                            : 0
-                        }
-                        today={today}
-                        batch={dataForPool?.batch}
-                        allLocationFeedings={feedings}
-                        onRefresh={() => {
-                          // Save current scroll position to sessionStorage
-                          sessionStorage.setItem(
-                            "scrollPosition",
-                            window.scrollY.toString()
+                    <th className="border p-2">{time.time}</th>
+                    <th className="border">Коригування</th>
+                  </React.Fragment>
+                ))}
+                <th className="border p-2">Годувати</th>
+              </tr>
+            </thead>
+            <tbody>
+              {line.pools.map((pool) =>
+                pool.locations.map((loc, index) => {
+                  const dataForPool = feedingsData.find(
+                    (row) => row.locId === loc.id
+                  );
+                  if (loc.id === 50) {
+                    console.log(
+                      "--- DaySummaryContent DEBUG for location 50 ---"
+                    );
+                    console.log("dataForPool:", dataForPool);
+                    console.log("feedings:", dataForPool?.feedings);
+                  }
+                  const feedings = dataForPool?.feedings;
+                  return (
+                    <React.Fragment key={index}>
+                      {feedings?.map((feeding, feedingIndex) => {
+                        if (loc.id === 50) {
+                          console.log(
+                            "Feeding line for location 50:",
+                            feedingIndex,
+                            feeding
                           );
-                          window.location.reload();
-                        }}
-                      />
-                    ))}
+                        }
+                        return (
+                          <RowForFeeding
+                            key={feedingIndex}
+                            locInfo={{
+                              id: loc.id,
+                              name: loc.name,
+                              percent_feeding: pool?.percent_feeding ?? 0,
+                            }}
+                            rowData={feeding}
+                            times={times}
+                            rowCount={
+                              feedingIndex === 0 && dataForPool
+                                ? getRowCount(dataForPool, loc.id)
+                                : 0
+                            }
+                            today={today}
+                            batch={dataForPool?.batch}
+                            allLocationFeedings={feedings}
+                            onRefresh={() => {
+                              // Save current scroll position to sessionStorage
+                              sessionStorage.setItem(
+                                "scrollPosition",
+                                window.scrollY.toString()
+                              );
+                              window.location.reload();
+                            }}
+                          />
+                        );
+                      })}
 
-                    {feedings?.length && feedings.length > 0 ? (
-                      <tr>
-                        <td className="text-center text-md bg-gray-100">
-                          <Popover placement="bottom" showArrow offset={10}>
-                            <PopoverTrigger>
-                              <button className="py-0" color="primary">
-                                Додати корм
-                              </button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-[240px]">
-                              <div className="my-2 flex flex-col gap-2 w-full">
-                                {/* <div className="my-2 flex flex-col gap-2 w-full"> */}
-                                <Select
-                                  label="Корм"
-                                  placeholder="Оберіть корм"
-                                  className="max-w-xs"
-                                  onChange={(e) =>
-                                    setAddedNewFeed(Number(e.target.value))
-                                  }
-                                >
-                                  {feeds
-                                    .filter((feed) => {
-                                      // Get current location's feedings
-                                      const locationFeedings = feedings || [];
-                                      // Check if this feed is already used
-                                      return !locationFeedings.some(
-                                        (feeding) =>
-                                          feeding.feedId === feed.id ||
-                                          (feeding.feedType ===
-                                            feed.feedtypes?.name &&
-                                            feeding.feedName === feed.name)
-                                      );
-                                    })
-                                    .map((feed) => (
-                                      <SelectItem key={feed.id} value={feed.id}>
-                                        {feed.name}
-                                      </SelectItem>
-                                    ))}
-                                </Select>
-                                {/* </div> */}
-                                {addedNewFeed ? (
-                                  <Button
-                                    onClick={() =>
-                                      handleAddFeedClick(loc.id, addedNewFeed)
+                      {feedings?.length && feedings.length > 0 ? (
+                        <tr>
+                          <td className="text-center text-md bg-gray-100">
+                            <Popover placement="bottom" showArrow offset={10}>
+                              <PopoverTrigger>
+                                <button className="py-0" color="primary">
+                                  Додати корм
+                                </button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-[240px]">
+                                <div className="my-2 flex flex-col gap-2 w-full">
+                                  {/* <div className="my-2 flex flex-col gap-2 w-full"> */}
+                                  <Select
+                                    label="Корм"
+                                    placeholder="Оберіть корм"
+                                    className="max-w-xs"
+                                    onChange={(e) =>
+                                      setAddedNewFeed(Number(e.target.value))
                                     }
                                   >
-                                    Додати
-                                  </Button>
-                                ) : null}
-                              </div>
-                            </PopoverContent>
-                          </Popover>
-                        </td>
-                      </tr>
-                    ) : null}
-                  </React.Fragment>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-      ))}
+                                    {feeds
+                                      .filter((feed) => {
+                                        // Get current location's feedings
+                                        const locationFeedings = feedings || [];
+                                        // Check if this feed is already used
+                                        return !locationFeedings.some(
+                                          (feeding) =>
+                                            feeding.feedId === feed.id ||
+                                            (feeding.feedType ===
+                                              feed.feedtypes?.name &&
+                                              feeding.feedName === feed.name)
+                                        );
+                                      })
+                                      .map((feed) => (
+                                        <SelectItem
+                                          key={feed.id}
+                                          value={feed.id}
+                                        >
+                                          {feed.name}
+                                        </SelectItem>
+                                      ))}
+                                  </Select>
+                                  {/* </div> */}
+                                  {addedNewFeed ? (
+                                    <Button
+                                      onClick={() =>
+                                        handleAddFeedClick(loc.id, addedNewFeed)
+                                      }
+                                    >
+                                      Додати
+                                    </Button>
+                                  ) : null}
+                                </div>
+                              </PopoverContent>
+                            </Popover>
+                          </td>
+                        </tr>
+                      ) : null}
+                    </React.Fragment>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        ))}
     </>
   );
 }

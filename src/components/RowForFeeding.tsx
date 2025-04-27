@@ -331,7 +331,7 @@ export default function RowForFeeding({
             const originalFeeding = rowData.feedings?.[feedingTime]?.feeding;
             newFeedings[feedingTime] = {
               feeding: originalFeeding || formattedValue,
-                editing: formattedValue,
+              editing: formattedValue,
               hasDocument: true,
             };
           }
@@ -496,6 +496,14 @@ export default function RowForFeeding({
     locInfo.name,
   ]);
 
+  if (locInfo.id === 48) {
+    console.log("RowForFeeding render:", {
+      feedType: rowData.feedType,
+      feedName: rowData.feedName,
+      rowData,
+    });
+  }
+
   return (
     <tr>
       {rowCount && rowCount > 0 ? (
@@ -613,7 +621,7 @@ export default function RowForFeeding({
               />
             );
           })}
-            <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center">
             {!fed ? (
               <button
                 type="submit"
@@ -645,7 +653,7 @@ export default function RowForFeeding({
                 <Image src={cancelIcon} alt="cancel feeding" height={35} />
               </button>
             )}
-            </div>
+          </div>
         </form>
 
         {/* Confirmation Modal */}
@@ -709,27 +717,27 @@ export default function RowForFeeding({
 
         {/* Error Modal */}
         <Modal isOpen={isErrorOpen} onClose={onErrorClose} placement="center">
-            <ModalContent>
-              {(onClose) => (
-                <>
-                  <ModalHeader className="flex flex-col gap-1 text-red-600">
+          <ModalContent>
+            {(onClose) => (
+              <>
+                <ModalHeader className="flex flex-col gap-1 text-red-600">
                   {errorMessage}
-                  </ModalHeader>
-                  <ModalBody>
+                </ModalHeader>
+                <ModalBody>
                   <p>
                     Неможливо скасувати годування, оскільки існують пізніші
                     транзакції.
                   </p>
-                  </ModalBody>
-                  <ModalFooter>
-                    <Button color="primary" onPress={onClose}>
-                      Close
-                    </Button>
-                  </ModalFooter>
-                </>
-              )}
-            </ModalContent>
-          </Modal>
+                </ModalBody>
+                <ModalFooter>
+                  <Button color="primary" onPress={onClose}>
+                    Close
+                  </Button>
+                </ModalFooter>
+              </>
+            )}
+          </ModalContent>
+        </Modal>
       </td>
     </tr>
   );

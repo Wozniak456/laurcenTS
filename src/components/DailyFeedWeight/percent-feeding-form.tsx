@@ -26,8 +26,11 @@ export default function PercentFeedingForm(props: PercentFormType) {
 
   return (
     <div className="">
+      <h2 className="text-lg font-semibold mb-4 text-center">
+        Редагування % відхилення
+      </h2>
       <form className="mb-4 flex flex-col gap-4" action={action}>
-        <div className="flex gap-2 items-center justify-center">
+        <div className="flex gap-2 items-center justify-center mb-4">
           <h1 className="text-lg font-semibold min-w-24">
             {props.location?.name}
           </h1>
@@ -43,8 +46,7 @@ export default function PercentFeedingForm(props: PercentFormType) {
           </div>
           <input type="hidden" name={`location`} value={props.location?.id} />
         </div>
-
-        <div className="flex justify-between mt-4">
+        <div className="flex justify-center mt-4">
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
             type="submit"

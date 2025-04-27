@@ -142,7 +142,7 @@ export const poolInfo = async (
 
   const batch = lastStocking?.itemtransactions[0]?.itembatches;
   const qty = lastStocking?.itemtransactions[0]?.quantity;
-  const fishWeight = lastStocking?.stocking[0].average_weight;
+  const fishWeight = lastStocking?.stocking[0]?.average_weight;
   const updateDate = lastStocking?.date_time.toISOString().split("T")[0];
 
   let allowedToEdit = false;
@@ -164,7 +164,7 @@ export const poolInfo = async (
 };
 
 //встановлюємо перехід на новий корм
-export async function setTransitionDayForLocation(
+export async function setTransitionDayForLocationOld(
   location_id: number,
   prisma?: any
 ) {
@@ -209,6 +209,176 @@ export async function setTransitionDayForLocation(
       }
     }
   }
+}
+
+export async function setTransitionDayForLocation(
+  location_id: number,
+  prisma?: any
+) {
+  console.log("DEBUG: setTransitionDayForLocation START", { location_id });
+  const activeDb = prisma || db;
+
+  // 1. Find the latest calculation_table record for this location
+  const lastCalc = await activeDb.calculation_table.findFirst({
+    where: {
+      documents: { location_id },
+    },
+    orderBy: { id: "desc" },
+  });
+  console.log("DEBUG: lastCalc", lastCalc);
+  if (!lastCalc) return;
+
+  // 2. Get the doc_id from this calculation_table record
+  const lastDocId = lastCalc.doc_id;
+  console.log("DEBUG: lastDocId", lastDocId);
+
+  // 3. Get all calculation_table records for this doc_id
+  const calcs = await activeDb.calculation_table.findMany({
+    where: { doc_id: lastDocId },
+    orderBy: { day: "asc" },
+  });
+  console.log(
+    "DEBUG: calcs.length",
+    calcs.length,
+    calcs.map((c: calculation_table) => ({
+      id: c.id,
+      day: c.day,
+      date: c.date,
+      transition_day: c.transition_day,
+    }))
+  );
+  if (!calcs.length) return;
+
+  // Fetch the document for lastDocId to get its date_time
+  const lastDoc = await activeDb.documents.findUnique({
+    where: { id: lastDocId },
+    select: { date_time: true },
+  });
+  console.log("DEBUG: lastDoc", lastDoc);
+  if (!lastDoc) {
+    console.log("DEBUG: lastDoc is falsy, returning early");
+    return;
+  }
+  const dateObj = lastDoc.date_time;
+
+  // 4. Get batch_generation for this location and date (using your SQL logic)
+  const batchGen = await getLatestBatchGenerationForLocation(
+    activeDb,
+    location_id,
+    dateObj
+  );
+  console.log("DEBUG: batchGen", batchGen);
+
+  // 4.1 Get batch_generation for the end of the day
+  const endOfDayDate = new Date(dateObj);
+  endOfDayDate.setUTCHours(23, 59, 59, 999);
+  const batchGenEndOfDay = await getLatestBatchGenerationForLocation(
+    activeDb,
+    location_id,
+    endOfDayDate
+  );
+  console.log("DEBUG: batchGenEndOfDay", batchGenEndOfDay);
+
+  // 4.2 Compare batch generations and handle transition if needed
+  let lastUpdatedIndex = -1;
+  if (batchGen && batchGenEndOfDay && batchGen.id === batchGenEndOfDay.id) {
+    // Get first date from current calculations
+    const firstCalcDate = calcs[0].date;
+    const prevDayDate = new Date(firstCalcDate);
+    prevDayDate.setDate(prevDayDate.getDate() - 1);
+    console.log("DEBUG: firstCalcDate", firstCalcDate);
+    console.log("DEBUG: prevDayDate", prevDayDate);
+
+    // Find previous calculation record
+    console.log("DEBUG: Searching for prevCalc with:", {
+      location_id,
+      lastDocId,
+      prevDayDate,
+    });
+    const prevCalc = await activeDb.calculation_table.findFirst({
+      where: {
+        documents: {
+          location_id: location_id,
+        },
+        doc_id: {
+          lt: lastDocId,
+        },
+        date: prevDayDate,
+      },
+      orderBy: {
+        id: "desc",
+      },
+    });
+    console.log("DEBUG: prevCalc", prevCalc);
+    if (prevCalc?.transition_day !== null) {
+      let currentTransitionDay = prevCalc.transition_day;
+      console.log(
+        "DEBUG: Starting transition copy from prevCalc.transition_day =",
+        currentTransitionDay
+      );
+      for (let i = 0; i < calcs.length; i++) {
+        console.log(
+          `DEBUG: i=${i}, currentTransitionDay=${currentTransitionDay}`
+        );
+        if (currentTransitionDay && currentTransitionDay <= 4) {
+          await activeDb.calculation_table.update({
+            where: { id: calcs[i].id },
+            data: { transition_day: currentTransitionDay },
+          });
+          console.log(
+            `DEBUG: Updated calcs[${i}].id=${calcs[i].id} with transition_day=${currentTransitionDay}`
+          );
+          currentTransitionDay++;
+          lastUpdatedIndex = i;
+        } else {
+          console.log(
+            `DEBUG: Breaking at i=${i}, currentTransitionDay=${currentTransitionDay}`
+          );
+          break;
+        }
+      }
+    } else {
+      console.log("DEBUG: prevCalc.transition_day is null or undefined");
+    }
+  }
+
+  // 6. Process remaining records with transition logic
+  let prevFeedType = null;
+
+  // If we had any updates, get the feed type from the last updated record
+  if (lastUpdatedIndex >= 0) {
+    prevFeedType = await getFeedType(
+      calcs[lastUpdatedIndex].fish_weight,
+      activeDb
+    );
+  }
+
+  // Process remaining records
+  for (let i = lastUpdatedIndex + 1; i < calcs.length; i++) {
+    const currentFeedType = await getFeedType(calcs[i].fish_weight, activeDb);
+
+    // Check if feed type changed
+    if (prevFeedType?.id !== currentFeedType?.id) {
+      // Start new transition sequence
+      let transitionDay = 1;
+      for (let j = i; j < calcs.length && transitionDay <= 4; j++) {
+        await activeDb.calculation_table.update({
+          where: { id: calcs[j].id },
+          data: { transition_day: transitionDay },
+        });
+        transitionDay++;
+        i = j; // Update main loop index to skip processed records
+      }
+      prevFeedType = currentFeedType;
+    } else {
+      // No transition needed
+      await activeDb.calculation_table.update({
+        where: { id: calcs[i].id },
+        data: { transition_day: null },
+      });
+    }
+  }
+  console.log("DEBUG: setTransitionDayForLocation END", { location_id });
 }
 
 export async function getFeedType(
@@ -667,4 +837,67 @@ export async function getPrevCalc(
       index--;
     }
   }
+}
+
+// Helper function to get the latest batch_generation for a location before a given date
+async function getLatestBatchGenerationForLocation(
+  activeDb: any,
+  location_id: number,
+  dateObj: Date
+) {
+  console.log("DEBUG: getLatestBatchGenerationForLocation START", {
+    location_id,
+    dateObj,
+  });
+  // 1. Find all stocking documents for this location and before the given date
+  const stockingDocs = await activeDb.documents.findMany({
+    where: {
+      doc_type_id: 1,
+      date_time: { lt: dateObj },
+      itemtransactions: {
+        some: { location_id },
+      },
+    },
+    select: {
+      id: true,
+      itemtransactions: {
+        select: { location_id: true },
+      },
+    },
+  });
+  console.log("DEBUG: stockingDocs", stockingDocs);
+
+  // 2. Filter to only those docs with more than one unique location in itemtransactions
+  const realStockingDocIds = stockingDocs
+    .filter(
+      (doc: { id: number; itemtransactions: { location_id: number }[] }) => {
+        const uniqueLocs = new Set<number>(
+          doc.itemtransactions.map(
+            (tran: { location_id: number }) => tran.location_id
+          )
+        );
+        return uniqueLocs.size > 1;
+      }
+    )
+    .map((doc: { id: number }) => doc.id);
+  console.log("DEBUG: realStockingDocIds", realStockingDocIds);
+
+  let batchGen = null;
+  if (realStockingDocIds.length > 0) {
+    // 3. Find the latest batch_generation for this location and those docs
+    batchGen = await activeDb.batch_generation.findFirst({
+      where: {
+        location_id,
+        itemtransactions: {
+          doc_id: { in: realStockingDocIds },
+        },
+      },
+      orderBy: { id: "desc" },
+    });
+    console.log("DEBUG: batchGen found", batchGen);
+  } else {
+    console.log("DEBUG: No realStockingDocIds found");
+  }
+  console.log("DEBUG: getLatestBatchGenerationForLocation END", { batchGen });
+  return batchGen;
 }

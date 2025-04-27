@@ -1,3 +1,4 @@
+"use client";
 import LocationComponent from "@/components/DailyFeedWeight/location-info";
 import * as feedingActions from "@/actions/feeding";
 import * as stockingActions from "@/actions/stocking";
@@ -6,6 +7,10 @@ import {
   calculationAndFeed,
   calculationAndFeedExtended,
 } from "@/types/app_types";
+import PriorityForm from "@/components/DailyFeedWeight/priority-form";
+import PercentFeedingForm from "@/components/DailyFeedWeight/percent-feeding-form";
+import { Modal, ModalContent } from "@nextui-org/react";
+import React, { useState } from "react";
 
 type LocationSummary = {
   uniqueItemId: number;
@@ -33,22 +38,27 @@ type Row = {
   rows?: subRow[];
 };
 
-interface DailyFeedWeightProps {
-  lines: {
+interface Feeding {
+  feedType: string;
+  feedName?: string;
+  feedId?: number;
+  feedings?: { [time: string]: { feeding?: string; editing?: string } };
+}
+
+interface FeedingInfo {
+  date: string;
+  locId: number;
+  locName: string;
+  rowCount?: number;
+  feedings?: Feeding[];
+  batch?: {
     id: number;
-    pools: {
-      id: number;
-      name: string;
-      percent_feeding: number | null;
-      locations: {
-        name: string;
-        id: number;
-      }[];
-    }[];
-  }[];
-  summary: {
-    [itemId: number]: LocationSummary;
+    name: string;
   };
+}
+
+interface DailyFeedWeightProps {
+  data: FeedingInfo[];
   items: {
     id: number;
     name: string;
@@ -57,13 +67,11 @@ interface DailyFeedWeightProps {
       name: string;
     } | null;
   }[];
-
   date: string;
 }
 
-export default async function DailyFeedWeight({
-  lines,
-  summary,
+export default function DailyFeedWeight({
+  data,
   items,
   date,
 }: DailyFeedWeightProps) {
@@ -71,148 +79,92 @@ export default async function DailyFeedWeight({
     "Lines data received in DailyFeedWeight:",
     JSON.stringify(lines, null, 2)
   );*/
-  const data: Row[] = [];
-
-  for (const line of lines) {
-    for (const pool of line.pools) {
-      for (const loc of pool.locations) {
-        // перевірка чи локація не пуста
-        const isPoolFilled = await feedingActions.isFilled(loc.id);
-
-        let todayCalcExtended: calculationAndFeedExtended | undefined;
-        let prevCalcExtended: calculationAndFeedExtended | undefined;
-
-        if (isPoolFilled) {
-          const todayCalc: calculationAndFeed | undefined =
-            await stockingActions.calculationForLocation(loc.id, date);
-          if (loc.id === 48) {
-            console.log(
-              `pool-id: ${pool.id} pool-name: ${pool.name} percent-feeding: ${pool.percent_feeding}`
-            );
-          }
-          if (todayCalc?.feed && todayCalc.feed.type_id) {
-            todayCalcExtended = {
-              ...todayCalc,
-              allItems: await actions.getAllItemsForFeedType(
-                todayCalc.feed.type_id
-              ),
-            };
-          }
-
-          if (todayCalc?.calc?.transition_day) {
-            const prevCalc = await stockingActions.getPrevCalc(
-              loc.id,
-              todayCalc
-            );
-
-            if (prevCalc && prevCalc.calc && prevCalc.feed?.type_id) {
-              prevCalcExtended = {
-                ...prevCalc,
-                allItems: await actions.getAllItemsForFeedType(
-                  prevCalc.feed?.type_id
-                ),
-              };
-            }
-          }
-        }
-
-        const transitionDay = todayCalcExtended?.calc?.transition_day;
-
-        let row: Row = {};
-
-        if (transitionDay && todayCalcExtended?.calc?.feed_per_feeding) {
-          row = {
-            location: {
-              id: loc.id,
-              name: loc.name,
-              percent_feeding:
-                pool.percent_feeding === null ||
-                pool.percent_feeding === undefined
-                  ? 0
-                  : pool.percent_feeding,
-            },
-            rows: [
-              {
-                qty:
-                  todayCalcExtended?.calc?.feed_per_feeding *
-                  (1 - transitionDay * 0.2),
-                feed: {
-                  id: prevCalcExtended?.feed?.type_id,
-                  name: prevCalcExtended?.feed?.type_name,
-                },
-                item: {
-                  id: prevCalcExtended?.feed?.item_id,
-                  name: items.find(
-                    (item) => item.id === prevCalcExtended?.feed?.item_id
-                  )?.name,
-                },
-              },
-              {
-                qty:
-                  todayCalcExtended?.calc?.feed_per_feeding *
-                  (transitionDay * 0.2),
-                feed: {
-                  id: todayCalcExtended?.feed?.type_id,
-                  name: todayCalcExtended?.feed?.type_name,
-                },
-                item: {
-                  id: prevCalcExtended?.feed?.item_id,
-                  name: items.find(
-                    (item) => item.id === todayCalcExtended?.feed?.item_id
-                  )?.name,
-                },
-              },
-            ],
-          };
-        } else {
-          row = {
-            location: {
-              id: loc.id,
-              name: loc.name,
-              percent_feeding:
-                pool.percent_feeding === null ? 0 : pool.percent_feeding,
-            },
-            rows: [
-              {
-                qty: todayCalcExtended?.calc?.feed_per_feeding,
-                feed: {
-                  id: todayCalcExtended?.feed?.type_id,
-                  name: todayCalcExtended?.feed?.type_name,
-                },
-                item: {
-                  id: prevCalcExtended?.feed?.item_id,
-                  name: items.find(
-                    (item) => item.id === todayCalcExtended?.feed?.item_id
-                  )?.name,
-                },
-              },
-            ],
-          };
-        }
-
-        data.push(row);
-      }
-    }
-  }
-
   const aggregatedData: { [key: string]: number } = {};
 
+  // Group data by locId and locName to merge feedings for the same location
+  const groupedData: FeedingInfo[] = [];
+  const locMap = new Map<string, FeedingInfo>();
+
   data.forEach((row) => {
-    const pf_: number = row.location?.percent_feeding || 0;
-    row.rows?.forEach((subRow) => {
-      const itemName = subRow.item.name;
-      const qty_ = (subRow.qty || 0) * (1 + pf_ / 100);
-      if (itemName !== undefined) {
+    if (!row.locId || !row.locName) return;
+    const key = `${row.locId}__${row.locName}`;
+    if (!locMap.has(key)) {
+      // Clone the row and initialize feedings array
+      locMap.set(key, { ...row, feedings: [...(row.feedings ?? [])] });
+    } else {
+      // Merge feedings into the existing entry
+      const existing = locMap.get(key)!;
+      existing.feedings = [
+        ...(existing.feedings ?? []),
+        ...(row.feedings ?? []),
+      ];
+      // Optionally, update rowCount if needed
+      if (row.rowCount && existing.rowCount) {
+        existing.rowCount += row.rowCount;
+      } else if (row.rowCount) {
+        existing.rowCount = row.rowCount;
+      }
+      // For other properties (batch, date, etc.), keep the first occurrence (do nothing)
+    }
+  });
+  groupedData.push(...Array.from(locMap.values()));
+
+  // Deduplicate feedings by feedType and feedName within each location
+  groupedData.forEach((row) => {
+    if (!row.feedings) return;
+    const feedingMap = new Map<string, Feeding>();
+    row.feedings.forEach((feeding) => {
+      const key = `${feeding.feedType}__${feeding.feedName}`;
+      if (!feedingMap.has(key)) {
+        // Clone the feeding object
+        feedingMap.set(key, {
+          ...feeding,
+          feedings: { ...(feeding.feedings ?? {}) },
+        });
+      } else {
+        // Merge feedings maps (by time slot)
+        const existing = feedingMap.get(key)!;
+        existing.feedings = {
+          ...existing.feedings,
+          ...(feeding.feedings ?? {}),
+        };
+      }
+    });
+    row.feedings = Array.from(feedingMap.values());
+  });
+
+  // Build summary table: only use the first feeding value per item per location
+  groupedData.forEach((row) => {
+    (row.feedings ?? []).forEach((feeding: Feeding) => {
+      const itemName = feeding.feedName;
+      let firstFeeding = "";
+      if (feeding.feedings) {
+        const first = Object.values(feeding.feedings).find(
+          (f) =>
+            f.feeding !== undefined && f.feeding !== null && f.feeding !== ""
+        );
+        if (first && first.feeding)
+          firstFeeding = parseFloat(first.feeding).toFixed(2);
+      }
+      if (itemName !== undefined && firstFeeding !== "") {
         if (!aggregatedData[itemName]) {
-          // Якщо item.name ще не існує, створюємо новий запис
-          aggregatedData[itemName] = qty_;
+          aggregatedData[itemName] = parseFloat(firstFeeding);
         } else {
-          // Якщо item.name вже існує, акумулюємо значення qty
-          aggregatedData[itemName] += qty_;
+          aggregatedData[itemName] += parseFloat(firstFeeding);
         }
       }
     });
   });
+
+  const [openPriority, setOpenPriority] = useState<null | {
+    itemName: string;
+    qty: number;
+  }>(null);
+  const [openPercent, setOpenPercent] = useState<null | {
+    locationName: string;
+    locationId: number;
+    percent: number | null;
+  }>(null);
 
   return (
     <>
@@ -234,24 +186,10 @@ export default async function DailyFeedWeight({
             </tr>
           </thead>
           <tbody>
-            {lines.map((line) =>
-              line.pools.map((pool) =>
-                pool.locations.flatMap((loc) => {
-                  const row = data.find((row) => row.location?.id == loc.id);
-                  let outthisline = 0;
-                  row?.rows?.map((row_) => {
-                    if (row_.item.name) {
-                      //console.log(`super item: ${row_.item.name}`);
-                      outthisline = 1;
-                    }
-                  });
-                  return (
-                    outthisline === 1 && (
-                      <LocationComponent key={loc.id} row={row} items={items} />
-                    )
-                  );
-                })
-              )
+            {groupedData.map((row) =>
+              row.feedings && row.feedings.length > 0 ? (
+                <LocationComponent key={row.locId} row={row} items={items} />
+              ) : null
             )}
           </tbody>
         </table>
@@ -266,7 +204,12 @@ export default async function DailyFeedWeight({
           <tbody>
             {Object.entries(aggregatedData).map(([itemName, qty]) => (
               <tr key={itemName}>
-                <td className="px-4 h-10 border border-gray-400">{itemName}</td>
+                <td
+                  className="px-4 h-10 border border-gray-400 cursor-pointer hover:underline"
+                  onClick={() => setOpenPriority({ itemName, qty })}
+                >
+                  {itemName}
+                </td>
                 <td className="px-4 h-10 border border-gray-400  text-right">
                   {qty.toFixed(2)}
                 </td>
@@ -275,6 +218,45 @@ export default async function DailyFeedWeight({
           </tbody>
         </table>
       </div>
+      {/* PriorityForm Modal */}
+      <Modal
+        isOpen={!!openPriority}
+        onClose={() => setOpenPriority(null)}
+        placement="top-center"
+      >
+        <ModalContent>
+          {() =>
+            openPriority && (
+              <PriorityForm
+                location={undefined}
+                items={items}
+                item={{
+                  qty: openPriority.qty,
+                  feed: { name: openPriority.itemName },
+                  item: { name: openPriority.itemName },
+                }}
+              />
+            )
+          }
+        </ModalContent>
+      </Modal>
+      {/* PercentFeedingForm Modal (for summary table, you may want to add a clickable cell for percent if you show it) */}
+      {/* Example: <td onClick={() => setOpenPercent({ locationName, locationId, percent })}>...</td> */}
+      {/* <Modal isOpen={!!openPercent} onClose={() => setOpenPercent(null)} placement="top-center">
+        <ModalContent>
+          {() =>
+            openPercent && (
+              <PercentFeedingForm
+                location={{
+                  id: openPercent.locationId,
+                  name: openPercent.locationName,
+                  percent_feeding: openPercent.percent,
+                }}
+              />
+            )
+          }
+        </ModalContent>
+      </Modal> */}
     </>
   );
 }

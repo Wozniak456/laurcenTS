@@ -262,6 +262,63 @@ export async function fishFetching(
           console.timeEnd("Promise.all - generation_feed_amount.create");
         }
 
+        // Update stocking record for the source pool
+        const remainingQuantity = fish_qty_in_location_from - fetching_quantity;
+
+        if (remainingQuantity > 0) {
+          // Calculate total weight removed based on all fishing types
+          const totalWeightRemoved =
+            ((commercial_fishing_amount || 0) *
+              (commercial_fishing_total_weight || 0)) /
+              (commercial_fishing_amount || 1) +
+            ((sorted_fishing_amount || 0) *
+              (sorted_fishing_total_weight || 0)) /
+              (sorted_fishing_amount || 1) +
+            ((growout_fishing_amount || 0) *
+              (growout_fishing_total_weight || 0)) /
+              (growout_fishing_amount || 1) +
+            ((more500_fishing_amount || 0) *
+              (more500_fishing_total_weight || 0)) /
+              (more500_fishing_amount || 1) +
+            ((less500_fishing_amount || 0) *
+              (less500_fishing_total_weight || 0)) /
+              (less500_fishing_amount || 1);
+
+          // Calculate new average weight for remaining fish
+          const remainingTotalWeight =
+            fish_qty_in_location_from * average_fish_mass - totalWeightRemoved;
+          const newAverageWeight = remainingTotalWeight / remainingQuantity;
+
+          // Create new stocking record for the source pool
+          const newStockingDoc = await prisma.documents.create({
+            data: {
+              location_id: location_id_from,
+              doc_type_id: 1, // doc_type_id for stocking
+              date_time: new Date(today),
+              executed_by: executed_by,
+            },
+          });
+
+          // Create stocking record
+          await prisma.stocking.create({
+            data: {
+              doc_id: newStockingDoc.id,
+              average_weight: newAverageWeight,
+            },
+          });
+
+          // Create itemtransaction for the new stocking
+          await prisma.itemtransactions.create({
+            data: {
+              doc_id: newStockingDoc.id,
+              location_id: location_id_from,
+              batch_id: batch_id_from,
+              quantity: remainingQuantity,
+              unit_id: 1,
+            },
+          });
+        }
+
         formData.set(
           "fish_amount",
           String(fish_qty_in_location_from - fetching_quantity)

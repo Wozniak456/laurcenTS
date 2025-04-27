@@ -15,9 +15,10 @@ import {
 import FormButton from "./common/form-button";
 import { useFormState } from "react-dom";
 import * as actions from "@/actions";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FetchingReasons } from "@/types/fetching-reasons";
 import { poolManagingType } from "@/types/app_types";
+import { toast } from "sonner";
 
 interface FetchingFormProps {
   location: {
@@ -83,6 +84,110 @@ export default function FetchingForm({
     number | undefined
   >(undefined);
 
+  const [selectedLocationId, setSelectedLocationId] = useState<
+    number | undefined
+  >(undefined);
+
+  const validateForm = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const errors: string[] = [];
+
+    // Special validation for GrowOut (Доріст) - needs all three fields if any is filled
+    if (growOutAmount) {
+      if (!growOutWeight) {
+        errors.push(`Для "Доріст" потрібно вказати загальну масу`);
+      }
+      if (!selectedLocationId) {
+        errors.push(`Для "Доріст" потрібно вибрати басейн`);
+      }
+    }
+
+    // Check each pair of quantity and weight for other types
+    const validationPairs = [
+      {
+        amount: commercialFishingAmount,
+        weight: commercialFishingWeight,
+        name: "Вилов. товарна",
+      },
+      {
+        amount: sortedAmount,
+        weight: sortedWeight,
+        name: "Відсортована",
+      },
+      {
+        amount: moreThan500Amount,
+        weight: moreThan500Weight,
+        name: "> 500",
+      },
+      {
+        amount: lessThan500Amount,
+        weight: lessThan500Weight,
+        name: "< 500",
+      },
+    ];
+
+    for (const pair of validationPairs) {
+      if ((pair.amount && !pair.weight) || (!pair.amount && pair.weight)) {
+        errors.push(`Для "${pair.name}" потрібно вказати і кількість, і вагу`);
+      }
+    }
+
+    if (errors.length > 0) {
+      // Show all errors in a single toast with custom styling
+      toast.error(
+        <div className="flex flex-col gap-2">
+          {errors.map((error, index) => (
+            <div
+              key={index}
+              className="p-1 border-b border-red-200 last:border-0"
+              style={{
+                animation: `fadeOut 2s ease ${(index + 1) * 2}s forwards`,
+              }}
+            >
+              {error}
+            </div>
+          ))}
+        </div>,
+        {
+          duration: (errors.length + 1) * 2000,
+          style: {
+            backgroundColor: "rgb(254 226 226)",
+            color: "rgb(185 28 28)",
+            minWidth: "320px",
+          },
+        }
+      );
+      return; // Stop here if there are validation errors
+    }
+
+    // If validation passes, get the form element and submit using the server action
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+    const result = await actions.fishFetching(undefined, formData);
+
+    if (result?.message) {
+      toast.error(result.message);
+    } else {
+      onClose(); // Close the modal on success
+    }
+  };
+
+  // Add the animation style to the component
+  useEffect(() => {
+    const style = document.createElement("style");
+    style.textContent = `
+      @keyframes fadeOut {
+        0% { opacity: 1; }
+        100% { opacity: 0; height: 0; margin: 0; padding: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+
   return (
     <div>
       <Button onPress={onOpen} color="default">
@@ -102,7 +207,7 @@ export default function FetchingForm({
                 <p>Тиждень: {weekNum}</p>
               </ModalHeader>
               <ModalBody>
-                <form action={action}>
+                <form onSubmit={validateForm}>
                   <div className="flex gap-4 mb-8 flex-wrap w-full justify-around">
                     <input
                       type="hidden"
@@ -234,7 +339,13 @@ export default function FetchingForm({
                             min={0.0001}
                             step="any"
                           />
-                          <Select label="Басейн" name="location_id">
+                          <Select
+                            label="Басейн"
+                            name="location_id"
+                            onChange={(e) => {
+                              setSelectedLocationId(Number(e.target.value));
+                            }}
+                          >
                             {locations.map((loc) => (
                               <SelectItem
                                 key={Number(loc.id)}
