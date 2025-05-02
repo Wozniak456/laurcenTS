@@ -5,9 +5,15 @@ import { revalidatePath } from "next/cache";
 export async function checkLaterTransactions(
   locationId: number,
   date: string,
-  feedId?: number
+  feedId?: number,
+  isZeroFeeding?: boolean
 ) {
   try {
+    // If this is a zero feeding, allow it regardless of later transactions
+    if (isZeroFeeding) {
+      return true;
+    }
+
     const checkDate = new Date(date);
     checkDate.setUTCHours(23, 59, 59, 999);
 

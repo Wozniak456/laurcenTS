@@ -123,6 +123,9 @@ export async function feedBatch(
     );
     process.stdout.write(`Total quantity needed: ${totalQtyNeeded}\n`);
 
+    // Check if this is a zero feeding
+    const isZeroFeeding = totalQtyNeeded === 0;
+
     // Check if we have enough stock only if we need some feed
     if (totalQtyNeeded > 0) {
       const availableBatches = await getFeedBatchByItemId(

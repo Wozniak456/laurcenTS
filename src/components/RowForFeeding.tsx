@@ -302,6 +302,13 @@ export default function RowForFeeding({
         setButtonMode(true);
         const formData = new FormData(formElement);
 
+        // Check if all feeding values are zero
+        const allValuesZero = times.every((time) => {
+          const hours = parseInt(time.time.split(":")[0]);
+          const value = formData.get(`time_${hours}`) as string;
+          return value === "0.0" || value === "0" || !value;
+        });
+
         // Call the server action directly instead of using the form
         const response = await actions.feedBatch({ message: "" }, formData);
         console.warn("Server response:", response);
