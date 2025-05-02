@@ -89,6 +89,7 @@ export async function stockPool(
     }
 
     // документ зариблення
+    const parent_document = formData.get("division_doc_id");
     const date = addCurrentTimeToDate(new Date(today));
 
     // Find all documents for this location and date, ordered by time
@@ -132,6 +133,9 @@ export async function stockPool(
         date_time: date,
         executed_by: executed_by,
         comments: comments,
+        parent_document: parent_document
+          ? BigInt(parent_document as string)
+          : undefined,
       },
     });
 
@@ -280,12 +284,20 @@ export async function stockPool(
                 const fetch_record =
                   await activeDb.generation_feed_amount.create({
                     data: {
-                      batch_generation_id: record.batch_generation_id,
                       amount: -record.total_amount * part,
-                      feed_batch_id: record.feed_batch_id,
                       batch_generation: {
                         connect: {
                           id: record.batch_generation_id,
+                        },
+                      },
+                      feed_batches: {
+                        connect: {
+                          id: record.feed_batch_id,
+                        },
+                      },
+                      documents: {
+                        connect: {
+                          id: stockDoc.id,
                         },
                       },
                     },
@@ -296,12 +308,20 @@ export async function stockPool(
                 const push_record =
                   await activeDb.generation_feed_amount.create({
                     data: {
-                      batch_generation_id: generationOfTwoBatches.id,
                       amount: record.total_amount * part,
-                      feed_batch_id: record.feed_batch_id,
                       batch_generation: {
                         connect: {
                           id: generationOfTwoBatches.id,
+                        },
+                      },
+                      feed_batches: {
+                        connect: {
+                          id: record.feed_batch_id,
+                        },
+                      },
+                      documents: {
+                        connect: {
+                          id: stockDoc.id,
                         },
                       },
                     },
@@ -332,17 +352,43 @@ export async function stockPool(
         for (const record of grouped_second_ancestor) {
           const fetch_record = await activeDb.generation_feed_amount.create({
             data: {
-              batch_generation_id: record.batch_generation_id,
               amount: -record.total_amount,
-              feed_batch_id: record.feed_batch_id,
+              batch_generation: {
+                connect: {
+                  id: record.batch_generation_id,
+                },
+              },
+              feed_batches: {
+                connect: {
+                  id: record.feed_batch_id,
+                },
+              },
+              documents: {
+                connect: {
+                  id: stockDoc.id,
+                },
+              },
             },
           });
           // і вкидання у нове покоління
           const push_record = await activeDb.generation_feed_amount.create({
             data: {
-              batch_generation_id: generationOfTwoBatches.id,
               amount: record.total_amount,
-              feed_batch_id: record.feed_batch_id,
+              batch_generation: {
+                connect: {
+                  id: generationOfTwoBatches.id,
+                },
+              },
+              feed_batches: {
+                connect: {
+                  id: record.feed_batch_id,
+                },
+              },
+              documents: {
+                connect: {
+                  id: stockDoc.id,
+                },
+              },
             },
           });
 

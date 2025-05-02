@@ -181,6 +181,8 @@ export async function batchDivision(
         String(last_stocking?.quantity)
       ); //скільки у новому басейні
 
+      // Set division_doc_id for use as parent_document in stockPool
+      formData.set("division_doc_id", String(divDoc.id));
       await stockPool(formState, formData);
 
       index0++;
