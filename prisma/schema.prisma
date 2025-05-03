@@ -347,6 +347,7 @@ model stocking {
   id             Int       @id @default(autoincrement())
   doc_id         BigInt
   average_weight Float
+  form_average_weight Float?
   documents      documents @relation(fields: [doc_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 

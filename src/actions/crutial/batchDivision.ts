@@ -114,6 +114,13 @@ export async function batchDivision(
             doc_type_id: 1,
           },
         },
+        include: {
+          documents: {
+            include: {
+              stocking: true,
+            },
+          },
+        },
         orderBy: {
           id: "desc",
         },
@@ -185,8 +192,30 @@ export async function batchDivision(
       formData.set("division_doc_id", String(divDoc.id));
 
       // Set the correct average_fish_mass for this destination
-      const avgWeight = formData.get(`average_fish_mass_${index0}`);
-      formData.set("average_fish_mass", avgWeight ? String(avgWeight) : "");
+      let avgWeight = formData.get(`average_fish_mass_${index0}`);
+      let calculatedAvgWeight = avgWeight ? parseFloat(avgWeight as string) : 0;
+      const lastAvg = last_stocking?.documents?.stocking?.[0]?.average_weight;
+      if (
+        last_stocking &&
+        last_stocking.quantity > 0 &&
+        lastAvg !== undefined
+      ) {
+        const currentQty = last_stocking.quantity;
+        const transferQty = stocking_fish_amount;
+        const formAvg = avgWeight ? parseFloat(avgWeight as string) : 0;
+        const newQty = currentQty + transferQty;
+        if (newQty > 0) {
+          calculatedAvgWeight =
+            (currentQty * lastAvg + transferQty * formAvg) / newQty;
+        } else {
+          calculatedAvgWeight = formAvg;
+        }
+      }
+      formData.set("average_fish_mass", calculatedAvgWeight.toString()); // weighted value
+      formData.set(
+        "form_average_weight",
+        avgWeight ? avgWeight.toString() : ""
+      ); // original form value
 
       await stockPool(formState, formData);
 

@@ -52,6 +52,12 @@ export async function stockPool(
     );
     const average_weight_str = formData.get("average_fish_mass") as string;
     const average_weight = parseFloat(average_weight_str.replace(",", "."));
+    const form_average_weight_str = formData.get(
+      "form_average_weight"
+    ) as string;
+    const form_average_weight = form_average_weight_str
+      ? parseFloat(form_average_weight_str.replace(",", "."))
+      : null;
 
     const executed_by = 3; //number = parseInt(formData.get('executed_by') as string);
     const comments: string = formData.get("comments") as string;
@@ -400,18 +406,25 @@ export async function stockPool(
       console.log("huh3?");
     }
 
-    const stock = await activeDb.stocking.create({
-      data: {
-        doc_id: stockDoc.id,
-        average_weight: average_weight,
-      },
-    });
-
-    if (!stockTran) {
-      throw new Error("Помилка при створенні запису зариблення");
+    // Prepare form_average_weight for stocking.create
+    let stockingData: any = {
+      doc_id: stockDoc.id,
+      average_weight: average_weight,
+    };
+    if (form_average_weight !== null && !isNaN(form_average_weight)) {
+      stockingData.form_average_weight = form_average_weight;
     }
-
-    console.log("Створюємо stocking: ", stock.id);
+    console.log("About to create stocking with data:", stockingData);
+    let stock;
+    try {
+      stock = await activeDb.stocking.create({
+        data: stockingData,
+      });
+      console.log("Created stocking:", stock);
+    } catch (err) {
+      console.error("Error creating stocking:", err);
+      throw err;
+    }
 
     // тепер fish_amount це вся риба, яку зариблюємо.
     formData.set("fish_amount", String(count_to_stock));
