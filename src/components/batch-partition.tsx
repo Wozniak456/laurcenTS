@@ -33,12 +33,17 @@ export default function PartitionFormPage({
   today,
 }: PartitionFormPageProps) {
   const [selectedPools, setSelectedPools] = useState<(number | null)[]>([]);
+  const [lineWeights, setLineWeights] = useState<{ [key: number]: number }>({});
   const [formState, action] = useFormState(actions.batchDivision, {
     message: "",
   });
 
   const handleDeleteButton = (index: number) => {
     setSelectedPools(selectedPools.filter((item) => item !== index));
+    // Remove the weight for the deleted line
+    const newWeights = { ...lineWeights };
+    delete newWeights[index];
+    setLineWeights(newWeights);
   };
 
   const handlePoolChange = (index: number) => {
@@ -53,6 +58,16 @@ export default function PartitionFormPage({
 
         return uniqueSelectedPools;
       });
+    };
+  };
+
+  const handleWeightChange = (index: number) => {
+    return (e: React.ChangeEvent<HTMLInputElement>) => {
+      const weight = parseFloat(e.target.value);
+      setLineWeights((prev) => ({
+        ...prev,
+        [index]: weight,
+      }));
     };
   };
 
@@ -90,68 +105,54 @@ export default function PartitionFormPage({
 
           {selectedPools.map((selectedPoolId, index) => {
             return (
-              <div key={index} className="flex mb-4">
-                <div className="flex w-[34px]">
-                  <button
-                    className={`hover:bg-red-100 mr-2 rounded ${
-                      !selectedPoolId ? "hidden" : ""
-                    } `}
-                    onClick={() => {
-                      if (selectedPoolId !== null) {
-                        handleDeleteButton(selectedPoolId);
-                      }
-                    }}
-                    type="button"
-                  >
-                    <Image
-                      src={deleteImg}
-                      alt="Delete"
-                      width={30}
-                      height={30}
-                      className=""
-                    />
-                  </button>
-                </div>
-                <div className="flex flex-wrap items-center gap-2 justify-between w-full">
-                  <div className="w-1/2">
-                    <Select
-                      label="Басейн:"
-                      name={`location_id_to_${index}`}
-                      isRequired
-                      onChange={handlePoolChange(index)}
-                    >
-                      {locations
-                        .filter((location) => location.location_type_id === 2)
-                        .sort((a, b) => a.id - b.id)
-                        .map((location, index) => (
-                          <SelectItem key={location.id} value={location.id}>
-                            {location.name}
-                          </SelectItem>
-                        ))}
-                    </Select>
-                  </div>
-                  <div className="w-2/5">
-                    <Input
-                      placeholder="Кількість:"
-                      name={`stocking_fish_amount_${index}`}
-                      type="number"
-                      min={1}
-                      isRequired
-                    />
-                  </div>
-                </div>
+              <div
+                key={index}
+                className="flex flex-row items-center gap-2 mb-4"
+              >
+                <button
+                  className="hover:bg-red-100 mr-2 rounded"
+                  onClick={() => handleDeleteButton(index)}
+                  type="button"
+                >
+                  <Image src={deleteImg} alt="Delete" width={30} height={30} />
+                </button>
+                <Select
+                  label="Басейн:"
+                  name={`location_id_to_${index}`}
+                  isRequired
+                  onChange={handlePoolChange(index)}
+                  className="w-1/4"
+                >
+                  {locations
+                    .filter((location) => location.location_type_id === 2)
+                    .sort((a, b) => a.id - b.id)
+                    .map((location) => (
+                      <SelectItem key={location.id} value={location.id}>
+                        {location.name}
+                      </SelectItem>
+                    ))}
+                </Select>
+                <Input
+                  placeholder="Кількість:"
+                  name={`stocking_fish_amount_${index}`}
+                  type="number"
+                  min={1}
+                  isRequired
+                  className="w-1/4"
+                />
+                <Input
+                  placeholder="Сер. вага:"
+                  name={`average_fish_mass_${index}`}
+                  type="number"
+                  min={1}
+                  isRequired
+                  value={lineWeights[index]?.toString() || ""}
+                  onChange={handleWeightChange(index)}
+                  className="w-1/4"
+                />
               </div>
             );
           })}
-          {selectedPools.length > 0 && (
-            <Input
-              placeholder="Сер. вага:"
-              name="average_fish_mass"
-              type="number"
-              min={1}
-              isRequired
-            />
-          )}
         </div>
 
         <div className="flex justify-around m-4 w-full">

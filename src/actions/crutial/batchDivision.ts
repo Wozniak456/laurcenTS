@@ -183,7 +183,15 @@ export async function batchDivision(
 
       // Set division_doc_id for use as parent_document in stockPool
       formData.set("division_doc_id", String(divDoc.id));
+
+      // Set the correct average_fish_mass for this destination
+      const avgWeight = formData.get(`average_fish_mass_${index0}`);
+      formData.set("average_fish_mass", avgWeight ? String(avgWeight) : "");
+
       await stockPool(formState, formData);
+
+      // Clean up for next iteration
+      formData.delete("average_fish_mass");
 
       index0++;
     }
