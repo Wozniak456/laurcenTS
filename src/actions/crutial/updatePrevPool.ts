@@ -52,12 +52,12 @@ export async function updatePrevPool({
       doc_type_id: 1,
       date_time: addCurrentTimeToDate(new Date(today)),
       executed_by: 3,
+      parent_document: info.divDocId,
     },
   });
   console.log("документ зариблення залишком", stockDoc);
 
   //транзакція витягування що там є за документом розподілу
-
   const fetchTran = await activeDb.itemtransactions.create({
     data: {
       doc_id: stockDoc.id,
@@ -73,7 +73,6 @@ export async function updatePrevPool({
   );
 
   //транзакція зариблення тої ж кількості за документом зариблення
-
   const stockTran = await activeDb.itemtransactions.create({
     data: {
       doc_id: stockDoc.id,
@@ -88,17 +87,33 @@ export async function updatePrevPool({
     stockTran
   );
 
+  // створення batch_generation для цієї операції
+  // знайти попередній batch_generation для цієї локації
+  const prevBatchGen = await activeDb.batch_generation.findFirst({
+    where: {
+      location_id: location_id,
+    },
+    orderBy: { id: "desc" },
+  });
+
+  const newBatchGen = await activeDb.batch_generation.create({
+    data: {
+      location_id: location_id,
+      initial_batch_id: batch_id,
+      first_parent_id: prevBatchGen?.id,
+      transaction_id: stockTran.id,
+    },
+  });
+  console.log("створено batch_generation", newBatchGen);
+
   //створення запису в stocking
-
   console.log("av_weight", av_weight);
-
   const stocking = await activeDb.stocking.create({
     data: {
       doc_id: stockDoc.id,
       average_weight: av_weight,
     },
   });
-
   console.log("створення запису в stocking", stocking);
 
   //створення калькуляції

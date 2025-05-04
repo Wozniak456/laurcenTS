@@ -95,7 +95,7 @@ export async function stockPool(
     }
 
     // документ зариблення
-    const parent_document = formData.get("division_doc_id");
+    const parent_document = formData.get("parent_document");
     const date = addCurrentTimeToDate(new Date(today));
 
     // Find all documents for this location and date, ordered by time
@@ -238,8 +238,8 @@ export async function stockPool(
     }
     console.log(`Зариблюємо ${location_id_to}. Tran: `, stockTran);
 
-    // Only create batch generation and handle feed amounts if locations are different
-    if (location_id_from !== location_id_to) {
+    // Create batch generation if we have a parent document or if locations are different
+    if (parent_document || location_id_from !== location_id_to) {
       // створити покоління змішування партії
       const generationOfTwoBatches = await activeDb.batch_generation.create({
         data: {
@@ -253,153 +253,158 @@ export async function stockPool(
 
       console.log("????generationOfTwoBatches", generationOfTwoBatches);
 
-      if (first_parent_generation) {
-        // знаходимо скільки зїв перший предок
-        const grouped_first_ancestor = await getFeedAmountsAndNames(
-          first_parent_generation?.id,
-          prisma
-        );
-        console.log("grouped_first_ancestor", grouped_first_ancestor);
+      // Handle feed amounts only if locations are different
+      if (location_id_from !== location_id_to) {
+        if (first_parent_generation) {
+          // знаходимо скільки зїв перший предок
+          const grouped_first_ancestor = await getFeedAmountsAndNames(
+            first_parent_generation?.id,
+            prisma
+          );
+          console.log("grouped_first_ancestor", grouped_first_ancestor);
 
-        //знаходимо який відсоток ми переміщаємо
-        console.log(
-          "stocking_quantity",
-          stocking_quantity,
-          "fish_qty_in_location_from",
-          fish_qty_in_location_from
-        );
-        if (!Number.isNaN(fish_qty_in_location_from)) {
-          if (fish_qty_in_location_from > 0) {
-            const part = stocking_quantity / fish_qty_in_location_from;
-            console.log("Calculated part:", part);
-            console.log(
-              "Number of records to process:",
-              grouped_first_ancestor.length
-            );
-            for (const record of grouped_first_ancestor) {
-              console.log("Processing record:", {
-                batch_generation_id: record.batch_generation_id,
-                total_amount: record.total_amount,
-                feed_batch_id: record.feed_batch_id,
-                calculated_amount: record.total_amount * part,
-              });
-              try {
-                const fetch_record =
-                  await activeDb.generation_feed_amount.create({
-                    data: {
-                      amount: -record.total_amount * part,
-                      batch_generation: {
-                        connect: {
-                          id: record.batch_generation_id,
+          //знаходимо який відсоток ми переміщаємо
+          console.log(
+            "stocking_quantity",
+            stocking_quantity,
+            "fish_qty_in_location_from",
+            fish_qty_in_location_from
+          );
+          if (!Number.isNaN(fish_qty_in_location_from)) {
+            if (fish_qty_in_location_from > 0) {
+              const part = stocking_quantity / fish_qty_in_location_from;
+              console.log("Calculated part:", part);
+              console.log(
+                "Number of records to process:",
+                grouped_first_ancestor.length
+              );
+              for (const record of grouped_first_ancestor) {
+                console.log("Processing record:", {
+                  batch_generation_id: record.batch_generation_id,
+                  total_amount: record.total_amount,
+                  feed_batch_id: record.feed_batch_id,
+                  calculated_amount: record.total_amount * part,
+                });
+                try {
+                  const fetch_record =
+                    await activeDb.generation_feed_amount.create({
+                      data: {
+                        amount: -record.total_amount * part,
+                        batch_generation: {
+                          connect: {
+                            id: record.batch_generation_id,
+                          },
+                        },
+                        feed_batches: {
+                          connect: {
+                            id: record.feed_batch_id,
+                          },
+                        },
+                        documents: {
+                          connect: {
+                            id: stockDoc.id,
+                          },
                         },
                       },
-                      feed_batches: {
-                        connect: {
-                          id: record.feed_batch_id,
-                        },
-                      },
-                      documents: {
-                        connect: {
-                          id: stockDoc.id,
-                        },
-                      },
-                    },
-                  });
-                console.log("Created fetch record:", fetch_record);
+                    });
+                  console.log("Created fetch record:", fetch_record);
 
-                // І вкидання у нову локацію
-                const push_record =
-                  await activeDb.generation_feed_amount.create({
-                    data: {
-                      amount: record.total_amount * part,
-                      batch_generation: {
-                        connect: {
-                          id: generationOfTwoBatches.id,
+                  // І вкидання у нову локацію
+                  const push_record =
+                    await activeDb.generation_feed_amount.create({
+                      data: {
+                        amount: record.total_amount * part,
+                        batch_generation: {
+                          connect: {
+                            id: generationOfTwoBatches.id,
+                          },
+                        },
+                        feed_batches: {
+                          connect: {
+                            id: record.feed_batch_id,
+                          },
+                        },
+                        documents: {
+                          connect: {
+                            id: stockDoc.id,
+                          },
                         },
                       },
-                      feed_batches: {
-                        connect: {
-                          id: record.feed_batch_id,
-                        },
-                      },
-                      documents: {
-                        connect: {
-                          id: stockDoc.id,
-                        },
-                      },
-                    },
-                  });
-                console.log("Created push record:", push_record);
+                    });
+                  console.log("Created push record:", push_record);
 
-                console.log(
-                  `витягнули частку з'їдженого: ${fetch_record.feed_batch_id}: ${fetch_record.amount}. І накинули на ${push_record.batch_generation_id}`
-                );
-              } catch (error) {
-                console.error("Error creating feed amount records:", error);
-                throw error;
+                  console.log(
+                    `витягнули частку з'їдженого: ${fetch_record.feed_batch_id}: ${fetch_record.amount}. І накинули на ${push_record.batch_generation_id}`
+                  );
+                } catch (error) {
+                  console.error("Error creating feed amount records:", error);
+                  throw error;
+                }
               }
             }
           }
-        }
 
-        if (second_parent_generation) {
-          console.log("huh2?");
-          // знаходимо скільки зїв другий предок, якщо він є
-          const grouped_second_ancestor = await getFeedAmountsAndNames(
-            second_parent_generation?.id
-          );
-          console.log("grouped_second_ancestor", grouped_second_ancestor);
-
-          //додаємо записи витягування частини зїдженого з попереднього покоління
-          for (const record of grouped_second_ancestor) {
-            const fetch_record = await activeDb.generation_feed_amount.create({
-              data: {
-                amount: -record.total_amount,
-                batch_generation: {
-                  connect: {
-                    id: record.batch_generation_id,
-                  },
-                },
-                feed_batches: {
-                  connect: {
-                    id: record.feed_batch_id,
-                  },
-                },
-                documents: {
-                  connect: {
-                    id: stockDoc.id,
-                  },
-                },
-              },
-            });
-            // і вкидання у нове покоління
-            const push_record = await activeDb.generation_feed_amount.create({
-              data: {
-                amount: record.total_amount,
-                batch_generation: {
-                  connect: {
-                    id: generationOfTwoBatches.id,
-                  },
-                },
-                feed_batches: {
-                  connect: {
-                    id: record.feed_batch_id,
-                  },
-                },
-                documents: {
-                  connect: {
-                    id: stockDoc.id,
-                  },
-                },
-              },
-            });
-
-            console.log(
-              `витягнули частку зЇдженого: ${fetch_record.feed_batch_id}: ${fetch_record.amount}. і накинули на ${push_record.batch_generation_id}`
+          if (second_parent_generation) {
+            console.log("huh2?");
+            // знаходимо скільки зїв другий предок, якщо він є
+            const grouped_second_ancestor = await getFeedAmountsAndNames(
+              second_parent_generation?.id
             );
+            console.log("grouped_second_ancestor", grouped_second_ancestor);
+
+            //додаємо записи витягування частини зїдженого з попереднього покоління
+            for (const record of grouped_second_ancestor) {
+              const fetch_record = await activeDb.generation_feed_amount.create(
+                {
+                  data: {
+                    amount: -record.total_amount,
+                    batch_generation: {
+                      connect: {
+                        id: record.batch_generation_id,
+                      },
+                    },
+                    feed_batches: {
+                      connect: {
+                        id: record.feed_batch_id,
+                      },
+                    },
+                    documents: {
+                      connect: {
+                        id: stockDoc.id,
+                      },
+                    },
+                  },
+                }
+              );
+              // і вкидання у нове покоління
+              const push_record = await activeDb.generation_feed_amount.create({
+                data: {
+                  amount: record.total_amount,
+                  batch_generation: {
+                    connect: {
+                      id: generationOfTwoBatches.id,
+                    },
+                  },
+                  feed_batches: {
+                    connect: {
+                      id: record.feed_batch_id,
+                    },
+                  },
+                  documents: {
+                    connect: {
+                      id: stockDoc.id,
+                    },
+                  },
+                },
+              });
+
+              console.log(
+                `витягнули частку зЇдженого: ${fetch_record.feed_batch_id}: ${fetch_record.amount}. і накинули на ${push_record.batch_generation_id}`
+              );
+            }
           }
+          console.log("huh3?");
         }
-        console.log("huh3?");
       }
     }
     // Prepare form_average_weight for stocking.create

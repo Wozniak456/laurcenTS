@@ -188,8 +188,8 @@ export async function batchDivision(
         String(last_stocking?.quantity)
       ); //скільки у новому басейні
 
-      // Set division_doc_id for use as parent_document in stockPool
-      formData.set("division_doc_id", String(divDoc.id));
+      // Set parent_document for use in stockPool
+      formData.set("parent_document", String(divDoc.id));
 
       // Set the correct average_fish_mass for this destination
       let avgWeight = formData.get(`average_fish_mass_${index0}`);

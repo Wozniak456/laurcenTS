@@ -5,6 +5,7 @@ import { getFeedAmountsAndNames } from "./getFeedAmountsAndNames";
 import { updatePrevPool } from "./updatePrevPool";
 import { FetchingReasons } from "@/types/fetching-reasons";
 import { stockPool } from "@/actions";
+import { createCalcTable } from "./createCalcTable";
 
 type updatePrevPoolProps = {
   formData: FormData;
@@ -115,6 +116,8 @@ export async function fishFetching(
     },
   ];
 
+  let growoutProcessed = false;
+
   // Виконання транзакції
   const result = await db.$transaction(
     async (prisma) => {
@@ -139,59 +142,141 @@ export async function fishFetching(
         console.log(`\n документ вилову для ${location_id_from}`, fetchDoc.id);
 
         for (const { amount, total_weight, reason } of fishingData) {
-          if (amount) {
-            console.time(`createFishingTransaction - reason: ${reason}`);
-            const result = await createFishingTransaction(
-              prisma,
-              Number(fetchDoc.id),
-              location_id_from,
-              88,
-              batch_id_from,
-              amount,
-              1,
-              reason,
-              total_weight,
-              week_num
-            );
-            console.log("Транзакція успішно завершена:", result);
-            console.timeEnd(`createFishingTransaction - reason: ${reason}`);
-          }
-          console.log("Reason = ", reason);
-          if (reason === FetchingReasons.GrowOut && amount) {
-            console.time("findFirst last_stocking");
-            const last_stocking = await prisma.itemtransactions.findFirst({
-              where: {
-                location_id: location_id_to,
-                documents: {
-                  doc_type_id: 1,
+          if (!amount) continue;
+
+          if (reason === FetchingReasons.GrowOut) {
+            // GROWOUT LOGIC
+            if (location_id_from === location_id_to) {
+              // Only create a withdrawal transaction, stocking doc, and fetching record
+              const fetchTran = await prisma.itemtransactions.create({
+                data: {
+                  doc_id: fetchDoc.id,
+                  location_id: location_id_from,
+                  batch_id: batch_id_from,
+                  quantity: -amount,
+                  unit_id: 1,
                 },
-              },
-              orderBy: {
-                id: "desc",
-              },
-            });
-            console.timeEnd("findFirst last_stocking");
+              });
 
-            console.log("last_stocking", last_stocking);
+              // Create a stocking document for the same pool
+              const stockDoc = await prisma.documents.create({
+                data: {
+                  location_id: location_id_from,
+                  doc_type_id: 1,
+                  date_time: addCurrentTimeToDate(new Date(today)),
+                  executed_by: executed_by,
+                  parent_document: fetchDoc.id,
+                },
+              });
 
-            formData.delete("location_id_to");
-            formData.set("location_id_to", String(location_id_to));
-            formData.set("fish_amount", String(growout_fishing_amount));
-            formData.set("batch_id_to", String(last_stocking?.batch_id));
-            formData.set(
-              "fish_amount_in_location_to",
-              String(last_stocking?.quantity)
-            );
-            formData.delete("average_fish_mass");
-            formData.set(
-              "average_fish_mass",
-              String(growout_fishing_total_weight / growout_fishing_amount)
-            );
+              // Create a positive transaction in the new stocking doc
+              const stockTran = await prisma.itemtransactions.create({
+                data: {
+                  doc_id: stockDoc.id,
+                  location_id: location_id_from,
+                  batch_id: batch_id_from,
+                  quantity: amount,
+                  unit_id: 1,
+                },
+              });
 
-            console.time("stockPool");
-            await stockPool(formState, formData, prisma);
-            console.timeEnd("stockPool");
+              // Set average_weight and form_average_weight from the form
+              const avgWeight =
+                growout_fishing_total_weight / growout_fishing_amount;
+              await prisma.stocking.create({
+                data: {
+                  doc_id: stockDoc.id,
+                  average_weight: avgWeight,
+                  form_average_weight: avgWeight,
+                },
+              });
+
+              // Create batch_generation for this stocking event
+              const prevBatchGen = await prisma.batch_generation.findFirst({
+                where: { location_id: location_id_from },
+                orderBy: { id: "desc" },
+              });
+              await prisma.batch_generation.create({
+                data: {
+                  location_id: location_id_from,
+                  initial_batch_id: batch_id_from,
+                  first_parent_id: prevBatchGen?.id,
+                  transaction_id: stockTran.id,
+                },
+              });
+
+              // Create a fetching record referencing the withdrawal transaction
+              await prisma.fetching.create({
+                data: {
+                  tran_id: fetchTran.id,
+                  fetching_reason: reason,
+                  total_weight: total_weight,
+                  weekNumber: week_num,
+                },
+              });
+
+              // Create feeding calculation (calc table)
+              formData.set("parent_doc", String(stockDoc.id));
+              formData.set("fish_amount", String(amount));
+              formData.set("location_id_to", String(location_id_from));
+              formData.set("average_fish_mass", String(avgWeight));
+              await createCalcTable(formState, formData, prisma);
+
+              // Set flag to prevent updatePrevPool
+              growoutProcessed = true;
+              continue;
+            } else {
+              // GrowOut to a different pool: use division/transfer logic, but do NOT create a transaction to location 88
+              // Prepare data for stockPool
+              const last_stocking = await prisma.itemtransactions.findFirst({
+                where: {
+                  location_id: location_id_to,
+                  documents: {
+                    doc_type_id: 1,
+                  },
+                },
+                orderBy: {
+                  id: "desc",
+                },
+              });
+
+              formData.delete("location_id_to");
+              formData.set("location_id_to", String(location_id_to));
+              formData.set("fish_amount", String(growout_fishing_amount));
+              formData.set("batch_id_to", String(last_stocking?.batch_id));
+              formData.set(
+                "fish_amount_in_location_to",
+                String(last_stocking?.quantity)
+              );
+              formData.delete("average_fish_mass");
+              formData.set(
+                "average_fish_mass",
+                String(growout_fishing_total_weight / growout_fishing_amount)
+              );
+              formData.set("parent_document", String(fetchDoc.id));
+              formData.set("doc_type_id", "2"); // division/transfer
+
+              await stockPool(formState, formData, prisma);
+              continue;
+            }
           }
+
+          // DEFAULT LOGIC for all other reasons (transaction to location 88)
+          console.time(`createFishingTransaction - reason: ${reason}`);
+          const result = await createFishingTransaction(
+            prisma,
+            Number(fetchDoc.id),
+            location_id_from,
+            88,
+            batch_id_from,
+            amount,
+            1,
+            reason,
+            total_weight,
+            week_num
+          );
+          console.log("Транзакція успішно завершена:", result);
+          console.timeEnd(`createFishingTransaction - reason: ${reason}`);
         }
         console.log("find batch generation - line 188");
         console.time("findFirst prev_generation");
@@ -331,18 +416,21 @@ export async function fishFetching(
           fish_qty_in_location_from - fetching_quantity
         );
 
-        const info: updatePrevPoolProps = {
-          formData: formData,
-          formState: formState,
-          info: {
-            amount_in_pool: fish_qty_in_location_from - fetching_quantity,
-            divDocId: fetchDoc.id,
-          },
-          prisma,
-        };
-        console.time("updatePrevPool");
-        await updatePrevPool(info);
-        console.timeEnd("updatePrevPool");
+        // Before calling updatePrevPool, check if GrowOut was already processed
+        if (!growoutProcessed) {
+          const info: updatePrevPoolProps = {
+            formData: formData,
+            formState: formState,
+            info: {
+              amount_in_pool: fish_qty_in_location_from - fetching_quantity,
+              divDocId: fetchDoc.id,
+            },
+            prisma,
+          };
+          console.time("updatePrevPool");
+          await updatePrevPool(info);
+          console.timeEnd("updatePrevPool");
+        }
       } catch (innerError: any) {
         // console.error('Помилка у транзакції:');
         throw new Error(
