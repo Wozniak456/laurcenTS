@@ -126,31 +126,6 @@ export async function batchDivision(
         },
       });
 
-      //якщо у басейні було ненульове зариблення
-      let tran;
-      if (last_stocking && last_stocking.quantity > 0) {
-        // створюємо транзакцію витягування риби з нового басейну, якщо там щось є
-        tran = await db.itemtransactions.create({
-          data: {
-            doc_id: divDoc.id,
-            location_id: location_id_to,
-            batch_id: last_stocking.batch_id,
-            quantity: -last_stocking.quantity,
-            unit_id: 1,
-          },
-        });
-
-        if (!tran) {
-          throw new Error(
-            "Помилка при створенні транзакції витягування риби з нового басейну"
-          );
-        }
-        console.log(
-          `транзакція витягування риби з нового басейну ${location_id_to}`,
-          tran
-        );
-      }
-
       //зариблення. підганяємо вхідні ідентифікатори для функції stockPool
 
       formData.delete(`location_id_to_${index0}`);

@@ -152,28 +152,33 @@ export async function stockPool(
     console.log(`\n документ зариблення для ${location_id_to}`, stockDoc.id);
 
     // транзакція для витягування з попереднього басейна stocking_quantity
+    const doc_type_id = formData.get("doc_type_id")
+      ? parseInt(formData.get("doc_type_id") as string)
+      : 1;
+    let fetchTran = null;
+    if (doc_type_id !== 13) {
+      fetchTran = await activeDb.itemtransactions.create({
+        data: {
+          doc_id: stockDoc.id,
+          location_id: location_id_from,
+          batch_id: batch_id_from,
+          quantity: -stocking_quantity,
+          unit_id: 1,
+          // parent_transaction: p_tran
+        },
+      });
 
-    const fetchTran = await activeDb.itemtransactions.create({
-      data: {
-        doc_id: stockDoc.id,
-        location_id: location_id_from,
-        batch_id: batch_id_from,
-        quantity: -stocking_quantity,
-        unit_id: 1,
-        // parent_transaction: p_tran
-      },
-    });
+      if (!fetchTran) {
+        throw new Error(
+          "Помилка при створенні транзакції для витягування з попереднього басейна"
+        );
+      }
 
-    if (!fetchTran) {
-      throw new Error(
-        "Помилка при створенні транзакції для витягування з попереднього басейна"
+      console.log(
+        ` Витягуємо з попереднього для ${location_id_to}. Tran: `,
+        fetchTran
       );
     }
-
-    console.log(
-      ` Витягуємо з попереднього для ${location_id_to}. Tran: `,
-      fetchTran
-    );
 
     //визначаємо яку кількість зариблювати
 
@@ -220,16 +225,43 @@ export async function stockPool(
 
     // транзакція для зариблення нового басейна
 
-    const stockTran = await activeDb.itemtransactions.create({
-      data: {
-        doc_id: stockDoc.id,
-        location_id: location_id_to,
-        batch_id: batch_id_to, //
-        quantity: count_to_stock,
-        unit_id: 1,
-        parent_transaction: fetchTran.id,
-      },
-    });
+    let stockTran;
+    let negativeStockTran;
+    if (location_id_from !== location_id_to && doc_type_id === 13) {
+      // Create negative transaction first for growout location
+      negativeStockTran = await activeDb.itemtransactions.create({
+        data: {
+          doc_id: stockDoc.id,
+          location_id: location_id_to,
+          batch_id: batch_id_to,
+          quantity: -count_to_stock,
+          unit_id: 1,
+        },
+      });
+      // Create positive transaction referencing the negative one
+      stockTran = await activeDb.itemtransactions.create({
+        data: {
+          doc_id: stockDoc.id,
+          location_id: location_id_to,
+          batch_id: batch_id_to, //
+          quantity: count_to_stock,
+          unit_id: 1,
+          parent_transaction: negativeStockTran.id,
+        },
+      });
+    } else {
+      // Same location logic (original)
+      stockTran = await activeDb.itemtransactions.create({
+        data: {
+          doc_id: stockDoc.id,
+          location_id: location_id_to,
+          batch_id: batch_id_to, //
+          quantity: count_to_stock,
+          unit_id: 1,
+          parent_transaction: fetchTran ? fetchTran.id : undefined,
+        },
+      });
+    }
 
     if (!stockTran) {
       throw new Error(
@@ -237,6 +269,87 @@ export async function stockPool(
       );
     }
     console.log(`Зариблюємо ${location_id_to}. Tran: `, stockTran);
+
+    // Fetch the last stocking record for the destination location
+    const lastStocking = await activeDb.stocking.findFirst({
+      where: {
+        documents: {
+          location_id: location_id_to,
+          doc_type_id: 1,
+        },
+      },
+      orderBy: {
+        documents: {
+          date_time: "desc",
+        },
+      },
+      include: {
+        documents: true,
+      },
+    });
+
+    // Calculate form_average_weight in grams from the form value
+    const formAvgWeightGrams =
+      form_average_weight !== null && !isNaN(form_average_weight)
+        ? Math.round(form_average_weight * 1000) / 1000 // already in grams, just round
+        : null;
+
+    // Use previous quantity and average (before addition) and transferred quantity and average, all in grams
+    const prevQty = quantity_in_location_to; // before addition
+    const prevAvgWeight = lastStocking?.average_weight || 0; // Use actual previous average weight from stocking record
+    const addQty = stocking_quantity;
+    const addAvgWeight = formAvgWeightGrams;
+    let calculatedAvgWeightGrams = formAvgWeightGrams;
+
+    console.log("Average weight calculation:", {
+      prevQty,
+      prevAvgWeight,
+      addQty,
+      addAvgWeight,
+      formAvgWeightGrams,
+    });
+
+    if (
+      prevQty &&
+      !isNaN(prevQty) &&
+      addQty &&
+      !isNaN(addQty) &&
+      prevAvgWeight !== null &&
+      addAvgWeight !== null
+    ) {
+      const newTotal = prevQty + addQty;
+      calculatedAvgWeightGrams =
+        Math.round(
+          ((prevQty * prevAvgWeight + addQty * addAvgWeight) / newTotal) * 1000
+        ) / 1000;
+      console.log("Calculated new average weight:", calculatedAvgWeightGrams);
+    } else if (formAvgWeightGrams !== null) {
+      calculatedAvgWeightGrams = formAvgWeightGrams;
+      console.log("Using form average weight:", calculatedAvgWeightGrams);
+    } else {
+      calculatedAvgWeightGrams = 0;
+      console.log("No valid weights, defaulting to 0");
+    }
+
+    // Always create a stocking record for every stocking document
+    await activeDb.stocking.create({
+      data: {
+        doc_id: stockDoc.id,
+        average_weight: calculatedAvgWeightGrams,
+        ...(formAvgWeightGrams !== null
+          ? { form_average_weight: formAvgWeightGrams }
+          : {}),
+      },
+    });
+
+    // For GrowOut to a different location with doc_type_id 13, create feeding calculation only (do not create stocking record again)
+    if (doc_type_id === 13 && location_id_from !== location_id_to) {
+      formData.set("parent_doc", String(stockDoc.id));
+      formData.set("fish_amount", String(count_to_stock));
+      formData.set("location_id_to", String(location_id_to));
+      formData.set("average_fish_mass", String(calculatedAvgWeightGrams));
+      await createCalcTable(formState, formData, prisma);
+    }
 
     // Create batch generation if we have a parent document or if locations are different
     if (parent_document || location_id_from !== location_id_to) {
@@ -406,25 +519,6 @@ export async function stockPool(
           console.log("huh3?");
         }
       }
-    }
-    // Prepare form_average_weight for stocking.create
-    let stockingData: any = {
-      doc_id: stockDoc.id,
-      average_weight: average_weight,
-    };
-    if (form_average_weight !== null && !isNaN(form_average_weight)) {
-      stockingData.form_average_weight = form_average_weight;
-    }
-    console.log("About to create stocking with data:", stockingData);
-    let stock;
-    try {
-      stock = await activeDb.stocking.create({
-        data: stockingData,
-      });
-      console.log("Created stocking:", stock);
-    } catch (err) {
-      console.error("Error creating stocking:", err);
-      throw err;
     }
 
     // тепер fish_amount це вся риба, яку зариблюємо.

@@ -164,6 +164,13 @@ export default function FetchingForm({
     // If validation passes, get the form element and submit using the server action
     const form = e.target as HTMLFormElement;
     const formData = new FormData(form);
+
+    // In the GrowOut section, before submitting the form, set form_average_weight in grams
+    if (growOutAmount && growOutWeight) {
+      const avgWeightGrams = (growOutWeight * 1000) / growOutAmount;
+      formData.set("form_average_weight", String(avgWeightGrams));
+    }
+
     const result = await actions.fishFetching(undefined, formData);
 
     if (result?.message) {

@@ -87,46 +87,55 @@ export async function updatePrevPool({
     stockTran
   );
 
-  // створення batch_generation для цієї операції
-  // знайти попередній batch_generation для цієї локації
-  const prevBatchGen = await activeDb.batch_generation.findFirst({
-    where: {
-      location_id: location_id,
-    },
-    orderBy: { id: "desc" },
-  });
-
-  const newBatchGen = await activeDb.batch_generation.create({
-    data: {
-      location_id: location_id,
-      initial_batch_id: batch_id,
-      first_parent_id: prevBatchGen?.id,
-      transaction_id: stockTran.id,
-    },
-  });
-  console.log("створено batch_generation", newBatchGen);
-
   //створення запису в stocking
-  console.log("av_weight", av_weight);
+  let stockingAvgWeight = av_weight;
+  if (info.amount_in_pool === 0) {
+    stockingAvgWeight = 0;
+  }
+  console.log("av_weight", stockingAvgWeight);
   const stocking = await activeDb.stocking.create({
     data: {
       doc_id: stockDoc.id,
-      average_weight: av_weight,
+      average_weight: stockingAvgWeight,
     },
   });
   console.log("створення запису в stocking", stocking);
 
-  //створення калькуляції
-  formData.set("parent_doc", String(stockDoc.id));
-  formData.set("fish_amount", String(info.amount_in_pool));
-  formData.set("location_id_to", String(location_id));
+  //створення batch_generation і feeding calc тільки якщо кількість > 0
+  if (info.amount_in_pool > 0) {
+    // створення batch_generation для цієї операції
+    // знайти попередній batch_generation для цієї локації
+    const prevBatchGen = await activeDb.batch_generation.findFirst({
+      where: {
+        location_id: location_id,
+      },
+      orderBy: { id: "desc" },
+    });
 
-  console.log("МИ ОНОВИЛИ fish_amount", info.amount_in_pool);
+    const newBatchGen = await activeDb.batch_generation.create({
+      data: {
+        location_id: location_id,
+        initial_batch_id: batch_id,
+        first_parent_id: prevBatchGen?.id,
+        transaction_id: stockTran.id,
+      },
+    });
+    console.log("створено batch_generation", newBatchGen);
 
-  formData.delete(`average_fish_mass`);
-  formData.delete(`old_average_fish_mass`);
+    //створення калькуляції
+    formData.set("parent_doc", String(stockDoc.id));
+    formData.set("fish_amount", String(info.amount_in_pool));
+    formData.set("location_id_to", String(location_id));
 
-  formData.set("average_fish_mass", String(av_weight)); // новий басейн
+    console.log("МИ ОНОВИЛИ fish_amount", info.amount_in_pool);
 
-  return await createCalcTable(formState, formData, prisma);
+    formData.delete(`average_fish_mass`);
+    formData.delete(`old_average_fish_mass`);
+
+    formData.set("average_fish_mass", String(stockingAvgWeight)); // новий басейн
+
+    return await createCalcTable(formState, formData, prisma);
+  }
+  // якщо кількість 0, не створюємо batch_generation і feeding calc
+  return;
 }

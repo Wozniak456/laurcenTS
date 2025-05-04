@@ -6,6 +6,7 @@ import { updatePrevPool } from "./updatePrevPool";
 import { FetchingReasons } from "@/types/fetching-reasons";
 import { stockPool } from "@/actions";
 import { createCalcTable } from "./createCalcTable";
+import { Prisma } from "@prisma/client";
 
 type updatePrevPoolProps = {
   formData: FormData;
@@ -120,7 +121,7 @@ export async function fishFetching(
 
   // Виконання транзакції
   const result = await db.$transaction(
-    async (prisma) => {
+    async (prisma: Prisma.TransactionClient) => {
       try {
         // Створення документа вилову
         console.time("Create fetchDoc");
@@ -181,13 +182,13 @@ export async function fishFetching(
               });
 
               // Set average_weight and form_average_weight from the form
-              const avgWeight =
-                growout_fishing_total_weight / growout_fishing_amount;
+              const avgWeightGrams =
+                (growout_fishing_total_weight / growout_fishing_amount) * 1000;
               await prisma.stocking.create({
                 data: {
                   doc_id: stockDoc.id,
-                  average_weight: avgWeight,
-                  form_average_weight: avgWeight,
+                  average_weight: Math.round(avgWeightGrams * 1000) / 1000,
+                  form_average_weight: Math.round(avgWeightGrams * 1000) / 1000,
                 },
               });
 
@@ -219,14 +220,49 @@ export async function fishFetching(
               formData.set("parent_doc", String(stockDoc.id));
               formData.set("fish_amount", String(amount));
               formData.set("location_id_to", String(location_id_from));
-              formData.set("average_fish_mass", String(avgWeight));
+              formData.set(
+                "average_fish_mass",
+                String(Math.round(avgWeightGrams * 1000) / 1000)
+              );
               await createCalcTable(formState, formData, prisma);
 
               // Set flag to prevent updatePrevPool
               growoutProcessed = true;
               continue;
             } else {
-              // GrowOut to a different pool: use division/transfer logic, but do NOT create a transaction to location 88
+              // GrowOut to a different pool: create both transactions in fetching doc
+              // a) Remove from fetching location
+              const fetchTran = await prisma.itemtransactions.create({
+                data: {
+                  doc_id: fetchDoc.id,
+                  location_id: location_id_from,
+                  batch_id: batch_id_from,
+                  quantity: -growout_fishing_amount,
+                  unit_id: 1,
+                },
+              });
+              // b) Put to growout location
+              const pushTran = await prisma.itemtransactions.create({
+                data: {
+                  doc_id: fetchDoc.id,
+                  location_id: location_id_to,
+                  batch_id: batch_id_from,
+                  quantity: growout_fishing_amount,
+                  unit_id: 1,
+                  parent_transaction: fetchTran.id,
+                },
+              });
+              // Create a fetching record referencing the withdrawal transaction
+              await prisma.fetching.create({
+                data: {
+                  tran_id: fetchTran.id,
+                  fetching_reason: reason,
+                  total_weight: total_weight,
+                  weekNumber: week_num,
+                },
+              });
+
+              // Now create the stocking document for the growout location with both positive and negative transactions
               // Prepare data for stockPool
               const last_stocking = await prisma.itemtransactions.findFirst({
                 where: {
@@ -253,8 +289,22 @@ export async function fishFetching(
                 "average_fish_mass",
                 String(growout_fishing_total_weight / growout_fishing_amount)
               );
+              // Set form_average_weight for growout stocking
+              if (
+                growout_fishing_amount &&
+                !isNaN(growout_fishing_amount) &&
+                growout_fishing_amount !== 0
+              ) {
+                formData.set(
+                  "form_average_weight",
+                  String(
+                    (growout_fishing_total_weight / growout_fishing_amount) *
+                      1000
+                  )
+                );
+              }
               formData.set("parent_document", String(fetchDoc.id));
-              formData.set("doc_type_id", "2"); // division/transfer
+              formData.set("doc_type_id", "13"); // fetching doc type for growout stocking
 
               await stockPool(formState, formData, prisma);
               continue;
