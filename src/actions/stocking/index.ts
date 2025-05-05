@@ -310,7 +310,8 @@ export async function setTransitionDayForLocation(
       },
     });
     console.log("DEBUG: prevCalc", prevCalc);
-    if (prevCalc?.transition_day !== null) {
+    // we decided to not to continue transition, so we will not use prevCalc
+    /*    if (prevCalc?.transition_day !== null) {
       let currentTransitionDay = prevCalc.transition_day;
       console.log(
         "DEBUG: Starting transition copy from prevCalc.transition_day =",
@@ -339,29 +340,41 @@ export async function setTransitionDayForLocation(
       }
     } else {
       console.log("DEBUG: prevCalc.transition_day is null or undefined");
-    }
+    }*/
   }
 
   // 6. Process remaining records with transition logic
-  let prevFeedType = null;
-
-  // If we had any updates, get the feed type from the last updated record
-  if (lastUpdatedIndex >= 0) {
-    prevFeedType = await getFeedType(
-      calcs[lastUpdatedIndex].fish_weight,
-      activeDb
-    );
-  }
+  let prevFeedType = await getFeedType(
+    calcs[lastUpdatedIndex + 1]?.fish_weight,
+    activeDb
+  );
 
   // Process remaining records
   for (let i = lastUpdatedIndex + 1; i < calcs.length; i++) {
     const currentFeedType = await getFeedType(calcs[i].fish_weight, activeDb);
 
+    // Debug log: show current loop state
+    console.log("DEBUG: Loop i=", i, {
+      prevFeedType,
+      currentFeedType,
+      calcsId: calcs[i].id,
+      fish_weight: calcs[i].fish_weight,
+    });
+
     // Check if feed type changed
-    if (prevFeedType?.id !== currentFeedType?.id) {
+    if (
+      prevFeedType?.id != null &&
+      currentFeedType?.id != null &&
+      prevFeedType.id !== currentFeedType.id
+    ) {
       // Start new transition sequence
       let transitionDay = 1;
       for (let j = i; j < calcs.length && transitionDay <= 4; j++) {
+        console.log("DEBUG: Transition inner loop", {
+          j,
+          transitionDay,
+          calcsId: calcs[j].id,
+        });
         await activeDb.calculation_table.update({
           where: { id: calcs[j].id },
           data: { transition_day: transitionDay },
@@ -369,9 +382,16 @@ export async function setTransitionDayForLocation(
         transitionDay++;
         i = j; // Update main loop index to skip processed records
       }
+      console.log(
+        "DEBUG: Transition complete, set prevFeedType = currentFeedType",
+        { prevFeedType, currentFeedType }
+      );
       prevFeedType = currentFeedType;
     } else {
       // No transition needed
+      console.log("DEBUG: No transition needed for i=", i, {
+        calcsId: calcs[i].id,
+      });
       await activeDb.calculation_table.update({
         where: { id: calcs[i].id },
         data: { transition_day: null },

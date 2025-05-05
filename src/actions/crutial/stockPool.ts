@@ -335,7 +335,9 @@ export async function stockPool(
     await activeDb.stocking.create({
       data: {
         doc_id: stockDoc.id,
-        average_weight: calculatedAvgWeightGrams,
+        average_weight: calculatedAvgWeightGrams
+          ? calculatedAvgWeightGrams
+          : average_weight,
         ...(formAvgWeightGrams !== null
           ? { form_average_weight: formAvgWeightGrams }
           : {}),
