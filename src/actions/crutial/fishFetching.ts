@@ -399,7 +399,7 @@ export async function fishFetching(
 
         // Update stocking record for the source pool
         const remainingQuantity = fish_qty_in_location_from - fetching_quantity;
-
+        /*
         if (remainingQuantity > 0) {
           // Calculate total weight removed based on all fishing types
           const totalWeightRemoved =
@@ -453,7 +453,7 @@ export async function fishFetching(
             },
           });
         }
-
+*/
         formData.set(
           "fish_amount",
           String(fish_qty_in_location_from - fetching_quantity)
