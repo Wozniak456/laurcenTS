@@ -196,7 +196,7 @@ export default function StockPoolPage({
         </Link>
       </div>
 
-      {!poolInfo?.wasFetchedThisWeek && poolInfo?.qty && poolInfo.qty > 0 && (
+      {poolInfo?.qty && poolInfo.qty > 0 && (
         <div className="flex justify-end mb-4">
           <FetchingForm
             location={location}
