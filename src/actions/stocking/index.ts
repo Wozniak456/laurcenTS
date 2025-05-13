@@ -85,9 +85,30 @@ export const poolInfo = async (
   date: string
 ): Promise<poolManagingType | undefined> => {
   const dateValue = new Date(date);
-
   dateValue.setUTCHours(23, 59, 59, 999);
 
+  // Sum all fish transactions for this location up to the given date
+  const sumResult = await db.itemtransactions.aggregate({
+    _sum: {
+      quantity: true,
+    },
+    where: {
+      location_id: location_id,
+      documents: {
+        date_time: {
+          lte: dateValue,
+        },
+      },
+      itembatches: {
+        items: {
+          item_type_id: 1,
+        },
+      },
+    },
+  });
+  const qty = sumResult._sum.quantity || 0;
+
+  // Get the latest stocking document for average weight and other info
   const lastStocking = await db.documents.findFirst({
     select: {
       id: true,
@@ -134,33 +155,25 @@ export const poolInfo = async (
   });
 
   let feedType;
-
   if (lastStocking) {
     feedType = await getFeedType(lastStocking.stocking[0]?.average_weight);
-    //console.log("LastStocking = ", lastStocking);
   }
-
   const batch = lastStocking?.itemtransactions[0]?.itembatches;
-  const qty = lastStocking?.itemtransactions[0]?.quantity;
   const fishWeight = lastStocking?.stocking[0]?.average_weight;
   const updateDate = lastStocking?.date_time.toISOString().split("T")[0];
 
   let allowedToEdit = false;
-
   if (lastStocking?.itemtransactions[0]?.parent_transaction) {
     const connectedTran = await db.itemtransactions.findFirst({
       where: {
         id: lastStocking?.itemtransactions[0]?.parent_transaction,
       },
     });
-
     if (connectedTran?.location_id == 87) {
       allowedToEdit = true;
     }
   }
-  if (qty) {
-    return { batch, qty, fishWeight, feedType, updateDate, allowedToEdit };
-  }
+  return { batch, qty, fishWeight, feedType, updateDate, allowedToEdit };
 };
 
 //встановлюємо перехід на новий корм
