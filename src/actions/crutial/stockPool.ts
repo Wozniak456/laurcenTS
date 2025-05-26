@@ -182,13 +182,7 @@ export async function stockPool(
 
     //визначаємо яку кількість зариблювати
 
-    let count_to_stock;
-
-    if (quantity_in_location_to) {
-      count_to_stock = stocking_quantity + quantity_in_location_to;
-    } else {
-      count_to_stock = stocking_quantity;
-    }
+    const count_to_stock = stocking_quantity;
 
     //знайти дані про останнє покоління з попередньої локації
 

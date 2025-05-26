@@ -4,6 +4,7 @@ import {
   createCalcBelow25,
   createCalcOver25,
   setTransitionDayForLocation,
+  poolInfo,
 } from "@/actions/stocking";
 
 function addCurrentTimeToDate(date: Date) {
@@ -30,16 +31,18 @@ export async function createCalcTable(
   try {
     console.log("Ми в createCalcTable");
     console.log(formData);
-    const fish_amount: number = parseInt(formData.get("fish_amount") as string); // скільки зариблюємо
-    const average_fish_mass: number = parseFloat(
-      formData.get("average_fish_mass") as string
-    );
-    const percentage = 0; //number = parseFloat(formData.get('percentage') as string);
     const location_id_to: number = parseInt(
       formData.get("location_id_to") as string
     );
     const parent_doc: number = parseInt(formData.get("parent_doc") as string);
     const today: string = formData.get("today") as string;
+
+    const pool = await poolInfo(location_id_to, today);
+    const fish_amount: number = pool?.qty || 0;
+    const average_fish_mass: number = parseFloat(
+      formData.get("average_fish_mass") as string
+    );
+    const percentage = 0; //number = parseFloat(formData.get('percentage') as string);
 
     console.log("до звернення до бд");
 
