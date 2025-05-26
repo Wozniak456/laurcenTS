@@ -63,14 +63,16 @@ export async function getFeedBatchByItemId(
 
   const batches_quantity: BatchQuantity[] = batches_quantity_;
 
-  const batches_quantity_with_price = batches_quantity.map((bq) => {
-    const batch = batches.find((batch) => batch.id === bq.batch_id);
-    return {
-      ...bq,
-      price: batch ? batch.price : null,
-      feed_type_id: batch ? batch.items.feed_type_id : null,
-    };
-  });
+  const batches_quantity_with_price = batches_quantity
+    .map((bq) => {
+      const batch = batches.find((batch) => batch.id === bq.batch_id);
+      return {
+        ...bq,
+        price: batch ? batch.price : null,
+        feed_type_id: batch ? batch.items.feed_type_id : null,
+      };
+    })
+    .filter((bq) => (bq._sum.quantity ?? 0) > 0); // Only keep batches with positive quantity
 
   console.warn("DEBUG - Batches with price:", batches_quantity_with_price);
 

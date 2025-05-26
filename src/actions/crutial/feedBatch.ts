@@ -240,31 +240,31 @@ export async function feedBatch(
             prisma
           );
 
-          // Get the first available batch for zero quantity transactions
-          const batch = batches_id[0];
-
-          if (batch) {
-            // Create transactions with the actual quantity (can be zero)
+          let leftToFeed = qty / 1000; // Convert to kg
+          for (const batch of batches_id) {
+            if (leftToFeed <= 0) break;
+            const available = batch._sum.quantity ?? 0;
+            const consume = Math.min(available, leftToFeed);
+            // Create negative transaction for warehouse
             const fetchTran = await prisma.itemtransactions.create({
               data: {
                 doc_id: feedDoc.id,
                 location_id: 87,
                 batch_id: batch.batch_id,
-                quantity: -qty / 1000, // Convert to kg
+                quantity: -consume,
                 unit_id: 2,
               },
             });
-
+            // Create positive transaction for pool
             const feedTran = await prisma.itemtransactions.create({
               data: {
                 doc_id: feedDoc.id,
                 location_id: location_id,
                 batch_id: batch.batch_id,
-                quantity: qty / 1000, // Convert to kg
+                quantity: consume,
                 unit_id: 2,
               },
             });
-
             const latestGeneration = await prisma.batch_generation.findFirst({
               include: {
                 itemtransactions: true,
@@ -277,22 +277,23 @@ export async function feedBatch(
               },
               take: 1,
             });
-
             const record = await prisma.generation_feed_amount.create({
               data: {
                 batch_generation_id: latestGeneration?.id as bigint,
                 feed_batch_id: batch.batch_id,
-                amount: qty,
+                amount: consume * 1000, // store in grams if needed
                 doc_id: feedDoc.id,
               },
             });
-
+            leftToFeed -= consume;
             process.stdout.write(
               `Created transactions: ${JSON.stringify(
                 {
                   fetchTransactionId: String(fetchTran.id),
                   feedTransactionId: String(feedTran.id),
                   recordId: String(record.id),
+                  consumed: consume,
+                  leftToFeed,
                 },
                 null,
                 2

@@ -297,37 +297,38 @@ export async function feedBatch(
           }
 
           // Process all batch transactions under this single document
-          let remainingQty = qty;
-          const batchTransactions = [];
-
-          // First, calculate all the transactions we need to make
+          let leftToFeed = qty / 1000; // Convert to kg
           for (const batch of availableBatches) {
-            if (remainingQty <= 0) break;
-
-            const qtyFromBatch = Math.min(
-              remainingQty,
-              batch._sum.quantity || 0
-            );
-            batchTransactions.push({
-              doc_id: feedDoc.id,
-              location_id: location_id,
-              batch_id: batch.batch_id,
-              quantity: -qtyFromBatch,
-              unit_id: 1,
+            if (leftToFeed <= 0) break;
+            const available = batch._sum.quantity ?? 0;
+            const consume = Math.min(available, leftToFeed);
+            // Negative transaction for warehouse
+            await db.itemtransactions.create({
+              data: {
+                doc_id: feedDoc.id,
+                location_id: 87,
+                batch_id: batch.batch_id,
+                quantity: -consume,
+                unit_id: 2,
+              },
             });
-
-            remainingQty -= qtyFromBatch;
+            // Positive transaction for pool
+            await db.itemtransactions.create({
+              data: {
+                doc_id: feedDoc.id,
+                location_id: location_id,
+                batch_id: batch.batch_id,
+                quantity: consume,
+                unit_id: 2,
+              },
+            });
+            leftToFeed -= consume;
           }
-
-          // Then create all transactions at once
-          await db.itemtransactions.createMany({
-            data: batchTransactions,
-          });
 
           console.log("DEBUG - Created feed transactions:", {
             docId: feedDoc.id,
             timeSlot: time.hours,
-            transactionCount: batchTransactions.length,
+            transactionCount: leftToFeed,
           });
         }
       }
