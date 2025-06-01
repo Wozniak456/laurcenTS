@@ -109,8 +109,8 @@ export default async function FetchingPage({ searchParams }: PageProps) {
     }
 
     // Calculate the start and end dates of the week
-    const startOfWeek = moment().year(year).week(weekNum).startOf("week");
-    const endOfWeek = moment().year(year).week(weekNum).endOf("week");
+    const startOfWeek = moment().year(year).isoWeek(weekNum).startOf("isoWeek");
+    const endOfWeek = moment().year(year).isoWeek(weekNum).endOf("isoWeek");
 
     weekPeriod = `${startOfWeek.format("DD.MM.YYYY")} - ${endOfWeek.format(
       "DD.MM.YYYY"
@@ -122,8 +122,16 @@ export default async function FetchingPage({ searchParams }: PageProps) {
   }
 
   // Calculate the start and end dates for the week
-  const startDate = moment().year(year).week(weekNum).startOf("week").toDate();
-  const endDate = moment().year(year).week(weekNum).endOf("week").toDate();
+  const startDate = moment()
+    .year(year)
+    .isoWeek(weekNum)
+    .startOf("isoWeek")
+    .toDate();
+  const endDate = moment()
+    .year(year)
+    .isoWeek(weekNum)
+    .endOf("isoWeek")
+    .toDate();
 
   console.log("Debug - Query Parameters:", {
     year,

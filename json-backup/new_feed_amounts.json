@@ -1,0 +1,2642 @@
+[
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "467",
+    "amount": 204.95000000110088,
+    "doc_id": "19270"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 463.6499999988991,
+    "doc_id": "19270"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 668.6,
+    "doc_id": "19271"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "474",
+    "amount": 882,
+    "doc_id": "19321"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "474",
+    "amount": 882,
+    "doc_id": "19322"
+  },
+  {
+    "batch_generation_id": "1269",
+    "feed_batch_id": "474",
+    "amount": 653.55,
+    "doc_id": "19364"
+  },
+  {
+    "batch_generation_id": "1269",
+    "feed_batch_id": "474",
+    "amount": 653.55,
+    "doc_id": "19365"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 625,
+    "doc_id": "19696"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 625,
+    "doc_id": "19697"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 625,
+    "doc_id": "19698"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 625,
+    "doc_id": "19699"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 625,
+    "doc_id": "19700"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "474",
+    "amount": 403.45,
+    "doc_id": "19741"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "474",
+    "amount": 403.45,
+    "doc_id": "19742"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "474",
+    "amount": 403.45,
+    "doc_id": "19743"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "474",
+    "amount": 403.45,
+    "doc_id": "19744"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "474",
+    "amount": 403.45,
+    "doc_id": "19745"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 421,
+    "doc_id": "19756"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 421,
+    "doc_id": "19757"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 421,
+    "doc_id": "19758"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 421,
+    "doc_id": "19759"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 421,
+    "doc_id": "19760"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 648.5,
+    "doc_id": "19911"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 648.5,
+    "doc_id": "19912"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 648.5,
+    "doc_id": "19913"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 648.5,
+    "doc_id": "19914"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 648.5,
+    "doc_id": "19915"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "474",
+    "amount": 418.3,
+    "doc_id": "19956"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "474",
+    "amount": 418.3,
+    "doc_id": "19957"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "474",
+    "amount": 418.3,
+    "doc_id": "19958"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "474",
+    "amount": 418.3,
+    "doc_id": "19959"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "474",
+    "amount": 418.3,
+    "doc_id": "19960"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 455,
+    "doc_id": "19971"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 455,
+    "doc_id": "19972"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 455,
+    "doc_id": "19973"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 455,
+    "doc_id": "19974"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 455,
+    "doc_id": "19975"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 695.7,
+    "doc_id": "20121"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 695.7,
+    "doc_id": "20122"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 695.7,
+    "doc_id": "20123"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 695.7,
+    "doc_id": "20124"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 695.7,
+    "doc_id": "20125"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "474",
+    "amount": 433.55,
+    "doc_id": "20166"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "474",
+    "amount": 433.55,
+    "doc_id": "20167"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "474",
+    "amount": 433.55,
+    "doc_id": "20168"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "474",
+    "amount": 433.55,
+    "doc_id": "20169"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "474",
+    "amount": 433.55,
+    "doc_id": "20170"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 491.3,
+    "doc_id": "20181"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 491.3,
+    "doc_id": "20182"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 491.3,
+    "doc_id": "20183"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 491.3,
+    "doc_id": "20184"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 491.3,
+    "doc_id": "20185"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 721.7,
+    "doc_id": "20367"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 721.7,
+    "doc_id": "20368"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 721.7,
+    "doc_id": "20369"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 721.7,
+    "doc_id": "20370"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 721.7,
+    "doc_id": "20371"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "474",
+    "amount": 449.05,
+    "doc_id": "20412"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "474",
+    "amount": 449.05,
+    "doc_id": "20413"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "474",
+    "amount": 449.05,
+    "doc_id": "20414"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "474",
+    "amount": 449.05,
+    "doc_id": "20415"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "474",
+    "amount": 449.05,
+    "doc_id": "20416"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 530.7,
+    "doc_id": "20427"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 530.7,
+    "doc_id": "20428"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 530.7,
+    "doc_id": "20429"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 530.7,
+    "doc_id": "20430"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 530.7,
+    "doc_id": "20431"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 748.6,
+    "doc_id": "20572"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 748.6,
+    "doc_id": "20573"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 748.6,
+    "doc_id": "20574"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 748.6,
+    "doc_id": "20575"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 748.6,
+    "doc_id": "20576"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "474",
+    "amount": 476.25,
+    "doc_id": "20617"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "474",
+    "amount": 476.25,
+    "doc_id": "20618"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "474",
+    "amount": 476.25,
+    "doc_id": "20619"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "474",
+    "amount": 476.25,
+    "doc_id": "20620"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "474",
+    "amount": 476.25,
+    "doc_id": "20621"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 573.1,
+    "doc_id": "20632"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 573.1,
+    "doc_id": "20633"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 573.1,
+    "doc_id": "20634"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 573.1,
+    "doc_id": "20635"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 573.1,
+    "doc_id": "20636"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 776.2,
+    "doc_id": "20891"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 776.2,
+    "doc_id": "20893"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 776.2,
+    "doc_id": "20894"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 776.2,
+    "doc_id": "20895"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "474",
+    "amount": 493,
+    "doc_id": "20931"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "474",
+    "amount": 493,
+    "doc_id": "20933"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "474",
+    "amount": 493,
+    "doc_id": "20934"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "474",
+    "amount": 493,
+    "doc_id": "20935"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 619,
+    "doc_id": "20941"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 619,
+    "doc_id": "20943"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 619,
+    "doc_id": "20944"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 619,
+    "doc_id": "20945"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 200,
+    "doc_id": "21171"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 200,
+    "doc_id": "21172"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 735.5,
+    "doc_id": "21173"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 735.5,
+    "doc_id": "21174"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 735.5,
+    "doc_id": "21175"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 735.5,
+    "doc_id": "21176"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 735.5,
+    "doc_id": "21177"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1061.3,
+    "doc_id": "21223"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1061.3,
+    "doc_id": "21224"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1061.3,
+    "doc_id": "21225"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1061.3,
+    "doc_id": "21226"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1061.3,
+    "doc_id": "21227"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 281,
+    "doc_id": "21373"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 281,
+    "doc_id": "21374"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 281,
+    "doc_id": "21375"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 281,
+    "doc_id": "21376"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 281,
+    "doc_id": "21377"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 762,
+    "doc_id": "21378"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 762,
+    "doc_id": "21379"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 762,
+    "doc_id": "21380"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 762,
+    "doc_id": "21381"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 762,
+    "doc_id": "21382"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 479,
+    "doc_id": "21438"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 479,
+    "doc_id": "21439"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 279,
+    "doc_id": "21440"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 279,
+    "doc_id": "21441"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 279,
+    "doc_id": "21442"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1099,
+    "doc_id": "21443"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1099,
+    "doc_id": "21444"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1099,
+    "doc_id": "21445"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1099,
+    "doc_id": "21446"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1099,
+    "doc_id": "21447"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 303,
+    "doc_id": "21596"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 303,
+    "doc_id": "21597"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 303,
+    "doc_id": "21598"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 303,
+    "doc_id": "21599"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 303,
+    "doc_id": "21600"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 789.6,
+    "doc_id": "21601"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 789.6,
+    "doc_id": "21602"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 789.6,
+    "doc_id": "21603"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 789.6,
+    "doc_id": "21604"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 789.6,
+    "doc_id": "21605"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 301.8,
+    "doc_id": "21646"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 301.8,
+    "doc_id": "21647"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 301.8,
+    "doc_id": "21648"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 301.8,
+    "doc_id": "21649"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 301.8,
+    "doc_id": "21650"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1187.1000000000001,
+    "doc_id": "21651"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1187.1000000000001,
+    "doc_id": "21652"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1187.1000000000001,
+    "doc_id": "21653"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1187.1000000000001,
+    "doc_id": "21654"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1187.1000000000001,
+    "doc_id": "21655"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 327.2,
+    "doc_id": "21791"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 327.2,
+    "doc_id": "21792"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 327.2,
+    "doc_id": "21793"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 327.2,
+    "doc_id": "21794"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 327.2,
+    "doc_id": "21795"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 837.4,
+    "doc_id": "21796"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 837.4,
+    "doc_id": "21797"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 837.4,
+    "doc_id": "21798"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 837.4,
+    "doc_id": "21799"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 837.4,
+    "doc_id": "21800"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 326,
+    "doc_id": "21846"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 326,
+    "doc_id": "21847"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 326,
+    "doc_id": "21848"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 326,
+    "doc_id": "21849"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 326,
+    "doc_id": "21850"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1230.9,
+    "doc_id": "21901"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 900,
+    "doc_id": "21902"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 900,
+    "doc_id": "21903"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 900,
+    "doc_id": "21904"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 900,
+    "doc_id": "21905"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 353.4,
+    "doc_id": "21991"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 353.4,
+    "doc_id": "21992"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 353.4,
+    "doc_id": "21993"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 353.4,
+    "doc_id": "21994"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 353.4,
+    "doc_id": "21995"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 866.9,
+    "doc_id": "21996"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 866.9,
+    "doc_id": "21997"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 866.9,
+    "doc_id": "21998"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 866.9,
+    "doc_id": "21999"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 866.9,
+    "doc_id": "22000"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "474",
+    "amount": 781,
+    "doc_id": "22046"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "474",
+    "amount": 781,
+    "doc_id": "22047"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "474",
+    "amount": 781,
+    "doc_id": "22048"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "474",
+    "amount": 781,
+    "doc_id": "22049"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "474",
+    "amount": 781,
+    "doc_id": "22050"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 352,
+    "doc_id": "22051"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 352,
+    "doc_id": "22052"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 352,
+    "doc_id": "22053"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 352,
+    "doc_id": "22054"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 352,
+    "doc_id": "22055"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1000,
+    "doc_id": "22056"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1000,
+    "doc_id": "22057"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1000,
+    "doc_id": "22058"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1000,
+    "doc_id": "22059"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1000,
+    "doc_id": "22060"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 381.7,
+    "doc_id": "22196"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 381.7,
+    "doc_id": "22197"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 381.7,
+    "doc_id": "22198"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 381.7,
+    "doc_id": "22199"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 381.7,
+    "doc_id": "22200"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 896.9,
+    "doc_id": "22201"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 896.9,
+    "doc_id": "22202"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 896.9,
+    "doc_id": "22203"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 896.9,
+    "doc_id": "22204"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 896.9,
+    "doc_id": "22205"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 380.2,
+    "doc_id": "22251"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 380.2,
+    "doc_id": "22252"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 380.2,
+    "doc_id": "22253"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 380.2,
+    "doc_id": "22254"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 380.2,
+    "doc_id": "22255"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1324.8,
+    "doc_id": "22256"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1324.8,
+    "doc_id": "22257"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1324.8,
+    "doc_id": "22258"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1324.8,
+    "doc_id": "22259"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1324.8,
+    "doc_id": "22260"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 412.2,
+    "doc_id": "22396"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 412.2,
+    "doc_id": "22398"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 412.2,
+    "doc_id": "22399"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 412.2,
+    "doc_id": "22400"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 927.4,
+    "doc_id": "22401"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 927.4,
+    "doc_id": "22403"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 927.4,
+    "doc_id": "22404"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 927.4,
+    "doc_id": "22405"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 410.6,
+    "doc_id": "22456"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 410.6,
+    "doc_id": "22458"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 410.6,
+    "doc_id": "22459"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 410.6,
+    "doc_id": "22460"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1374.1000000000001,
+    "doc_id": "22461"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1374.1000000000001,
+    "doc_id": "22463"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1374.1000000000001,
+    "doc_id": "22464"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1374.1000000000001,
+    "doc_id": "22465"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 724.4,
+    "doc_id": "22768"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 724.4,
+    "doc_id": "22769"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 724.4,
+    "doc_id": "22770"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 724.4,
+    "doc_id": "22771"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 724.4,
+    "doc_id": "22772"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 508.55000000000007,
+    "doc_id": "22773"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 508.55000000000007,
+    "doc_id": "22774"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 508.55000000000007,
+    "doc_id": "22775"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 508.55000000000007,
+    "doc_id": "22776"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 508.55000000000007,
+    "doc_id": "22777"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 677.4,
+    "doc_id": "22818"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 677.4,
+    "doc_id": "22819"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 677.4,
+    "doc_id": "22820"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 677.4,
+    "doc_id": "22821"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 677.4,
+    "doc_id": "22822"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1063.5,
+    "doc_id": "22823"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1063.5,
+    "doc_id": "22824"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1063.5,
+    "doc_id": "22825"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1063.5,
+    "doc_id": "22826"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1063.5,
+    "doc_id": "22827"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 750,
+    "doc_id": "22963"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 750,
+    "doc_id": "22964"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 750,
+    "doc_id": "22965"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 750,
+    "doc_id": "22966"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 750,
+    "doc_id": "22967"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 527,
+    "doc_id": "22968"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 527,
+    "doc_id": "22969"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 527,
+    "doc_id": "22970"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 527,
+    "doc_id": "22971"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 527,
+    "doc_id": "22972"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 702,
+    "doc_id": "23013"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 702,
+    "doc_id": "23014"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 702,
+    "doc_id": "23015"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 702,
+    "doc_id": "23016"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 702,
+    "doc_id": "23017"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1103,
+    "doc_id": "23018"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1103,
+    "doc_id": "23019"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1103,
+    "doc_id": "23020"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1103,
+    "doc_id": "23021"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1103,
+    "doc_id": "23022"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 777.9,
+    "doc_id": "23163"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 777.9,
+    "doc_id": "23164"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 777.9,
+    "doc_id": "23165"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 777.9,
+    "doc_id": "23166"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 777.9,
+    "doc_id": "23167"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 545.35,
+    "doc_id": "23168"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 545.35,
+    "doc_id": "23169"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 545.35,
+    "doc_id": "23170"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 545.35,
+    "doc_id": "23171"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 545.35,
+    "doc_id": "23172"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 727.5,
+    "doc_id": "23208"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 727.5,
+    "doc_id": "23209"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 727.5,
+    "doc_id": "23210"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 727.5,
+    "doc_id": "23211"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 727.5,
+    "doc_id": "23212"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1000,
+    "doc_id": "23213"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1000,
+    "doc_id": "23214"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1000,
+    "doc_id": "23215"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1000,
+    "doc_id": "23216"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1000,
+    "doc_id": "23217"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 807,
+    "doc_id": "23362"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 807,
+    "doc_id": "23363"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 807,
+    "doc_id": "23364"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 807,
+    "doc_id": "23365"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 807,
+    "doc_id": "23366"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 564.2,
+    "doc_id": "23367"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 564.2,
+    "doc_id": "23368"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 564.2,
+    "doc_id": "23369"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 564.2,
+    "doc_id": "23370"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 564.2,
+    "doc_id": "23371"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 754.7,
+    "doc_id": "23407"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 754.7,
+    "doc_id": "23408"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 754.7,
+    "doc_id": "23409"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 754.7,
+    "doc_id": "23410"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 754.7,
+    "doc_id": "23411"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1037,
+    "doc_id": "23412"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1037,
+    "doc_id": "23413"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1037,
+    "doc_id": "23414"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1037,
+    "doc_id": "23415"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 1037,
+    "doc_id": "23416"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 837.2,
+    "doc_id": "23560"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 837.2,
+    "doc_id": "23561"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 837.2,
+    "doc_id": "23562"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 837.2,
+    "doc_id": "23563"
+  },
+  {
+    "batch_generation_id": "1373",
+    "feed_batch_id": "474",
+    "amount": 837.2,
+    "doc_id": "23564"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 583.4,
+    "doc_id": "23565"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 583.4,
+    "doc_id": "23566"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 583.4,
+    "doc_id": "23567"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 583.4,
+    "doc_id": "23568"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "474",
+    "amount": 583.4,
+    "doc_id": "23569"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "455",
+    "amount": 583.4,
+    "doc_id": "23570"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "455",
+    "amount": 583.4,
+    "doc_id": "23571"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "455",
+    "amount": 583.4,
+    "doc_id": "23572"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "455",
+    "amount": 583.4,
+    "doc_id": "23573"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "455",
+    "amount": 583.4,
+    "doc_id": "23574"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "455",
+    "amount": 1145,
+    "doc_id": "23600"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "455",
+    "amount": 1145,
+    "doc_id": "23601"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "455",
+    "amount": 1145,
+    "doc_id": "23602"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "455",
+    "amount": 1145,
+    "doc_id": "23603"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "455",
+    "amount": 1145,
+    "doc_id": "23604"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 782.9,
+    "doc_id": "23605"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 782.9,
+    "doc_id": "23606"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 782.9,
+    "doc_id": "23607"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 782.9,
+    "doc_id": "23608"
+  },
+  {
+    "batch_generation_id": "1374",
+    "feed_batch_id": "474",
+    "amount": 782.9,
+    "doc_id": "23609"
+  },
+  {
+    "batch_generation_id": "1343",
+    "feed_batch_id": "474",
+    "amount": 131.3500000012804,
+    "doc_id": "23610"
+  },
+  {
+    "batch_generation_id": "1269",
+    "feed_batch_id": "455",
+    "amount": 1314.2000000200019,
+    "doc_id": "23636"
+  },
+  {
+    "batch_generation_id": "1269",
+    "feed_batch_id": "476",
+    "amount": 317.79999997999806,
+    "doc_id": "23636"
+  },
+  {
+    "batch_generation_id": "1269",
+    "feed_batch_id": "476",
+    "amount": 1632,
+    "doc_id": "23637"
+  },
+  {
+    "batch_generation_id": "1269",
+    "feed_batch_id": "476",
+    "amount": 1632,
+    "doc_id": "23638"
+  },
+  {
+    "batch_generation_id": "1269",
+    "feed_batch_id": "476",
+    "amount": 1632,
+    "doc_id": "23639"
+  },
+  {
+    "batch_generation_id": "1269",
+    "feed_batch_id": "476",
+    "amount": 1632,
+    "doc_id": "23640"
+  },
+  {
+    "batch_generation_id": "1270",
+    "feed_batch_id": "476",
+    "amount": 1420,
+    "doc_id": "23641"
+  },
+  {
+    "batch_generation_id": "1270",
+    "feed_batch_id": "476",
+    "amount": 1420,
+    "doc_id": "23642"
+  },
+  {
+    "batch_generation_id": "1270",
+    "feed_batch_id": "476",
+    "amount": 1420,
+    "doc_id": "23643"
+  },
+  {
+    "batch_generation_id": "1270",
+    "feed_batch_id": "476",
+    "amount": 1420,
+    "doc_id": "23644"
+  },
+  {
+    "batch_generation_id": "1270",
+    "feed_batch_id": "476",
+    "amount": 1420,
+    "doc_id": "23645"
+  },
+  {
+    "batch_generation_id": "1271",
+    "feed_batch_id": "476",
+    "amount": 1860,
+    "doc_id": "23646"
+  },
+  {
+    "batch_generation_id": "1271",
+    "feed_batch_id": "476",
+    "amount": 1860,
+    "doc_id": "23647"
+  },
+  {
+    "batch_generation_id": "1271",
+    "feed_batch_id": "476",
+    "amount": 1860,
+    "doc_id": "23648"
+  },
+  {
+    "batch_generation_id": "1271",
+    "feed_batch_id": "476",
+    "amount": 1860,
+    "doc_id": "23649"
+  },
+  {
+    "batch_generation_id": "1271",
+    "feed_batch_id": "476",
+    "amount": 1860,
+    "doc_id": "23650"
+  },
+  {
+    "batch_generation_id": "1369",
+    "feed_batch_id": "476",
+    "amount": 1308.2,
+    "doc_id": "23721"
+  },
+  {
+    "batch_generation_id": "1369",
+    "feed_batch_id": "476",
+    "amount": 1308.2,
+    "doc_id": "23722"
+  },
+  {
+    "batch_generation_id": "1369",
+    "feed_batch_id": "476",
+    "amount": 1308.2,
+    "doc_id": "23723"
+  },
+  {
+    "batch_generation_id": "1369",
+    "feed_batch_id": "476",
+    "amount": 1308.2,
+    "doc_id": "23724"
+  },
+  {
+    "batch_generation_id": "1369",
+    "feed_batch_id": "476",
+    "amount": 1308.2,
+    "doc_id": "23725"
+  },
+  {
+    "batch_generation_id": "1367",
+    "feed_batch_id": "476",
+    "amount": 1488.8,
+    "doc_id": "23726"
+  },
+  {
+    "batch_generation_id": "1367",
+    "feed_batch_id": "476",
+    "amount": 1488.8,
+    "doc_id": "23727"
+  },
+  {
+    "batch_generation_id": "1367",
+    "feed_batch_id": "476",
+    "amount": 1488.8,
+    "doc_id": "23728"
+  },
+  {
+    "batch_generation_id": "1367",
+    "feed_batch_id": "476",
+    "amount": 1488.8,
+    "doc_id": "23729"
+  },
+  {
+    "batch_generation_id": "1367",
+    "feed_batch_id": "476",
+    "amount": 1488.8,
+    "doc_id": "23730"
+  },
+  {
+    "batch_generation_id": "1372",
+    "feed_batch_id": "476",
+    "amount": 2470,
+    "doc_id": "23736"
+  },
+  {
+    "batch_generation_id": "1372",
+    "feed_batch_id": "476",
+    "amount": 2470,
+    "doc_id": "23737"
+  },
+  {
+    "batch_generation_id": "1372",
+    "feed_batch_id": "476",
+    "amount": 2470,
+    "doc_id": "23738"
+  },
+  {
+    "batch_generation_id": "1372",
+    "feed_batch_id": "476",
+    "amount": 2470,
+    "doc_id": "23739"
+  },
+  {
+    "batch_generation_id": "1372",
+    "feed_batch_id": "476",
+    "amount": 2470,
+    "doc_id": "23740"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "476",
+    "amount": 602.85,
+    "doc_id": "23751"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "476",
+    "amount": 602.85,
+    "doc_id": "23752"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "476",
+    "amount": 602.85,
+    "doc_id": "23753"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "476",
+    "amount": 602.85,
+    "doc_id": "23754"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "476",
+    "amount": 602.85,
+    "doc_id": "23755"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "476",
+    "amount": 1181,
+    "doc_id": "23796"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "476",
+    "amount": 1181,
+    "doc_id": "23797"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "476",
+    "amount": 1181,
+    "doc_id": "23798"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "476",
+    "amount": 1181,
+    "doc_id": "23799"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "476",
+    "amount": 1181,
+    "doc_id": "23800"
+  },
+  {
+    "batch_generation_id": "1269",
+    "feed_batch_id": "476",
+    "amount": 1683.1000000000001,
+    "doc_id": "23831"
+  },
+  {
+    "batch_generation_id": "1269",
+    "feed_batch_id": "476",
+    "amount": 1683.1000000000001,
+    "doc_id": "23832"
+  },
+  {
+    "batch_generation_id": "1269",
+    "feed_batch_id": "476",
+    "amount": 1683.1000000000001,
+    "doc_id": "23833"
+  },
+  {
+    "batch_generation_id": "1269",
+    "feed_batch_id": "476",
+    "amount": 1683.1000000000001,
+    "doc_id": "23834"
+  },
+  {
+    "batch_generation_id": "1269",
+    "feed_batch_id": "476",
+    "amount": 1683.1000000000001,
+    "doc_id": "23835"
+  },
+  {
+    "batch_generation_id": "1270",
+    "feed_batch_id": "476",
+    "amount": 1460.3999999999999,
+    "doc_id": "23837"
+  },
+  {
+    "batch_generation_id": "1270",
+    "feed_batch_id": "476",
+    "amount": 1460.3999999999999,
+    "doc_id": "23838"
+  },
+  {
+    "batch_generation_id": "1270",
+    "feed_batch_id": "476",
+    "amount": 1460.3999999999999,
+    "doc_id": "23839"
+  },
+  {
+    "batch_generation_id": "1270",
+    "feed_batch_id": "476",
+    "amount": 1460.3999999999999,
+    "doc_id": "23840"
+  },
+  {
+    "batch_generation_id": "1270",
+    "feed_batch_id": "476",
+    "amount": 1460.3999999999999,
+    "doc_id": "23841"
+  },
+  {
+    "batch_generation_id": "1369",
+    "feed_batch_id": "476",
+    "amount": 2434.5,
+    "doc_id": "23907"
+  },
+  {
+    "batch_generation_id": "1369",
+    "feed_batch_id": "476",
+    "amount": 2434.5,
+    "doc_id": "23908"
+  },
+  {
+    "batch_generation_id": "1369",
+    "feed_batch_id": "476",
+    "amount": 2434.5,
+    "doc_id": "23909"
+  },
+  {
+    "batch_generation_id": "1369",
+    "feed_batch_id": "476",
+    "amount": 2434.5,
+    "doc_id": "23910"
+  },
+  {
+    "batch_generation_id": "1369",
+    "feed_batch_id": "476",
+    "amount": 2434.5,
+    "doc_id": "23911"
+  },
+  {
+    "batch_generation_id": "1367",
+    "feed_batch_id": "476",
+    "amount": 1526.1,
+    "doc_id": "23917"
+  },
+  {
+    "batch_generation_id": "1367",
+    "feed_batch_id": "476",
+    "amount": 1526.1,
+    "doc_id": "23918"
+  },
+  {
+    "batch_generation_id": "1367",
+    "feed_batch_id": "476",
+    "amount": 1526.1,
+    "doc_id": "23919"
+  },
+  {
+    "batch_generation_id": "1367",
+    "feed_batch_id": "476",
+    "amount": 1526.1,
+    "doc_id": "23920"
+  },
+  {
+    "batch_generation_id": "1367",
+    "feed_batch_id": "476",
+    "amount": 1526.1,
+    "doc_id": "23921"
+  },
+  {
+    "batch_generation_id": "1372",
+    "feed_batch_id": "476",
+    "amount": 4213.3,
+    "doc_id": "23927"
+  },
+  {
+    "batch_generation_id": "1372",
+    "feed_batch_id": "476",
+    "amount": 4213.3,
+    "doc_id": "23928"
+  },
+  {
+    "batch_generation_id": "1372",
+    "feed_batch_id": "476",
+    "amount": 4213.3,
+    "doc_id": "23929"
+  },
+  {
+    "batch_generation_id": "1372",
+    "feed_batch_id": "476",
+    "amount": 4213.3,
+    "doc_id": "23930"
+  },
+  {
+    "batch_generation_id": "1372",
+    "feed_batch_id": "476",
+    "amount": 4213.3,
+    "doc_id": "23931"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "476",
+    "amount": 622.5,
+    "doc_id": "23939"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "476",
+    "amount": 622.5,
+    "doc_id": "23941"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "476",
+    "amount": 622.5,
+    "doc_id": "23942"
+  },
+  {
+    "batch_generation_id": "1251",
+    "feed_batch_id": "476",
+    "amount": 622.5,
+    "doc_id": "23943"
+  },
+  {
+    "batch_generation_id": "1387",
+    "feed_batch_id": "476",
+    "amount": 500,
+    "doc_id": "23960"
+  },
+  {
+    "batch_generation_id": "1387",
+    "feed_batch_id": "476",
+    "amount": 500,
+    "doc_id": "23962"
+  },
+  {
+    "batch_generation_id": "1387",
+    "feed_batch_id": "476",
+    "amount": 500,
+    "doc_id": "23963"
+  },
+  {
+    "batch_generation_id": "1387",
+    "feed_batch_id": "476",
+    "amount": 500,
+    "doc_id": "23964"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "476",
+    "amount": 1217.4,
+    "doc_id": "23980"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "476",
+    "amount": 1217.4,
+    "doc_id": "23982"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "476",
+    "amount": 1217.4,
+    "doc_id": "23983"
+  },
+  {
+    "batch_generation_id": "1259",
+    "feed_batch_id": "476",
+    "amount": 1217.4,
+    "doc_id": "23984"
+  },
+  {
+    "batch_generation_id": "1269",
+    "feed_batch_id": "476",
+    "amount": 1734,
+    "doc_id": "24035"
+  },
+  {
+    "batch_generation_id": "1269",
+    "feed_batch_id": "476",
+    "amount": 1734,
+    "doc_id": "24037"
+  },
+  {
+    "batch_generation_id": "1269",
+    "feed_batch_id": "476",
+    "amount": 1734,
+    "doc_id": "24038"
+  },
+  {
+    "batch_generation_id": "1269",
+    "feed_batch_id": "476",
+    "amount": 1734,
+    "doc_id": "24039"
+  },
+  {
+    "batch_generation_id": "1270",
+    "feed_batch_id": "476",
+    "amount": 1501.2,
+    "doc_id": "24040"
+  },
+  {
+    "batch_generation_id": "1270",
+    "feed_batch_id": "476",
+    "amount": 1501.2,
+    "doc_id": "24042"
+  },
+  {
+    "batch_generation_id": "1270",
+    "feed_batch_id": "476",
+    "amount": 1501.2,
+    "doc_id": "24043"
+  },
+  {
+    "batch_generation_id": "1270",
+    "feed_batch_id": "476",
+    "amount": 1501.2,
+    "doc_id": "24044"
+  },
+  {
+    "batch_generation_id": "1388",
+    "feed_batch_id": "476",
+    "amount": 500,
+    "doc_id": "24050"
+  },
+  {
+    "batch_generation_id": "1388",
+    "feed_batch_id": "476",
+    "amount": 500,
+    "doc_id": "24052"
+  },
+  {
+    "batch_generation_id": "1388",
+    "feed_batch_id": "476",
+    "amount": 500,
+    "doc_id": "24053"
+  },
+  {
+    "batch_generation_id": "1388",
+    "feed_batch_id": "476",
+    "amount": 500,
+    "doc_id": "24054"
+  },
+  {
+    "batch_generation_id": "1369",
+    "feed_batch_id": "476",
+    "amount": 1369.8999999999999,
+    "doc_id": "24120"
+  },
+  {
+    "batch_generation_id": "1369",
+    "feed_batch_id": "476",
+    "amount": 1369.8999999999999,
+    "doc_id": "24122"
+  },
+  {
+    "batch_generation_id": "1369",
+    "feed_batch_id": "476",
+    "amount": 1369.8999999999999,
+    "doc_id": "24123"
+  },
+  {
+    "batch_generation_id": "1369",
+    "feed_batch_id": "476",
+    "amount": 1369.8999999999999,
+    "doc_id": "24124"
+  },
+  {
+    "batch_generation_id": "1389",
+    "feed_batch_id": "476",
+    "amount": 500,
+    "doc_id": "24130"
+  },
+  {
+    "batch_generation_id": "1389",
+    "feed_batch_id": "476",
+    "amount": 500,
+    "doc_id": "24132"
+  },
+  {
+    "batch_generation_id": "1389",
+    "feed_batch_id": "476",
+    "amount": 500,
+    "doc_id": "24133"
+  },
+  {
+    "batch_generation_id": "1389",
+    "feed_batch_id": "476",
+    "amount": 500,
+    "doc_id": "24134"
+  },
+  {
+    "batch_generation_id": "1367",
+    "feed_batch_id": "476",
+    "amount": 1585.2,
+    "doc_id": "24135"
+  },
+  {
+    "batch_generation_id": "1367",
+    "feed_batch_id": "476",
+    "amount": 1585.2,
+    "doc_id": "24137"
+  },
+  {
+    "batch_generation_id": "1367",
+    "feed_batch_id": "476",
+    "amount": 1585.2,
+    "doc_id": "24138"
+  },
+  {
+    "batch_generation_id": "1367",
+    "feed_batch_id": "476",
+    "amount": 1585.2,
+    "doc_id": "24139"
+  },
+  {
+    "batch_generation_id": "1372",
+    "feed_batch_id": "476",
+    "amount": 2585.3,
+    "doc_id": "24145"
+  },
+  {
+    "batch_generation_id": "1372",
+    "feed_batch_id": "476",
+    "amount": 2585.3,
+    "doc_id": "24146"
+  },
+  {
+    "batch_generation_id": "1372",
+    "feed_batch_id": "476",
+    "amount": 2585.3,
+    "doc_id": "24147"
+  },
+  {
+    "batch_generation_id": "1372",
+    "feed_batch_id": "476",
+    "amount": 2585.3,
+    "doc_id": "24148"
+  },
+  {
+    "batch_generation_id": "1372",
+    "feed_batch_id": "476",
+    "amount": 2585.3,
+    "doc_id": "24149"
+  }
+]

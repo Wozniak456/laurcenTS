@@ -1,0 +1,7822 @@
+[
+  {
+    "doc_id": "19270",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": -0.20495000000110086,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19270",
+    "location_id": 41,
+    "batch_id": "467",
+    "quantity": 0.20495000000110086,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19270",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.4636499999988991,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19270",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.4636499999988991,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19271",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.6686,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19271",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.6686,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19321",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.882,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19321",
+    "location_id": 49,
+    "batch_id": "474",
+    "quantity": 0.882,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19322",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.882,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19322",
+    "location_id": 49,
+    "batch_id": "474",
+    "quantity": 0.882,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19364",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.65355,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19364",
+    "location_id": 56,
+    "batch_id": "474",
+    "quantity": 0.65355,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19365",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.65355,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19365",
+    "location_id": 56,
+    "batch_id": "474",
+    "quantity": 0.65355,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19696",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.625,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19696",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.625,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19697",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.625,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19697",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.625,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19698",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.625,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19698",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.625,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19699",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.625,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19699",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.625,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19700",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.625,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19700",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.625,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19741",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.40345,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19741",
+    "location_id": 49,
+    "batch_id": "474",
+    "quantity": 0.40345,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19742",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.40345,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19742",
+    "location_id": 49,
+    "batch_id": "474",
+    "quantity": 0.40345,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19743",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.40345,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19743",
+    "location_id": 49,
+    "batch_id": "474",
+    "quantity": 0.40345,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19744",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.40345,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19744",
+    "location_id": 49,
+    "batch_id": "474",
+    "quantity": 0.40345,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19745",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.40345,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19745",
+    "location_id": 49,
+    "batch_id": "474",
+    "quantity": 0.40345,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19756",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.421,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19756",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 0.421,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19757",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.421,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19757",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 0.421,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19758",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.421,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19758",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 0.421,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19759",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.421,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19759",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 0.421,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19760",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.421,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19760",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 0.421,
+    "unit_id": 2
+  },
+  {
+    "id": "33790",
+    "doc_id": "19791",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "33791",
+    "doc_id": "19791",
+    "location_id": 56,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "33792",
+    "doc_id": "19792",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "33793",
+    "doc_id": "19792",
+    "location_id": 56,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "33794",
+    "doc_id": "19793",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "33795",
+    "doc_id": "19793",
+    "location_id": 56,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "33796",
+    "doc_id": "19794",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "33797",
+    "doc_id": "19794",
+    "location_id": 56,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "33798",
+    "doc_id": "19795",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "33799",
+    "doc_id": "19795",
+    "location_id": 56,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "doc_id": "19911",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.6485,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19911",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.6485,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19912",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.6485,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19912",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.6485,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19913",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.6485,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19913",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.6485,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19914",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.6485,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19914",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.6485,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19915",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.6485,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19915",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.6485,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19956",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.4183,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19956",
+    "location_id": 49,
+    "batch_id": "474",
+    "quantity": 0.4183,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19957",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.4183,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19957",
+    "location_id": 49,
+    "batch_id": "474",
+    "quantity": 0.4183,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19958",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.4183,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19958",
+    "location_id": 49,
+    "batch_id": "474",
+    "quantity": 0.4183,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19959",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.4183,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19959",
+    "location_id": 49,
+    "batch_id": "474",
+    "quantity": 0.4183,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19960",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.4183,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19960",
+    "location_id": 49,
+    "batch_id": "474",
+    "quantity": 0.4183,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19971",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.455,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19971",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 0.455,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19972",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.455,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19972",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 0.455,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19973",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.455,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19973",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 0.455,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19974",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.455,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19974",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 0.455,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19975",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.455,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "19975",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 0.455,
+    "unit_id": 2
+  },
+  {
+    "id": "34220",
+    "doc_id": "20006",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "34221",
+    "doc_id": "20006",
+    "location_id": 56,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "34222",
+    "doc_id": "20007",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "34223",
+    "doc_id": "20007",
+    "location_id": 56,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "34224",
+    "doc_id": "20008",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "34225",
+    "doc_id": "20008",
+    "location_id": 56,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "34226",
+    "doc_id": "20009",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "34227",
+    "doc_id": "20009",
+    "location_id": 56,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "34228",
+    "doc_id": "20010",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "34229",
+    "doc_id": "20010",
+    "location_id": 56,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "doc_id": "20121",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.6957000000000001,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20121",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.6957000000000001,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20122",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.6957000000000001,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20122",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.6957000000000001,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20123",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.6957000000000001,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20123",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.6957000000000001,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20124",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.6957000000000001,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20124",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.6957000000000001,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20125",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.6957000000000001,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20125",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.6957000000000001,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20166",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.43355,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20166",
+    "location_id": 49,
+    "batch_id": "474",
+    "quantity": 0.43355,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20167",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.43355,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20167",
+    "location_id": 49,
+    "batch_id": "474",
+    "quantity": 0.43355,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20168",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.43355,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20168",
+    "location_id": 49,
+    "batch_id": "474",
+    "quantity": 0.43355,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20169",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.43355,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20169",
+    "location_id": 49,
+    "batch_id": "474",
+    "quantity": 0.43355,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20170",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.43355,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20170",
+    "location_id": 49,
+    "batch_id": "474",
+    "quantity": 0.43355,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20181",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.4913,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20181",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 0.4913,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20182",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.4913,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20182",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 0.4913,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20183",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.4913,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20183",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 0.4913,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20184",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.4913,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20184",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 0.4913,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20185",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.4913,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20185",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 0.4913,
+    "unit_id": 2
+  },
+  {
+    "id": "34650",
+    "doc_id": "20221",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "34651",
+    "doc_id": "20221",
+    "location_id": 56,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "34652",
+    "doc_id": "20222",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "34653",
+    "doc_id": "20222",
+    "location_id": 56,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "34654",
+    "doc_id": "20223",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "34655",
+    "doc_id": "20223",
+    "location_id": 56,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "34656",
+    "doc_id": "20224",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "34657",
+    "doc_id": "20224",
+    "location_id": 56,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "34658",
+    "doc_id": "20225",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "34659",
+    "doc_id": "20225",
+    "location_id": 56,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "doc_id": "20367",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7217,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20367",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.7217,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20368",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7217,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20368",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.7217,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20369",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7217,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20369",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.7217,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20370",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7217,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20370",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.7217,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20371",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7217,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20371",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.7217,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20412",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.44905,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20412",
+    "location_id": 49,
+    "batch_id": "474",
+    "quantity": 0.44905,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20413",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.44905,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20413",
+    "location_id": 49,
+    "batch_id": "474",
+    "quantity": 0.44905,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20414",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.44905,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20414",
+    "location_id": 49,
+    "batch_id": "474",
+    "quantity": 0.44905,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20415",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.44905,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20415",
+    "location_id": 49,
+    "batch_id": "474",
+    "quantity": 0.44905,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20416",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.44905,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20416",
+    "location_id": 49,
+    "batch_id": "474",
+    "quantity": 0.44905,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20427",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.5307000000000001,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20427",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 0.5307000000000001,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20428",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.5307000000000001,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20428",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 0.5307000000000001,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20429",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.5307000000000001,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20429",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 0.5307000000000001,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20430",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.5307000000000001,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20430",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 0.5307000000000001,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20431",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.5307000000000001,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20431",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 0.5307000000000001,
+    "unit_id": 2
+  },
+  {
+    "id": "35334",
+    "doc_id": "20562",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "35335",
+    "doc_id": "20562",
+    "location_id": 56,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "35336",
+    "doc_id": "20563",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "35337",
+    "doc_id": "20563",
+    "location_id": 56,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "35338",
+    "doc_id": "20564",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "35339",
+    "doc_id": "20564",
+    "location_id": 56,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "35340",
+    "doc_id": "20565",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "35341",
+    "doc_id": "20565",
+    "location_id": 56,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "35342",
+    "doc_id": "20566",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "35343",
+    "doc_id": "20566",
+    "location_id": 56,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "doc_id": "20572",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7486,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20572",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.7486,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20573",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7486,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20573",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.7486,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20574",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7486,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20574",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.7486,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20575",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7486,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20575",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.7486,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20576",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7486,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20576",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.7486,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20617",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.47625,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20617",
+    "location_id": 49,
+    "batch_id": "474",
+    "quantity": 0.47625,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20618",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.47625,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20618",
+    "location_id": 49,
+    "batch_id": "474",
+    "quantity": 0.47625,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20619",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.47625,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20619",
+    "location_id": 49,
+    "batch_id": "474",
+    "quantity": 0.47625,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20620",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.47625,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20620",
+    "location_id": 49,
+    "batch_id": "474",
+    "quantity": 0.47625,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20621",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.47625,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20621",
+    "location_id": 49,
+    "batch_id": "474",
+    "quantity": 0.47625,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20632",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.5731,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20632",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 0.5731,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20633",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.5731,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20633",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 0.5731,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20634",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.5731,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20634",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 0.5731,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20635",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.5731,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20635",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 0.5731,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20636",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.5731,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20636",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 0.5731,
+    "unit_id": 2
+  },
+  {
+    "id": "35792",
+    "doc_id": "20814",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "35793",
+    "doc_id": "20814",
+    "location_id": 56,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "35794",
+    "doc_id": "20815",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "35795",
+    "doc_id": "20815",
+    "location_id": 56,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "35796",
+    "doc_id": "20816",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "35797",
+    "doc_id": "20816",
+    "location_id": 56,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "35798",
+    "doc_id": "20817",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "35799",
+    "doc_id": "20817",
+    "location_id": 56,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "35800",
+    "doc_id": "20818",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "35801",
+    "doc_id": "20818",
+    "location_id": 56,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "doc_id": "20891",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7762,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20891",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.7762,
+    "unit_id": 2
+  },
+  {
+    "id": "35932",
+    "doc_id": "20892",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "35933",
+    "doc_id": "20892",
+    "location_id": 41,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "doc_id": "20893",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7762,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20893",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.7762,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20894",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7762,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20894",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.7762,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20895",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7762,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20895",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.7762,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20931",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.493,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20931",
+    "location_id": 49,
+    "batch_id": "474",
+    "quantity": 0.493,
+    "unit_id": 2
+  },
+  {
+    "id": "36012",
+    "doc_id": "20932",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "36013",
+    "doc_id": "20932",
+    "location_id": 49,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "doc_id": "20933",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.493,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20933",
+    "location_id": 49,
+    "batch_id": "474",
+    "quantity": 0.493,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20934",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.493,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20934",
+    "location_id": 49,
+    "batch_id": "474",
+    "quantity": 0.493,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20935",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.493,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20935",
+    "location_id": 49,
+    "batch_id": "474",
+    "quantity": 0.493,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20941",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.619,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20941",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 0.619,
+    "unit_id": 2
+  },
+  {
+    "id": "36032",
+    "doc_id": "20942",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "36033",
+    "doc_id": "20942",
+    "location_id": 51,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "doc_id": "20943",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.619,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20943",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 0.619,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20944",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.619,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20944",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 0.619,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20945",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.619,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "20945",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 0.619,
+    "unit_id": 2
+  },
+  {
+    "id": "36100",
+    "doc_id": "20976",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "36101",
+    "doc_id": "20976",
+    "location_id": 56,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "36102",
+    "doc_id": "20977",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "36103",
+    "doc_id": "20977",
+    "location_id": 56,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "36104",
+    "doc_id": "20978",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "36105",
+    "doc_id": "20978",
+    "location_id": 56,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "36106",
+    "doc_id": "20979",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "36107",
+    "doc_id": "20979",
+    "location_id": 56,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "36108",
+    "doc_id": "20980",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "36109",
+    "doc_id": "20980",
+    "location_id": 56,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "36412",
+    "doc_id": "21168",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "36413",
+    "doc_id": "21168",
+    "location_id": 40,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "36414",
+    "doc_id": "21169",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "36415",
+    "doc_id": "21169",
+    "location_id": 40,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "36416",
+    "doc_id": "21170",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "36417",
+    "doc_id": "21170",
+    "location_id": 40,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "doc_id": "21171",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.2,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21171",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.2,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21172",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.2,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21172",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.2,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21173",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7355,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21173",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.7355,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21174",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7355,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21174",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.7355,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21175",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7355,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21175",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.7355,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21176",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7355,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21176",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.7355,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21177",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7355,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21177",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.7355,
+    "unit_id": 2
+  },
+  {
+    "id": "36512",
+    "doc_id": "21218",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "36513",
+    "doc_id": "21218",
+    "location_id": 49,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "36514",
+    "doc_id": "21219",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "36515",
+    "doc_id": "21219",
+    "location_id": 49,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "36516",
+    "doc_id": "21220",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "36517",
+    "doc_id": "21220",
+    "location_id": 49,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "36518",
+    "doc_id": "21221",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "36519",
+    "doc_id": "21221",
+    "location_id": 49,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "36520",
+    "doc_id": "21222",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "36521",
+    "doc_id": "21222",
+    "location_id": 49,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "doc_id": "21223",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.0613,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21223",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.0613,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21224",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.0613,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21224",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.0613,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21225",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.0613,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21225",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.0613,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21226",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.0613,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21226",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.0613,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21227",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.0613,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21227",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.0613,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21373",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.281,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21373",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.281,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21374",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.281,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21374",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.281,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21375",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.281,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21375",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.281,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21376",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.281,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21376",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.281,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21377",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.281,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21377",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.281,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21378",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.762,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21378",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.762,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21379",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.762,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21379",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.762,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21380",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.762,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21380",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.762,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21381",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.762,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21381",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.762,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21382",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.762,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21382",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.762,
+    "unit_id": 2
+  },
+  {
+    "id": "36932",
+    "doc_id": "21428",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "36933",
+    "doc_id": "21428",
+    "location_id": 49,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "36934",
+    "doc_id": "21429",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "36935",
+    "doc_id": "21429",
+    "location_id": 49,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "36936",
+    "doc_id": "21430",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "36937",
+    "doc_id": "21430",
+    "location_id": 49,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "36938",
+    "doc_id": "21431",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "36939",
+    "doc_id": "21431",
+    "location_id": 49,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "36940",
+    "doc_id": "21432",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "36941",
+    "doc_id": "21432",
+    "location_id": 49,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "doc_id": "21438",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.479,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21438",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.479,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21439",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.479,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21439",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.479,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21440",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.279,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21440",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.279,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21441",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.279,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21441",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.279,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21442",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.279,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21442",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.279,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21443",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.099,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21443",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.099,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21444",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.099,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21444",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.099,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21445",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.099,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21445",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.099,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21446",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.099,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21446",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.099,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21447",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.099,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21447",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.099,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21596",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.303,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21596",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.303,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21597",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.303,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21597",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.303,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21598",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.303,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21598",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.303,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21599",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.303,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21599",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.303,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21600",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.303,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21600",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.303,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21601",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7896,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21601",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.7896,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21602",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7896,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21602",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.7896,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21603",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7896,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21603",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.7896,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21604",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7896,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21604",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.7896,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21605",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7896,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21605",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.7896,
+    "unit_id": 2
+  },
+  {
+    "id": "37359",
+    "doc_id": "21641",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "37360",
+    "doc_id": "21641",
+    "location_id": 49,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "37361",
+    "doc_id": "21642",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "37362",
+    "doc_id": "21642",
+    "location_id": 49,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "37363",
+    "doc_id": "21643",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "37364",
+    "doc_id": "21643",
+    "location_id": 49,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "37365",
+    "doc_id": "21644",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "37366",
+    "doc_id": "21644",
+    "location_id": 49,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "37367",
+    "doc_id": "21645",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "37368",
+    "doc_id": "21645",
+    "location_id": 49,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "doc_id": "21646",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.3018,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21646",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.3018,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21647",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.3018,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21647",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.3018,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21648",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.3018,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21648",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.3018,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21649",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.3018,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21649",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.3018,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21650",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.3018,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21650",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.3018,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21651",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.1871,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21651",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.1871,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21652",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.1871,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21652",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.1871,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21653",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.1871,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21653",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.1871,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21654",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.1871,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21654",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.1871,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21655",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.1871,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21655",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.1871,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21791",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.3272,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21791",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.3272,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21792",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.3272,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21792",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.3272,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21793",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.3272,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21793",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.3272,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21794",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.3272,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21794",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.3272,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21795",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.3272,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21795",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.3272,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21796",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.8373999999999999,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21796",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.8373999999999999,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21797",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.8373999999999999,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21797",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.8373999999999999,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21798",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.8373999999999999,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21798",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.8373999999999999,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21799",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.8373999999999999,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21799",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.8373999999999999,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21800",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.8373999999999999,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21800",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.8373999999999999,
+    "unit_id": 2
+  },
+  {
+    "id": "37749",
+    "doc_id": "21836",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "37750",
+    "doc_id": "21836",
+    "location_id": 49,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "37751",
+    "doc_id": "21837",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "37752",
+    "doc_id": "21837",
+    "location_id": 49,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "37753",
+    "doc_id": "21838",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "37754",
+    "doc_id": "21838",
+    "location_id": 49,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "37755",
+    "doc_id": "21839",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "37756",
+    "doc_id": "21839",
+    "location_id": 49,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "37757",
+    "doc_id": "21840",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "37758",
+    "doc_id": "21840",
+    "location_id": 49,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "doc_id": "21846",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.326,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21846",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.326,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21847",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.326,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21847",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.326,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21848",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.326,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21848",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.326,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21849",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.326,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21849",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.326,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21850",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.326,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21850",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.326,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21901",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.2309,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21901",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.2309,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21902",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.9,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21902",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 0.9,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21903",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.9,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21903",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 0.9,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21904",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.9,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21904",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 0.9,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21905",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.9,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21905",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 0.9,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21991",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.3534,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21991",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.3534,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21992",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.3534,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21992",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.3534,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21993",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.3534,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21993",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.3534,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21994",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.3534,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21994",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.3534,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21995",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.3534,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21995",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.3534,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21996",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.8669,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21996",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.8669,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21997",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.8669,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21997",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.8669,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21998",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.8669,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21998",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.8669,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21999",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.8669,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "21999",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.8669,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22000",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.8669,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22000",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.8669,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22046",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.781,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22046",
+    "location_id": 49,
+    "batch_id": "474",
+    "quantity": 0.781,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22047",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.781,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22047",
+    "location_id": 49,
+    "batch_id": "474",
+    "quantity": 0.781,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22048",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.781,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22048",
+    "location_id": 49,
+    "batch_id": "474",
+    "quantity": 0.781,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22049",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.781,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22049",
+    "location_id": 49,
+    "batch_id": "474",
+    "quantity": 0.781,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22050",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.781,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22050",
+    "location_id": 49,
+    "batch_id": "474",
+    "quantity": 0.781,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22051",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.352,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22051",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.352,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22052",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.352,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22052",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.352,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22053",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.352,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22053",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.352,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22054",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.352,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22054",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.352,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22055",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.352,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22055",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.352,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22056",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22056",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22057",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22057",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22058",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22058",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22059",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22059",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22060",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22060",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22196",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.3817,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22196",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.3817,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22197",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.3817,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22197",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.3817,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22198",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.3817,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22198",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.3817,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22199",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.3817,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22199",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.3817,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22200",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.3817,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22200",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.3817,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22201",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.8969,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22201",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.8969,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22202",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.8969,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22202",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.8969,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22203",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.8969,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22203",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.8969,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22204",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.8969,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22204",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.8969,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22205",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.8969,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22205",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.8969,
+    "unit_id": 2
+  },
+  {
+    "id": "38569",
+    "doc_id": "22246",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "38570",
+    "doc_id": "22246",
+    "location_id": 49,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "38571",
+    "doc_id": "22247",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "38572",
+    "doc_id": "22247",
+    "location_id": 49,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "38573",
+    "doc_id": "22248",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "38574",
+    "doc_id": "22248",
+    "location_id": 49,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "38575",
+    "doc_id": "22249",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "38576",
+    "doc_id": "22249",
+    "location_id": 49,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "38577",
+    "doc_id": "22250",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "38578",
+    "doc_id": "22250",
+    "location_id": 49,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "doc_id": "22251",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.3802,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22251",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.3802,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22252",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.3802,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22252",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.3802,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22253",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.3802,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22253",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.3802,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22254",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.3802,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22254",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.3802,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22255",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.3802,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22255",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.3802,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22256",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.3248,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22256",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.3248,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22257",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.3248,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22257",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.3248,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22258",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.3248,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22258",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.3248,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22259",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.3248,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22259",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.3248,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22260",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.3248,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22260",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.3248,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22396",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.4122,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22396",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.4122,
+    "unit_id": 2
+  },
+  {
+    "id": "38871",
+    "doc_id": "22397",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "38872",
+    "doc_id": "22397",
+    "location_id": 40,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "doc_id": "22398",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.4122,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22398",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.4122,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22399",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.4122,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22399",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.4122,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22400",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.4122,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22400",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.4122,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22401",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.9274,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22401",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.9274,
+    "unit_id": 2
+  },
+  {
+    "id": "38881",
+    "doc_id": "22402",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "38882",
+    "doc_id": "22402",
+    "location_id": 41,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "doc_id": "22403",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.9274,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22403",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.9274,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22404",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.9274,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22404",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.9274,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22405",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.9274,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22405",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.9274,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22456",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.4106,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22456",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.4106,
+    "unit_id": 2
+  },
+  {
+    "id": "38991",
+    "doc_id": "22457",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "38992",
+    "doc_id": "22457",
+    "location_id": 50,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "doc_id": "22458",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.4106,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22458",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.4106,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22459",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.4106,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22459",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.4106,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22460",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.4106,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22460",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.4106,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22461",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.3741,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22461",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.3741,
+    "unit_id": 2
+  },
+  {
+    "id": "39001",
+    "doc_id": "22462",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "39002",
+    "doc_id": "22462",
+    "location_id": 51,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "doc_id": "22463",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.3741,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22463",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.3741,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22464",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.3741,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22464",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.3741,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22465",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.3741,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22465",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.3741,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22768",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7243999999999999,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22768",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.7243999999999999,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22769",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7243999999999999,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22769",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.7243999999999999,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22770",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7243999999999999,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22770",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.7243999999999999,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22771",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7243999999999999,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22771",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.7243999999999999,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22772",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7243999999999999,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22772",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.7243999999999999,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22773",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.5085500000000001,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22773",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.5085500000000001,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22774",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.5085500000000001,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22774",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.5085500000000001,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22775",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.5085500000000001,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22775",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.5085500000000001,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22776",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.5085500000000001,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22776",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.5085500000000001,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22777",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.5085500000000001,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22777",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.5085500000000001,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22818",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.6774,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22818",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.6774,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22819",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.6774,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22819",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.6774,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22820",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.6774,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22820",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.6774,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22821",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.6774,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22821",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.6774,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22822",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.6774,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22822",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.6774,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22823",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.0635,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22823",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.0635,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22824",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.0635,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22824",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.0635,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22825",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.0635,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22825",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.0635,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22826",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.0635,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22826",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.0635,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22827",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.0635,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22827",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.0635,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22963",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.75,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22963",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.75,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22964",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.75,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22964",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.75,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22965",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.75,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22965",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.75,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22966",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.75,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22966",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.75,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22967",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.75,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22967",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.75,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22968",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.527,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22968",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.527,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22969",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.527,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22969",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.527,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22970",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.527,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22970",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.527,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22971",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.527,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22971",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.527,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22972",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.527,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "22972",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.527,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23013",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.702,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23013",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.702,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23014",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.702,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23014",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.702,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23015",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.702,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23015",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.702,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23016",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.702,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23016",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.702,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23017",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.702,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23017",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.702,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23018",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.103,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23018",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.103,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23019",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.103,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23019",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.103,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23020",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.103,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23020",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.103,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23021",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.103,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23021",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.103,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23022",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.103,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23022",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.103,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23163",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7778999999999999,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23163",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.7778999999999999,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23164",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7778999999999999,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23164",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.7778999999999999,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23165",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7778999999999999,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23165",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.7778999999999999,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23166",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7778999999999999,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23166",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.7778999999999999,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23167",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7778999999999999,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23167",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.7778999999999999,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23168",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.54535,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23168",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.54535,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23169",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.54535,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23169",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.54535,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23170",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.54535,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23170",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.54535,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23171",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.54535,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23171",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.54535,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23172",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.54535,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23172",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.54535,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23208",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7275,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23208",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.7275,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23209",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7275,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23209",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.7275,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23210",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7275,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23210",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.7275,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23211",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7275,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23211",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.7275,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23212",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7275,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23212",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.7275,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23213",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23213",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23214",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23214",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23215",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23215",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23216",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23216",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23217",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23217",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23362",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.807,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23362",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.807,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23363",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.807,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23363",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.807,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23364",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.807,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23364",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.807,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23365",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.807,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23365",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.807,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23366",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.807,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23366",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.807,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23367",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.5642,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23367",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.5642,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23368",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.5642,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23368",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.5642,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23369",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.5642,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23369",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.5642,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23370",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.5642,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23370",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.5642,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23371",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.5642,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23371",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.5642,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23407",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7547,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23407",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.7547,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23408",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7547,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23408",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.7547,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23409",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7547,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23409",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.7547,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23410",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7547,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23410",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.7547,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23411",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7547,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23411",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.7547,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23412",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.037,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23412",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.037,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23413",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.037,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23413",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.037,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23414",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.037,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23414",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.037,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23415",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.037,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23415",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.037,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23416",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -1.037,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23416",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 1.037,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23560",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.8372,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23560",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.8372,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23561",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.8372,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23561",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.8372,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23562",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.8372,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23562",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.8372,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23563",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.8372,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23563",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.8372,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23564",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.8372,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23564",
+    "location_id": 40,
+    "batch_id": "474",
+    "quantity": 0.8372,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23565",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.5834,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23565",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.5834,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23566",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.5834,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23566",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.5834,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23567",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.5834,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23567",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.5834,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23568",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.5834,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23568",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.5834,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23569",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.5834,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23569",
+    "location_id": 41,
+    "batch_id": "474",
+    "quantity": 0.5834,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23570",
+    "location_id": 87,
+    "batch_id": "455",
+    "quantity": -0.5834,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23570",
+    "location_id": 41,
+    "batch_id": "455",
+    "quantity": 0.5834,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23571",
+    "location_id": 87,
+    "batch_id": "455",
+    "quantity": -0.5834,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23571",
+    "location_id": 41,
+    "batch_id": "455",
+    "quantity": 0.5834,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23572",
+    "location_id": 87,
+    "batch_id": "455",
+    "quantity": -0.5834,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23572",
+    "location_id": 41,
+    "batch_id": "455",
+    "quantity": 0.5834,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23573",
+    "location_id": 87,
+    "batch_id": "455",
+    "quantity": -0.5834,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23573",
+    "location_id": 41,
+    "batch_id": "455",
+    "quantity": 0.5834,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23574",
+    "location_id": 87,
+    "batch_id": "455",
+    "quantity": -0.5834,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23574",
+    "location_id": 41,
+    "batch_id": "455",
+    "quantity": 0.5834,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23600",
+    "location_id": 87,
+    "batch_id": "455",
+    "quantity": -1.145,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23600",
+    "location_id": 49,
+    "batch_id": "455",
+    "quantity": 1.145,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23601",
+    "location_id": 87,
+    "batch_id": "455",
+    "quantity": -1.145,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23601",
+    "location_id": 49,
+    "batch_id": "455",
+    "quantity": 1.145,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23602",
+    "location_id": 87,
+    "batch_id": "455",
+    "quantity": -1.145,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23602",
+    "location_id": 49,
+    "batch_id": "455",
+    "quantity": 1.145,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23603",
+    "location_id": 87,
+    "batch_id": "455",
+    "quantity": -1.145,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23603",
+    "location_id": 49,
+    "batch_id": "455",
+    "quantity": 1.145,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23604",
+    "location_id": 87,
+    "batch_id": "455",
+    "quantity": -1.145,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23604",
+    "location_id": 49,
+    "batch_id": "455",
+    "quantity": 1.145,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23605",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7828999999999999,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23605",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.7828999999999999,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23606",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7828999999999999,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23606",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.7828999999999999,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23607",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7828999999999999,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23607",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.7828999999999999,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23608",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7828999999999999,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23608",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.7828999999999999,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23609",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.7828999999999999,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23609",
+    "location_id": 50,
+    "batch_id": "474",
+    "quantity": 0.7828999999999999,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23610",
+    "location_id": 87,
+    "batch_id": "474",
+    "quantity": -0.1313500000012804,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23610",
+    "location_id": 51,
+    "batch_id": "474",
+    "quantity": 0.1313500000012804,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23636",
+    "location_id": 87,
+    "batch_id": "455",
+    "quantity": -1.3142000000200018,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23636",
+    "location_id": 56,
+    "batch_id": "455",
+    "quantity": 1.3142000000200018,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23636",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -0.3177999999799981,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23636",
+    "location_id": 56,
+    "batch_id": "476",
+    "quantity": 0.3177999999799981,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23637",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.632,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23637",
+    "location_id": 56,
+    "batch_id": "476",
+    "quantity": 1.632,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23638",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.632,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23638",
+    "location_id": 56,
+    "batch_id": "476",
+    "quantity": 1.632,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23639",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.632,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23639",
+    "location_id": 56,
+    "batch_id": "476",
+    "quantity": 1.632,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23640",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.632,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23640",
+    "location_id": 56,
+    "batch_id": "476",
+    "quantity": 1.632,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23641",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.42,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23641",
+    "location_id": 57,
+    "batch_id": "476",
+    "quantity": 1.42,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23642",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.42,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23642",
+    "location_id": 57,
+    "batch_id": "476",
+    "quantity": 1.42,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23643",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.42,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23643",
+    "location_id": 57,
+    "batch_id": "476",
+    "quantity": 1.42,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23644",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.42,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23644",
+    "location_id": 57,
+    "batch_id": "476",
+    "quantity": 1.42,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23645",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.42,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23645",
+    "location_id": 57,
+    "batch_id": "476",
+    "quantity": 1.42,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23646",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.86,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23646",
+    "location_id": 58,
+    "batch_id": "476",
+    "quantity": 1.86,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23647",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.86,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23647",
+    "location_id": 58,
+    "batch_id": "476",
+    "quantity": 1.86,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23648",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.86,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23648",
+    "location_id": 58,
+    "batch_id": "476",
+    "quantity": 1.86,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23649",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.86,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23649",
+    "location_id": 58,
+    "batch_id": "476",
+    "quantity": 1.86,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23650",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.86,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23650",
+    "location_id": 58,
+    "batch_id": "476",
+    "quantity": 1.86,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23721",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.3082,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23721",
+    "location_id": 73,
+    "batch_id": "476",
+    "quantity": 1.3082,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23722",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.3082,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23722",
+    "location_id": 73,
+    "batch_id": "476",
+    "quantity": 1.3082,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23723",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.3082,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23723",
+    "location_id": 73,
+    "batch_id": "476",
+    "quantity": 1.3082,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23724",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.3082,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23724",
+    "location_id": 73,
+    "batch_id": "476",
+    "quantity": 1.3082,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23725",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.3082,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23725",
+    "location_id": 73,
+    "batch_id": "476",
+    "quantity": 1.3082,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23726",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.4888,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23726",
+    "location_id": 75,
+    "batch_id": "476",
+    "quantity": 1.4888,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23727",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.4888,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23727",
+    "location_id": 75,
+    "batch_id": "476",
+    "quantity": 1.4888,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23728",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.4888,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23728",
+    "location_id": 75,
+    "batch_id": "476",
+    "quantity": 1.4888,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23729",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.4888,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23729",
+    "location_id": 75,
+    "batch_id": "476",
+    "quantity": 1.4888,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23730",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.4888,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23730",
+    "location_id": 75,
+    "batch_id": "476",
+    "quantity": 1.4888,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23736",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -2.47,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23736",
+    "location_id": 77,
+    "batch_id": "476",
+    "quantity": 2.47,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23737",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -2.47,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23737",
+    "location_id": 77,
+    "batch_id": "476",
+    "quantity": 2.47,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23738",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -2.47,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23738",
+    "location_id": 77,
+    "batch_id": "476",
+    "quantity": 2.47,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23739",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -2.47,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23739",
+    "location_id": 77,
+    "batch_id": "476",
+    "quantity": 2.47,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23740",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -2.47,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23740",
+    "location_id": 77,
+    "batch_id": "476",
+    "quantity": 2.47,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23751",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -0.60285,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23751",
+    "location_id": 41,
+    "batch_id": "476",
+    "quantity": 0.60285,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23752",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -0.60285,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23752",
+    "location_id": 41,
+    "batch_id": "476",
+    "quantity": 0.60285,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23753",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -0.60285,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23753",
+    "location_id": 41,
+    "batch_id": "476",
+    "quantity": 0.60285,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23754",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -0.60285,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23754",
+    "location_id": 41,
+    "batch_id": "476",
+    "quantity": 0.60285,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23755",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -0.60285,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23755",
+    "location_id": 41,
+    "batch_id": "476",
+    "quantity": 0.60285,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23796",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.181,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23796",
+    "location_id": 49,
+    "batch_id": "476",
+    "quantity": 1.181,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23797",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.181,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23797",
+    "location_id": 49,
+    "batch_id": "476",
+    "quantity": 1.181,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23798",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.181,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23798",
+    "location_id": 49,
+    "batch_id": "476",
+    "quantity": 1.181,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23799",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.181,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23799",
+    "location_id": 49,
+    "batch_id": "476",
+    "quantity": 1.181,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23800",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.181,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23800",
+    "location_id": 49,
+    "batch_id": "476",
+    "quantity": 1.181,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23831",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.6831,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23831",
+    "location_id": 56,
+    "batch_id": "476",
+    "quantity": 1.6831,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23832",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.6831,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23832",
+    "location_id": 56,
+    "batch_id": "476",
+    "quantity": 1.6831,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23833",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.6831,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23833",
+    "location_id": 56,
+    "batch_id": "476",
+    "quantity": 1.6831,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23834",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.6831,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23834",
+    "location_id": 56,
+    "batch_id": "476",
+    "quantity": 1.6831,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23835",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.6831,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23835",
+    "location_id": 56,
+    "batch_id": "476",
+    "quantity": 1.6831,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23837",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.4604,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23837",
+    "location_id": 57,
+    "batch_id": "476",
+    "quantity": 1.4604,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23838",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.4604,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23838",
+    "location_id": 57,
+    "batch_id": "476",
+    "quantity": 1.4604,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23839",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.4604,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23839",
+    "location_id": 57,
+    "batch_id": "476",
+    "quantity": 1.4604,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23840",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.4604,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23840",
+    "location_id": 57,
+    "batch_id": "476",
+    "quantity": 1.4604,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23841",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.4604,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23841",
+    "location_id": 57,
+    "batch_id": "476",
+    "quantity": 1.4604,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23907",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -2.4345,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23907",
+    "location_id": 73,
+    "batch_id": "476",
+    "quantity": 2.4345,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23908",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -2.4345,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23908",
+    "location_id": 73,
+    "batch_id": "476",
+    "quantity": 2.4345,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23909",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -2.4345,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23909",
+    "location_id": 73,
+    "batch_id": "476",
+    "quantity": 2.4345,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23910",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -2.4345,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23910",
+    "location_id": 73,
+    "batch_id": "476",
+    "quantity": 2.4345,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23911",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -2.4345,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23911",
+    "location_id": 73,
+    "batch_id": "476",
+    "quantity": 2.4345,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23917",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.5261,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23917",
+    "location_id": 75,
+    "batch_id": "476",
+    "quantity": 1.5261,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23918",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.5261,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23918",
+    "location_id": 75,
+    "batch_id": "476",
+    "quantity": 1.5261,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23919",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.5261,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23919",
+    "location_id": 75,
+    "batch_id": "476",
+    "quantity": 1.5261,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23920",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.5261,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23920",
+    "location_id": 75,
+    "batch_id": "476",
+    "quantity": 1.5261,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23921",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.5261,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23921",
+    "location_id": 75,
+    "batch_id": "476",
+    "quantity": 1.5261,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23927",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -4.2133,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23927",
+    "location_id": 77,
+    "batch_id": "476",
+    "quantity": 4.2133,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23928",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -4.2133,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23928",
+    "location_id": 77,
+    "batch_id": "476",
+    "quantity": 4.2133,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23929",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -4.2133,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23929",
+    "location_id": 77,
+    "batch_id": "476",
+    "quantity": 4.2133,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23930",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -4.2133,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23930",
+    "location_id": 77,
+    "batch_id": "476",
+    "quantity": 4.2133,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23931",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -4.2133,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23931",
+    "location_id": 77,
+    "batch_id": "476",
+    "quantity": 4.2133,
+    "unit_id": 2
+  },
+  {
+    "id": "41744",
+    "doc_id": "23935",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "41745",
+    "doc_id": "23935",
+    "location_id": 40,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "doc_id": "23939",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -0.6225,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23939",
+    "location_id": 41,
+    "batch_id": "476",
+    "quantity": 0.6225,
+    "unit_id": 2
+  },
+  {
+    "id": "41754",
+    "doc_id": "23940",
+    "location_id": 87,
+    "batch_id": "455",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "41755",
+    "doc_id": "23940",
+    "location_id": 41,
+    "batch_id": "455",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "doc_id": "23941",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -0.6225,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23941",
+    "location_id": 41,
+    "batch_id": "476",
+    "quantity": 0.6225,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23942",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -0.6225,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23942",
+    "location_id": 41,
+    "batch_id": "476",
+    "quantity": 0.6225,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23943",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -0.6225,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23943",
+    "location_id": 41,
+    "batch_id": "476",
+    "quantity": 0.6225,
+    "unit_id": 2
+  },
+  {
+    "id": "41764",
+    "doc_id": "23945",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "41765",
+    "doc_id": "23945",
+    "location_id": 41,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "doc_id": "23960",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -0.5,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23960",
+    "location_id": 45,
+    "batch_id": "476",
+    "quantity": 0.5,
+    "unit_id": 2
+  },
+  {
+    "id": "41794",
+    "doc_id": "23961",
+    "location_id": 87,
+    "batch_id": "455",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "41795",
+    "doc_id": "23961",
+    "location_id": 45,
+    "batch_id": "455",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "doc_id": "23962",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -0.5,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23962",
+    "location_id": 45,
+    "batch_id": "476",
+    "quantity": 0.5,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23963",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -0.5,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23963",
+    "location_id": 45,
+    "batch_id": "476",
+    "quantity": 0.5,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23964",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -0.5,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23964",
+    "location_id": 45,
+    "batch_id": "476",
+    "quantity": 0.5,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23980",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.2174,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23980",
+    "location_id": 49,
+    "batch_id": "476",
+    "quantity": 1.2174,
+    "unit_id": 2
+  },
+  {
+    "id": "41834",
+    "doc_id": "23981",
+    "location_id": 87,
+    "batch_id": "455",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "41835",
+    "doc_id": "23981",
+    "location_id": 49,
+    "batch_id": "455",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "doc_id": "23982",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.2174,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23982",
+    "location_id": 49,
+    "batch_id": "476",
+    "quantity": 1.2174,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23983",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.2174,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23983",
+    "location_id": 49,
+    "batch_id": "476",
+    "quantity": 1.2174,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23984",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.2174,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "23984",
+    "location_id": 49,
+    "batch_id": "476",
+    "quantity": 1.2174,
+    "unit_id": 2
+  },
+  {
+    "id": "41844",
+    "doc_id": "23986",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "41845",
+    "doc_id": "23986",
+    "location_id": 50,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "41854",
+    "doc_id": "23991",
+    "location_id": 87,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "41855",
+    "doc_id": "23991",
+    "location_id": 51,
+    "batch_id": "467",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "41862",
+    "doc_id": "23995",
+    "location_id": 87,
+    "batch_id": "455",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "41863",
+    "doc_id": "23995",
+    "location_id": 51,
+    "batch_id": "455",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "41864",
+    "doc_id": "23996",
+    "location_id": 87,
+    "batch_id": "455",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "41865",
+    "doc_id": "23996",
+    "location_id": 51,
+    "batch_id": "455",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "41866",
+    "doc_id": "23997",
+    "location_id": 87,
+    "batch_id": "455",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "41867",
+    "doc_id": "23997",
+    "location_id": 51,
+    "batch_id": "455",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "41868",
+    "doc_id": "23998",
+    "location_id": 87,
+    "batch_id": "455",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "41869",
+    "doc_id": "23998",
+    "location_id": 51,
+    "batch_id": "455",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "41870",
+    "doc_id": "23999",
+    "location_id": 87,
+    "batch_id": "455",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "41871",
+    "doc_id": "23999",
+    "location_id": 51,
+    "batch_id": "455",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "doc_id": "24035",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.734,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24035",
+    "location_id": 56,
+    "batch_id": "476",
+    "quantity": 1.734,
+    "unit_id": 2
+  },
+  {
+    "id": "41944",
+    "doc_id": "24036",
+    "location_id": 87,
+    "batch_id": "455",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "41945",
+    "doc_id": "24036",
+    "location_id": 56,
+    "batch_id": "455",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "doc_id": "24037",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.734,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24037",
+    "location_id": 56,
+    "batch_id": "476",
+    "quantity": 1.734,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24038",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.734,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24038",
+    "location_id": 56,
+    "batch_id": "476",
+    "quantity": 1.734,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24039",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.734,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24039",
+    "location_id": 56,
+    "batch_id": "476",
+    "quantity": 1.734,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24040",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.5012,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24040",
+    "location_id": 57,
+    "batch_id": "476",
+    "quantity": 1.5012,
+    "unit_id": 2
+  },
+  {
+    "id": "41954",
+    "doc_id": "24041",
+    "location_id": 87,
+    "batch_id": "455",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "41955",
+    "doc_id": "24041",
+    "location_id": 57,
+    "batch_id": "455",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "doc_id": "24042",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.5012,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24042",
+    "location_id": 57,
+    "batch_id": "476",
+    "quantity": 1.5012,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24043",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.5012,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24043",
+    "location_id": 57,
+    "batch_id": "476",
+    "quantity": 1.5012,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24044",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.5012,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24044",
+    "location_id": 57,
+    "batch_id": "476",
+    "quantity": 1.5012,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24050",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -0.5,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24050",
+    "location_id": 60,
+    "batch_id": "476",
+    "quantity": 0.5,
+    "unit_id": 2
+  },
+  {
+    "id": "41974",
+    "doc_id": "24051",
+    "location_id": 87,
+    "batch_id": "455",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "41975",
+    "doc_id": "24051",
+    "location_id": 60,
+    "batch_id": "455",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "doc_id": "24052",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -0.5,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24052",
+    "location_id": 60,
+    "batch_id": "476",
+    "quantity": 0.5,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24053",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -0.5,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24053",
+    "location_id": 60,
+    "batch_id": "476",
+    "quantity": 0.5,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24054",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -0.5,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24054",
+    "location_id": 60,
+    "batch_id": "476",
+    "quantity": 0.5,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24120",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.3699,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24120",
+    "location_id": 73,
+    "batch_id": "476",
+    "quantity": 1.3699,
+    "unit_id": 2
+  },
+  {
+    "id": "42114",
+    "doc_id": "24121",
+    "location_id": 87,
+    "batch_id": "455",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "42115",
+    "doc_id": "24121",
+    "location_id": 73,
+    "batch_id": "455",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "doc_id": "24122",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.3699,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24122",
+    "location_id": 73,
+    "batch_id": "476",
+    "quantity": 1.3699,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24123",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.3699,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24123",
+    "location_id": 73,
+    "batch_id": "476",
+    "quantity": 1.3699,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24124",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.3699,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24124",
+    "location_id": 73,
+    "batch_id": "476",
+    "quantity": 1.3699,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24130",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -0.5,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24130",
+    "location_id": 74,
+    "batch_id": "476",
+    "quantity": 0.5,
+    "unit_id": 2
+  },
+  {
+    "id": "42134",
+    "doc_id": "24131",
+    "location_id": 87,
+    "batch_id": "455",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "42135",
+    "doc_id": "24131",
+    "location_id": 74,
+    "batch_id": "455",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "doc_id": "24132",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -0.5,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24132",
+    "location_id": 74,
+    "batch_id": "476",
+    "quantity": 0.5,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24133",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -0.5,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24133",
+    "location_id": 74,
+    "batch_id": "476",
+    "quantity": 0.5,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24134",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -0.5,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24134",
+    "location_id": 74,
+    "batch_id": "476",
+    "quantity": 0.5,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24135",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.5852,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24135",
+    "location_id": 75,
+    "batch_id": "476",
+    "quantity": 1.5852,
+    "unit_id": 2
+  },
+  {
+    "id": "42144",
+    "doc_id": "24136",
+    "location_id": 87,
+    "batch_id": "455",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "id": "42145",
+    "doc_id": "24136",
+    "location_id": 75,
+    "batch_id": "455",
+    "quantity": 0,
+    "unit_id": 2,
+    "parent_transaction": null,
+    "status_id": 3
+  },
+  {
+    "doc_id": "24137",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.5852,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24137",
+    "location_id": 75,
+    "batch_id": "476",
+    "quantity": 1.5852,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24138",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.5852,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24138",
+    "location_id": 75,
+    "batch_id": "476",
+    "quantity": 1.5852,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24139",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -1.5852,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24139",
+    "location_id": 75,
+    "batch_id": "476",
+    "quantity": 1.5852,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24145",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -2.5853,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24145",
+    "location_id": 77,
+    "batch_id": "476",
+    "quantity": 2.5853,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24146",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -2.5853,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24146",
+    "location_id": 77,
+    "batch_id": "476",
+    "quantity": 2.5853,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24147",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -2.5853,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24147",
+    "location_id": 77,
+    "batch_id": "476",
+    "quantity": 2.5853,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24148",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -2.5853,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24148",
+    "location_id": 77,
+    "batch_id": "476",
+    "quantity": 2.5853,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24149",
+    "location_id": 87,
+    "batch_id": "476",
+    "quantity": -2.5853,
+    "unit_id": 2
+  },
+  {
+    "doc_id": "24149",
+    "location_id": 77,
+    "batch_id": "476",
+    "quantity": 2.5853,
+    "unit_id": 2
+  }
+]
