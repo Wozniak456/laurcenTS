@@ -34,6 +34,11 @@ const menuCategories = [
         href: "/pool-managing/day",
         icon: <PoolIcon />,
       },
+      {
+        label: "Дії над басейнами",
+        href: "/pools/actions",
+        icon: <PoolIcon />,
+      },
     ],
   },
   {
