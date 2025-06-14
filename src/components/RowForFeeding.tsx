@@ -223,7 +223,7 @@ export default function RowForFeeding({
         if (response?.message?.includes("Немає достатньо корму")) {
           console.warn("Feed submission failed: Not enough feed");
           setButtonMode(false);
-          setErrorMessage(response.message);
+          setErrorMessage("Недостатньо корму для годування");
           setLoadingStatus("error");
 
           await new Promise((resolve) => setTimeout(resolve, 500));
@@ -655,10 +655,11 @@ export default function RowForFeeding({
                   {errorMessage}
                 </ModalHeader>
                 <ModalBody>
-                  <p>
-                    Неможливо скасувати годування, оскільки існують пізніші
-                    транзакції.
-                  </p>
+                  {/* No body text for cancellation error, only title */}
+                  {errorMessage !==
+                  "Неможливо скасувати годування - існують пізніші транзакції"
+                    ? null
+                    : null}
                 </ModalBody>
                 <ModalFooter>
                   <Button color="primary" onPress={onClose}>
