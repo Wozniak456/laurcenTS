@@ -364,6 +364,23 @@ const feedingForLocation = async (locationId: number, today: Date) => {
   return timeQtyArray;
 };
 
+// Helper to sum all itemtransactions quantities for a given editing array
+function sumEditingQuantities(editingArr: any[]): number {
+  if (!Array.isArray(editingArr) || editingArr.length === 0) return 0;
+  return editingArr.reduce((sum: number, doc: any) => {
+    if (Array.isArray(doc.itemtransactions)) {
+      return (
+        sum +
+        doc.itemtransactions.reduce(
+          (s: number, t: any) => s + (t.quantity || 0),
+          0
+        )
+      );
+    }
+    return sum;
+  }, 0);
+}
+
 const setData = async (
   today: string,
   times: { id: number; time: string }[]
@@ -731,17 +748,14 @@ const setData = async (
                             ];
                           const editing =
                             editings[loc.id]?.[itemId!]?.[hours] || [];
+                          const totalEditing = sumEditingQuantities(editing);
                           return [
                             hours.toString(),
                             {
                               feeding: feedingAmountForPrev?.toFixed(1),
                               editing:
-                                editing[0]?.itemtransactions[0]?.quantity !==
-                                undefined
-                                  ? (
-                                      editing[0].itemtransactions[0].quantity *
-                                      1000
-                                    ).toFixed(1)
+                                totalEditing !== 0
+                                  ? (totalEditing * 1000).toFixed(1)
                                   : "",
                               hasDocument: editing[0]?.hasDocument || false,
                             },
@@ -766,17 +780,14 @@ const setData = async (
                             ];
                           const editing =
                             editings[loc.id]?.[itemId!]?.[hours] || [];
+                          const totalEditing = sumEditingQuantities(editing);
                           return [
                             hours.toString(),
                             {
                               feeding: feedingAmountForToday?.toFixed(1),
                               editing:
-                                editing[0]?.itemtransactions[0]?.quantity !==
-                                undefined
-                                  ? (
-                                      editing[0].itemtransactions[0].quantity *
-                                      1000
-                                    ).toFixed(1)
+                                totalEditing !== 0
+                                  ? (totalEditing * 1000).toFixed(1)
                                   : "",
                               hasDocument: editing[0]?.hasDocument || false,
                             },
@@ -804,19 +815,15 @@ const setData = async (
                             loc.id,
                             itemId
                           );
-
+                          const totalEditing = sumEditingQuantities(editing);
                           return [
                             hours.toString(),
                             {
                               feeding:
                                 todayCalc.calc?.feed_per_feeding?.toFixed(1),
                               editing:
-                                editing[0]?.itemtransactions[0]?.quantity !==
-                                undefined
-                                  ? (
-                                      editing[0].itemtransactions[0].quantity *
-                                      1000
-                                    ).toFixed(1)
+                                totalEditing !== 0
+                                  ? (totalEditing * 1000).toFixed(1)
                                   : "",
                               hasDocument: editing[0]?.hasDocument || false,
                             },
@@ -905,6 +912,42 @@ const setData = async (
                         typeof v === "bigint" ? v.toString() : v
                       )
                     );
+                  }
+
+                  // Group editing values for each feeding row (by feedId) and time slot
+                  if (feedings.length > 0) {
+                    // Build a map: { [feedId]: { [hour]: totalEditing } }
+                    const groupedEditing: Record<
+                      number,
+                      Record<string, number>
+                    > = {};
+                    feedings.forEach((feeding) => {
+                      const feedId = feeding.feedId;
+                      if (!feedId) return;
+                      Object.entries(feeding.feedings || {}).forEach(
+                        ([hour, val]) => {
+                          if (!groupedEditing[feedId])
+                            groupedEditing[feedId] = {};
+                          const editingVal = val.editing
+                            ? parseFloat(val.editing)
+                            : 0;
+                          if (!groupedEditing[feedId][hour])
+                            groupedEditing[feedId][hour] = 0;
+                          groupedEditing[feedId][hour] += editingVal;
+                        }
+                      );
+                    });
+                    // Now update each feeding row's editing value to the grouped sum
+                    feedings.forEach((feeding) => {
+                      const feedId = feeding.feedId;
+                      if (!feedId) return;
+                      Object.entries(feeding.feedings || {}).forEach(
+                        ([hour, val]) => {
+                          val.editing =
+                            groupedEditing[feedId][hour]?.toFixed(1) || "0.0";
+                        }
+                      );
+                    });
                   }
 
                   //що ми додаємо
@@ -1104,15 +1147,14 @@ const setData = async (
                     { feeding: "", editing: "", hasDocument: false },
                   ];
                 const editing = editings[loc.id]?.[itemId!]?.[hours] || [];
+                const totalEditing = sumEditingQuantities(editing);
                 return [
                   hours.toString(),
                   {
                     feeding: feedingAmountForPrev?.toFixed(1),
                     editing:
-                      editing[0]?.itemtransactions[0]?.quantity !== undefined
-                        ? (
-                            editing[0].itemtransactions[0].quantity * 1000
-                          ).toFixed(1)
+                      totalEditing !== 0
+                        ? (totalEditing * 1000).toFixed(1)
                         : "",
                     hasDocument: editing[0]?.hasDocument || false,
                   },
@@ -1136,15 +1178,14 @@ const setData = async (
                     { feeding: "", editing: "", hasDocument: false },
                   ];
                 const editing = editings[loc.id]?.[itemId!]?.[hours] || [];
+                const totalEditing = sumEditingQuantities(editing);
                 return [
                   hours.toString(),
                   {
                     feeding: feedingAmountForToday?.toFixed(1),
                     editing:
-                      editing[0]?.itemtransactions[0]?.quantity !== undefined
-                        ? (
-                            editing[0].itemtransactions[0].quantity * 1000
-                          ).toFixed(1)
+                      totalEditing !== 0
+                        ? (totalEditing * 1000).toFixed(1)
                         : "",
                     hasDocument: editing[0]?.hasDocument || false,
                   },
@@ -1168,16 +1209,14 @@ const setData = async (
                     { feeding: "", editing: "", hasDocument: false },
                   ];
                 const editing = await getEdited(hours, loc.id, itemId);
-
+                const totalEditing = sumEditingQuantities(editing);
                 return [
                   hours.toString(),
                   {
                     feeding: todayCalc.calc?.feed_per_feeding?.toFixed(1),
                     editing:
-                      editing[0]?.itemtransactions[0]?.quantity !== undefined
-                        ? (
-                            editing[0].itemtransactions[0].quantity * 1000
-                          ).toFixed(1)
+                      totalEditing !== 0
+                        ? (totalEditing * 1000).toFixed(1)
                         : "",
                     hasDocument: editing[0]?.hasDocument || false,
                   },
@@ -1265,6 +1304,31 @@ const setData = async (
               return value;
             })
           );
+        }
+
+        // Group editing values for each feeding row (by feedId) and time slot
+        if (feedings.length > 0) {
+          // Build a map: { [feedId]: { [hour]: totalEditing } }
+          const groupedEditing: Record<number, Record<string, number>> = {};
+          feedings.forEach((feeding) => {
+            const feedId = feeding.feedId;
+            if (!feedId) return;
+            Object.entries(feeding.feedings || {}).forEach(([hour, val]) => {
+              if (!groupedEditing[feedId]) groupedEditing[feedId] = {};
+              const editingVal = val.editing ? parseFloat(val.editing) : 0;
+              if (!groupedEditing[feedId][hour])
+                groupedEditing[feedId][hour] = 0;
+              groupedEditing[feedId][hour] += editingVal;
+            });
+          });
+          // Now update each feeding row's editing value to the grouped sum
+          feedings.forEach((feeding) => {
+            const feedId = feeding.feedId;
+            if (!feedId) return;
+            Object.entries(feeding.feedings || {}).forEach(([hour, val]) => {
+              val.editing = groupedEditing[feedId][hour]?.toFixed(1) || "0.0";
+            });
+          });
         }
 
         //що ми додаємо

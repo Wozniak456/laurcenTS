@@ -132,100 +132,6 @@ export default function RowForFeeding({
     });
   }
 
-  useEffect(() => {
-    // Debug log for newly added items
-    console.log(`[${locInfo.name}] Initial data:`, {
-      rowData,
-      hasFeedings,
-      feedings: rowData.feedings,
-      localFeedings,
-    });
-
-    const initialValues: { [key: string]: string } = {};
-    let hasAnyFeedingDocument = false;
-
-    times.forEach(({ time }) => {
-      const feedingTime = parseInt(time.split(":")[0]);
-      const feedingData = rowData.feedings?.[feedingTime];
-
-      // Debug log for each time slot
-      console.log(`[${locInfo.name}] Time ${feedingTime}:`, {
-        feedingData,
-        hasDocument: feedingData?.hasDocument,
-      });
-
-      // Check if this time has a feeding document
-      if (feedingData?.hasDocument) {
-        hasAnyFeedingDocument = true;
-      }
-
-      // Set values if we have feeding data
-      if (feedingData) {
-        const key = `${locInfo.id}-${feedingTime}`;
-        const editingVal = feedingData.editing
-          ? parseFloat(feedingData.editing)
-          : null;
-        const baseValue = feedingData.feeding
-          ? parseFloat(feedingData.feeding)
-          : 0;
-        const percentFeeding = locInfo.percent_feeding || 0;
-
-        // If we have an editing value, use it (even if it's 0)
-        if (editingVal !== null) {
-          initialValues[key] = editingVal.toFixed(1);
-        } else if (baseValue > 0) {
-          // If no editing value but we have a base value, calculate it
-          const adjustedValue = (
-            baseValue *
-            (1 + percentFeeding / 100)
-          ).toFixed(1);
-          initialValues[key] = adjustedValue;
-        }
-      }
-    });
-
-    // If we found any feeding documents, update localFeedings to reflect this
-    if (hasAnyFeedingDocument) {
-      const newLocalFeedings: { [key: string]: any } = {};
-      times.forEach(({ time }) => {
-        const feedingTime = parseInt(time.split(":")[0]);
-        const feedingData = rowData.feedings?.[feedingTime];
-        if (feedingData) {
-          newLocalFeedings[feedingTime] = {
-            ...feedingData,
-            hasDocument: true,
-          };
-        }
-      });
-
-      // Debug log final state
-      console.log(`[${locInfo.name}] Final state:`, {
-        hasAnyFeedingDocument,
-        initialValues,
-        newLocalFeedings,
-      });
-
-      setLocalFeedings(newLocalFeedings);
-    } else {
-      // Debug log final state when no documents
-      console.log(`[${locInfo.name}] Final state:`, {
-        hasAnyFeedingDocument,
-        initialValues,
-        newLocalFeedings: null,
-      });
-    }
-
-    setEditingValue(initialValues);
-  }, [
-    rowData.feedings,
-    times,
-    locInfo.id,
-    locInfo.percent_feeding,
-    rowData.feedId,
-    rowData.feedType,
-    locInfo.name,
-  ]);
-
   // Check if this specific feeding item has a document
   const hasDocumentForThisItem =
     hasFeedings &&
@@ -333,7 +239,7 @@ export default function RowForFeeding({
           const key = `${locInfo.id}-${feedingTime}`;
           const value = formData.get(`time_${feedingTime}`) as string;
           if (value !== null) {
-            const formattedValue = value ? Number(value).toFixed(1) : "0.0";
+            const formattedValue = value ? Number(value).toFixed(1) : "";
             // Keep the original feeding value and add editing value separately
             const originalFeeding = rowData.feedings?.[feedingTime]?.feeding;
             newFeedings[feedingTime] = {
@@ -548,8 +454,7 @@ export default function RowForFeeding({
           <React.Fragment key={index}>
             <td
               className={`px-4 py-2 border border-gray-400 w-14 ${
-                (fed && editingValueFromFeedings === "0.0") ||
-                (!fed && editingValue[key] === "0.0")
+                fed && parseFloat(editingValueFromFeedings || "0") === 0
                   ? "bg-gray-100"
                   : ""
               }`}
@@ -560,17 +465,15 @@ export default function RowForFeeding({
             {fed ? (
               <td
                 className={`px-4 py-2 border border-gray-400 w-14 ${
-                  editingValueFromFeedings === "0.0" ? "bg-gray-100" : ""
+                  fed && parseFloat(editingValueFromFeedings || "0") === 0
+                    ? "bg-gray-100"
+                    : ""
                 }`}
               >
                 {editingValueFromFeedings || "0.0"}
               </td>
             ) : (
-              <td
-                className={`px-4 py-2 border border-gray-400 w-14 relative ${
-                  editingValue[key] === "0.0" ? "bg-gray-100" : ""
-                }`}
-              >
+              <td className={`px-4 py-2 border border-gray-400 w-14 relative`}>
                 {editingValue[key] && index < times.length - 1 && (
                   <button
                     type="button"
@@ -584,10 +487,18 @@ export default function RowForFeeding({
                 <input
                   name={`feed_given_${index}`}
                   className={`border border-black w-full text-center no-spinners ${
-                    editingValue[key] === "0.0" ? "bg-gray-100" : "bg-blue-100"
+                    fed && parseFloat(editingValue[key] || "0") === 0
+                      ? "bg-gray-100"
+                      : "bg-blue-100"
                   }`}
                   id={`feed_given_${index}`}
-                  value={editingValue[key] || calculatedQuantity || ""}
+                  value={
+                    editingValue[key] !== undefined &&
+                    editingValue[key] !== null &&
+                    editingValue[key] !== ""
+                      ? editingValue[key]
+                      : calculatedQuantity || ""
+                  }
                   onChange={(e) =>
                     handleInputChange(
                       String(feedingTime),
@@ -597,7 +508,7 @@ export default function RowForFeeding({
                   }
                   type="number"
                   disabled={fed}
-                  placeholder="0.0"
+                  placeholder={calculatedQuantity || ""}
                 />
               </td>
             )}
@@ -617,8 +528,21 @@ export default function RowForFeeding({
           {times.map((time) => {
             const feedingTime = parseInt(time.time.split(":")[0]);
             const key = `${locInfo.id}-${feedingTime}`;
-            // Get the value from editingValue if it exists, otherwise use 0
-            const value = editingValue[key] || "0.0";
+            // Get the value from editingValue if it exists, otherwise use calculatedQuantity
+            const feedingData = rowData.feedings?.[feedingTime];
+            const baseQuantity = feedingData?.feeding;
+            const percentFeeding = locInfo.percent_feeding || 0;
+            const calculatedQuantity = baseQuantity
+              ? (parseFloat(baseQuantity) * (1 + percentFeeding / 100)).toFixed(
+                  2
+                )
+              : "";
+            const value =
+              editingValue[key] !== undefined &&
+              editingValue[key] !== null &&
+              editingValue[key] !== ""
+                ? editingValue[key]
+                : calculatedQuantity;
             return (
               <input
                 key={key}
