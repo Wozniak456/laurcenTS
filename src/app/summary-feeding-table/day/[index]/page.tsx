@@ -11,6 +11,8 @@ import ExportButton from "@/components/dayFeedingTableToPrint";
 import { addDays, format } from "date-fns";
 import { uk } from "date-fns/locale"; // If you need specific Ukrainian locale formatting
 import { request } from "http";
+import { fetchPercentFeedingsForLocations } from "@/actions/periodicServer";
+import { feedBatch } from "@/actions";
 
 interface DayFeedingProps {
   params: {
@@ -180,6 +182,19 @@ export default async function DayFeeding(props: DayFeedingProps) {
 
   const data = await setData(today, times);
 
+  // Collect all unique location IDs
+  const locationIds = Array.from(
+    new Set(
+      lines.flatMap((line) =>
+        line.pools.flatMap((pool) => pool.locations.map((loc) => loc.id))
+      )
+    )
+  );
+  const percentFeedingMap = await fetchPercentFeedingsForLocations(
+    locationIds,
+    today
+  );
+
   /* data.map((data1) => {
     if (data1.locId == 65) {
       console.log("data1. loc: ", data1.locId);
@@ -217,6 +232,8 @@ export default async function DayFeeding(props: DayFeedingProps) {
         today={today}
         times={times}
         feeds={items}
+        percentFeedingMap={percentFeedingMap}
+        feedBatchAction={feedBatch}
       />
       <DailyFeedWeightPage data={data} items={items} date={today} />
     </div>
@@ -392,19 +409,8 @@ const setData = async (
   let data: FeedingInfo[] = [];
 
   const getEdited = async (hours: number, locId: number, itemId: number) => {
-    console.log("[getEdited] CALLED WITH:", { hours, locId, itemId });
     const todayDate = new Date(today);
     todayDate.setUTCHours(hours, 0, 0, 0);
-
-    if (locId === 50) {
-      console.log("[getEdited] Params:", {
-        hours,
-        locId,
-        itemId,
-        today,
-        todayDate: todayDate.toISOString(),
-      });
-    }
 
     // Find documents for this specific item and time
     const fedAlready = await db.documents.findMany({
@@ -439,29 +445,6 @@ const setData = async (
         },
       },
     });
-
-    if (locId === 50) {
-      console.log("[getEdited] DB result:", {
-        hours,
-        locId,
-        itemId,
-        todayDate: todayDate.toISOString(),
-        fedAlreadyCount: fedAlready.length,
-        fedAlready,
-      });
-      if (fedAlready.length === 0) {
-        console.warn("[getEdited] No records found for:", {
-          hours,
-          locId,
-          itemId,
-          todayDate: todayDate.toISOString(),
-        });
-      }
-    }
-
-    if (locId === 50 && hours === 22) {
-      console.log("[getEdited] 22:00 output:", fedAlready);
-    }
 
     // Only set hasDocument to true if we found documents with transactions for this specific item
     return fedAlready.map((doc) => ({

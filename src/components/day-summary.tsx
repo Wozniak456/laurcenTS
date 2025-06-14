@@ -7,6 +7,7 @@ import React, {
   useEffect,
   useMemo,
   useState,
+  useRef,
 } from "react";
 import RowForFeeding from "./RowForFeeding";
 import {
@@ -18,6 +19,9 @@ import {
   Select,
   SelectItem,
 } from "@nextui-org/react";
+import { fetchPercentFeeding } from "@/actions/periodicServer";
+import { fetchFeedingRow } from "@/actions/feeding";
+import { feedBatch } from "@/actions";
 
 interface DaySummaryProps {
   data: FeedingInfo[];
@@ -47,6 +51,8 @@ interface DaySummaryProps {
       name: string;
     } | null;
   }[];
+  percentFeedingMap: Record<number, number>;
+  feedBatchAction: typeof feedBatch;
 }
 
 interface FeedingInfo {
@@ -74,6 +80,8 @@ export default function DaySummaryContent({
   today,
   times,
   feeds,
+  percentFeedingMap,
+  feedBatchAction,
 }: DaySummaryProps) {
   // Restore scroll position after reload
   useEffect(() => {
@@ -112,7 +120,61 @@ export default function DaySummaryContent({
   const [addedNewFeed, setAddedNewFeed] = useState<number | undefined>(
     undefined
   );
-  const [feedingsData, setFeedingsData] = useState(data); // Локальний стан для збереження даних кормів
+  const [feedingsData, setFeedingsData] = useState(data);
+
+  // Function to update only a single row's feedings in state
+  const handleRowUpdate = async (
+    locId: number,
+    feedId: number,
+    newFeedings: any
+  ) => {
+    // If newFeedings is empty or falsy, fetch the latest planned feedings from the backend
+    if (!newFeedings || Object.keys(newFeedings).length === 0) {
+      // Fetch the latest planned feedings for this row from the backend
+      const today = feedingsData.find((r) => r.locId === locId)?.date || "";
+      const feedingsObj =
+        feedingsData.find((r) => r.locId === locId)?.feedings?.[0]?.feedings ||
+        {};
+      const times = Object.keys(feedingsObj);
+      const refreshedRow = await fetchFeedingRow({
+        date: today,
+        location_id: locId,
+        item_id: feedId,
+        times: times.map((time) => ({ id: 0, time: `${time}:00` })),
+      });
+      setFeedingsData((prev) =>
+        prev.map((row) =>
+          row.locId === locId
+            ? {
+                ...row,
+                feedings:
+                  refreshedRow &&
+                  refreshedRow.feedings &&
+                  refreshedRow.feedings.length > 0
+                    ? [refreshedRow.feedings].flat()
+                    : row.feedings, // Do NOT reset to empty, keep previous feedings
+              }
+            : row
+        )
+      );
+      return;
+    }
+    // Otherwise, update the feedings for the specified feedId
+    setFeedingsData((prev) =>
+      prev.map((row) =>
+        row.locId === locId
+          ? {
+              ...row,
+              feedings: row.feedings?.map((feeding) =>
+                feeding.feedId === feedId
+                  ? { ...feeding, feedings: newFeedings }
+                  : feeding
+              ),
+            }
+          : row
+      )
+    );
+  };
 
   // Функція для додавання нового корму до feedings
   const handleAddFeedClick = (locId: number, feedId: number) => {
@@ -240,14 +302,9 @@ export default function DaySummaryContent({
                             today={today}
                             batch={dataForPool?.batch}
                             allLocationFeedings={feedings}
-                            onRefresh={() => {
-                              // Save current scroll position to sessionStorage
-                              sessionStorage.setItem(
-                                "scrollPosition",
-                                window.scrollY.toString()
-                              );
-                              window.location.reload();
-                            }}
+                            percentFeeding={percentFeedingMap[loc.id] ?? 0}
+                            onRowUpdate={handleRowUpdate}
+                            feedBatchAction={feedBatchAction}
                           />
                         );
                       })}

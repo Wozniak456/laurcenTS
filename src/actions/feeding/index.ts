@@ -213,134 +213,129 @@ export async function feedBatch(
       totalQtyNeeded,
     });
 
-    // Check stock availability
-    try {
-      console.log("DEBUG - Checking stock for:", {
-        item_id,
-        quantity: totalQtyNeeded,
-      });
+    // Calculate total available stock for the item
+    const availableBatches = await getFeedBatchByItemId(item_id, 0, db);
+    const totalAvailable = availableBatches
+      ? availableBatches.reduce(
+          (sum, batch) => sum + (batch._sum.quantity ?? 0),
+          0
+        )
+      : 0;
 
-      const availableBatches = await getFeedBatchByItemId(
-        item_id,
-        totalQtyNeeded,
-        db
-      );
+    // If requested > available, return error
+    if (totalQtyNeeded > totalAvailable * 1000) {
+      // *1000 if available is in kg and needed is in grams
+      return { message: "Not enough feed available: Немає достатньо корму" };
+    }
 
-      console.log("DEBUG - Stock check result:", {
-        success: !!availableBatches,
-        batchCount: availableBatches?.length || 0,
-      });
+    // Now get batches for the actual needed amount (as before)
+    const batchesForFeeding = await getFeedBatchByItemId(
+      item_id,
+      totalQtyNeeded,
+      db
+    );
 
-      if (!availableBatches || availableBatches.length === 0) {
-        console.log("DEBUG - No batches found for item:", item_id);
-        return { message: "Not enough feed available: Немає достатньо корму" };
-      }
+    if (!batchesForFeeding || batchesForFeeding.length === 0) {
+      console.log("DEBUG - No batches found for item:", item_id);
+      return { message: "Not enough feed available: Немає достатньо корму" };
+    }
 
-      // Create feeding document
-      const date = new Date();
+    // Create feeding document
+    const date = new Date();
 
-      // Create transactions for each time slot
-      for (const time of times) {
-        const timeKey = `time_${time.hours}`;
-        const qty = parseFloat(formData.get(timeKey) as string);
+    // Create transactions for each time slot
+    for (const time of times) {
+      const timeKey = `time_${time.hours}`;
+      const qty = parseFloat(formData.get(timeKey) as string);
 
-        if (!isNaN(qty) && qty > 0) {
-          // Create ONE document for this specific time slot
-          const feedTime = new Date(
-            date.getFullYear(),
-            date.getMonth(),
-            date.getDate(),
-            time.hours,
-            0,
-            0
-          );
-          feedTime.setMilliseconds(0);
+      if (!isNaN(qty) && qty > 0) {
+        // Create ONE document for this specific time slot
+        const feedTime = new Date(
+          date.getFullYear(),
+          date.getMonth(),
+          date.getDate(),
+          time.hours,
+          0,
+          0
+        );
+        feedTime.setMilliseconds(0);
 
-          const docData = {
-            location_id,
-            doc_type_id: 9,
-            date_time: feedTime.toISOString(),
-            executed_by: 3,
-            comments: "Годівля",
-          };
+        const docData = {
+          location_id,
+          doc_type_id: 9,
+          date_time: feedTime.toISOString(),
+          executed_by: 3,
+          comments: "Годівля",
+        };
 
-          // Log the data we're about to send
-          console.error(
-            "Creating document with data:",
-            JSON.stringify(docData, null, 2)
-          );
+        // Log the data we're about to send
+        console.error(
+          "Creating document with data:",
+          JSON.stringify(docData, null, 2)
+        );
 
-          const feedDoc = await db.documents.create({
-            data: docData,
-            // Explicitly select all fields including comments
-            select: {
-              id: true,
-              comments: true,
-              date_time: true,
-              doc_type_id: true,
-              location_id: true,
-              executed_by: true,
+        const feedDoc = await db.documents.create({
+          data: docData,
+          // Explicitly select all fields including comments
+          select: {
+            id: true,
+            comments: true,
+            date_time: true,
+            doc_type_id: true,
+            location_id: true,
+            executed_by: true,
+          },
+        });
+
+        // Log the result immediately after creation
+        console.error("Document created:", JSON.stringify(feedDoc, null, 2));
+
+        if (!feedDoc) {
+          throw new Error("Failed to create document - no document returned");
+        }
+
+        if (!feedDoc.comments) {
+          console.error("Warning: Document created but comments field is null");
+        }
+
+        // Process all batch transactions under this single document
+        let leftToFeed = qty / 1000; // Convert to kg
+        for (const batch of batchesForFeeding) {
+          if (leftToFeed <= 0) break;
+          const available = batch._sum.quantity ?? 0;
+          const consume = Math.min(available, leftToFeed);
+          // Negative transaction for warehouse
+          await db.itemtransactions.create({
+            data: {
+              doc_id: feedDoc.id,
+              location_id: 87,
+              batch_id: batch.batch_id,
+              quantity: -consume,
+              unit_id: 2,
             },
           });
-
-          // Log the result immediately after creation
-          console.error("Document created:", JSON.stringify(feedDoc, null, 2));
-
-          if (!feedDoc) {
-            throw new Error("Failed to create document - no document returned");
-          }
-
-          if (!feedDoc.comments) {
-            console.error(
-              "Warning: Document created but comments field is null"
-            );
-          }
-
-          // Process all batch transactions under this single document
-          let leftToFeed = qty / 1000; // Convert to kg
-          for (const batch of availableBatches) {
-            if (leftToFeed <= 0) break;
-            const available = batch._sum.quantity ?? 0;
-            const consume = Math.min(available, leftToFeed);
-            // Negative transaction for warehouse
-            await db.itemtransactions.create({
-              data: {
-                doc_id: feedDoc.id,
-                location_id: 87,
-                batch_id: batch.batch_id,
-                quantity: -consume,
-                unit_id: 2,
-              },
-            });
-            // Positive transaction for pool
-            await db.itemtransactions.create({
-              data: {
-                doc_id: feedDoc.id,
-                location_id: location_id,
-                batch_id: batch.batch_id,
-                quantity: consume,
-                unit_id: 2,
-              },
-            });
-            leftToFeed -= consume;
-          }
-
-          console.log("DEBUG - Created feed transactions:", {
-            docId: feedDoc.id,
-            timeSlot: time.hours,
-            transactionCount: leftToFeed,
+          // Positive transaction for pool
+          await db.itemtransactions.create({
+            data: {
+              doc_id: feedDoc.id,
+              location_id: location_id,
+              batch_id: batch.batch_id,
+              quantity: consume,
+              unit_id: 2,
+            },
           });
+          leftToFeed -= consume;
         }
-      }
 
-      return { message: "Feed batch processed successfully" };
-    } catch (error) {
-      console.log("DEBUG - Stock check error:", error);
-      if (error instanceof Error && error.message === "Немає достатньо корму") {
-        return { message: "Not enough feed available: Немає достатньо корму" };
+        console.log("DEBUG - Created feed transactions:", {
+          docId: feedDoc.id,
+          timeSlot: time.hours,
+          transactionCount: leftToFeed,
+        });
       }
-      throw error;
     }
+
+    return { message: "Feed batch processed successfully" };
   } catch (error) {
     console.log("DEBUG - Main error:", error);
     return {
@@ -349,4 +344,172 @@ export async function feedBatch(
       }`,
     };
   }
+}
+
+/**
+ * Fetch a single feeding row for a given date, location, and item (feed) id.
+ * Returns the same structure as a row in the summary feeding table.
+ */
+export async function fetchFeedingRow({
+  date,
+  location_id,
+  item_id,
+  times,
+}: {
+  date: string;
+  location_id: number;
+  item_id: number;
+  times: { id: number; time: string }[];
+}) {
+  const db = (await import("@/db")).db;
+  const actions = await import("@/actions");
+  const stockingActions = await import("@/actions/stocking");
+
+  // 1. Check if pool is filled
+  const isPoolFilled = await actions.isFilled(location_id, date);
+  if (!isPoolFilled) return null;
+
+  // 2. Get calculation info for this location and date
+  const todayCalc = await stockingActions.calculationForLocation(
+    location_id,
+    date
+  );
+
+  // 3. Get feed type info for this item
+  const item = await db.items.findUnique({
+    where: { id: item_id },
+    select: {
+      id: true,
+      name: true,
+      feedtypes: { select: { id: true, name: true } },
+    },
+  });
+  if (!item) return null;
+  const feedTypeInfo = item.feedtypes;
+
+  // 4. For each time slot, fetch editing/feeding values
+  const getEdited = async (hours: number) => {
+    const todayDate = new Date(date);
+    todayDate.setUTCHours(hours, 0, 0, 0);
+    const fedAlready = await db.documents.findMany({
+      select: {
+        id: true,
+        itemtransactions: {
+          select: { quantity: true },
+          where: {
+            location_id: location_id,
+            itembatches: { items: { id: item_id } },
+          },
+        },
+      },
+      where: {
+        location_id: location_id,
+        doc_type_id: 9,
+        date_time: todayDate,
+        itemtransactions: {
+          some: { itembatches: { items: { id: item_id } } },
+        },
+      },
+    });
+    return fedAlready.map((doc) => ({
+      ...doc,
+      hasDocument: doc.itemtransactions.length > 0,
+      itemtransactions: doc.itemtransactions.length
+        ? doc.itemtransactions
+        : [{ quantity: 0 }],
+    }));
+  };
+
+  // 5. Build feedings array for this item
+  const feedings: any[] = [];
+  if (todayCalc && todayCalc.feed && todayCalc.feed.item_id === item_id) {
+    // No transition logic for simplicity; add if needed
+    const feedingsResult = Object.fromEntries(
+      await Promise.all(
+        times.map(async ({ time }) => {
+          const hours = Number(time.split(":")[0]);
+          const editing = await getEdited(hours);
+          const totalEditing = editing.reduce(
+            (sum, e) => sum + (e.itemtransactions[0]?.quantity || 0),
+            0
+          );
+          return [
+            hours.toString(),
+            {
+              feeding: todayCalc.calc?.feed_per_feeding?.toFixed(1) || "",
+              editing:
+                totalEditing !== 0 ? (totalEditing * 1000).toFixed(1) : "",
+              hasDocument: editing[0]?.hasDocument || false,
+            },
+          ];
+        })
+      )
+    );
+    feedings.push({
+      feedType: todayCalc.feed.type_name || "",
+      feedName: todayCalc.feed.item_name || "",
+      feedId: todayCalc.feed.item_id,
+      feedings: feedingsResult,
+    });
+  }
+
+  // 6. Compose the row object
+  return {
+    locId: location_id,
+    locName: item.name,
+    date,
+    batch: {
+      id: Number(todayCalc?.batch.batch_id),
+      name: String(todayCalc?.batch.batch_name),
+    },
+    rowCount: feedings.length,
+    feedings,
+    percent_feeding: undefined, // Add percent_feeding if needed
+  };
+}
+
+/**
+ * Check if there is enough stock for a planned feeding (pre-submit, no DB changes).
+ * Returns { ok: true } or { ok: false, message }.
+ */
+export async function checkStockBeforeFeed({
+  location_id,
+  item_id,
+  date,
+  quantities, // { [time: string]: number }
+}: {
+  location_id: number;
+  item_id: number;
+  date: string;
+  quantities: Record<string, number>;
+}) {
+  const db = (await import("@/db")).db;
+  // Sum all planned quantities (convert to kg if needed)
+  const totalQuantity =
+    Object.values(quantities).reduce(
+      (sum, q) => sum + (parseFloat(q as any) || 0),
+      0
+    ) / 1000; // assuming input is in grams
+
+  // Find all batches for this item
+  const batches = await db.itembatches.findMany({
+    where: { item_id },
+    select: { id: true },
+  });
+  const batchIds = batches.map((b) => b.id);
+
+  // Sum available stock for these batches at this location
+  const stock = await db.itemtransactions.aggregate({
+    _sum: { quantity: true },
+    where: {
+      location_id,
+      batch_id: { in: batchIds },
+    },
+  });
+  const available = stock._sum.quantity || 0;
+
+  if (available < totalQuantity) {
+    return { ok: false, message: "Not enough stock (pre-submit check)" };
+  }
+  return { ok: true };
 }

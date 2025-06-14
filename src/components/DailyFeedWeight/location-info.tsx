@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { calculationAndFeedExtended } from "@/types/app_types";
 import PriorityForm from "@/components/DailyFeedWeight/priority-form";
 import PercentFeedingForm from "@/components/DailyFeedWeight/percent-feeding-form";
@@ -15,6 +15,7 @@ import {
   ModalFooter,
   useDisclosure,
 } from "@nextui-org/react";
+import { getPercentFeedingForDate, getPriorityForDate } from "@/utils/periodic";
 
 interface Feeding {
   feedType: string;
@@ -59,6 +60,7 @@ export type LocationComponentProps = {
       name: string;
     } | null;
   }[];
+  date: string;
 };
 
 type subRow = {
@@ -88,10 +90,16 @@ function isOldRow(row: Row): row is {
   return row !== undefined && (row as any).location !== undefined;
 }
 
+interface LocationComponentPropsWithPercent extends LocationComponentProps {
+  percentFeeding: number;
+}
+
 export default function LocationComponent({
   row,
   items,
-}: LocationComponentProps) {
+  date,
+  percentFeeding,
+}: LocationComponentPropsWithPercent) {
   // console.log(row?.location?.name)
   // row?.rows?.map(row =>
   //     console.log(row.item)
@@ -143,10 +151,9 @@ export default function LocationComponent({
               className="px-4 h-10 border border-gray-400 text-center"
               rowSpan={Number(row.rows?.length) + 1}
             >
-              {row.location?.percent_feeding === 0 ||
-              row.location?.percent_feeding == null
+              {percentFeeding === 0 || percentFeeding == null
                 ? ""
-                : row.location?.percent_feeding}
+                : percentFeeding}
             </td>
             <td
               className="px-4 h-10 border border-gray-400"
@@ -158,9 +165,7 @@ export default function LocationComponent({
               }
             >
               &nbsp;
-              {row.location?.percent_feeding === 0
-                ? ""
-                : row.location?.percent_feeding}
+              {percentFeeding === 0 ? "" : percentFeeding}
               &nbsp;
               {openLocationIndex != null && (
                 <Modal
@@ -191,20 +196,12 @@ export default function LocationComponent({
             let rqty: number =
               item.qty === null || item.qty === undefined ? 0 : item.qty;
             let feed_: number =
-              row.location?.percent_feeding === null ||
-              row.location?.percent_feeding === undefined
+              percentFeeding === null || percentFeeding === undefined
                 ? 0
-                : row.location?.percent_feeding;
-            let percent = isFeedingInfo(row)
-              ? row.percentFeeding ?? row.percent_feeding ?? 0
-              : 0;
+                : percentFeeding;
             let adjustedFeeding = "";
-            if (rqty * (1 + feed_ / 100) !== 0 && !isNaN(percent)) {
-              adjustedFeeding = (
-                rqty *
-                (1 + feed_ / 100) *
-                (1 + percent / 100)
-              ).toFixed(2);
+            if (rqty * (1 + feed_ / 100) !== 0 && !isNaN(feed_)) {
+              adjustedFeeding = (rqty * (1 + feed_ / 100)).toFixed(2);
             }
             return (
               <tr key={itemIndex}>
@@ -269,15 +266,11 @@ export default function LocationComponent({
               if (first && first.feeding)
                 firstFeeding = parseFloat(first.feeding).toFixed(2);
             }
-            let percent =
-              (row as FeedingInfo).percentFeeding ??
-              (row as FeedingInfo).percent_feeding ??
-              0;
             let adjustedFeeding = "";
-            if (firstFeeding !== "" && !isNaN(percent)) {
+            if (firstFeeding !== "" && !isNaN(percentFeeding)) {
               adjustedFeeding = (
                 parseFloat(firstFeeding) *
-                (1 + percent / 100)
+                (1 + percentFeeding / 100)
               ).toFixed(2);
             }
             return (
@@ -295,11 +288,11 @@ export default function LocationComponent({
                       rowSpan={row.feedings?.length}
                       onClick={() => setOpenPercentModal(true)}
                     >
-                      {(row.percentFeeding ?? row.percent_feeding) === 0 ||
-                      (row.percentFeeding == null &&
-                        row.percent_feeding == null)
+                      {(row as FeedingInfo).percentFeeding === 0 ||
+                      (row as FeedingInfo).percent_feeding === 0
                         ? ""
-                        : row.percentFeeding ?? row.percent_feeding}
+                        : (row as FeedingInfo).percentFeeding ??
+                          (row as FeedingInfo).percent_feeding}
                       {openPercentModal && (
                         <Modal
                           isOpen={true}
@@ -313,7 +306,8 @@ export default function LocationComponent({
                                   id: row.locId,
                                   name: row.locName,
                                   percent_feeding:
-                                    row.percentFeeding ?? row.percent_feeding,
+                                    (row as FeedingInfo).percentFeeding ??
+                                    (row as FeedingInfo).percent_feeding,
                                 }}
                               />
                             )}
