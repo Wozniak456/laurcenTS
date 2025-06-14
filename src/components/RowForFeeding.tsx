@@ -206,6 +206,23 @@ export default function RowForFeeding({
 
       try {
         setButtonMode(true);
+        const canFeed = await checkLaterTransactions(
+          locInfo.id,
+          today,
+          rowData.feedId
+        );
+        if (!canFeed) {
+          setLoadingStatus("error");
+          setErrorMessage(
+            "Неможливо провести годування — існують пізніші транзакції. Ви не можете додати годування заднім числом."
+          );
+          onLoadingClose();
+          onErrorOpen();
+          setIsLoading(false);
+          setButtonMode(false);
+          return;
+        }
+
         const formData = new FormData(formElement);
 
         // Check if all feeding values are zero
