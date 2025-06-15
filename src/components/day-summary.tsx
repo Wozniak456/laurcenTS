@@ -31,7 +31,6 @@ interface DaySummaryProps {
     pools: {
       id: number;
       name: string;
-      percent_feeding: number | null;
       locations: {
         id: number;
         name: string;
@@ -266,31 +265,16 @@ export default function DaySummaryContent({
                   const dataForPool = feedingsData.find(
                     (row) => row.locId === loc.id
                   );
-                  if (loc.id === 50) {
-                    console.log(
-                      "--- DaySummaryContent DEBUG for location 50 ---"
-                    );
-                    console.log("dataForPool:", dataForPool);
-                    console.log("feedings:", dataForPool?.feedings);
-                  }
                   const feedings = dataForPool?.feedings;
                   return (
                     <React.Fragment key={index}>
                       {feedings?.map((feeding, feedingIndex) => {
-                        if (loc.id === 50) {
-                          console.log(
-                            "Feeding line for location 50:",
-                            feedingIndex,
-                            feeding
-                          );
-                        }
                         return (
                           <RowForFeeding
                             key={feedingIndex}
                             locInfo={{
                               id: loc.id,
                               name: loc.name,
-                              percent_feeding: pool?.percent_feeding ?? 0,
                             }}
                             rowData={feeding}
                             times={times}

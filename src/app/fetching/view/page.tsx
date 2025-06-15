@@ -133,13 +133,13 @@ export default async function FetchingPage({ searchParams }: PageProps) {
     .endOf("isoWeek")
     .toDate();
 
-  console.log("Debug - Query Parameters:", {
-    year,
-    weekNum,
-    startDate,
-    endDate,
-    weekPeriod,
-  });
+  //console.log("Debug - Query Parameters:", {
+  //year,
+  //weekNum,
+  //startDate,
+  //endDate,
+  //weekPeriod,
+  //});
 
   const fetchingData = (await db.$queryRaw`
     SELECT 
@@ -223,7 +223,7 @@ export default async function FetchingPage({ searchParams }: PageProps) {
       info.lessThan500Amount > 0
   );
 
-  console.log("Debug - Summary Array:", summaryArray);
+  //console.log("Debug - Summary Array:", summaryArray);
 
   return (
     <>

@@ -35,7 +35,7 @@ export async function updatePrevPool({
 }: updatePrevPoolProps) {
   const activeDb = prisma || db;
 
-  console.log("оновлюємо попередній басейн");
+  //console.log("оновлюємо попередній басейн");
   const location_id: number = parseInt(
     formData.get("location_id_from") as string
   );
@@ -55,7 +55,7 @@ export async function updatePrevPool({
       parent_document: info.divDocId,
     },
   });
-  console.log("документ зариблення залишком", stockDoc);
+  //console.log("документ зариблення залишком", stockDoc);
 
   //транзакція витягування що там є за документом розподілу
   const fetchTran = await activeDb.itemtransactions.create({
@@ -67,10 +67,10 @@ export async function updatePrevPool({
       unit_id: 1,
     },
   });
-  console.log(
-    "транзакція витягування що там є за документом розподілу",
-    fetchTran
-  );
+  //console.log(
+  //"транзакція витягування що там є за документом розподілу",
+  //fetchTran
+  //);
 
   //транзакція зариблення тої ж кількості за документом зариблення
   const stockTran = await activeDb.itemtransactions.create({
@@ -82,24 +82,24 @@ export async function updatePrevPool({
       unit_id: 1,
     },
   });
-  console.log(
-    "транзакція зариблення тої ж кількості за документом зариблення",
-    stockTran
-  );
+  //console.log(
+  //"транзакція зариблення тої ж кількості за документом зариблення",
+  //stockTran
+  //);
 
   //створення запису в stocking
   let stockingAvgWeight = av_weight;
   if (info.amount_in_pool === 0) {
     stockingAvgWeight = 0;
   }
-  console.log("av_weight", stockingAvgWeight);
+  //console.log("av_weight", stockingAvgWeight);
   const stocking = await activeDb.stocking.create({
     data: {
       doc_id: stockDoc.id,
       average_weight: stockingAvgWeight,
     },
   });
-  console.log("створення запису в stocking", stocking);
+  //console.log("створення запису в stocking", stocking);
 
   //створення batch_generation і feeding calc тільки якщо кількість > 0
   if (info.amount_in_pool > 0) {
@@ -120,14 +120,14 @@ export async function updatePrevPool({
         transaction_id: stockTran.id,
       },
     });
-    console.log("створено batch_generation", newBatchGen);
+    //console.log("створено batch_generation", newBatchGen);
 
     //створення калькуляції
     formData.set("parent_doc", String(stockDoc.id));
     formData.set("fish_amount", String(info.amount_in_pool));
     formData.set("location_id_to", String(location_id));
 
-    console.log("МИ ОНОВИЛИ fish_amount", info.amount_in_pool);
+    //console.log("МИ ОНОВИЛИ fish_amount", info.amount_in_pool);
 
     formData.delete(`average_fish_mass`);
     formData.delete(`old_average_fish_mass`);

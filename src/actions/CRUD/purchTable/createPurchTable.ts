@@ -21,7 +21,7 @@ export async function createPurchTable(
   formData: FormData
 ): Promise<createPurchTableFormState> {
   //        try{
-  console.log(formData);
+  //console.log(formData);
 
   const createdString = formData.get("delivery_date") as string;
   const vendor_id: number = parseInt(formData.get("vendor_id") as string);

@@ -29,8 +29,8 @@ export async function createCalcTable(
 ) {
   const activeDb = prisma || db;
   try {
-    console.log("Ми в createCalcTable");
-    console.log(formData);
+    //console.log("Ми в createCalcTable");
+    //console.log(formData);
     const location_id_to: number = parseInt(
       formData.get("location_id_to") as string
     );
@@ -44,7 +44,7 @@ export async function createCalcTable(
     );
     const percentage = 0; //number = parseFloat(formData.get('percentage') as string);
 
-    console.log("до звернення до бд");
+    //console.log("до звернення до бд");
 
     // документ створення калькуляції
     const document_for_location_to = await activeDb.documents.create({
@@ -57,16 +57,16 @@ export async function createCalcTable(
       },
     });
 
-    console.log("після звернення до бд");
+    //console.log("після звернення до бд");
 
     if (!document_for_location_to) {
       throw new Error("Помилка при створенні документа калькуляції");
     }
 
-    console.log(
-      "створено документ з doc_type_id: 7",
-      document_for_location_to.id
-    );
+    //console.log(
+    //"створено документ з doc_type_id: 7",
+    //document_for_location_to.id
+    //);
 
     const doc_id = document_for_location_to.id;
 

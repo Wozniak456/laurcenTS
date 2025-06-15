@@ -38,7 +38,7 @@ export default async function PoolManagingShowPage(
     if (!location) {
       notFound();
     }
-    console.log(props.params);
+    //console.log(props.params);
     const today = addCurrentTimeToDate(new Date(props.params.index));
 
     // let poolInfo = await stockingActions.poolInfo(props.params.id, today.toISOString().split("T")[0])

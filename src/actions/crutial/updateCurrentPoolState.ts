@@ -25,8 +25,8 @@ export async function updateCurrentPoolState(
   const today: string = formData.get("today") as string;
 
   try {
-    console.log("ми в updateCurrentPoolState");
-    console.log(formData);
+    //console.log("ми в updateCurrentPoolState");
+    //console.log(formData);
 
     let batch_id_before: number = parseInt(
       formData.get("batch_id_before") as string
@@ -65,23 +65,23 @@ export async function updateCurrentPoolState(
     let newFishQuantityOnWarehouse = fishQuantityOnWarehouse; //100
 
     if (!batch_id_before) {
-      console.log("ПАРТІЯ НЕ ЗМІНИЛАСЯ");
-      console.log(
-        "fish_amount_before: ",
-        fish_amount_before,
-        "fishQuantityOnWarehouse: ",
-        fishQuantityOnWarehouse
-      );
+      //console.log("ПАРТІЯ НЕ ЗМІНИЛАСЯ");
+      //console.log(
+      //"fish_amount_before: ",
+      //fish_amount_before,
+      //"fishQuantityOnWarehouse: ",
+      //fishQuantityOnWarehouse
+      //);
       newFishQuantityOnWarehouse = fish_amount_before + fishQuantityOnWarehouse; //300
     }
 
-    console.log("newFishQuantityOnWarehouse", newFishQuantityOnWarehouse);
+    //console.log("newFishQuantityOnWarehouse", newFishQuantityOnWarehouse);
 
     if (fish_amount > newFishQuantityOnWarehouse) {
-      console.log(
-        "fish_amount > newFishQuantityOnWarehouse: ",
-        fish_amount > newFishQuantityOnWarehouse
-      );
+      //console.log(
+      //"fish_amount > newFishQuantityOnWarehouse: ",
+      //fish_amount > newFishQuantityOnWarehouse
+      //);
       throw new Error("Недостатня кількість на складі");
     }
 

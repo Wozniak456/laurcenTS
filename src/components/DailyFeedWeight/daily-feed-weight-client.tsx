@@ -47,8 +47,10 @@ export default function DailyFeedWeightClient({
   aggregatedData,
 }: DailyFeedWeightClientProps) {
   const [openPriority, setOpenPriority] = useState<null | {
-    itemName: string;
-    qty: number;
+    location?: { id: number; name: string };
+    item?: any;
+    items: any;
+    date: string;
   }>(null);
   const [openPercent, setOpenPercent] = useState<null | {
     locationName: string;
@@ -69,10 +71,10 @@ export default function DailyFeedWeightClient({
             <tr className="bg-gray-800 text-white">
               <th className="border p-4">Басейн</th>
               <th className="border p-4">% відх.</th>
-              <th className="border p-4">Калк. к-сть, г</th>
-              <th className="border p-4">Розр. к-сть, г</th>
               <th className="border p-4">Тип корму</th>
               <th className="border p-4">Корм</th>
+              <th className="border p-4">Калк. к-сть, г</th>
+              <th className="border p-4">Розр. к-сть, г</th>
             </tr>
           </thead>
           <tbody>
@@ -100,12 +102,7 @@ export default function DailyFeedWeightClient({
           <tbody>
             {Object.entries(aggregatedData).map(([itemName, qty]) => (
               <tr key={itemName}>
-                <td
-                  className="px-4 h-10 border border-gray-400 cursor-pointer hover:underline"
-                  onClick={() => setOpenPriority({ itemName, qty })}
-                >
-                  {itemName}
-                </td>
+                <td className="px-4 h-10 border border-gray-400">{itemName}</td>
                 <td className="px-4 h-10 border border-gray-400  text-right">
                   {qty.toFixed(2)}
                 </td>
@@ -124,13 +121,10 @@ export default function DailyFeedWeightClient({
           {() =>
             openPriority && (
               <PriorityForm
-                location={undefined}
-                items={items}
-                item={{
-                  qty: openPriority.qty,
-                  feed: { name: openPriority.itemName },
-                  item: { name: openPriority.itemName },
-                }}
+                location={openPriority.location}
+                items={openPriority.items}
+                item={openPriority.item}
+                date={openPriority.date}
               />
             )
           }

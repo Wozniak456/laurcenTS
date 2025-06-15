@@ -33,7 +33,7 @@ export async function registerGoodsInProduction(
   formState: { message: string },
   formData: FormData
 ) {
-  console.log("registerGoodsInProduction", formData);
+  //console.log("registerGoodsInProduction", formData);
   try {
     const header_id: number = parseInt(formData.get("header_id") as string);
     const vendor_id: number = parseInt(formData.get("vendor_id") as string);
@@ -48,7 +48,7 @@ export async function registerGoodsInProduction(
     // Виконання транзакції
     const result = await db.$transaction(async (prisma) => {
       try {
-        console.log("Purch date: ", purch_date);
+        //console.log("Purch date: ", purch_date);
         // Створення документа
         const document = await prisma.documents.create({
           data: {
@@ -59,7 +59,7 @@ export async function registerGoodsInProduction(
           },
         });
 
-        console.log("створився документ", document.id);
+        //console.log("створився документ", document.id);
 
         await prisma.purchtable.update({
           where: { id: header_id },
@@ -68,7 +68,7 @@ export async function registerGoodsInProduction(
           },
         });
 
-        console.log("оновився doc_id");
+        //console.log("оновився doc_id");
 
         const lines = await prisma.purchaselines.findMany({
           select: {
@@ -106,7 +106,7 @@ export async function registerGoodsInProduction(
             },
           });
 
-          console.log("створилась партія", batch.id);
+          //console.log("створилась партія", batch.id);
 
           const transaction = await prisma.itemtransactions.create({
             data: {
@@ -118,7 +118,7 @@ export async function registerGoodsInProduction(
             },
           });
 
-          console.log("створилась транзакція", transaction.id);
+          //console.log("створилась транзакція", transaction.id);
 
           await prisma.purchaselines.update({
             where: { id: line.id },
@@ -127,7 +127,7 @@ export async function registerGoodsInProduction(
             },
           });
 
-          console.log("оновився рядок", batch.id);
+          //console.log("оновився рядок", batch.id);
         }
       } catch (innerError: any) {
         // console.error('Помилка у транзакції:');

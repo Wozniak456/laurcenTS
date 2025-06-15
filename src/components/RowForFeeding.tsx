@@ -43,7 +43,6 @@ interface RowForFeedingProps {
   locInfo: {
     id: number;
     name: string;
-    percent_feeding?: number;
   };
   rowData: Feeding;
   times: {
@@ -57,10 +56,14 @@ interface RowForFeedingProps {
     name: string;
   };
   onRefresh?: () => void;
-  onRowUpdate?: (locId: number, feedId: number, newFeedings: any) => void;
+  onRowUpdate?: (
+    locId: number,
+    feedId: number,
+    newFeedings: Feeding["feedings"]
+  ) => void;
   allLocationFeedings?: Feeding[];
   percentFeeding: number;
-  feedBatchAction: any;
+  feedBatchAction: typeof feedBatch;
 }
 
 type itemAndTime = {
@@ -73,20 +76,37 @@ interface FeedBatchResponse {
   message: string;
 }
 
+interface FormState {
+  message: string;
+}
+
 export default function RowForFeedingServer(props: RowForFeedingProps) {
   const [showForm, setShowForm] = useState(false);
-  const [formState, action] = useFormState(feedBatch, { message: "" });
+  const [formState, action] = useFormState<FormState, FormData>(
+    async (state: FormState, formData: FormData) => {
+      const result = await feedBatch(state, formData);
+      return result;
+    },
+    { message: "" }
+  );
 
-  // Prepare all props to pass to the client component, including action, formState, showForm, setShowForm, etc.
+  const handleAction = async (formData: FormData) => {
+    const result = await action(formData);
+    return result;
+  };
+
   return (
     <RowForFeedingClient
       {...props}
       showForm={showForm}
       setShowForm={setShowForm}
       formState={formState}
-      action={action}
+      action={handleAction}
       onRowUpdate={props.onRowUpdate}
-      cancelAction={cancelFeeding}
+      cancelAction={async (locId: number, date: string, feedId: number) => {
+        const result = await cancelFeeding(locId, date, feedId);
+        return result;
+      }}
     />
   );
 }

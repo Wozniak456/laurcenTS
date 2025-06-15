@@ -8,7 +8,7 @@ export async function updateSmth(
   formState: { message: string } | undefined,
   formData: FormData
 ) {
-  console.log(formData);
+  //console.log(formData);
   const date = formData.get("date") as string;
   const location_id: number = parseInt(
     formData.get("location_id_to") as string

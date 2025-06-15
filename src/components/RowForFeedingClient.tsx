@@ -17,7 +17,52 @@ import {
 import { fetchFeedingRow, checkStockBeforeFeed } from "@/actions/feeding";
 import { checkLaterTransactions } from "@/actions/crutial/cancelFeeding";
 
-export default function RowForFeedingClient(props: any) {
+interface Feeding {
+  feedType: string;
+  feedName?: string;
+  feedId?: number;
+  feedings?: {
+    [time: string]: {
+      feeding?: string;
+      editing?: string;
+      hasDocument?: boolean;
+    };
+  };
+}
+
+interface TimeSlot {
+  id: number;
+  time: string;
+}
+
+interface Batch {
+  id: number;
+  name: string;
+}
+
+interface LocationInfo {
+  id: number;
+  name: string;
+}
+
+interface RowForFeedingClientProps {
+  locInfo: LocationInfo;
+  rowData: Feeding;
+  times: TimeSlot[];
+  rowCount?: number;
+  today: string;
+  batch?: Batch;
+  onRowUpdate?: (locId: number, feedId: number, newFeedings: any) => void;
+  allLocationFeedings?: Feeding[];
+  percentFeeding: number;
+  showForm?: boolean;
+  setShowForm?: (show: boolean) => void;
+  formState?: { message?: string };
+  action?: (formData: FormData) => Promise<any>;
+  cancelAction?: (locId: number, date: string, feedId: number) => Promise<any>;
+}
+
+export default function RowForFeedingClient(props: RowForFeedingClientProps) {
   const {
     locInfo,
     rowData,
@@ -102,10 +147,10 @@ export default function RowForFeedingClient(props: any) {
     if (!valueToSpread) return;
     const newEditingValues = { ...editingValue };
     const currentTimeIndex = times.findIndex(
-      (t: any) =>
+      (t) =>
         parseInt(t.time.split(":")[0]) === parseInt(currentTime.split(":")[0])
     );
-    times.slice(currentTimeIndex + 1).forEach((t: any) => {
+    times.slice(currentTimeIndex + 1).forEach((t) => {
       const timeKey = `${locInfo.id}-${parseInt(t.time.split(":")[0])}`;
       newEditingValues[timeKey] = valueToSpread;
     });
@@ -141,10 +186,12 @@ export default function RowForFeedingClient(props: any) {
     setShowModal(false);
     setButtonMode(false);
     setFedState(true);
-    setShowForm(false);
+    if (setShowForm) {
+      setShowForm(false);
+    }
     // Build updated feedings object with editing values and hasDocument true
     const updatedFeedings = { ...rowData.feedings };
-    times.forEach((time: any) => {
+    times.forEach((time) => {
       const feedingTime = parseInt(time.time.split(":")[0]);
       const key = `${locInfo.id}-${feedingTime}`;
       const value =
@@ -165,7 +212,7 @@ export default function RowForFeedingClient(props: any) {
   // When showForm becomes true, auto-submit the form, but only if there is no error and stock is sufficient
   useEffect(() => {
     const tryAutoSubmit = async () => {
-      if (showForm && formRef.current && !errorMessage) {
+      if (showForm && formRef.current && !errorMessage && rowData.feedId) {
         // Precheck for newer transactions before feeding
         const canFeed = await checkLaterTransactions(
           locInfo.id,
@@ -178,7 +225,7 @@ export default function RowForFeedingClient(props: any) {
         }
         // Gather planned quantities for all time slots
         const plannedQuantities: Record<string, number> = {};
-        times.forEach((time: any) => {
+        times.forEach((time) => {
           const feedingTime = parseInt(time.time.split(":")[0]);
           const key = `${locInfo.id}-${feedingTime}`;
           // Use editingValue if present, else calculatedQuantity
@@ -205,13 +252,21 @@ export default function RowForFeedingClient(props: any) {
         if (result.ok) {
           formRef.current.requestSubmit();
         } else {
-          setErrorMessage(result.message);
+          setErrorMessage(result.message || "Unknown error");
         }
       }
     };
     tryAutoSubmit();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showForm, errorMessage]);
+  }, [
+    showForm,
+    errorMessage,
+    rowData.feedId,
+    locInfo.id,
+    today,
+    times,
+    editingValue,
+    percentFeeding,
+  ]);
 
   // Reset local state when rowData or rowData.feedings changes (after parent update)
   useEffect(() => {
@@ -237,7 +292,7 @@ export default function RowForFeedingClient(props: any) {
     e.preventDefault();
     setIsLoading(true);
     let result = undefined;
-    if (cancelAction) {
+    if (cancelAction && rowData.feedId) {
       result = await cancelAction(locInfo.id, today, rowData.feedId);
     }
     setIsLoading(false);
@@ -247,11 +302,12 @@ export default function RowForFeedingClient(props: any) {
     }
     // On success: restore planned values, show inputs, replace Cancel with Feed
     setFedState(false);
-    setShowForm(false);
+    if (setShowForm) {
+      setShowForm(false);
+    }
     setEditingValue({});
     setLocalFeedings(plannedFeedingsRef.current || {});
     setCanceling(false);
-    // Optionally, call onRowUpdate to update parent state if needed
   };
 
   // When rowData.feedings changes (e.g., after feeding), update plannedFeedingsRef
@@ -357,20 +413,20 @@ export default function RowForFeedingClient(props: any) {
           <button
             type="button"
             className=""
-            onClick={() => setShowForm(true)}
+            onClick={() => setShowForm && setShowForm(true)}
             disabled={isLoading || isBlocked}
           >
             <Image src={feedButton} alt="feeding icon" height={35} />
           </button>
         )}
-        {showForm && !fedState && (
+        {showForm && !fedState && action && (
           <form ref={formRef} action={action} onSubmit={handleSubmit}>
             <input type="hidden" name="location_id" value={locInfo.id} />
             <input type="hidden" name="executed_by" value={3} />
             <input type="hidden" name="item_id" value={rowData.feedId} />
             <input type="hidden" name="batch_id" value={batch?.id} />
             <input type="hidden" name="date_time" value={today} />
-            {times.map((time: any) => {
+            {times.map((time) => {
               const feedingTime = parseInt(time.time.split(":")[0]);
               const key = `${locInfo.id}-${feedingTime}`;
               const feedingData = rowData.feedings?.[feedingTime];
@@ -435,7 +491,7 @@ export default function RowForFeedingClient(props: any) {
               isOpen={!!errorMessage}
               onClose={() => {
                 setErrorMessage(null);
-                setShowForm(false);
+                setShowForm?.(false);
               }}
               placement="top-center"
             >
@@ -454,7 +510,7 @@ export default function RowForFeedingClient(props: any) {
                     variant="light"
                     onClick={() => {
                       setErrorMessage(null);
-                      setShowForm(false);
+                      setShowForm?.(false);
                     }}
                   >
                     Закрити
@@ -497,7 +553,7 @@ export default function RowForFeedingClient(props: any) {
             </Modal>
           </form>
         )}
-        {fedState && (
+        {fedState && cancelAction && (
           <>
             <form
               ref={cancelFormRef}

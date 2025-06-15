@@ -95,7 +95,7 @@ export async function caviarRegistering(
   purchId: number,
   comments?: string
 ): Promise<bigint | null> {
-  console.log("we are in caviarRegistering");
+  //console.log("we are in caviarRegistering");
   let batchId: bigint | null = null;
 
   try {
@@ -145,12 +145,12 @@ export async function caviarRegistering(
           select: { vendor_doc_number: true },
         });
 
-        console.log("insertedId: ", insertedId);
+        //console.log("insertedId: ", insertedId);
 
         const formattedDate = date_time.toISOString().split("T")[0];
 
-        console.log("vendorIdValue", vendorId);
-        console.log("vendorDocNumberValue", vendorDocNumber);
+        //console.log("vendorIdValue", vendorId);
+        //console.log("vendorDocNumberValue", vendorDocNumber);
 
         const batch = await db.itembatches.create({
           data: {

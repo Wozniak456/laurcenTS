@@ -32,16 +32,17 @@ type PriorityFormType = {
   }[];
   item?: subRow;
   onSuccess?: () => void;
+  date?: string;
 };
 
 export default function PriorityForm(props: PriorityFormType) {
   // Debug logs
-  console.log("PriorityForm props.items:", props.items);
-  console.log("PriorityForm props.item?.feed.id:", props.item?.feed.id);
+  //console.log("PriorityForm props.items:", props.items);
+  //console.log("PriorityForm props.item?.feed.id:", props.item?.feed.id);
   const filteredItems = props.items.filter(
     (item) => item.feedtypes?.id === props.item?.feed.id
   );
-  console.log("PriorityForm filtered items:", filteredItems);
+  //console.log("PriorityForm filtered items:", filteredItems);
 
   const priority = props.item?.item.id;
 
@@ -58,7 +59,8 @@ export default function PriorityForm(props: PriorityFormType) {
     // Let the server action run, then reload
     setTimeout(() => {
       // sessionStorage.setItem('scrollY', window.scrollY.toString()); // Already saved before opening modal
-      window.location.reload();
+      if (props.onSuccess) props.onSuccess();
+      // window.location.reload();
     }, 0);
   };
 
@@ -110,6 +112,8 @@ export default function PriorityForm(props: PriorityFormType) {
           </div>
           <input type="hidden" name={`location`} value={props.location?.id} />
         </div>
+
+        <input type="hidden" name="validFrom" value={props.date || ""} />
 
         <div className="flex justify-between mt-4">
           <button

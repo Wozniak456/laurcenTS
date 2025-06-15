@@ -7,13 +7,14 @@ type PercentFormType = {
   location?: {
     id: number;
     name: string;
-    percent_feeding?: number;
+    percentFeeding?: number;
   };
+  date?: string;
 };
 
 export default function PercentFeedingForm(props: PercentFormType) {
   const [percentValue, setPercentValue] = useState<string>(
-    props.location?.percent_feeding?.toString() || ""
+    props.location?.percentFeeding?.toString() || ""
   );
 
   const [formState, action] = useFormState(actions.managePercentFeeding, {
@@ -45,6 +46,7 @@ export default function PercentFeedingForm(props: PercentFormType) {
             />
           </div>
           <input type="hidden" name={`location`} value={props.location?.id} />
+          <input type="hidden" name="validFrom" value={props.date || ""} />
         </div>
         <div className="flex justify-center mt-4">
           <button

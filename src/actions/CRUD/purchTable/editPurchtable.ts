@@ -17,7 +17,7 @@ export async function editPurchtable(
   formData: FormData
 ): Promise<createPurchTableFormState> {
   //        try{
-  console.log("editPurchtable", formData);
+  //console.log("editPurchtable", formData);
   const id: number = parseInt(formData.get("header_id") as string);
 
   const delivery_date_str = formData.get("delivery_date") as string;

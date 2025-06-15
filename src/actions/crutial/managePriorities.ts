@@ -54,9 +54,9 @@ export async function managePriorities(
 
     // If item_id is 0 or null, do not create a new record
     if (!item_id || item_id === 0) {
-      console.log(
-        `Closed active priority_history for location ${location_id} and feed_type_id ${feed_type_id}, no new record created (item_id=0/null)`
-      );
+      //console.log(
+      //`Closed active priority_history for location ${location_id} and feed_type_id ${feed_type_id}, no new record created (item_id=0/null)`
+      //);
       return;
     }
 
@@ -71,9 +71,9 @@ export async function managePriorities(
       },
     });
 
-    console.log(
-      `priority_history: inserted for location ${location_id} and item ${item_id}`
-    );
+    //console.log(
+    //`priority_history: inserted for location ${location_id} and item ${item_id}`
+    //);
   } catch (err: unknown) {
     if (err instanceof Error) {
       if (err.message.includes("Foreign key constraint failed")) {

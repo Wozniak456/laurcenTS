@@ -22,6 +22,7 @@ interface Feeding {
   feedName?: string;
   feedId?: number;
   feedings?: { [time: string]: { feeding?: string; editing?: string } };
+  hasDocument?: boolean;
 }
 
 interface FeedingInfo {
@@ -35,7 +36,6 @@ interface FeedingInfo {
     name: string;
   };
   percentFeeding?: number;
-  percent_feeding?: number;
 }
 
 type Row =
@@ -90,9 +90,9 @@ function isOldRow(row: Row): row is {
   return row !== undefined && (row as any).location !== undefined;
 }
 
-interface LocationComponentPropsWithPercent extends LocationComponentProps {
+export type LocationComponentPropsWithPercent = LocationComponentProps & {
   percentFeeding: number;
-}
+};
 
 export default function LocationComponent({
   row,
@@ -120,6 +120,14 @@ export default function LocationComponent({
   } | null>(null);
 
   const [openPercentModal, setOpenPercentModal] = useState<boolean>(false);
+
+  const [openPriorityIndex, setOpenPriorityIndex] = useState<number | null>(
+    null
+  );
+
+  const [openPriorityFeedIdx, setOpenPriorityFeedIdx] = useState<number | null>(
+    null
+  );
 
   const handleOpen = (index: number) => {
     setOpenItemIndex(index);
@@ -212,39 +220,46 @@ export default function LocationComponent({
                   {adjustedFeeding}
                 </td>
                 <td className="px-4 h-10 border border-gray-400">
-                  {item.feed.name}
-                </td>
-                <td className="px-4 h-10 border border-gray-400">
-                  <button onClick={() => handleOpen(itemIndex)} color="default">
-                    {item.item.name}
+                  W
+                  <button
+                    type="button"
+                    className="underline text-blue-700 hover:text-blue-900 focus:outline-none"
+                    tabIndex={0}
+                    title={`Змінити пріоритет для ${item.feed.name}`}
+                    aria-label={`Змінити пріоритет для ${item.feed.name}`}
+                    onClick={() => {
+                      console.log(
+                        "Clicked feed name:",
+                        item.feed.name,
+                        "at index",
+                        itemIndex
+                      );
+                      setOpenPriorityIndex(itemIndex);
+                    }}
+                  >
+                    {item.feed.name}
                   </button>
-                  {openItemIndex === itemIndex && (
+                  {openPriorityIndex === itemIndex && (
                     <Modal
                       isOpen={true}
-                      onClose={handleClose}
+                      onClose={() => setOpenPriorityIndex(null)}
                       placement="top-center"
                     >
                       <ModalContent>
                         {(onClose) => (
-                          <>
-                            <ModalHeader className="flex flex-col gap-1">
-                              Вибір корму
-                            </ModalHeader>
-                            <ModalBody>
-                              <PriorityForm
-                                location={row.location}
-                                items={items}
-                                item={item}
-                              />
-                            </ModalBody>
-                            <ModalFooter>
-                              {/* Можливо, ви хочете додати додаткові дії */}
-                            </ModalFooter>
-                          </>
+                          <PriorityForm
+                            location={row.location}
+                            items={items}
+                            item={item}
+                            date={date}
+                          />
                         )}
                       </ModalContent>
                     </Modal>
                   )}
+                </td>
+                <td className="px-4 h-10 border border-gray-400">
+                  <button color="default">{item.item.name}</button>
                 </td>
               </tr>
             );
@@ -253,134 +268,184 @@ export default function LocationComponent({
       )}
       {isFeedingInfo(row) && (
         <React.Fragment key={row.locId}>
-          {row.feedings?.map((feeding, idx) => {
-            // Show only the first available feeding weight for this feeding type
-            let firstFeeding = "";
-            if (feeding.feedings) {
-              const first = Object.values(feeding.feedings).find(
-                (f) =>
-                  f.feeding !== undefined &&
-                  f.feeding !== null &&
-                  f.feeding !== ""
-              );
-              if (first && first.feeding)
-                firstFeeding = parseFloat(first.feeding).toFixed(2);
-            }
-            let adjustedFeeding = "";
-            if (firstFeeding !== "" && !isNaN(percentFeeding)) {
-              adjustedFeeding = (
-                parseFloat(firstFeeding) *
-                (1 + percentFeeding / 100)
-              ).toFixed(2);
-            }
-            return (
-              <tr key={idx}>
-                {idx === 0 && (
-                  <>
-                    <td
-                      className="px-4 h-10 border border-gray-400"
-                      rowSpan={row.feedings?.length}
-                    >
-                      {row.locName}
-                    </td>
-                    <td
-                      className="px-4 h-10 border border-gray-400 text-center cursor-pointer hover:underline"
-                      rowSpan={row.feedings?.length}
-                      onClick={() => setOpenPercentModal(true)}
-                    >
-                      {(row as FeedingInfo).percentFeeding === 0 ||
-                      (row as FeedingInfo).percent_feeding === 0
-                        ? ""
-                        : (row as FeedingInfo).percentFeeding ??
-                          (row as FeedingInfo).percent_feeding}
-                      {openPercentModal && (
-                        <Modal
-                          isOpen={true}
-                          onClose={() => setOpenPercentModal(false)}
-                          placement="top-center"
-                        >
-                          <ModalContent>
-                            {(onClose) => (
-                              <PercentFeedingForm
-                                location={{
-                                  id: row.locId,
-                                  name: row.locName,
-                                  percent_feeding:
-                                    (row as FeedingInfo).percentFeeding ??
-                                    (row as FeedingInfo).percent_feeding,
-                                }}
-                              />
-                            )}
-                          </ModalContent>
-                        </Modal>
-                      )}
-                    </td>
-                  </>
-                )}
-                <td className="px-4 h-10 border border-gray-400 text-right">
-                  {firstFeeding}
-                </td>
-                <td className="px-4 h-10 border border-gray-400 text-right">
-                  {adjustedFeeding}
-                </td>
-                <td className="px-4 h-10 border border-gray-400">
-                  {feeding.feedType}
-                </td>
-                <td className="px-4 h-10 border border-gray-400">
-                  <span
-                    className="cursor-pointer hover:underline"
-                    onClick={() => {
-                      // Save scroll position before opening modal
-                      sessionStorage.setItem(
-                        "scrollY",
-                        window.scrollY.toString()
-                      );
-                      // Find feed type id from items by matching feedType name
-                      const feedTypeId = items.find(
-                        (item) => item.feedtypes?.name === feeding.feedType
-                      )?.feedtypes?.id;
-                      setOpenFeedingIndex({
-                        idx,
-                        feedTypeId,
-                        modalKey: Date.now(),
-                      });
-                    }}
-                  >
-                    {feeding.feedName}
-                  </span>
-                  {openFeedingIndex && openFeedingIndex.idx === idx && (
-                    <Modal
-                      key={openFeedingIndex.modalKey}
-                      isOpen={true}
-                      onClose={() => setOpenFeedingIndex(null)}
-                      placement="top-center"
-                    >
-                      <ModalContent>
-                        {(onClose) => (
-                          <PriorityForm
-                            key={openFeedingIndex.modalKey}
-                            location={{ id: row.locId, name: row.locName }}
-                            items={items}
-                            item={{
-                              feed: {
-                                id: openFeedingIndex.feedTypeId,
-                                name: feeding.feedType,
-                              },
-                              item: {
-                                id: feeding.feedId,
-                                name: feeding.feedName,
-                              },
-                            }}
-                            onSuccess={() => setOpenFeedingIndex(null)}
-                          />
-                        )}
-                      </ModalContent>
-                    </Modal>
-                  )}
-                </td>
-              </tr>
+          {(() => {
+            const filteredFeedings = (row.feedings ?? []).filter((feeding) => {
+              let firstFeeding = "";
+              if (feeding.feedings) {
+                const first = Object.values(feeding.feedings).find(
+                  (f) =>
+                    f.feeding !== undefined &&
+                    f.feeding !== null &&
+                    f.feeding !== ""
+                );
+                if (first && first.feeding)
+                  firstFeeding = parseFloat(first.feeding).toFixed(2);
+              }
+              return parseFloat(firstFeeding) !== 0;
+            });
+            const allFeedingsUnfed = filteredFeedings.every(
+              (feeding) =>
+                feeding.feedings &&
+                Object.values(feeding.feedings).every((f) =>
+                  Boolean(
+                    f && "hasDocument" in f && (f as any).hasDocument === false
+                  )
+                )
             );
-          })}
+            return filteredFeedings.map((feeding, idx) => {
+              let firstFeeding = "";
+              if (feeding.feedings) {
+                const first = Object.values(feeding.feedings).find(
+                  (f) =>
+                    f.feeding !== undefined &&
+                    f.feeding !== null &&
+                    f.feeding !== ""
+                );
+                if (first && first.feeding)
+                  firstFeeding = parseFloat(first.feeding).toFixed(2);
+              }
+              let adjustedFeeding = "";
+              if (firstFeeding !== "" && !isNaN(percentFeeding)) {
+                adjustedFeeding = (
+                  parseFloat(firstFeeding) *
+                  (1 + percentFeeding / 100)
+                ).toFixed(2);
+              }
+              return (
+                <tr key={idx}>
+                  {idx === 0 && (
+                    <>
+                      <td
+                        className="px-4 h-10 border border-gray-400"
+                        rowSpan={filteredFeedings.length}
+                      >
+                        {row.locName}
+                      </td>
+                      <td
+                        className={
+                          allFeedingsUnfed
+                            ? "px-4 h-10 border border-gray-400 text-center cursor-pointer hover:underline"
+                            : "px-4 h-10 border border-gray-400 text-center"
+                        }
+                        rowSpan={filteredFeedings.length}
+                        onClick={
+                          allFeedingsUnfed
+                            ? () => setOpenPercentModal(true)
+                            : undefined
+                        }
+                        style={
+                          allFeedingsUnfed
+                            ? { color: "#2563eb", textDecoration: "underline" }
+                            : {}
+                        }
+                      >
+                        {percentFeeding === 0 ? "" : percentFeeding}
+                        {openPercentModal && allFeedingsUnfed && (
+                          <Modal
+                            isOpen={true}
+                            onClose={() => setOpenPercentModal(false)}
+                            placement="top-center"
+                          >
+                            <ModalContent>
+                              {(onClose) => (
+                                <PercentFeedingForm
+                                  location={{
+                                    id: row.locId,
+                                    name: row.locName,
+                                    percentFeeding: percentFeeding,
+                                  }}
+                                  date={date}
+                                />
+                              )}
+                            </ModalContent>
+                          </Modal>
+                        )}
+                      </td>
+                    </>
+                  )}
+                  <td className="px-4 h-10 border border-gray-400">
+                    {feeding.feedType}
+                  </td>
+                  <td className="px-4 h-10 border border-gray-400">
+                    {(() => {
+                      const allTimeSlotsUnfed =
+                        feeding.feedings &&
+                        Object.values(feeding.feedings).every((f) =>
+                          Boolean(
+                            f &&
+                              "hasDocument" in f &&
+                              (f as any).hasDocument === false
+                          )
+                        );
+                      if (allTimeSlotsUnfed) {
+                        return (
+                          <>
+                            <button
+                              type="button"
+                              className="underline text-blue-700 hover:text-blue-900 focus:outline-none"
+                              tabIndex={0}
+                              title={`Змінити пріоритет для ${feeding.feedName}`}
+                              aria-label={`Змінити пріоритет для ${feeding.feedName}`}
+                              onClick={() => {
+                                setOpenPriorityFeedIdx(idx);
+                                console.log(
+                                  "Clicked feed name:",
+                                  feeding.feedName,
+                                  "at index",
+                                  idx
+                                );
+                              }}
+                            >
+                              {feeding.feedName}
+                            </button>
+                            {openPriorityFeedIdx === idx &&
+                              allTimeSlotsUnfed && (
+                                <Modal
+                                  isOpen={true}
+                                  onClose={() => setOpenPriorityFeedIdx(null)}
+                                  placement="top-center"
+                                >
+                                  <ModalContent>
+                                    {(onClose) => (
+                                      <PriorityForm
+                                        location={{
+                                          id: row.locId,
+                                          name: row.locName,
+                                        }}
+                                        items={items}
+                                        item={{
+                                          feed: {
+                                            id: feeding.feedId,
+                                            name: feeding.feedName,
+                                          },
+                                          item: {},
+                                        }}
+                                        date={date}
+                                        onSuccess={() =>
+                                          setOpenPriorityFeedIdx(null)
+                                        }
+                                      />
+                                    )}
+                                  </ModalContent>
+                                </Modal>
+                              )}
+                          </>
+                        );
+                      } else {
+                        return feeding.feedName;
+                      }
+                    })()}
+                  </td>
+                  <td className="px-4 h-10 border border-gray-400 text-right">
+                    {firstFeeding}
+                  </td>
+                  <td className="px-4 h-10 border border-gray-400 text-right">
+                    {adjustedFeeding}
+                  </td>
+                </tr>
+              );
+            });
+          })()}
         </React.Fragment>
       )}
     </>

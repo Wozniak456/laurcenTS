@@ -27,8 +27,8 @@ export async function stockPool(
   const today: string = formData.get("today") as string;
 
   try {
-    console.log("stockPool");
-    console.log(formData);
+    //console.log("stockPool");
+    //console.log(formData);
 
     const activeDb = prisma || db;
 
@@ -149,7 +149,7 @@ export async function stockPool(
       throw new Error("Помилка при створенні документа зариблення");
     }
 
-    console.log(`\n документ зариблення для ${location_id_to}`, stockDoc.id);
+    //console.log(`\n документ зариблення для ${location_id_to}`, stockDoc.id);
 
     // транзакція для витягування з попереднього басейна stocking_quantity
     const doc_type_id = formData.get("doc_type_id")
@@ -174,10 +174,10 @@ export async function stockPool(
         );
       }
 
-      console.log(
-        ` Витягуємо з попереднього для ${location_id_to}. Tran: `,
-        fetchTran
-      );
+      //console.log(
+      //` Витягуємо з попереднього для ${location_id_to}. Tran: `,
+      //fetchTran
+      //);
     }
 
     //визначаємо яку кількість зариблювати
@@ -196,7 +196,7 @@ export async function stockPool(
       take: 1,
     });
 
-    console.log("prev_generation", prev_generation);
+    //console.log("prev_generation", prev_generation);
 
     const first_parent_generation = prev_generation;
 
@@ -262,7 +262,7 @@ export async function stockPool(
         "Помилка при створенні транзакції для зариблення нового басейна"
       );
     }
-    console.log(`Зариблюємо ${location_id_to}. Tran: `, stockTran);
+    //console.log(`Зариблюємо ${location_id_to}. Tran: `, stockTran);
 
     // Fetch the last stocking record for the destination location
     const lastStocking = await activeDb.stocking.findFirst({
@@ -295,13 +295,13 @@ export async function stockPool(
     const addAvgWeight = formAvgWeightGrams;
     let calculatedAvgWeightGrams = formAvgWeightGrams;
 
-    console.log("Average weight calculation:", {
-      prevQty,
-      prevAvgWeight,
-      addQty,
-      addAvgWeight,
-      formAvgWeightGrams,
-    });
+    //console.log("Average weight calculation:", {
+    // prevQty,
+    // prevAvgWeight,
+    //addQty,
+    //addAvgWeight,
+    //formAvgWeightGrams,
+    //});
 
     if (
       prevQty &&
@@ -316,13 +316,13 @@ export async function stockPool(
         Math.round(
           ((prevQty * prevAvgWeight + addQty * addAvgWeight) / newTotal) * 1000
         ) / 1000;
-      console.log("Calculated new average weight:", calculatedAvgWeightGrams);
+      //console.log("Calculated new average weight:", calculatedAvgWeightGrams);
     } else if (formAvgWeightGrams !== null) {
       calculatedAvgWeightGrams = formAvgWeightGrams;
-      console.log("Using form average weight:", calculatedAvgWeightGrams);
+      //console.log("Using form average weight:", calculatedAvgWeightGrams);
     } else {
       calculatedAvgWeightGrams = 0;
-      console.log("No valid weights, defaulting to 0");
+      //console.log("No valid weights, defaulting to 0");
     }
 
     // Always create a stocking record for every stocking document
@@ -360,7 +360,7 @@ export async function stockPool(
         },
       });
 
-      console.log("????generationOfTwoBatches", generationOfTwoBatches);
+      //console.log("????generationOfTwoBatches", generationOfTwoBatches);
 
       // Handle feed amounts only if locations are different
       if (location_id_from !== location_id_to) {
@@ -370,30 +370,30 @@ export async function stockPool(
             first_parent_generation?.id,
             prisma
           );
-          console.log("grouped_first_ancestor", grouped_first_ancestor);
+          //console.log("grouped_first_ancestor", grouped_first_ancestor);
 
           //знаходимо який відсоток ми переміщаємо
-          console.log(
-            "stocking_quantity",
-            stocking_quantity,
-            "fish_qty_in_location_from",
-            fish_qty_in_location_from
-          );
+          //console.log(
+          //"stocking_quantity",
+          //stocking_quantity,
+          //"fish_qty_in_location_from",
+          //fish_qty_in_location_from
+          //);
           if (!Number.isNaN(fish_qty_in_location_from)) {
             if (fish_qty_in_location_from > 0) {
               const part = stocking_quantity / fish_qty_in_location_from;
-              console.log("Calculated part:", part);
-              console.log(
-                "Number of records to process:",
-                grouped_first_ancestor.length
-              );
+              //console.log("Calculated part:", part);
+              //console.log(
+              //"Number of records to process:",
+              //grouped_first_ancestor.length
+              //);
               for (const record of grouped_first_ancestor) {
-                console.log("Processing record:", {
-                  batch_generation_id: record.batch_generation_id,
-                  total_amount: record.total_amount,
-                  feed_batch_id: record.feed_batch_id,
-                  calculated_amount: record.total_amount * part,
-                });
+                //console.log("Processing record:", {
+                //batch_generation_id: record.batch_generation_id,
+                //total_amount: record.total_amount,
+                //feed_batch_id: record.feed_batch_id,
+                //calculated_amount: record.total_amount * part,
+                //});
                 try {
                   const fetch_record =
                     await activeDb.generation_feed_amount.create({
@@ -416,7 +416,7 @@ export async function stockPool(
                         },
                       },
                     });
-                  console.log("Created fetch record:", fetch_record);
+                  //console.log("Created fetch record:", fetch_record);
 
                   // І вкидання у нову локацію
                   const push_record =
@@ -440,13 +440,13 @@ export async function stockPool(
                         },
                       },
                     });
-                  console.log("Created push record:", push_record);
+                  //console.log("Created push record:", push_record);
 
-                  console.log(
-                    `витягнули частку з'їдженого: ${fetch_record.feed_batch_id}: ${fetch_record.amount}. І накинули на ${push_record.batch_generation_id}`
-                  );
+                  //console.log(
+                  // `витягнули частку з'їдженого: ${fetch_record.feed_batch_id}: ${fetch_record.amount}. І накинули на ${push_record.batch_generation_id}`
+                  //);
                 } catch (error) {
-                  console.error("Error creating feed amount records:", error);
+                  //console.error("Error creating feed amount records:", error);
                   throw error;
                 }
               }
@@ -454,12 +454,12 @@ export async function stockPool(
           }
 
           if (second_parent_generation) {
-            console.log("huh2?");
+            //console.log("huh2?");
             // знаходимо скільки зїв другий предок, якщо він є
             const grouped_second_ancestor = await getFeedAmountsAndNames(
               second_parent_generation?.id
             );
-            console.log("grouped_second_ancestor", grouped_second_ancestor);
+            //console.log("grouped_second_ancestor", grouped_second_ancestor);
 
             //додаємо записи витягування частини зїдженого з попереднього покоління
             for (const record of grouped_second_ancestor) {
@@ -507,12 +507,12 @@ export async function stockPool(
                 },
               });
 
-              console.log(
-                `витягнули частку зЇдженого: ${fetch_record.feed_batch_id}: ${fetch_record.amount}. і накинули на ${push_record.batch_generation_id}`
-              );
+              //console.log(
+              //`витягнули частку зЇдженого: ${fetch_record.feed_batch_id}: ${fetch_record.amount}. і накинули на ${push_record.batch_generation_id}`
+              //);
             }
           }
-          console.log("huh3?");
+          //console.log("huh3?");
         }
       }
     }
@@ -525,7 +525,7 @@ export async function stockPool(
 
     await createCalcTable(formState, formData, prisma);
 
-    console.log("Створили calc table");
+    //console.log("Створили calc table");
   } catch (err: unknown) {
     if (err instanceof Error) {
       if (err.message.includes("Foreign key constraint failed")) {

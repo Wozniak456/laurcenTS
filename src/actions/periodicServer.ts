@@ -12,6 +12,13 @@ export async function fetchPercentFeedingsForLocations(
   locationIds: number[],
   date: string
 ) {
+  // Ensure date is converted to UTC midnight
+  const dateObj = new Date(date + "T00:00:00Z");
+  console.log("[DEBUG] fetchPercentFeedingsForLocations", {
+    inputDate: date,
+    utcDate: dateObj,
+    iso: dateObj.toISOString(),
+  });
   // Get all pool_ids for the given locations
   const locations = await db.locations.findMany({
     where: { id: { in: locationIds } },
@@ -22,6 +29,7 @@ export async function fetchPercentFeedingsForLocations(
     if (loc.pool_id) poolIdToLocId[loc.pool_id] = loc.id;
   });
   const poolIds = locations.map((loc) => loc.pool_id).filter(Boolean);
+  console.log("[DEBUG] fetchPercentFeedingsForLocations poolIds", poolIds);
   if (poolIds.length === 0) return {};
 
   // Fetch all percent_feeding_history for these pools and date
@@ -31,8 +39,8 @@ export async function fetchPercentFeedingsForLocations(
     SELECT pool_id, percent_feeding
     FROM percent_feeding_history
     WHERE pool_id IN (${Prisma.join(poolIds)})
-    AND valid_from <= ${new Date(date)}
-    AND (valid_to IS NULL OR valid_to >= ${new Date(date)})
+    AND valid_from::date <= ${dateObj}::date
+    AND (valid_to IS NULL OR valid_to::date >= ${dateObj}::date)
     ORDER BY valid_from DESC
   `;
 

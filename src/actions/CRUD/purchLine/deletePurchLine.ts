@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 export async function deletePurchLine(id: number) {
-  console.log(id);
+  //console.log(id);
   const result = await db.$transaction(async (prisma) => {
     try {
       await prisma.purchaselines.delete({

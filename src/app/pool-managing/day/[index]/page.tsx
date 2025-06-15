@@ -21,10 +21,10 @@ export default async function StockingHome(props: StockingProps) {
   const currentDate: Date = new Date(today);
 
   //const today = new Date();
-  console.log(
-    "current date: ",
-    currentDate.toLocaleString("uk-ua", { timeZone: "Europe/Kiev" })
-  );
+  //console.log(
+  //"current date: ",
+  //currentDate.toLocaleString("uk-ua", { timeZone: "Europe/Kiev" })
+  //);
   const areas = await actions.getAreas();
 
   const locations = await actions.getPools();

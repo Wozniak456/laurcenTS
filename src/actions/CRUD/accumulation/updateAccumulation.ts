@@ -9,7 +9,7 @@ export async function updateAccumulation(
   formState: { message: string },
   formData: FormData
 ) {
-  console.log("updateAccu", formData);
+  //console.log("updateAccu", formData);
   try {
     const location_id = parseInt(formData.get("location_id") as string);
 
@@ -34,11 +34,11 @@ export async function updateAccumulation(
       take: 1,
     });
 
-    console.log("остання собівартість", latestGeneration);
+    //console.log("остання собівартість", latestGeneration);
 
     items.forEach(async (item) => {
       const qty: number = parseFloat(formData.get(`item_${item.id}`) as string);
-      console.log("qty from updateAccu", qty);
+      //console.log("qty from updateAccu", qty);
       const prev_qty: number = parseFloat(
         formData.get(`prev_item_${item.id}`) as string
       );
@@ -46,7 +46,7 @@ export async function updateAccumulation(
       // prev_qty може бути NaN
 
       if (!isNaN(qty)) {
-        console.log("ПРАЦЮЄМО З item: ", item);
+        //console.log("ПРАЦЮЄМО З item: ", item);
 
         //витягнути з басейна попереднє число
         const returnDoc = await db.documents.create({
@@ -63,7 +63,7 @@ export async function updateAccumulation(
             prev_qty * 1000
           );
 
-          console.log("партія корму, яка повертається", batches_id[0]);
+          //console.log("партія корму, яка повертається", batches_id[0]);
 
           const fetchTran = await db.itemtransactions.create({
             data: {
@@ -74,7 +74,7 @@ export async function updateAccumulation(
               unit_id: 2,
             },
           });
-          console.log("Витягнули з басейна", fetchTran.id);
+          //console.log("Витягнули з басейна", fetchTran.id);
 
           const returnTran = await db.itemtransactions.create({
             data: {
@@ -86,7 +86,7 @@ export async function updateAccumulation(
             },
           });
 
-          console.log("Кидаємо на склад", returnTran);
+          //console.log("Кидаємо на склад", returnTran);
 
           //забираємо із собівартості
 
@@ -99,7 +99,7 @@ export async function updateAccumulation(
             },
           });
 
-          console.log("забираємо із собівартості", record);
+          //console.log("забираємо із собівартості", record);
         }
 
         //погодувати
@@ -111,12 +111,12 @@ export async function updateAccumulation(
         formData.delete(`item_${item.id}`);
         formData.delete(`prev_item_${item.id}`);
 
-        console.log("додали поля для годування");
+        //console.log("додали поля для годування");
 
         await onefeeding(formState, formData);
       }
     });
-    console.log("кінець updateAccu");
+    //console.log("кінець updateAccu");
   } catch (err: unknown) {
     return { message: "Something went wrong!" };
   }

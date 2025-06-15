@@ -37,7 +37,7 @@ export async function getCatfishBatches() {
     const catfishType = process.env.itemTypeCatfish;
 
     if (!catfishType) {
-      console.log("process.env.itemTypeCatfish not set");
+      //console.log("process.env.itemTypeCatfish not set");
       throw new Error("process.env.itemTypeCatfish not set");
     }
 
@@ -116,7 +116,7 @@ export async function getCatfishBatches() {
 
     return processedBatches;
   } catch (err) {
-    console.log(`error: ${err}`);
+    //console.log(`error: ${err}`);
     return [];
   }
 }

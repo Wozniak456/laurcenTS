@@ -35,8 +35,8 @@ export async function batchDivision(
 ): Promise<{ message: string } | undefined> {
   const today: string = formData.get("today") as string;
   try {
-    console.log("ми в batchDivision");
-    console.log(formData);
+    //console.log("ми в batchDivision");
+    //console.log(formData);
 
     const location_from: number = parseInt(
       formData.get("location_id_from") as string
@@ -68,12 +68,12 @@ export async function batchDivision(
       index1++;
     }
 
-    console.log(
-      "fish_qty_in_location_from",
-      fish_qty_in_location_from,
-      "sum",
-      sum
-    );
+    //console.log(
+    //"fish_qty_in_location_from",
+    //fish_qty_in_location_from,
+    //"sum",
+    //sum
+    //);
 
     if (isNaN(fish_qty_in_location_from) || fish_qty_in_location_from < sum) {
       throw new Error("У басейні немає стільки риби");
@@ -89,7 +89,7 @@ export async function batchDivision(
       },
     });
 
-    console.log(`документ розділення для локації ${location_from}`, divDoc);
+    //console.log(`документ розділення для локації ${location_from}`, divDoc);
 
     //рахуємо скільки ми хочемо витягнути
 
@@ -140,20 +140,20 @@ export async function batchDivision(
 
       if (last_stocking) {
         if (last_stocking.quantity >= stocking_fish_amount) {
-          console.log(
-            "у басейні більше, ніж прийшло. ",
-            last_stocking.quantity,
-            ">=",
-            stocking_fish_amount
-          );
+          //console.log(
+          //"у басейні більше, ніж прийшло. ",
+          //last_stocking.quantity,
+          //">=",
+          //stocking_fish_amount
+          //);
           formData.set("batch_id_to", String(last_stocking?.batch_id)); //партія з нового
         } else {
-          console.log(
-            "у басейні менше, ніж прийшло. ",
-            last_stocking.quantity,
-            "<",
-            stocking_fish_amount
-          );
+          //console.log(
+          //"у басейні менше, ніж прийшло. ",
+          //last_stocking.quantity,
+          //"<",
+          //stocking_fish_amount
+          //);
           formData.set("batch_id_to", String(batch_id_from)); //партія з старого
         }
       }
@@ -208,12 +208,12 @@ export async function batchDivision(
         divDocId: divDoc.id,
       },
     };
-    console.log(
-      "СКІЛЬКИ МИ БУДЕМО ВКИДАТИ В СТАРИЙ БАСЕЙН",
-      fish_qty_in_location_from - sum
-    );
+    //console.log(
+    //"СКІЛЬКИ МИ БУДЕМО ВКИДАТИ В СТАРИЙ БАСЕЙН",
+    //fish_qty_in_location_from - sum
+    //);
 
-    console.log("що ми передаємо в updatePrevPool", info);
+    //console.log("що ми передаємо в updatePrevPool", info);
     await updatePrevPool(info);
   } catch (err: unknown) {
     if (err instanceof Error) {

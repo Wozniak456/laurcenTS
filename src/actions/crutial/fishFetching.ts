@@ -37,8 +37,8 @@ export async function fishFetching(
   formState: { message: string } | undefined,
   formData: FormData
 ): Promise<{ message: string } | undefined> {
-  console.log("fishFetching");
-  console.log(formData);
+  //console.log("fishFetching");
+  //console.log(formData);
 
   const location_id_from: number = parseInt(
     formData.get("location_id_from") as string
@@ -140,7 +140,7 @@ export async function fishFetching(
           throw new Error("Помилка при створенні документа вилову");
         }
 
-        console.log(`\n документ вилову для ${location_id_from}`, fetchDoc.id);
+        //console.log(`\n документ вилову для ${location_id_from}`, fetchDoc.id);
 
         for (const { amount, total_weight, reason } of fishingData) {
           if (!amount) continue;
@@ -325,19 +325,19 @@ export async function fishFetching(
             total_weight,
             week_num
           );
-          console.log("Транзакція успішно завершена:", result);
-          console.timeEnd(`createFishingTransaction - reason: ${reason}`);
+          //console.log("Транзакція успішно завершена:", result);
+          //console.timeEnd(`createFishingTransaction - reason: ${reason}`);
         }
-        console.log("find batch generation - line 188");
-        console.time("findFirst prev_generation");
+        //console.log("find batch generation - line 188");
+        //console.time("findFirst prev_generation");
         const prev_generation = await prisma.batch_generation.findFirst({
           where: { location_id: location_id_from },
           orderBy: { id: "desc" },
           take: 1,
         });
-        console.timeEnd("findFirst prev_generation");
+        //console.timeEnd("findFirst prev_generation");
 
-        console.log("prev_generation", prev_generation);
+        //console.log("prev_generation", prev_generation);
 
         const first_parent_generation = prev_generation;
 
@@ -349,35 +349,35 @@ export async function fishFetching(
           less500_fishing_amount,
         ].reduce((acc, qty) => acc + (isNaN(qty) ? 0 : qty), 0);
 
-        console.log("fetching_quantity", fetching_quantity);
+        //console.log("fetching_quantity", fetching_quantity);
 
         if (first_parent_generation) {
-          console.log("ми в if (first_parent_generation)");
-          console.time("getFeedAmountsAndNames");
+          //console.log("ми в if (first_parent_generation)");
+          //console.time("getFeedAmountsAndNames");
           const grouped_first_ancestor = await getFeedAmountsAndNames(
             first_parent_generation?.id,
             prisma
           );
-          console.timeEnd("getFeedAmountsAndNames");
-          console.log("grouped_first_ancestor", grouped_first_ancestor);
+          //console.timeEnd("getFeedAmountsAndNames");
+          //console.log("grouped_first_ancestor", grouped_first_ancestor);
 
           const NEW_fish_qty_in_location_from =
             fish_qty_in_location_from -
             (isNaN(growout_fishing_amount) ? 0 : growout_fishing_amount);
 
-          console.log(
-            "stocking_quantity",
-            fetching_quantity,
-            "NEW_fish_qty_in_location_from",
-            NEW_fish_qty_in_location_from
-          );
+          //console.log(
+          //"stocking_quantity",
+          //fetching_quantity,
+          //"NEW_fish_qty_in_location_from",
+          //NEW_fish_qty_in_location_from
+          //);
           const part =
             (fetching_quantity -
               (isNaN(growout_fishing_amount) ? 0 : growout_fishing_amount)) /
             NEW_fish_qty_in_location_from;
-          console.log("переміщаємо :", part, " %");
+          //console.log("переміщаємо :", part, " %");
 
-          console.time("Promise.all - generation_feed_amount.create");
+          //console.time("Promise.all - generation_feed_amount.create");
           await Promise.all(
             grouped_first_ancestor.map(async (record) => {
               const fetch_record = await prisma.generation_feed_amount.create({
@@ -389,12 +389,12 @@ export async function fishFetching(
                 },
               });
 
-              console.log(
-                `витягнули частку зЇдженого: ${fetch_record.feed_batch_id}: ${fetch_record.amount}`
-              );
+              //console.log(
+              //`витягнули частку зЇдженого: ${fetch_record.feed_batch_id}: ${fetch_record.amount}`
+              //);
             })
           );
-          console.timeEnd("Promise.all - generation_feed_amount.create");
+          //console.timeEnd("Promise.all - generation_feed_amount.create");
         }
 
         // Update stocking record for the source pool
@@ -461,10 +461,10 @@ export async function fishFetching(
         formData.set("location_id_to", String(location_id_from));
         formData.set("average_fish_mass", String(average_fish_mass));
 
-        console.log(
-          "СКІЛЬКИ МИ БУДЕМО ВКИДАТИ В СТАРИЙ БАСЕЙН",
-          fish_qty_in_location_from - fetching_quantity
-        );
+        //console.log(
+        //"СКІЛЬКИ МИ БУДЕМО ВКИДАТИ В СТАРИЙ БАСЕЙН",
+        //fish_qty_in_location_from - fetching_quantity
+        //);
 
         // Before calling updatePrevPool, check if GrowOut was already processed
         if (!growoutProcessed) {
@@ -492,7 +492,7 @@ export async function fishFetching(
     { timeout: 20000 }
   );
 
-  console.log("Операція пройшла успішно");
+  //console.log("Операція пройшла успішно");
   revalidatePath("/fetching/view");
   return { message: "Операція завершена успішно" };
 }

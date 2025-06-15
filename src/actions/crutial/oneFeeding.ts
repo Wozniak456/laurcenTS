@@ -9,8 +9,8 @@ export async function onefeeding(
   formData: FormData
 ) {
   try {
-    console.log("onefeeding");
-    console.log(formData);
+    //console.log("onefeeding");
+    //console.log(formData);
 
     const executed_by: number = parseInt(formData.get("executed_by") as string);
     const date_time = formData.get("date_time") as string;
@@ -29,11 +29,11 @@ export async function onefeeding(
       },
     });
 
-    console.log("today_item_id", today_item_id);
+    //console.log("today_item_id", today_item_id);
 
     const batches_id = await getFeedBatchByItemId(today_item_id, qty);
 
-    console.log("партія корму: ", batches_id);
+    //console.log("партія корму: ", batches_id);
 
     let left_to_feed = qty / 1000;
 
@@ -74,20 +74,20 @@ export async function onefeeding(
         },
         take: 1,
       });
-      console.log(
-        `Витягнули зі складу: ${fetchTran.id} і вкинули в басейн: ${feedTran.id}`
-      );
+      //console.log(
+      //`Витягнули зі складу: ${fetchTran.id} і вкинули в басейн: ${feedTran.id}`
+      //);
       left_to_feed -= consume;
       if (left_to_feed <= 0) break;
     }
 
     if (left_to_feed > 0) {
-      console.log(
-        `Не вдалося знайти достатню кількість корму для годування. Залишилося ${left_to_feed}.`
-      );
+      //console.log(
+      //`Не вдалося знайти достатню кількість корму для годування. Залишилося ${left_to_feed}.`
+      //);
     }
 
-    console.log("кінець oneFeeding ");
+    //console.log("кінець oneFeeding ");
   } catch (err: unknown) {
     if (err instanceof Error) {
       {

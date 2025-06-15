@@ -5,24 +5,57 @@ import { Prisma } from "@prisma/client";
 export async function getPriorityForDate(
   location_id: number,
   item_id: number,
-  date: Date
+  date: string | Date
 ) {
-  return await db.priority_history.findFirst({
+  // Ensure date is a Date object in UTC
+  let dateObj: Date;
+  if (typeof date === "string") {
+    dateObj = new Date(date + "T00:00:00Z");
+  } else {
+    dateObj = date;
+  }
+  // Debug log for all locations
+  console.log("[DEBUG] getPriorityForDate", {
+    location_id,
+    item_id,
+    date: dateObj,
+    iso: dateObj.toISOString(),
+  });
+
+  const result = await db.priority_history.findFirst({
     where: {
       location_id: location_id,
       item_id: item_id,
-      valid_from: { lte: date },
-      OR: [{ valid_to: null }, { valid_to: { gte: date } }],
+      valid_from: { lte: dateObj },
+      OR: [{ valid_to: null }, { valid_to: { gte: dateObj } }],
     },
     orderBy: { valid_from: "desc" },
   });
+  if (location_id === 40) {
+    console.log("[DEBUG] getPriorityForDate result", result);
+  }
+  return result;
 }
 
 // Fetch the active percent_feeding for a given location and date
 export async function getPercentFeedingForDate(
   location_id: number,
-  date: Date
+  date: string | Date
 ) {
+  // Ensure date is a Date object in UTC
+  let dateObj: Date;
+  if (typeof date === "string") {
+    dateObj = new Date(date + "T00:00:00Z");
+  } else {
+    dateObj = date;
+  }
+  // Debug log for all locations
+  console.log("[DEBUG] getPercentFeedingForDate", {
+    location_id,
+    date: dateObj,
+    iso: dateObj.toISOString(),
+  });
+
   // Find the pool_id for the location
   const location = await db.locations.findUnique({
     where: { id: location_id },
@@ -32,12 +65,14 @@ export async function getPercentFeedingForDate(
   const result = await db.percent_feeding_history.findFirst({
     where: {
       pool_id: location.pool_id,
-      valid_from: { lte: date },
-      OR: [{ valid_to: null }, { valid_to: { gte: date } }],
+      valid_from: { lte: dateObj },
+      OR: [{ valid_to: null }, { valid_to: { gte: dateObj } }],
     },
     orderBy: { valid_from: "desc" },
   });
-
+  if (location_id === 40) {
+    console.log("[DEBUG] getPercentFeedingForDate result", result);
+  }
   if (!result) return null;
 
   // Convert Decimal to number before returning

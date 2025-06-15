@@ -11,8 +11,8 @@ export async function initialStocking(
 ): Promise<{ message: string } | undefined> {
   const today: string = formData.get("today") as string;
   try {
-    console.log("initialStocking");
-    console.log(formData);
+    //console.log("initialStocking");
+    //console.log(formData);
     let location_id_from: number = parseInt(
       formData.get("location_id_from") as string
     );
@@ -50,7 +50,7 @@ export async function initialStocking(
         today: today,
       };
 
-      console.log("props", props);
+      //console.log("props", props);
       if (feedAmount && feedAmount > 0) await oneFeeding(props);
     });
   } catch (err: unknown) {
@@ -96,7 +96,7 @@ async function oneFeeding(props: feedingProps) {
 
   const batches_id = await getFeedBatchByItemId(props.item_id, props.qty);
 
-  console.log("партія корму: ", batches_id);
+  //console.log("партія корму: ", batches_id);
 
   let left_to_feed = props.qty / 1000;
 
@@ -138,11 +138,11 @@ async function oneFeeding(props: feedingProps) {
           take: 1,
         });
 
-        console.log("latestGeneration", latestGeneration);
+        //console.log("latestGeneration", latestGeneration);
 
-        console.log(
-          `Витягнули зі складу: ${fetchTran.id} і вкинули в басейн: ${feedTran.id}`
-        );
+        //console.log(
+        // `Витягнули зі складу: ${fetchTran.id} і вкинули в басейн: ${feedTran.id}`
+        //);
         // console.log(`Собівартість змінилася, ${cost_record}`)
 
         left_to_feed = 0;
@@ -169,18 +169,18 @@ async function oneFeeding(props: feedingProps) {
           },
         });
 
-        console.log(
-          `Витягнули зі складу: ${fetchTran.id} і вкинули в басейн: ${feedTran.id}`
-        );
+        //console.log(
+        //`Витягнули зі складу: ${fetchTran.id} і вкинули в басейн: ${feedTran.id}`
+        //);
         left_to_feed -= batch._sum.quantity; // Віднімаємо використану кількість
-        console.log("left_to_feed = ", left_to_feed);
+        //console.log("left_to_feed = ", left_to_feed);
       }
     }
   }
 
   if (left_to_feed > 0) {
-    console.log(
-      `Не вдалося знайти достатню кількість корму для годування. Залишилося ${left_to_feed}.`
-    );
+    //console.log(
+    //`Не вдалося знайти достатню кількість корму для годування. Залишилося ${left_to_feed}.`
+    //);
   }
 }

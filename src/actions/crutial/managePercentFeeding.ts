@@ -7,8 +7,8 @@ export async function managePercentFeeding(
   formData: FormData
 ) {
   try {
-    console.log("ми в managePercentFeeding");
-    console.log(formData);
+    //console.log("ми в managePercentFeeding");
+    //console.log(formData);
 
     const location_id: number = parseInt(formData.get("location") as string);
     const percent: number = parseInt(formData.get("percent") as string);
@@ -16,7 +16,7 @@ export async function managePercentFeeding(
 
     await updatePoolByLocationId(location_id, percent, validFrom);
 
-    console.log(`% відхилення в годуванні для локації ${location_id} оновлена`);
+    //console.log(`% відхилення в годуванні для локації ${location_id} оновлена`);
   } catch (err: unknown) {
     if (err instanceof Error) {
       if (err.message.includes("Foreign key constraint failed")) {
@@ -53,7 +53,7 @@ async function updatePoolByLocationId(
     });
 
     if (!location?.pool_id) {
-      console.log(`No pool associated with location ID ${locationId}`);
+      //console.log(`No pool associated with location ID ${locationId}`);
       return null;
     }
 
@@ -81,9 +81,9 @@ async function updatePoolByLocationId(
 
     // If newPercent is 0, do not create a new record
     if (newPercent === 0) {
-      console.log(
-        `Closed active percent_feeding_history for pool ID ${poolIdToUpdate}, no new record created (percent_feeding=0)`
-      );
+      //console.log(
+      //`Closed active percent_feeding_history for pool ID ${poolIdToUpdate}, no new record created (percent_feeding=0)`
+      //);
       return null;
     }
 
@@ -97,12 +97,12 @@ async function updatePoolByLocationId(
       },
     });
 
-    console.log(
-      `Inserted percent_feeding_history for pool ID ${poolIdToUpdate}`
-    );
+    //console.log(
+    //`Inserted percent_feeding_history for pool ID ${poolIdToUpdate}`
+    //);
     return newHistory;
   } catch (error) {
-    console.error("Error updating percent_feeding_history:", error);
+    //console.error("Error updating percent_feeding_history:", error);
     throw error;
   }
 }

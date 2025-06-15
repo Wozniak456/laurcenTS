@@ -142,7 +142,7 @@ export default async function DayFeeding(props: DayFeedingProps) {
   const dates = datesArray(currentDate);
 
   const lines = await setLines();
-  console.log("Lines data from setLines:", JSON.stringify(lines, null, 2));
+  //console.log("Lines data from setLines:", JSON.stringify(lines, null, 2));
 
   const times = await db.time_table.findMany();
 
@@ -162,7 +162,7 @@ export default async function DayFeeding(props: DayFeedingProps) {
     },
   });
 
-  console.log("[DEBUG] items:", JSON.stringify(items, null, 2));
+  //console.log("[DEBUG] items:", JSON.stringify(items, null, 2));
 
   // Populate feedTypeInfo lookup table
   items.forEach((item) => {
@@ -176,7 +176,7 @@ export default async function DayFeeding(props: DayFeedingProps) {
       };
     }
   });
-  console.log("[DEBUG] feedTypeInfo:", JSON.stringify(feedTypeInfo, null, 2));
+  //console.log("[DEBUG] feedTypeInfo:", JSON.stringify(feedTypeInfo, null, 2));
 
   const summary = await feedingActions.getAllSummary(lines, currentDate);
 
@@ -318,7 +318,7 @@ const feedingForLocation = async (locationId: number, today: Date) => {
       2
     );
   if (locationId === 50) {
-    console.log("[feedingForLocation] Query result:", safeStringify(query));
+    //console.log("[feedingForLocation] Query result:", safeStringify(query));
   }
 
   const timeQtyArray: {
@@ -338,10 +338,10 @@ const feedingForLocation = async (locationId: number, today: Date) => {
 
     // Add this log:
     if (locationId === 50) {
-      console.log(
-        `[feedingForLocation] record at ${time}:`,
-        safeStringify(record)
-      );
+      //console.log(
+      //`[feedingForLocation] record at ${time}:`,
+      //safeStringify(record)
+      //);
     }
 
     // Group transactions by item_id
@@ -599,9 +599,9 @@ const setData = async (
                         for (const itemId of itemIds) {
                           if (!itemId) {
                             if (loc.id === 50) {
-                              console.log(
-                                `[DEBUG] Skipping because !itemId: hours=${hours}, itemId=${itemId}, locId=${loc.id}`
-                              );
+                              //console.log(
+                              //`[DEBUG] Skipping because !itemId: hours=${hours}, itemId=${itemId}, locId=${loc.id}`
+                              //);
                             }
                             continue; // Skip if itemId is undefined
                           }
@@ -610,9 +610,9 @@ const setData = async (
                           const currentFeedTypeInfo = feedTypeInfo[itemId];
                           if (!currentFeedTypeInfo) {
                             if (loc.id === 50) {
-                              console.log(
-                                `[DEBUG] Skipping because !currentFeedTypeInfo: hours=${hours}, itemId=${itemId}, locId=${loc.id}`
-                              );
+                              //console.log(
+                              //`[DEBUG] Skipping because !currentFeedTypeInfo: hours=${hours}, itemId=${itemId}, locId=${loc.id}`
+                              //);
                             }
                             continue; // Skip if no feed type info
                           }
@@ -621,17 +621,17 @@ const setData = async (
                           const prevFeedTypeInfo = feedTypeInfo[itemId];
                           if (!prevFeedTypeInfo) {
                             if (loc.id === 50) {
-                              console.log(
-                                `[DEBUG] Skipping because !prevFeedTypeInfo: hours=${hours}, itemId=${itemId}, locId=${loc.id}`
-                              );
+                              //console.log(
+                              //`[DEBUG] Skipping because !prevFeedTypeInfo: hours=${hours}, itemId=${itemId}, locId=${loc.id}`
+                              //);
                             }
                             continue; // Skip if no previous feed type info
                           }
 
                           if (loc.id === 50 && hours === 22) {
-                            console.log(
-                              `Checking hours: ${hours} location_id: ${loc.id} itemid: ${itemId}`
-                            );
+                            //console.log(
+                            //`Checking hours: ${hours} location_id: ${loc.id} itemid: ${itemId}`
+                            //);
                           }
                           const editing = await getEdited(
                             hours,
@@ -639,11 +639,11 @@ const setData = async (
                             itemId
                           );
                           if (loc.id === 50) {
-                            console.log(
-                              `hours: ${hours} location_id: ${loc.id} itemid: ${itemId}`
-                            );
+                            //console.log(
+                            //`hours: ${hours} location_id: ${loc.id} itemid: ${itemId}`
+                            //);
                             editing.map((editing1) => {
-                              console.log(editing1.itemtransactions);
+                              //console.log(editing1.itemtransactions);
                             });
                           }
                           // Ініціалізуємо вкладені об'єкти, якщо їх немає
@@ -664,15 +664,15 @@ const setData = async (
                   );
 
                   if (loc.id === 50) {
-                    console.log(
-                      "editings for 22:00:",
-                      JSON.stringify(
-                        editings[loc.id],
-                        (key, value) =>
-                          typeof value === "bigint" ? value.toString() : value,
-                        2
-                      )
-                    );
+                    //console.log(
+                    //"editings for 22:00:",
+                    //JSON.stringify(
+                    //editings[loc.id],
+                    //(key, value) =>
+                    //typeof value === "bigint" ? value.toString() : value,
+                    //2
+                    //)
+                    //);
                   }
 
                   extraFilledRows = await getExtraData(
@@ -702,18 +702,18 @@ const setData = async (
                   //якщо є перехід на новий корм і є попередній обрахунок
                   if (transition && prevFeedTypeInfo && todayCalc?.feed) {
                     if (loc.id === 50) {
-                      console.log("--- DEBUG for location 50 ---");
-                      console.log(
-                        "todayCalc:",
-                        JSON.stringify(todayCalc, (k, v) =>
-                          typeof v === "bigint" ? v.toString() : v
-                        )
-                      );
-                      console.log("prevFeedTypeInfo:", prevFeedTypeInfo);
-                      console.log(
-                        "transition:",
-                        todayCalc?.calc?.transition_day
-                      );
+                      //console.log("--- DEBUG for location 50 ---");
+                      //console.log(
+                      //"todayCalc:",
+                      //JSON.stringify(todayCalc, (k, v) =>
+                      //typeof v === "bigint" ? v.toString() : v
+                      //)
+                      //);
+                      //console.log("prevFeedTypeInfo:", prevFeedTypeInfo);
+                      //console.log(
+                      //"transition:",
+                      //todayCalc?.calc?.transition_day
+                      //);
                     }
                     // First line - previous feed type with decreasing amount
                     feedings.push({
@@ -825,7 +825,7 @@ const setData = async (
                   }
 
                   if (Object.keys(extraFilledRows).length > 0) {
-                    //   console.log(`${loc.id} 4 if`);
+                    //console.log(`${loc.id} 4 if`);
                     Object.keys(extraFilledRows).forEach((feedId) => {
                       const feedRows = extraFilledRows[Number(feedId)];
 
@@ -889,12 +889,12 @@ const setData = async (
 
                   // console.log('feedings: ', feedings)
                   if (loc.id === 50) {
-                    console.log(
-                      "Final feedings array for location 50:",
-                      JSON.stringify(feedings, (k, v) =>
-                        typeof v === "bigint" ? v.toString() : v
-                      )
-                    );
+                    //console.log(
+                    //"Final feedings array for location 50:",
+                    //JSON.stringify(feedings, (k, v) =>
+                    //typeof v === "bigint" ? v.toString() : v
+                    //)
+                    //);
                   }
 
                   // Group editing values for each feeding row (by feedId) and time slot
@@ -947,15 +947,15 @@ const setData = async (
                     percent_feeding: pool.percent_feeding,
                   };
                   if (loc.id === 50) {
-                    console.log(
-                      `locId: ${loc.id}`,
-                      JSON.stringify(pushResult, (key, value) => {
-                        if (typeof value === "bigint") {
-                          return value.toString();
-                        }
-                        return value;
-                      })
-                    );
+                    //console.log(
+                    //`locId: ${loc.id}`,
+                    //JSON.stringify(pushResult, (key, value) => {
+                    //if (typeof value === "bigint") {
+                    //return value.toString();
+                    //}
+                    //return value;
+                    //})
+                    //);
                   }
                   // Додати до загального масиву
                   data.push(pushResult);
@@ -964,10 +964,10 @@ const setData = async (
             }
 
             if (loc.id === 50) {
-              console.log("transitionStartCalc: ", transitionStartCalc);
-              console.log("todayCalc: ", todayCalc);
-              console.log("prevFeedTypeInfo: ", prevFeedTypeInfo);
-              console.log("nextFeedType with item: ", nextFeedType);
+              //console.log("transitionStartCalc: ", transitionStartCalc);
+              //console.log("todayCalc: ", todayCalc);
+              //console.log("prevFeedTypeInfo: ", prevFeedTypeInfo);
+              //console.log("nextFeedType with item: ", nextFeedType);
             }
           }
 
@@ -1009,9 +1009,9 @@ const setData = async (
               for (const itemId of itemIds) {
                 if (!itemId) {
                   if (loc.id === 50) {
-                    console.log(
-                      `[DEBUG] Skipping because !itemId: hours=${hours}, itemId=${itemId}, locId=${loc.id}`
-                    );
+                    //console.log(
+                    //`[DEBUG] Skipping because !itemId: hours=${hours}, itemId=${itemId}, locId=${loc.id}`
+                    //);
                   }
                   continue; // Skip if itemId is undefined
                 }
@@ -1020,9 +1020,9 @@ const setData = async (
                 const currentFeedTypeInfo = feedTypeInfo[itemId];
                 if (!currentFeedTypeInfo) {
                   if (loc.id === 50) {
-                    console.log(
-                      `[DEBUG] Skipping because !currentFeedTypeInfo: hours=${hours}, itemId=${itemId}, locId=${loc.id}`
-                    );
+                    //console.log(
+                    //`[DEBUG] Skipping because !currentFeedTypeInfo: hours=${hours}, itemId=${itemId}, locId=${loc.id}`
+                    //);
                   }
                   continue; // Skip if no feed type info
                 }
@@ -1031,25 +1031,25 @@ const setData = async (
                 const prevFeedTypeInfo = feedTypeInfo[itemId];
                 if (!prevFeedTypeInfo) {
                   if (loc.id === 50) {
-                    console.log(
-                      `[DEBUG] Skipping because !prevFeedTypeInfo: hours=${hours}, itemId=${itemId}, locId=${loc.id}`
-                    );
+                    //console.log(
+                    //`[DEBUG] Skipping because !prevFeedTypeInfo: hours=${hours}, itemId=${itemId}, locId=${loc.id}`
+                    //);
                   }
                   continue; // Skip if no previous feed type info
                 }
 
                 if (loc.id === 50 && hours === 22) {
-                  console.log(
-                    `Checking hours: ${hours} location_id: ${loc.id} itemid: ${itemId}`
-                  );
+                  //console.log(
+                  //`Checking hours: ${hours} location_id: ${loc.id} itemid: ${itemId}`
+                  //);
                 }
                 const editing = await getEdited(hours, loc.id, itemId);
                 if (loc.id === 50) {
-                  console.log(
-                    `hours: ${hours} location_id: ${loc.id} itemid: ${itemId}`
-                  );
+                  //console.log(
+                  //`hours: ${hours} location_id: ${loc.id} itemid: ${itemId}`
+                  //);
                   editing.map((editing1) => {
-                    console.log(editing1.itemtransactions);
+                    //console.log(editing1.itemtransactions);
                   });
                 }
                 // Ініціалізуємо вкладені об'єкти, якщо їх немає
@@ -1070,15 +1070,15 @@ const setData = async (
         );
 
         if (loc.id === 50) {
-          console.log(
-            "editings for 22:00:",
-            JSON.stringify(
-              editings[loc.id],
-              (key, value) =>
-                typeof value === "bigint" ? value.toString() : value,
-              2
-            )
-          );
+          //console.log(
+          //"editings for 22:00:",
+          //JSON.stringify(
+          //editings[loc.id],
+          //(key, value) =>
+          //typeof value === "bigint" ? value.toString() : value,
+          //2
+          //)
+          //);
         }
 
         extraFilledRows = await getExtraData(
@@ -1108,12 +1108,12 @@ const setData = async (
         //якщо є перехід на новий корм і є попередній обрахунок
         if (transition && prevFeedTypeInfo && todayCalc?.feed) {
           if (loc.id === 50) {
-            console.log("Feedings to render for transition:", {
-              prevFeedTypeInfo,
-              todayFeed: todayCalc.feed,
-              feedingAmountForPrev,
-              feedingAmountForToday,
-            });
+            //console.log("Feedings to render for transition:", {
+            //prevFeedTypeInfo,
+            //todayFeed: todayCalc.feed,
+            //feedingAmountForPrev,
+            //feedingAmountForToday,
+            //});
           }
           // First line - previous feed type with decreasing amount
           feedings.push({
@@ -1218,7 +1218,7 @@ const setData = async (
         }
 
         if (Object.keys(extraFilledRows).length > 0) {
-          //   console.log(`${loc.id} 4 if`);
+          //console.log(`${loc.id} 4 if`);
           Object.keys(extraFilledRows).forEach((feedId) => {
             const feedRows = extraFilledRows[Number(feedId)];
 
@@ -1278,15 +1278,15 @@ const setData = async (
 
         // console.log('feedings: ', feedings)
         if (loc.id === 50) {
-          console.log(
-            `locId: ${loc.id}`,
-            JSON.stringify(feedings, (key, value) => {
-              if (typeof value === "bigint") {
-                return value.toString();
-              }
-              return value;
-            })
-          );
+          //console.log(
+          //`locId: ${loc.id}`,
+          //JSON.stringify(feedings, (key, value) => {
+          //if (typeof value === "bigint") {
+          //return value.toString();
+          //}
+          //return value;
+          //})
+          //);
         }
 
         // Group editing values for each feeding row (by feedId) and time slot
@@ -1328,15 +1328,15 @@ const setData = async (
           percent_feeding: pool.percent_feeding,
         };
         if (loc.id === 50) {
-          console.log(
-            `locId: ${loc.id}`,
-            JSON.stringify(pushResult, (key, value) => {
-              if (typeof value === "bigint") {
-                return value.toString();
-              }
-              return value;
-            })
-          );
+          //console.log(
+          //`locId: ${loc.id}`,
+          //JSON.stringify(pushResult, (key, value) => {
+          //if (typeof value === "bigint") {
+          //return value.toString();
+          //}
+          //return value;
+          //})
+          //);
         }
         // Додати до загального масиву
         data.push(pushResult);

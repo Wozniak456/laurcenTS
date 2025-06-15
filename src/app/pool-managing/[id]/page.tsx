@@ -23,7 +23,7 @@ export default async function PoolManagingShowPage(
     if (!location) {
       notFound();
     }
-    console.log(props.params);
+    //console.log(props.params);
     const today = new Date(props.params.day);
 
     // let poolInfo = await stockingActions.poolInfo(props.params.id, today.toISOString().split("T")[0])

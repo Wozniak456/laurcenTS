@@ -8,7 +8,7 @@ export async function editPurchline(
   formData: FormData
 ) {
   try {
-    console.log("editPurchline", formData);
+    //console.log("editPurchline", formData);
     const purchase_id: number = parseInt(formData.get("purchase_id") as string);
     const item_id: number = parseInt(formData.get("item_id") as string);
     const quantity: number = parseFloat(formData.get("quantity") as string);

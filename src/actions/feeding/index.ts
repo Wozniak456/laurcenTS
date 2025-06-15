@@ -4,6 +4,7 @@ import { db } from "@/db";
 import * as actions from "@/actions";
 import * as stockingActions from "@/actions/stocking";
 import { getFeedBatchByItemId } from "../crutial/getFeedBatchByItemId";
+import { getPercentFeedingForDate } from "@/utils/periodic";
 
 interface TimeSlot {
   time: string;
@@ -181,14 +182,14 @@ export async function feedBatch(
   formState: { message: string },
   formData: FormData
 ): Promise<{ message: string }> {
-  console.log("================== FEED BATCH STARTED ==================");
+  //console.log("================== FEED BATCH STARTED ==================");
   try {
     // Debug: Log all form data keys and values
     const formDataDebug: Record<string, any> = {};
     formData.forEach((value, key) => {
       formDataDebug[key] = value;
     });
-    console.log("DEBUG - Form Data:", formDataDebug);
+    //console.log("DEBUG - Form Data:", formDataDebug);
 
     const item_id = parseInt(formData.get("item_id") as string);
     const location_id = parseInt(formData.get("location_id") as string);
@@ -206,12 +207,12 @@ export async function feedBatch(
       }
     }
 
-    console.log("DEBUG - Feed Check:", {
-      item_id,
-      location_id,
-      times: timeDebug,
-      totalQtyNeeded,
-    });
+    //console.log("DEBUG - Feed Check:", {
+    // item_id,
+    //location_id,
+    //times: timeDebug,
+    //totalQtyNeeded,
+    //});
 
     // Calculate total available stock for the item
     const availableBatches = await getFeedBatchByItemId(item_id, 0, db);
@@ -236,7 +237,7 @@ export async function feedBatch(
     );
 
     if (!batchesForFeeding || batchesForFeeding.length === 0) {
-      console.log("DEBUG - No batches found for item:", item_id);
+      //console.log("DEBUG - No batches found for item:", item_id);
       return { message: "Not enough feed available: Немає достатньо корму" };
     }
 
@@ -269,10 +270,10 @@ export async function feedBatch(
         };
 
         // Log the data we're about to send
-        console.error(
-          "Creating document with data:",
-          JSON.stringify(docData, null, 2)
-        );
+        //console.error(
+        //"Creating document with data:",
+        //JSON.stringify(docData, null, 2)
+        //);
 
         const feedDoc = await db.documents.create({
           data: docData,
@@ -288,14 +289,14 @@ export async function feedBatch(
         });
 
         // Log the result immediately after creation
-        console.error("Document created:", JSON.stringify(feedDoc, null, 2));
+        //console.error("Document created:", JSON.stringify(feedDoc, null, 2));
 
         if (!feedDoc) {
           throw new Error("Failed to create document - no document returned");
         }
 
         if (!feedDoc.comments) {
-          console.error("Warning: Document created but comments field is null");
+          //console.error("Warning: Document created but comments field is null");
         }
 
         // Process all batch transactions under this single document
@@ -327,17 +328,17 @@ export async function feedBatch(
           leftToFeed -= consume;
         }
 
-        console.log("DEBUG - Created feed transactions:", {
-          docId: feedDoc.id,
-          timeSlot: time.hours,
-          transactionCount: leftToFeed,
-        });
+        //console.log("DEBUG - Created feed transactions:", {
+        //docId: feedDoc.id,
+        //timeSlot: time.hours,
+        //transactionCount: leftToFeed,
+        //});
       }
     }
 
     return { message: "Feed batch processed successfully" };
   } catch (error) {
-    console.log("DEBUG - Main error:", error);
+    //console.log("DEBUG - Main error:", error);
     return {
       message: `Error: ${
         error instanceof Error ? error.message : String(error)
@@ -453,6 +454,12 @@ export async function fetchFeedingRow({
     });
   }
 
+  // Get percent_feeding using periodic function
+  const percentFeeding = await getPercentFeedingForDate(
+    location_id,
+    new Date(date)
+  );
+
   // 6. Compose the row object
   return {
     locId: location_id,
@@ -464,7 +471,7 @@ export async function fetchFeedingRow({
     },
     rowCount: feedings.length,
     feedings,
-    percent_feeding: undefined, // Add percent_feeding if needed
+    percent_feeding: percentFeeding?.percent_feeding || 0,
   };
 }
 

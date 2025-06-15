@@ -1,0 +1,15 @@
+we have tables:
+1) priorities - here we have per location_id priority for item_id
+so, if we have calculated that this location_id should eat this type of feeding item and we have on stock few items with this type of feeding and we want to process feeding with another item then we can add record in this table with this item_id and location_id
+
+please prepare solution how to use this prioritization as periodic values to be able to back and force in time and have exactly values assigned as priority for location_id
+
+then we have to find all places where we have this parameter in use and change to add date argument and calculate value as last value till this date (including this date)
+
+2) pools - here we have percent_feeding for pool_id
+
+please prepare solution how to use this percent_feeding as periodic values to be able to back and force in time and have exactly values assigned as percent_feeding for pool_id
+
+pool_id we have connected to location_id in locations table
+
+then we have to find all places where we have this parameter in use and change to add date argument and calculate value as last value till this date (including this date)
