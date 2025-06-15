@@ -13,6 +13,10 @@ import { uk } from "date-fns/locale"; // If you need specific Ukrainian locale f
 import { request } from "http";
 import { fetchPercentFeedingsForLocations } from "@/actions/periodicServer";
 import { feedBatch } from "@/actions";
+import {
+  getActivePriorityItemForDate,
+  getActivePrioritiesForDate,
+} from "@/utils/periodic";
 
 interface DayFeedingProps {
   params: {
@@ -73,7 +77,6 @@ interface DailyFeedWeightProps {
     pools: {
       id: number;
       name: string;
-      percent_feeding: number | null;
       locations: {
         name: string;
         id: number;
@@ -178,9 +181,15 @@ export default async function DayFeeding(props: DayFeedingProps) {
   });
   //console.log("[DEBUG] feedTypeInfo:", JSON.stringify(feedTypeInfo, null, 2));
 
+  const prioritiesMap = await getActivePrioritiesForDate(today);
+  console.log(
+    "[DEBUG] prioritiesMap[41]:",
+    JSON.stringify(prioritiesMap[41], null, 2)
+  );
+
   const summary = await feedingActions.getAllSummary(lines, currentDate);
 
-  const data = await setData(today, times);
+  const data = await setData(today, times, prioritiesMap);
 
   // Collect all unique location IDs
   const locationIds = Array.from(
@@ -400,14 +409,13 @@ function sumEditingQuantities(editingArr: any[]): number {
 
 const setData = async (
   today: string,
-  times: { id: number; time: string }[]
+  times: { id: number; time: string }[],
+  prioritiesMap: Record<number, Record<number, any>>
 ) => {
+  console.log("[DEBUG] setData: function called for today", today);
   const currentDate = new Date(today);
-
   const lines = await setLines();
-
   let data: FeedingInfo[] = [];
-
   const getEdited = async (hours: number, locId: number, itemId: number) => {
     const todayDate = new Date(today);
     todayDate.setUTCHours(hours, 0, 0, 0);
@@ -502,21 +510,161 @@ const setData = async (
             };
           }
 
+          if (loc.id === 41) {
+            console.log(
+              "[DEBUG][LOCATION 41] setData: checking transition_day and doc_id",
+              {
+                transition_day: todayCalc?.calc?.transition_day,
+                doc_id: todayCalc?.calc?.doc_id,
+                fish_weight: todayCalc?.calc?.fish_weight,
+                batch_id: todayCalc.batch?.batch_id,
+                todayCalc,
+                locId: loc.id,
+              }
+            );
+          }
+          // Always recalculate feed item for current feed type using prioritiesMap, regardless of transition_day
+          if (todayCalc?.calc?.fish_weight && todayCalc.batch?.batch_id) {
+            const currentFeedType = await stockingActions.getFeedType(
+              todayCalc.calc.fish_weight
+            );
+            if (currentFeedType) {
+              if (loc.id === 41) {
+                console.log("=== [DEBUG][PRIORITY LOOKUP] ===");
+                console.log("[DEBUG] Lookup keys:", {
+                  locId: loc.id,
+                  feedTypeId: currentFeedType.id,
+                });
+                console.log(
+                  "[DEBUG] prioritiesMap[41]:",
+                  JSON.stringify(prioritiesMap[41], null, 2)
+                );
+                if (prioritiesMap[41]) {
+                  console.log(
+                    "[DEBUG] prioritiesMap[41] keys:",
+                    Object.keys(prioritiesMap[41])
+                  );
+                }
+              }
+              const prio = prioritiesMap[loc.id]?.[currentFeedType.id];
+              let feedItem = null;
+              if (prio && prio.item_id && prio.items?.name) {
+                feedItem = {
+                  item_id: prio.item_id,
+                  item_name: prio.items.name,
+                  definedPrio: true,
+                };
+              } else {
+                if (loc.id === 41) {
+                  console.log(
+                    "[DEBUG][LOCATION 41] setData: fallback to first item of feed type (always)",
+                    { locId: loc.id, feedTypeId: currentFeedType.id }
+                  );
+                }
+                const itemsOfType = await db.items.findMany({
+                  where: { feed_type_id: currentFeedType.id },
+                  orderBy: { name: "asc" },
+                });
+                if (itemsOfType.length > 0) {
+                  feedItem = {
+                    item_id: itemsOfType[0].id,
+                    item_name: itemsOfType[0].name,
+                    definedPrio: false,
+                  };
+                }
+              }
+              if (feedItem) {
+                const updatedFeed: FeedInfo = {
+                  type_id: currentFeedType.id,
+                  type_name: currentFeedType.name,
+                  item_id: feedItem.item_id,
+                  item_name: feedItem.item_name,
+                  definedPrio: feedItem.definedPrio,
+                };
+                todayCalc = {
+                  ...todayCalc,
+                  feed: updatedFeed,
+                };
+                if (loc.id === 41) {
+                  console.log(
+                    "[DEBUG][LOCATION 41] FINAL FEED ITEM:",
+                    feedItem
+                  );
+                  console.log(
+                    "[DEBUG][LOCATION 41] todayCalc.feed:",
+                    todayCalc.feed
+                  );
+                }
+              }
+            }
+          }
+
           if (
             todayCalc?.calc?.transition_day !== null &&
             todayCalc?.calc?.doc_id
           ) {
-            // Get feed type based on the current calculation's fish weight
-            if (todayCalc?.calc?.fish_weight && todayCalc.batch?.batch_id) {
-              const currentFeedType = await stockingActions.getFeedType(
-                todayCalc.calc.fish_weight
+            if (loc.id === 41) {
+              console.log(
+                "[DEBUG][LOCATION 41] setData: inside transition_day/doc_id block",
+                {
+                  fish_weight: todayCalc?.calc?.fish_weight,
+                  batch_id: todayCalc.batch?.batch_id,
+                }
               );
+            }
+            if (todayCalc?.calc?.fish_weight && todayCalc.batch?.batch_id) {
+              // Always use periodic priority logic for planned/scheduled items
+              const currentFeedType =
+                todayCalc?.calc?.fish_weight && todayCalc.batch?.batch_id
+                  ? await stockingActions.getFeedType(
+                      todayCalc.calc.fish_weight
+                    )
+                  : null;
               if (currentFeedType) {
-                // Use getItemPerType to respect priorities
-                const feedItem = await actions.getItemPerType(
-                  currentFeedType.id,
-                  loc.id
-                );
+                if (loc.id === 41) {
+                  console.log("=== [DEBUG][PRIORITY LOOKUP] ===");
+                  console.log("[DEBUG] Lookup keys:", {
+                    locId: loc.id,
+                    feedTypeId: currentFeedType.id,
+                  });
+                  console.log(
+                    "[DEBUG] prioritiesMap[41]:",
+                    JSON.stringify(prioritiesMap[41], null, 2)
+                  );
+                  if (prioritiesMap[41]) {
+                    console.log(
+                      "[DEBUG] prioritiesMap[41] keys:",
+                      Object.keys(prioritiesMap[41])
+                    );
+                  }
+                }
+                const prio = prioritiesMap[loc.id]?.[currentFeedType.id];
+                let feedItem = null;
+                if (prio && prio.item_id && prio.items?.name) {
+                  feedItem = {
+                    item_id: prio.item_id,
+                    item_name: prio.items.name,
+                    definedPrio: true,
+                  };
+                } else {
+                  if (loc.id === 41) {
+                    console.log(
+                      "[DEBUG][LOCATION 41] setData: fallback to first item of feed type (always)",
+                      { locId: loc.id, feedTypeId: currentFeedType.id }
+                    );
+                  }
+                  const itemsOfType = await db.items.findMany({
+                    where: { feed_type_id: currentFeedType.id },
+                    orderBy: { name: "asc" },
+                  });
+                  if (itemsOfType.length > 0) {
+                    feedItem = {
+                      item_id: itemsOfType[0].id,
+                      item_name: itemsOfType[0].name,
+                      definedPrio: false,
+                    };
+                  }
+                }
                 if (feedItem) {
                   const updatedFeed: FeedInfo = {
                     type_id: currentFeedType.id,
@@ -529,455 +677,443 @@ const setData = async (
                     ...todayCalc,
                     feed: updatedFeed,
                   };
-
-                  // Get the previous feed type based on fish weight
-                  const fishId = 13; // Number(todayCalc.batch?.item_id) || - I will update correct later6
-                  const prevFeedType = await db.feedtypes.findFirst({
-                    select: {
-                      id: true,
-                      name: true,
-                      feedconnection_id: true,
-                    },
-                    where: {
-                      feedconnections: {
-                        fish_id: fishId,
-                        to_fish_weight: {
-                          lt: todayCalc.calc?.fish_weight || 0,
-                        },
-                      },
-                    },
-                    orderBy: {
-                      feedconnections: {
-                        to_fish_weight: "desc",
-                      },
-                    },
-                  });
-
-                  if (prevFeedType) {
-                    // Use getItemPerType for previous feed type as well
-                    const prevFeedItem = await actions.getItemPerType(
-                      prevFeedType.id,
-                      loc.id
+                  if (loc.id === 41) {
+                    console.log(
+                      "[DEBUG][LOCATION 41] FINAL FEED ITEM:",
+                      feedItem
                     );
-                    if (prevFeedItem) {
-                      prevFeedTypeInfo = {
-                        id: prevFeedType.id,
-                        name: prevFeedType.name,
-                        feedconnection_id: prevFeedType.feedconnection_id,
-                        itemId: prevFeedItem.item_id,
-                        itemName: prevFeedItem.item_name,
-                      };
-                    }
-                  }
-
-                  // Initialize editings object
-                  let editings: {
-                    [locId: number]: {
-                      [itemId: number]: {
-                        [time: string]: editingType[];
-                      };
-                    };
-                  } = {};
-
-                  // Define itemIds array here
-                  const itemIds = [
-                    todayCalc?.feed?.item_id,
-                    prevFeedTypeInfo?.itemId,
-                  ].filter((itemId): itemId is number => !!itemId); // Фільтруємо `undefined`
-
-                  // Process each time slot
-                  await Promise.all(
-                    times
-                      .sort(
-                        (a, b) =>
-                          Number(a.time.split(":")[0]) -
-                          Number(b.time.split(":")[0])
-                      )
-                      .map(async (time) => {
-                        const hours = Number(time.time.split(":")[0]);
-
-                        for (const itemId of itemIds) {
-                          if (!itemId) {
-                            if (loc.id === 50) {
-                              //console.log(
-                              //`[DEBUG] Skipping because !itemId: hours=${hours}, itemId=${itemId}, locId=${loc.id}`
-                              //);
-                            }
-                            continue; // Skip if itemId is undefined
-                          }
-
-                          // Get the current feed type info
-                          const currentFeedTypeInfo = feedTypeInfo[itemId];
-                          if (!currentFeedTypeInfo) {
-                            if (loc.id === 50) {
-                              //console.log(
-                              //`[DEBUG] Skipping because !currentFeedTypeInfo: hours=${hours}, itemId=${itemId}, locId=${loc.id}`
-                              //);
-                            }
-                            continue; // Skip if no feed type info
-                          }
-
-                          // Get the previous feed type info
-                          const prevFeedTypeInfo = feedTypeInfo[itemId];
-                          if (!prevFeedTypeInfo) {
-                            if (loc.id === 50) {
-                              //console.log(
-                              //`[DEBUG] Skipping because !prevFeedTypeInfo: hours=${hours}, itemId=${itemId}, locId=${loc.id}`
-                              //);
-                            }
-                            continue; // Skip if no previous feed type info
-                          }
-
-                          if (loc.id === 50 && hours === 22) {
-                            //console.log(
-                            //`Checking hours: ${hours} location_id: ${loc.id} itemid: ${itemId}`
-                            //);
-                          }
-                          const editing = await getEdited(
-                            hours,
-                            loc.id,
-                            itemId
-                          );
-                          if (loc.id === 50) {
-                            //console.log(
-                            //`hours: ${hours} location_id: ${loc.id} itemid: ${itemId}`
-                            //);
-                            editing.map((editing1) => {
-                              //console.log(editing1.itemtransactions);
-                            });
-                          }
-                          // Ініціалізуємо вкладені об'єкти, якщо їх немає
-                          if (!editings[loc.id]) {
-                            editings[loc.id] = {};
-                          }
-                          if (!editings[loc.id][itemId]) {
-                            editings[loc.id][itemId] = {};
-                          }
-                          if (!editings[loc.id][itemId][hours]) {
-                            editings[loc.id][itemId][hours] = [];
-                          }
-
-                          // Додаємо значення до editings
-                          editings[loc.id][itemId][hours] = editing;
-                        }
-                      })
-                  );
-
-                  if (loc.id === 50) {
-                    //console.log(
-                    //"editings for 22:00:",
-                    //JSON.stringify(
-                    //editings[loc.id],
-                    //(key, value) =>
-                    //typeof value === "bigint" ? value.toString() : value,
-                    //2
-                    //)
-                    //);
-                  }
-
-                  extraFilledRows = await getExtraData(
-                    loc.id,
-                    today,
-                    prevFeedTypeInfo?.itemId,
-                    todayCalc?.feed?.item_id
-                  );
-
-                  const transition = todayCalc?.calc?.transition_day;
-
-                  const feedingAmountForPrev =
-                    transition && todayCalc?.calc?.feed_per_feeding
-                      ? todayCalc.calc.feed_per_feeding * (1 - transition * 0.2)
-                      : undefined;
-
-                  const feedingAmountForToday =
-                    transition && todayCalc?.calc?.feed_per_feeding
-                      ? todayCalc.calc.feed_per_feeding * (transition * 0.2)
-                      : undefined;
-
-                  // Створення загального об'єкта для басейна
-                  const feedings: Feeding[] = [];
-
-                  let feedingsCount = 0;
-
-                  //якщо є перехід на новий корм і є попередній обрахунок
-                  if (transition && prevFeedTypeInfo && todayCalc?.feed) {
-                    if (loc.id === 50) {
-                      //console.log("--- DEBUG for location 50 ---");
-                      //console.log(
-                      //"todayCalc:",
-                      //JSON.stringify(todayCalc, (k, v) =>
-                      //typeof v === "bigint" ? v.toString() : v
-                      //)
-                      //);
-                      //console.log("prevFeedTypeInfo:", prevFeedTypeInfo);
-                      //console.log(
-                      //"transition:",
-                      //todayCalc?.calc?.transition_day
-                      //);
-                    }
-                    // First line - previous feed type with decreasing amount
-                    feedings.push({
-                      feedType: prevFeedTypeInfo!.name || "",
-                      feedName: prevFeedTypeInfo!.itemName || "",
-                      feedId: prevFeedTypeInfo!.itemId,
-                      feedings: Object.fromEntries(
-                        times.map(({ time }) => {
-                          const hours = Number(time.split(":")[0]);
-                          const itemId = prevFeedTypeInfo!.itemId;
-                          if (typeof itemId !== "number")
-                            return [
-                              hours.toString(),
-                              { feeding: "", editing: "", hasDocument: false },
-                            ];
-                          const editing =
-                            editings[loc.id]?.[itemId!]?.[hours] || [];
-                          const totalEditing = sumEditingQuantities(editing);
-                          return [
-                            hours.toString(),
-                            {
-                              feeding: feedingAmountForPrev?.toFixed(1),
-                              editing:
-                                totalEditing !== 0
-                                  ? (totalEditing * 1000).toFixed(1)
-                                  : "",
-                              hasDocument: editing[0]?.hasDocument || false,
-                            },
-                          ];
-                        })
-                      ),
-                    });
-
-                    // Second line - current feed type with increasing amount
-                    feedings.push({
-                      feedType: todayCalc.feed.type_name || "",
-                      feedName: todayCalc.feed.item_name || "",
-                      feedId: todayCalc.feed.item_id,
-                      feedings: Object.fromEntries(
-                        times.map(({ time }) => {
-                          const hours = Number(time.split(":")[0]);
-                          const itemId = todayCalc.feed.item_id;
-                          if (typeof itemId !== "number")
-                            return [
-                              hours.toString(),
-                              { feeding: "", editing: "", hasDocument: false },
-                            ];
-                          const editing =
-                            editings[loc.id]?.[itemId!]?.[hours] || [];
-                          const totalEditing = sumEditingQuantities(editing);
-                          return [
-                            hours.toString(),
-                            {
-                              feeding: feedingAmountForToday?.toFixed(1),
-                              editing:
-                                totalEditing !== 0
-                                  ? (totalEditing * 1000).toFixed(1)
-                                  : "",
-                              hasDocument: editing[0]?.hasDocument || false,
-                            },
-                          ];
-                        })
-                      ),
-                    });
-                    feedingsCount += 2;
-                  }
-
-                  // If no transition or after handling transition, add normal feeding line
-                  if (!transition && todayCalc?.feed) {
-                    const feedingsResult = Object.fromEntries(
-                      await Promise.all(
-                        times.map(async ({ time }) => {
-                          const hours = Number(time.split(":")[0]);
-                          const itemId = todayCalc.feed.item_id;
-                          if (typeof itemId !== "number")
-                            return [
-                              hours.toString(),
-                              { feeding: "", editing: "", hasDocument: false },
-                            ];
-                          const editing = await getEdited(
-                            hours,
-                            loc.id,
-                            itemId
-                          );
-                          const totalEditing = sumEditingQuantities(editing);
-                          return [
-                            hours.toString(),
-                            {
-                              feeding:
-                                todayCalc.calc?.feed_per_feeding?.toFixed(1),
-                              editing:
-                                totalEditing !== 0
-                                  ? (totalEditing * 1000).toFixed(1)
-                                  : "",
-                              hasDocument: editing[0]?.hasDocument || false,
-                            },
-                          ];
-                        })
-                      )
+                    console.log(
+                      "[DEBUG][LOCATION 41] todayCalc.feed:",
+                      todayCalc.feed
                     );
-
-                    feedings.push({
-                      feedType: todayCalc.feed.type_name || "",
-                      feedName: todayCalc.feed.item_name || "",
-                      feedId: todayCalc.feed.item_id,
-                      feedings: feedingsResult,
-                    });
-                    feedingsCount++;
                   }
-
-                  if (Object.keys(extraFilledRows).length > 0) {
-                    //console.log(`${loc.id} 4 if`);
-                    Object.keys(extraFilledRows).forEach((feedId) => {
-                      const feedRows = extraFilledRows[Number(feedId)];
-
-                      // console.log('loc: ', loc.id, feedRows)
-
-                      // Створюємо об'єкт для зберігання feedings для кожного часу
-                      const feedingsForFeedId: Record<
-                        string,
-                        {
-                          feeding: string;
-                          editing: string;
-                          hasDocument: boolean;
-                        }
-                      > = {};
-
-                      // Спочатку додаємо існуючі записи з extraFilledRows
-                      feedRows.forEach((row) => {
-                        const hours = parseInt(row.date_time.split(":")[0], 10);
-
-                        if (!feedingsForFeedId[hours]) {
-                          feedingsForFeedId[hours] = {
-                            feeding: "0", // Початкова кількість корму
-                            editing: "0", // Початкове редагування
-                            hasDocument: true, // Додаємо флаг, оскільки це дані з документів
-                          };
-                        }
-
-                        const editingValue = row.quantity
-                          ? (row.quantity * 1000).toFixed(1)
-                          : "0";
-                        feedingsForFeedId[hours].editing = editingValue;
-                        feedingsForFeedId[hours].hasDocument = true; // Встановлюємо флаг для існуючих записів
-                      });
-
-                      // Потім додаємо записи для годин з масиву times
-                      times.forEach(({ time }) => {
-                        const hours = parseInt(time, 10);
-
-                        if (!feedingsForFeedId[hours]) {
-                          // Якщо запис для цього часу не існує, створюємо його
-                          feedingsForFeedId[hours] = {
-                            feeding: "0", // Значення за замовчуванням
-                            editing: "0", // Редагування за замовчуванням
-                            hasDocument: true, // Додаємо флаг для всіх часових слотів цього item
-                          };
-                        }
-                      });
-
-                      const valueToPush = {
-                        feedType: feedRows[0].feedType, // Тип корму
-                        feedName: feedRows[0].feedName, // Назва корму
-                        feedId: feedRows[0].item_id, // ID корму
-                        feedings: feedingsForFeedId, // Зберігаємо feedings по годинах
-                      };
-
-                      // Додаємо цей корм до основного масиву feedings
-                      feedings.push(valueToPush);
-                    });
-                    feedingsCount++;
-                  }
-
-                  // console.log('feedings: ', feedings)
-                  if (loc.id === 50) {
-                    //console.log(
-                    //"Final feedings array for location 50:",
-                    //JSON.stringify(feedings, (k, v) =>
-                    //typeof v === "bigint" ? v.toString() : v
-                    //)
-                    //);
-                  }
-
-                  // Group editing values for each feeding row (by feedId) and time slot
-                  if (feedings.length > 0) {
-                    // Build a map: { [feedId]: { [hour]: totalEditing } }
-                    const groupedEditing: Record<
-                      number,
-                      Record<string, number>
-                    > = {};
-                    feedings.forEach((feeding) => {
-                      const feedId = feeding.feedId;
-                      if (!feedId) return;
-                      Object.entries(feeding.feedings || {}).forEach(
-                        ([hour, val]) => {
-                          if (!groupedEditing[feedId])
-                            groupedEditing[feedId] = {};
-                          const editingVal = val.editing
-                            ? parseFloat(val.editing)
-                            : 0;
-                          if (!groupedEditing[feedId][hour])
-                            groupedEditing[feedId][hour] = 0;
-                          groupedEditing[feedId][hour] += editingVal;
-                        }
-                      );
-                    });
-                    // Now update each feeding row's editing value to the grouped sum
-                    feedings.forEach((feeding) => {
-                      const feedId = feeding.feedId;
-                      if (!feedId) return;
-                      Object.entries(feeding.feedings || {}).forEach(
-                        ([hour, val]) => {
-                          val.editing =
-                            groupedEditing[feedId][hour]?.toFixed(1) || "0.0";
-                        }
-                      );
-                    });
-                  }
-
-                  //що ми додаємо
-                  const pushResult = {
-                    locId: loc.id,
-                    locName: loc.name,
-                    date: today,
-                    batch: {
-                      id: Number(todayCalc?.batch.batch_id),
-                      name: String(todayCalc?.batch.batch_name),
-                    },
-                    rowCount: feedingsCount,
-                    feedings,
-                    percent_feeding: pool.percent_feeding,
-                  };
-                  if (loc.id === 50) {
-                    //console.log(
-                    //`locId: ${loc.id}`,
-                    //JSON.stringify(pushResult, (key, value) => {
-                    //if (typeof value === "bigint") {
-                    //return value.toString();
-                    //}
-                    //return value;
-                    //})
-                    //);
-                  }
-                  // Додати до загального масиву
-                  data.push(pushResult);
                 }
               }
             }
 
-            if (loc.id === 50) {
-              //console.log("transitionStartCalc: ", transitionStartCalc);
-              //console.log("todayCalc: ", todayCalc);
-              //console.log("prevFeedTypeInfo: ", prevFeedTypeInfo);
-              //console.log("nextFeedType with item: ", nextFeedType);
+            // Get the previous feed type based on fish weight
+            const fishId = 13; // Number(todayCalc.batch?.item_id) || - I will update correct later6
+            const prevFeedType = await db.feedtypes.findFirst({
+              select: {
+                id: true,
+                name: true,
+                feedconnection_id: true,
+              },
+              where: {
+                feedconnections: {
+                  fish_id: fishId,
+                  to_fish_weight: {
+                    lt: todayCalc.calc?.fish_weight || 0,
+                  },
+                },
+              },
+              orderBy: {
+                feedconnections: {
+                  to_fish_weight: "desc",
+                },
+              },
+            });
+
+            if (prevFeedType) {
+              // Try to use prioritiesMap for previous feed type
+              const prevPrio = prioritiesMap[loc.id]?.[prevFeedType.id];
+              if (prevPrio && prevPrio.item_id && prevPrio.items?.name) {
+                prevFeedTypeInfo = {
+                  id: prevFeedType.id,
+                  name: prevFeedType.name,
+                  feedconnection_id: prevFeedType.feedconnection_id,
+                  itemId: prevPrio.item_id,
+                  itemName: prevPrio.items.name,
+                };
+              } else {
+                const prevFeedItem = await actions.getItemPerType(
+                  prevFeedType.id,
+                  loc.id
+                );
+                if (prevFeedItem) {
+                  prevFeedTypeInfo = {
+                    id: prevFeedType.id,
+                    name: prevFeedType.name,
+                    feedconnection_id: prevFeedType.feedconnection_id,
+                    itemId: prevFeedItem.item_id,
+                    itemName: prevFeedItem.item_name,
+                  };
+                }
+              }
             }
-          }
 
-          const batchInfo = await stockingActions.poolInfo(loc.id, today);
+            // Initialize editings object
+            let editings: {
+              [locId: number]: {
+                [itemId: number]: {
+                  [time: string]: editingType[];
+                };
+              };
+            } = {};
 
-          if (batchInfo) {
-            locationInfo = {
-              ...locationInfo,
-              batch_id: batchInfo.batch?.id,
+            // Define itemIds array here
+            const itemIds = [
+              todayCalc?.feed?.item_id,
+              prevFeedTypeInfo?.itemId,
+            ].filter((itemId): itemId is number => !!itemId); // Фільтруємо `undefined`
+
+            // Process each time slot
+            await Promise.all(
+              times
+                .sort(
+                  (a, b) =>
+                    Number(a.time.split(":")[0]) - Number(b.time.split(":")[0])
+                )
+                .map(async (time) => {
+                  const hours = Number(time.time.split(":")[0]);
+
+                  for (const itemId of itemIds) {
+                    if (!itemId) {
+                      if (loc.id === 50) {
+                        //console.log(
+                        //`[DEBUG] Skipping because !itemId: hours=${hours}, itemId=${itemId}, locId=${loc.id}`
+                        //);
+                      }
+                      continue; // Skip if itemId is undefined
+                    }
+
+                    // Get the current feed type info
+                    const currentFeedTypeInfo = feedTypeInfo[itemId];
+                    if (!currentFeedTypeInfo) {
+                      if (loc.id === 50) {
+                        //console.log(
+                        //`[DEBUG] Skipping because !currentFeedTypeInfo: hours=${hours}, itemId=${itemId}, locId=${loc.id}`
+                        //);
+                      }
+                      continue; // Skip if no feed type info
+                    }
+
+                    // Get the previous feed type info
+                    const prevFeedTypeInfo = feedTypeInfo[itemId];
+                    if (!prevFeedTypeInfo) {
+                      if (loc.id === 50) {
+                        //console.log(
+                        //`[DEBUG] Skipping because !prevFeedTypeInfo: hours=${hours}, itemId=${itemId}, locId=${loc.id}`
+                        //);
+                      }
+                      continue; // Skip if no previous feed type info
+                    }
+
+                    if (loc.id === 50 && hours === 22) {
+                      //console.log(
+                      //`Checking hours: ${hours} location_id: ${loc.id} itemid: ${itemId}`
+                      //);
+                    }
+                    const editing = await getEdited(hours, loc.id, itemId);
+                    if (loc.id === 50) {
+                      //console.log(
+                      //`hours: ${hours} location_id: ${loc.id} itemid: ${itemId}`
+                      //);
+                      editing.map((editing1) => {
+                        //console.log(editing1.itemtransactions);
+                      });
+                    }
+                    // Ініціалізуємо вкладені об'єкти, якщо їх немає
+                    if (!editings[loc.id]) {
+                      editings[loc.id] = {};
+                    }
+                    if (!editings[loc.id][itemId]) {
+                      editings[loc.id][itemId] = {};
+                    }
+                    if (!editings[loc.id][itemId][hours]) {
+                      editings[loc.id][itemId][hours] = [];
+                    }
+
+                    // Додаємо значення до editings
+                    editings[loc.id][itemId][hours] = editing;
+                  }
+                })
+            );
+
+            if (loc.id === 50) {
+              //console.log(
+              //"editings for 22:00:",
+              //JSON.stringify(
+              //editings[loc.id],
+              //(key, value) =>
+              //typeof value === "bigint" ? value.toString() : value,
+              //2
+              //)
+              //);
+            }
+
+            extraFilledRows = await getExtraData(
+              loc.id,
+              today,
+              prevFeedTypeInfo?.itemId,
+              todayCalc?.feed?.item_id
+            );
+
+            const transition = todayCalc?.calc?.transition_day;
+
+            const feedingAmountForPrev =
+              transition && todayCalc?.calc?.feed_per_feeding
+                ? todayCalc.calc.feed_per_feeding * (1 - transition * 0.2)
+                : undefined;
+
+            const feedingAmountForToday =
+              transition && todayCalc?.calc?.feed_per_feeding
+                ? todayCalc.calc.feed_per_feeding * (transition * 0.2)
+                : undefined;
+
+            // Створення загального об'єкта для басейна
+            const feedings: Feeding[] = [];
+
+            let feedingsCount = 0;
+
+            //якщо є перехід на новий корм і є попередній обрахунок
+            if (transition && prevFeedTypeInfo && todayCalc?.feed) {
+              if (loc.id === 50) {
+                //console.log("--- DEBUG for location 50 ---");
+                //console.log(
+                //"todayCalc:",
+                //JSON.stringify(todayCalc, (k, v) =>
+                //typeof v === "bigint" ? v.toString() : v
+                //)
+                //);
+                //console.log("prevFeedTypeInfo:", prevFeedTypeInfo);
+                //console.log(
+                //"transition:",
+                //todayCalc?.calc?.transition_day
+                //);
+              }
+              // First line - previous feed type with decreasing amount
+              feedings.push({
+                feedType: prevFeedTypeInfo!.name || "",
+                feedName: prevFeedTypeInfo!.itemName || "",
+                feedId: prevFeedTypeInfo!.itemId,
+                feedings: Object.fromEntries(
+                  times.map(({ time }) => {
+                    const hours = Number(time.split(":")[0]);
+                    const itemId = prevFeedTypeInfo!.itemId;
+                    if (typeof itemId !== "number")
+                      return [
+                        hours.toString(),
+                        { feeding: "", editing: "", hasDocument: false },
+                      ];
+                    const editing = editings[loc.id]?.[itemId!]?.[hours] || [];
+                    const totalEditing = sumEditingQuantities(editing);
+                    return [
+                      hours.toString(),
+                      {
+                        feeding: feedingAmountForPrev?.toFixed(1),
+                        editing:
+                          totalEditing !== 0
+                            ? (totalEditing * 1000).toFixed(1)
+                            : "",
+                        hasDocument: editing[0]?.hasDocument || false,
+                      },
+                    ];
+                  })
+                ),
+              });
+
+              // Second line - current feed type with increasing amount
+              feedings.push({
+                feedType: todayCalc.feed.type_name || "",
+                feedName: todayCalc.feed.item_name || "",
+                feedId: todayCalc.feed.item_id,
+                feedings: Object.fromEntries(
+                  times.map(({ time }) => {
+                    const hours = Number(time.split(":")[0]);
+                    const itemId = todayCalc.feed.item_id;
+                    if (typeof itemId !== "number")
+                      return [
+                        hours.toString(),
+                        { feeding: "", editing: "", hasDocument: false },
+                      ];
+                    const editing = editings[loc.id]?.[itemId!]?.[hours] || [];
+                    const totalEditing = sumEditingQuantities(editing);
+                    return [
+                      hours.toString(),
+                      {
+                        feeding: feedingAmountForToday?.toFixed(1),
+                        editing:
+                          totalEditing !== 0
+                            ? (totalEditing * 1000).toFixed(1)
+                            : "",
+                        hasDocument: editing[0]?.hasDocument || false,
+                      },
+                    ];
+                  })
+                ),
+              });
+              feedingsCount += 2;
+            }
+
+            // If no transition or after handling transition, add normal feeding line
+            if (!transition && todayCalc?.feed) {
+              const feedingsResult = Object.fromEntries(
+                await Promise.all(
+                  times.map(async ({ time }) => {
+                    const hours = Number(time.split(":")[0]);
+                    const itemId = todayCalc.feed.item_id;
+                    if (typeof itemId !== "number")
+                      return [
+                        hours.toString(),
+                        { feeding: "", editing: "", hasDocument: false },
+                      ];
+                    const editing = await getEdited(hours, loc.id, itemId);
+                    const totalEditing = sumEditingQuantities(editing);
+                    return [
+                      hours.toString(),
+                      {
+                        feeding: todayCalc.calc?.feed_per_feeding?.toFixed(1),
+                        editing:
+                          totalEditing !== 0
+                            ? (totalEditing * 1000).toFixed(1)
+                            : "",
+                        hasDocument: editing[0]?.hasDocument || false,
+                      },
+                    ];
+                  })
+                )
+              );
+
+              feedings.push({
+                feedType: todayCalc.feed.type_name || "",
+                feedName: todayCalc.feed.item_name || "",
+                feedId: todayCalc.feed.item_id,
+                feedings: feedingsResult,
+              });
+              feedingsCount++;
+            }
+
+            if (Object.keys(extraFilledRows).length > 0) {
+              //console.log(`${loc.id} 4 if`);
+              Object.keys(extraFilledRows).forEach((feedId) => {
+                const feedRows = extraFilledRows[Number(feedId)];
+
+                // console.log('loc: ', loc.id, feedRows)
+
+                // Створюємо об'єкт для зберігання feedings для кожного часу
+                const feedingsForFeedId: Record<
+                  string,
+                  {
+                    feeding: string;
+                    editing: string;
+                    hasDocument: boolean;
+                  }
+                > = {};
+
+                // Спочатку додаємо існуючі записи з extraFilledRows
+                feedRows.forEach((row) => {
+                  const hours = parseInt(row.date_time.split(":")[0], 10);
+
+                  if (!feedingsForFeedId[hours]) {
+                    feedingsForFeedId[hours] = {
+                      feeding: "0", // Початкова кількість корму
+                      editing: "0", // Початкове редагування
+                      hasDocument: true, // Додаємо флаг, оскільки це дані з документів
+                    };
+                  }
+
+                  const editingValue = row.quantity
+                    ? (row.quantity * 1000).toFixed(1)
+                    : "0";
+                  feedingsForFeedId[hours].editing = editingValue;
+                  feedingsForFeedId[hours].hasDocument = true; // Встановлюємо флаг для існуючих записів
+                });
+
+                // Потім додаємо записи для годин з масиву times
+                times.forEach(({ time }) => {
+                  const hours = parseInt(time, 10);
+
+                  if (!feedingsForFeedId[hours]) {
+                    // Якщо запис для цього часу не існує, створюємо його
+                    feedingsForFeedId[hours] = {
+                      feeding: "0", // Значення за замовчуванням
+                      editing: "0", // Редагування за замовчуванням
+                      hasDocument: true, // Додаємо флаг для всіх часових слотів цього item
+                    };
+                  }
+                });
+
+                const valueToPush = {
+                  feedType: feedRows[0].feedType, // Тип корму
+                  feedName: feedRows[0].feedName, // Назва корму
+                  feedId: feedRows[0].item_id, // ID корму
+                  feedings: feedingsForFeedId, // Зберігаємо feedings по годинах
+                };
+
+                // Додаємо цей корм до основного масиву feedings
+                feedings.push(valueToPush);
+              });
+              feedingsCount++;
+            }
+
+            // console.log('feedings: ', feedings)
+            if (loc.id === 50) {
+              //console.log(
+              //"Final feedings array for location 50:",
+              //JSON.stringify(feedings, (k, v) =>
+              //typeof v === "bigint" ? v.toString() : v
+              //)
+              //);
+            }
+
+            // Group editing values for each feeding row (by feedId) and time slot
+            if (feedings.length > 0) {
+              // Build a map: { [feedId]: { [hour]: totalEditing } }
+              const groupedEditing: Record<number, Record<string, number>> = {};
+              feedings.forEach((feeding) => {
+                const feedId = feeding.feedId;
+                if (!feedId) return;
+                Object.entries(feeding.feedings || {}).forEach(
+                  ([hour, val]) => {
+                    if (!groupedEditing[feedId]) groupedEditing[feedId] = {};
+                    const editingVal = val.editing
+                      ? parseFloat(val.editing)
+                      : 0;
+                    if (!groupedEditing[feedId][hour])
+                      groupedEditing[feedId][hour] = 0;
+                    groupedEditing[feedId][hour] += editingVal;
+                  }
+                );
+              });
+              // Now update each feeding row's editing value to the grouped sum
+              feedings.forEach((feeding) => {
+                const feedId = feeding.feedId;
+                if (!feedId) return;
+                Object.entries(feeding.feedings || {}).forEach(
+                  ([hour, val]) => {
+                    val.editing =
+                      groupedEditing[feedId][hour]?.toFixed(1) || "0.0";
+                  }
+                );
+              });
+            }
+
+            //що ми додаємо
+            const pushResult = {
+              locId: loc.id,
+              locName: loc.name,
+              date: today,
+              batch: {
+                id: Number(todayCalc?.batch.batch_id),
+                name: String(todayCalc?.batch.batch_name),
+              },
+              rowCount: feedingsCount,
+              feedings,
             };
+            if (loc.id === 50) {
+              //console.log(
+              //`locId: ${loc.id}`,
+              //JSON.stringify(pushResult, (key, value) => {
+              //if (typeof value === "bigint") {
+              //return value.toString();
+              //}
+              //return value;
+              //})
+              //);
+            }
+            // Додати до загального масиву
+            data.push(pushResult);
           }
         }
 
@@ -1325,7 +1461,6 @@ const setData = async (
           },
           rowCount: feedingsCount,
           feedings,
-          percent_feeding: pool.percent_feeding,
         };
         if (loc.id === 50) {
           //console.log(
@@ -1356,7 +1491,6 @@ const setLines = async () => {
         select: {
           name: true,
           id: true,
-          percent_feeding: true,
           locations: {
             select: {
               id: true,

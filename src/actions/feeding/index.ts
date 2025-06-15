@@ -4,7 +4,11 @@ import { db } from "@/db";
 import * as actions from "@/actions";
 import * as stockingActions from "@/actions/stocking";
 import { getFeedBatchByItemId } from "../crutial/getFeedBatchByItemId";
-import { getPercentFeedingForDate } from "@/utils/periodic";
+import {
+  getPercentFeedingForDate,
+  getPriorityForDate,
+  getActivePriorityItemForDate,
+} from "@/utils/periodic";
 
 interface TimeSlot {
   time: string;
@@ -370,6 +374,10 @@ export async function fetchFeedingRow({
   const isPoolFilled = await actions.isFilled(location_id, date);
   if (!isPoolFilled) return null;
 
+  // Get the active priority item for this location and date
+  const activePriority = await getActivePriorityItemForDate(location_id, date);
+  const activeItemId = activePriority?.item_id || item_id;
+
   // 2. Get calculation info for this location and date
   const todayCalc = await stockingActions.calculationForLocation(
     location_id,
@@ -378,7 +386,7 @@ export async function fetchFeedingRow({
 
   // 3. Get feed type info for this item
   const item = await db.items.findUnique({
-    where: { id: item_id },
+    where: { id: activeItemId },
     select: {
       id: true,
       name: true,
@@ -399,7 +407,7 @@ export async function fetchFeedingRow({
           select: { quantity: true },
           where: {
             location_id: location_id,
-            itembatches: { items: { id: item_id } },
+            itembatches: { items: { id: activeItemId } },
           },
         },
       },
@@ -408,7 +416,7 @@ export async function fetchFeedingRow({
         doc_type_id: 9,
         date_time: todayDate,
         itemtransactions: {
-          some: { itembatches: { items: { id: item_id } } },
+          some: { itembatches: { items: { id: activeItemId } } },
         },
       },
     });
@@ -423,7 +431,7 @@ export async function fetchFeedingRow({
 
   // 5. Build feedings array for this item
   const feedings: any[] = [];
-  if (todayCalc && todayCalc.feed && todayCalc.feed.item_id === item_id) {
+  if (todayCalc && todayCalc.feed && todayCalc.feed.item_id === activeItemId) {
     // No transition logic for simplicity; add if needed
     const feedingsResult = Object.fromEntries(
       await Promise.all(
@@ -472,6 +480,9 @@ export async function fetchFeedingRow({
     rowCount: feedings.length,
     feedings,
     percent_feeding: percentFeeding?.percent_feeding || 0,
+    priority: activePriority?.priority || 0,
+    priority_item_id: activePriority?.item_id || null,
+    priority_item_name: activePriority?.items?.name || null,
   };
 }
 

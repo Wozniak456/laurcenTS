@@ -148,7 +148,6 @@ model itembatches {
   employees              employees                @relation(fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
   items                  items                    @relation(fields: [item_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   itemtransactions       itemtransactions[]
-  priorities             priorities[]
 }
 
 model items {
@@ -165,21 +164,9 @@ model items {
   feedtypes        feedtypes?         @relation(fields: [feed_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   itemtypes        itemtypes?         @relation(fields: [item_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   vendors          vendors?           @relation(fields: [vendor_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  priorities       priorities[]
   priority_history priority_history[]
   purchaselines    purchaselines[]
   saleslines       saleslines[]
-}
-
-model priorities {
-  id          Int          @id @default(autoincrement())
-  item_id     Int
-  batch_id    BigInt?
-  location_id Int
-  priority    Int
-  itembatches itembatches? @relation(fields: [batch_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  items       items        @relation(fields: [item_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  locations   locations    @relation(fields: [location_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model itemtransactions {
@@ -234,7 +221,6 @@ model locations {
   itemtransactions itemtransactions[]
   locationtypes    locationtypes      @relation(fields: [location_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   pools            pools?             @relation(fields: [pool_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  priorities       priorities[]
   priority_history priority_history[]
   documents        documents[]        @relation("documentsTolocations")
 }
@@ -273,7 +259,6 @@ model pools {
   pool_height             Float?
   pool_width              Float?
   pool_length             Float?
-  percent_feeding         Float?
   locations               locations[]
   percent_feeding_history percent_feeding_history[]
   productionlines         productionlines           @relation(fields: [prod_line_id], references: [id], onDelete: NoAction, onUpdate: NoAction)

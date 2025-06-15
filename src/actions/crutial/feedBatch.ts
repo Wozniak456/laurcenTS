@@ -233,74 +233,102 @@ export async function feedBatch(
             )}\n`
           );
 
-          // Create transaction for any quantity (including zero)
-          const batches_id = await getFeedBatchByItemId(
-            item_id,
-            Math.max(qtyForWholeDay, 0.001), // Use a small positive number to get at least one batch
-            prisma
-          );
-
-          let leftToFeed = qty / 1000; // Convert to kg
-          for (const batch of batches_id) {
-            if (leftToFeed <= 0) break;
-            const available = batch._sum.quantity ?? 0;
-            const consume = Math.min(available, leftToFeed);
-            // Create negative transaction for warehouse
-            const fetchTran = await prisma.itemtransactions.create({
-              data: {
-                doc_id: feedDoc.id,
-                location_id: 87,
-                batch_id: batch.batch_id,
-                quantity: -consume,
-                unit_id: 2,
-              },
-            });
-            // Create positive transaction for pool
-            const feedTran = await prisma.itemtransactions.create({
-              data: {
-                doc_id: feedDoc.id,
-                location_id: location_id,
-                batch_id: batch.batch_id,
-                quantity: consume,
-                unit_id: 2,
-              },
-            });
-            const latestGeneration = await prisma.batch_generation.findFirst({
-              include: {
-                itemtransactions: true,
-              },
-              where: {
-                location_id: location_id,
-              },
-              orderBy: {
-                id: "desc",
-              },
-              take: 1,
-            });
-            const record = await prisma.generation_feed_amount.create({
-              data: {
-                batch_generation_id: latestGeneration?.id as bigint,
-                feed_batch_id: batch.batch_id,
-                amount: consume * 1000, // store in grams if needed
-                doc_id: feedDoc.id,
-              },
-            });
-            leftToFeed -= consume;
-            process.stdout.write(
-              `Created transactions: ${JSON.stringify(
-                {
-                  fetchTransactionId: String(fetchTran.id),
-                  feedTransactionId: String(feedTran.id),
-                  recordId: String(record.id),
-                  consumed: consume,
-                  leftToFeed,
-                },
-                null,
-                2
-              )}\n`
+          // Always create a transaction, even for 0 quantity
+          if (qty === 0) {
+            // Use actual batch_id(s) from getFeedBatchByItemId for zero feeding
+            const batches_id = await getFeedBatchByItemId(
+              item_id,
+              0.001, // Use a small positive number to get at least one batch
+              prisma
             );
+            for (const batch of batches_id) {
+              await prisma.itemtransactions.create({
+                data: {
+                  doc_id: feedDoc.id,
+                  location_id: 87,
+                  batch_id: batch.batch_id,
+                  quantity: 0,
+                  unit_id: 2,
+                },
+              });
+              await prisma.itemtransactions.create({
+                data: {
+                  doc_id: feedDoc.id,
+                  location_id: location_id,
+                  batch_id: batch.batch_id,
+                  quantity: 0,
+                  unit_id: 2,
+                },
+              });
+            }
+          } else {
+            // Create transaction for any quantity > 0 as before
+            const batches_id = await getFeedBatchByItemId(
+              item_id,
+              Math.max(qtyForWholeDay, 0.001), // Use a small positive number to get at least one batch
+              prisma
+            );
+            let leftToFeed = qty / 1000;
+            for (const batch of batches_id) {
+              if (leftToFeed <= 0) break;
+              const available = batch._sum.quantity ?? 0;
+              const consume = Math.min(available, leftToFeed);
+              // Create negative transaction for warehouse
+              const fetchTran = await prisma.itemtransactions.create({
+                data: {
+                  doc_id: feedDoc.id,
+                  location_id: 87,
+                  batch_id: batch.batch_id,
+                  quantity: -consume,
+                  unit_id: 2,
+                },
+              });
+              // Create positive transaction for pool
+              const feedTran = await prisma.itemtransactions.create({
+                data: {
+                  doc_id: feedDoc.id,
+                  location_id: location_id,
+                  batch_id: batch.batch_id,
+                  quantity: consume,
+                  unit_id: 2,
+                },
+              });
+              const latestGeneration = await prisma.batch_generation.findFirst({
+                include: {
+                  itemtransactions: true,
+                },
+                where: {
+                  location_id: location_id,
+                },
+                orderBy: {
+                  id: "desc",
+                },
+                take: 1,
+              });
+              const record = await prisma.generation_feed_amount.create({
+                data: {
+                  batch_generation_id: latestGeneration?.id as bigint,
+                  feed_batch_id: batch.batch_id,
+                  amount: consume * 1000, // store in grams if needed
+                  doc_id: feedDoc.id,
+                },
+              });
+              leftToFeed -= consume;
+              process.stdout.write(
+                `Created transactions: ${JSON.stringify(
+                  {
+                    fetchTransactionId: String(fetchTran.id),
+                    feedTransactionId: String(feedTran.id),
+                    recordId: String(record.id),
+                    consumed: consume,
+                    leftToFeed,
+                  },
+                  null,
+                  2
+                )}\n`
+              );
+            }
           }
-
           index++;
         }
       } catch (innerError: any) {

@@ -81,3 +81,72 @@ export async function getPercentFeedingForDate(
     percent_feeding: Number(result.percent_feeding),
   };
 }
+
+// Fetch the active priority item for a given location and date
+export async function getActivePriorityItemForDate(
+  location_id: number,
+  date: string | Date
+) {
+  let dateObj: Date;
+  if (typeof date === "string") {
+    dateObj = new Date(date + "T00:00:00Z");
+  } else {
+    dateObj = date;
+  }
+  console.log("[DEBUG] getActivePriorityItemForDate", {
+    location_id,
+    date: dateObj,
+    iso: dateObj.toISOString(),
+  });
+  const result = await db.priority_history.findFirst({
+    where: {
+      location_id: location_id,
+      valid_from: { lte: dateObj },
+      OR: [{ valid_to: null }, { valid_to: { gte: dateObj } }],
+    },
+    orderBy: { valid_from: "desc" },
+    include: { items: true }, // get item info
+  });
+  console.log("[DEBUG] getActivePriorityItemForDate result", result);
+  return result;
+}
+
+// Fetch all active priorities for all locations and feed types for a given date
+export async function getActivePrioritiesForDate(date: string | Date) {
+  let dateObj: Date;
+  if (typeof date === "string") {
+    dateObj = new Date(date + "T00:00:00Z");
+  } else {
+    dateObj = date;
+  }
+
+  // Get all active priorities for the date, including item info (to get feed_type_id)
+  const all = await db.priority_history.findMany({
+    where: {
+      valid_from: { lte: dateObj },
+      OR: [{ valid_to: null }, { valid_to: { gte: dateObj } }],
+    },
+    orderBy: [
+      { location_id: "asc" },
+      { item_id: "asc" },
+      { valid_from: "desc" },
+    ],
+    include: {
+      items: { select: { id: true, feed_type_id: true, name: true } },
+    },
+  });
+
+  // Build a nested map: { [location_id]: { [feed_type_id]: priorityRecord } }
+  const map: Record<number, Record<number, (typeof all)[0]>> = {};
+  for (const prio of all) {
+    const locId = prio.location_id;
+    const feedTypeId = prio.items.feed_type_id;
+    if (feedTypeId == null) continue; // skip if feed_type_id is null or undefined
+    if (!map[locId]) map[locId] = {};
+    // Only set if not already set (so we keep the latest valid_from per pair)
+    if (!map[locId][feedTypeId]) {
+      map[locId][feedTypeId] = prio;
+    }
+  }
+  return map;
+}

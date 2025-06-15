@@ -37,12 +37,9 @@ type PriorityFormType = {
 
 export default function PriorityForm(props: PriorityFormType) {
   // Debug logs
-  //console.log("PriorityForm props.items:", props.items);
-  //console.log("PriorityForm props.item?.feed.id:", props.item?.feed.id);
-  const filteredItems = props.items.filter(
-    (item) => item.feedtypes?.id === props.item?.feed.id
-  );
-  //console.log("PriorityForm filtered items:", filteredItems);
+  console.log("[PriorityForm] props.items:", props.items);
+  console.log("[PriorityForm] props.item:", props.item);
+  console.log("[PriorityForm] Filtering by feed type id:", props.item?.feed.id);
 
   const priority = props.item?.item.id;
 
@@ -89,9 +86,12 @@ export default function PriorityForm(props: PriorityFormType) {
             {props.location?.name}
           </h1>
           <div className="flex flex-col gap-1">
-            {props.items
-              .filter((item) => item.feedtypes?.id === props.item?.feed.id)
-              ?.map((item, index) => (
+            {props.items.length === 0 ? (
+              <div className="text-gray-500 text-sm italic">
+                Для цього типу корму доступний лише один варіант.
+              </div>
+            ) : (
+              props.items.map((item, index) => (
                 <div key={index} className="flex items-center">
                   <input
                     type="radio"
@@ -108,7 +108,8 @@ export default function PriorityForm(props: PriorityFormType) {
                     {item.name}
                   </label>
                 </div>
-              ))}
+              ))
+            )}
           </div>
           <input type="hidden" name={`location`} value={props.location?.id} />
         </div>
@@ -119,6 +120,7 @@ export default function PriorityForm(props: PriorityFormType) {
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
             type="submit"
+            disabled={props.items.length === 0}
           >
             Зберегти
           </button>

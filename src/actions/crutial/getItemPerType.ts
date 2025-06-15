@@ -23,47 +23,12 @@ export async function getItemPerType(
     };
   }
 
-  //якщо колізія є, то обираємо корм
+  //якщо колізія є, повертаємо перший елемент (periodic logic is now handled elsewhere)
   if (items.length > 1) {
-    const prio = await db.priorities.findFirst({
-      select: {
-        id: true,
-        item_id: true,
-        items: {
-          select: {
-            name: true,
-          },
-        },
-        batch_id: true,
-        location_id: true,
-        priority: true,
-      },
-      where: {
-        location_id: location_id,
-        items: {
-          feed_type_id: feed_type_id,
-        },
-      },
-      orderBy: {
-        id: "desc",
-      },
-    });
-
-    //якщо для басейну обрано корм, повертаємо його
-    if (prio) {
-      return {
-        item_id: prio.item_id,
-        item_name: prio.items?.name,
-        definedPrio: true,
-      };
-    }
-    //якщо для басейну не обрано корм, повертаємо перший елемент
-    else {
-      return {
-        item_id: items[0].id,
-        item_name: items[0].name,
-        definedPrio: false,
-      };
-    }
+    return {
+      item_id: items[0].id,
+      item_name: items[0].name,
+      definedPrio: false,
+    };
   }
 }

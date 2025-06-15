@@ -249,7 +249,11 @@ export default function LocationComponent({
                         {(onClose) => (
                           <PriorityForm
                             location={row.location}
-                            items={items}
+                            items={items.filter(
+                              (i) =>
+                                i.feedtypes?.id === item.feed?.id &&
+                                i.id !== item.item?.id
+                            )}
                             item={item}
                             date={date}
                           />
@@ -311,6 +315,8 @@ export default function LocationComponent({
                   (1 + percentFeeding / 100)
                 ).toFixed(2);
               }
+              const currentItem = items.find((i) => i.id === feeding.feedId);
+              const feedTypeId = currentItem?.feedtypes?.id;
               return (
                 <tr key={idx}>
                   {idx === 0 && (
@@ -377,6 +383,9 @@ export default function LocationComponent({
                               (f as any).hasDocument === false
                           )
                         );
+                      // Use priority_item_name if available, otherwise fallback to feeding.feedName
+                      const displayFeedName =
+                        (row as any).priority_item_name || feeding.feedName;
                       if (allTimeSlotsUnfed) {
                         return (
                           <>
@@ -384,19 +393,19 @@ export default function LocationComponent({
                               type="button"
                               className="underline text-blue-700 hover:text-blue-900 focus:outline-none"
                               tabIndex={0}
-                              title={`Змінити пріоритет для ${feeding.feedName}`}
-                              aria-label={`Змінити пріоритет для ${feeding.feedName}`}
+                              title={`Змінити пріоритет для ${displayFeedName}`}
+                              aria-label={`Змінити пріоритет для ${displayFeedName}`}
                               onClick={() => {
                                 setOpenPriorityFeedIdx(idx);
                                 console.log(
                                   "Clicked feed name:",
-                                  feeding.feedName,
+                                  displayFeedName,
                                   "at index",
                                   idx
                                 );
                               }}
                             >
-                              {feeding.feedName}
+                              {displayFeedName}
                             </button>
                             {openPriorityFeedIdx === idx &&
                               allTimeSlotsUnfed && (
@@ -412,13 +421,17 @@ export default function LocationComponent({
                                           id: row.locId,
                                           name: row.locName,
                                         }}
-                                        items={items}
+                                        items={items.filter(
+                                          (i) =>
+                                            i.feedtypes?.id === feedTypeId &&
+                                            i.id !== feeding.feedId
+                                        )}
                                         item={{
                                           feed: {
-                                            id: feeding.feedId,
-                                            name: feeding.feedName,
+                                            id: feedTypeId,
+                                            name: displayFeedName,
                                           },
-                                          item: {},
+                                          item: { id: feeding.feedId },
                                         }}
                                         date={date}
                                         onSuccess={() =>
@@ -432,7 +445,7 @@ export default function LocationComponent({
                           </>
                         );
                       } else {
-                        return feeding.feedName;
+                        return displayFeedName;
                       }
                     })()}
                   </td>

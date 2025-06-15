@@ -60,47 +60,95 @@ async function updatePoolByLocationId(
     const poolIdToUpdate = location.pool_id;
     const employee_id = 3; // TODO: Replace with actual employee id from session when multiuser
 
-    // Find the current active record for this pool
-    const prev = await db.percent_feeding_history.findFirst({
+    // 1. Check if a record already exists for this pool and valid_from (case: repeat change on same date)
+    const existing = await db.percent_feeding_history.findFirst({
       where: {
         pool_id: poolIdToUpdate,
-        valid_to: null,
+        valid_from: validFrom,
       },
-      orderBy: { valid_from: "desc" },
     });
+    if (existing) {
+      // Update the existing interval for this date
+      await db.percent_feeding_history.update({
+        where: { id: existing.id },
+        data: {
+          percent_feeding: newPercent,
+          updated_by: employee_id,
+          updated_at: new Date(),
+        },
+      });
+      return;
+    }
 
-    // If found, close it by setting valid_to to the day before validFrom
-    if (prev) {
+    // 2. Find previous and next intervals for this pool
+    const intervals = await db.percent_feeding_history.findMany({
+      where: {
+        pool_id: poolIdToUpdate,
+      },
+      orderBy: { valid_from: "asc" },
+    });
+    const prevInterval = intervals
+      .filter((i) => i.valid_from < validFrom)
+      .slice(-1)[0];
+    const nextInterval = intervals.find((i) => i.valid_from > validFrom);
+
+    // 2. If new value is the same as previous, merge intervals (remove redundant scheduled change)
+    if (prevInterval && Number(prevInterval.percent_feeding) === newPercent) {
+      // If there is a next interval, extend prevInterval to its valid_from - 1
+      let newValidTo = nextInterval ? new Date(nextInterval.valid_from) : null;
+      if (newValidTo) {
+        newValidTo.setDate(newValidTo.getDate() - 1);
+      }
+      await db.percent_feeding_history.update({
+        where: { id: prevInterval.id },
+        data: { valid_to: newValidTo },
+      });
+      // Remove any scheduled change at validFrom (if exists)
+      await db.percent_feeding_history.deleteMany({
+        where: {
+          pool_id: poolIdToUpdate,
+          valid_from: validFrom,
+        },
+      });
+      return;
+    }
+
+    // 3. Otherwise, close previous interval, insert new, and copy forward any future scheduled change
+    if (prevInterval) {
       const prevValidTo = new Date(validFrom);
       prevValidTo.setDate(prevValidTo.getDate() - 1);
       await db.percent_feeding_history.update({
-        where: { id: prev.id },
+        where: { id: prevInterval.id },
         data: { valid_to: prevValidTo },
       });
     }
-
-    // If newPercent is 0, do not create a new record
-    if (newPercent === 0) {
-      //console.log(
-      //`Closed active percent_feeding_history for pool ID ${poolIdToUpdate}, no new record created (percent_feeding=0)`
-      //);
-      return null;
-    }
-
-    // Insert a new record into percent_feeding_history
-    const newHistory = await db.percent_feeding_history.create({
+    // Insert the new interval
+    await db.percent_feeding_history.create({
       data: {
         pool_id: poolIdToUpdate,
         percent_feeding: newPercent,
         valid_from: validFrom,
+        valid_to: nextInterval
+          ? new Date(
+              nextInterval.valid_from.setDate(
+                nextInterval.valid_from.getDate() - 1
+              )
+            )
+          : null,
         created_by: employee_id,
       },
     });
-
-    //console.log(
-    //`Inserted percent_feeding_history for pool ID ${poolIdToUpdate}`
-    //);
-    return newHistory;
+    // If there is a next interval, re-insert it to start from its original valid_from
+    if (nextInterval) {
+      await db.percent_feeding_history.update({
+        where: { id: nextInterval.id },
+        data: {
+          valid_from: nextInterval.valid_from,
+          valid_to: nextInterval.valid_to,
+        },
+      });
+    }
+    return;
   } catch (error) {
     //console.error("Error updating percent_feeding_history:", error);
     throw error;
