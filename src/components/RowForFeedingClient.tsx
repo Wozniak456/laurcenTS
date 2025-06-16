@@ -322,15 +322,15 @@ export default function RowForFeedingClient(props: RowForFeedingClientProps) {
       {rowCount && rowCount > 0 ? (
         <td
           rowSpan={rowCount}
-          className="px-4 py-2 border border-gray-400 w-14"
+          className="px-4 py-2 border border-gray-400 col-bassein sticky left-0 z-10 bg-white"
         >
           {locInfo.name}
         </td>
       ) : null}
-      <td className="px-4 py-2 border border-gray-400 w-14">
+      <td className="px-4 py-2 border border-gray-400 col-feedtype">
         {rowData.feedType}
       </td>
-      <td className="px-4 py-2 border border-gray-400 w-14">
+      <td className="px-4 py-2 border border-gray-400 col-feedname">
         {rowData.feedName}
       </td>
       {times.map((time: any, index: number) => {
@@ -348,14 +348,14 @@ export default function RowForFeedingClient(props: RowForFeedingClientProps) {
         return (
           <React.Fragment key={index}>
             <td
-              className={`px-4 py-2 border border-gray-400 w-14 ${
+              className={`px-4 py-2 border border-gray-400 col-time ${
                 isZeroAndFed ? "bg-gray-100" : ""
               }`}
             >
               {calculatedQuantity}
             </td>
             <td
-              className={`px-4 py-2 border border-gray-400 w-14 relative ${
+              className={`px-4 py-2 border border-gray-400 col-correction relative ${
                 isZeroAndFed ? "bg-gray-100" : ""
               }`}
             >
@@ -382,7 +382,7 @@ export default function RowForFeedingClient(props: RowForFeedingClientProps) {
                           e.target.value
                         )
                       }
-                      className="border-2 border-blue-500 p-1 w-20 bg-yellow-50 text-center font-semibold rounded"
+                      className="border-2 border-blue-500 p-1 w-full bg-yellow-50 text-center font-semibold rounded"
                       disabled={isBlocked}
                     />
                     {index < times.length - 1 && (

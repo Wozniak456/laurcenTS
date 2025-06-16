@@ -21,12 +21,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <div className="container mx-auto px-4 max-w-7xl">
-          <Providers>
-            <Header />
-            {children}
-            <Toaster richColors position="top-center" />
-          </Providers>
+        <div className="flex justify-center w-full">
+          <div className="container px-4 max-w-[1650px]">
+            <Providers>
+              <Header />
+              {children}
+              <Toaster richColors position="top-center" />
+            </Providers>
+          </div>
         </div>
       </body>
     </html>

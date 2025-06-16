@@ -25,15 +25,19 @@ import { feedBatch } from "@/actions";
 
 interface DaySummaryProps {
   data: FeedingInfo[];
-  lines: {
+  areas: {
     id: number;
     name: string;
-    pools: {
+    productionlines: {
       id: number;
       name: string;
-      locations: {
+      pools: {
         id: number;
         name: string;
+        locations: {
+          id: number;
+          name: string;
+        }[];
       }[];
     }[];
   }[];
@@ -75,7 +79,7 @@ interface Feeding {
 
 export default function DaySummaryContent({
   data,
-  lines,
+  areas,
   today,
   times,
   feeds,
@@ -223,140 +227,174 @@ export default function DaySummaryContent({
 
   return (
     <>
-      {lines
-        .filter((line) =>
-          line.pools.some((pool) =>
-            pool.locations.some((loc) =>
-              data.some((row) => row.locId === loc.id)
+      {areas
+        .filter((area) =>
+          area.productionlines.some((line) =>
+            line.pools.some((pool) =>
+              pool.locations.some((loc) =>
+                data.some((row) => row.locId === loc.id)
+              )
             )
           )
         )
-        .map((line) => (
-          <table
-            key={line.id}
-            className="border-collapse border w-full mb-4 text-sm w-5/6"
-          >
-            <thead>
-              <tr>
-                <th
-                  colSpan={2 * times.length + 3}
-                  className="px-4 py-2 bg-blue-100"
+        .map((area) => (
+          <div key={area.id} className="mb-8">
+            <div className="max-w-[1650px] mx-auto">
+              <div className="text-lg font-bold bg-blue-200 p-2 mb-2 rounded">
+                {area.name}
+              </div>
+            </div>
+            {area.productionlines
+              .filter((line) =>
+                line.pools.some((pool) =>
+                  pool.locations.some((loc) =>
+                    data.some((row) => row.locId === loc.id)
+                  )
+                )
+              )
+              .map((line) => (
+                <table
+                  key={line.id}
+                  className="border-collapse border w-full max-w-[1600px] mx-auto mb-4 text-sm"
                 >
-                  {line.name}
-                </th>
-                <th className="px-4 py-2 bg-blue-100">{today.slice(5)}</th>
-              </tr>
-              <tr>
-                <th className="border p-2">Басейн</th>
-                <th className="border p-2">Вид корму</th>
-                <th className="border p-2 w-24">Назва корму</th>
-                {times.map((time, index) => (
-                  <React.Fragment key={index}>
-                    <th className="border p-2">{time.time}</th>
-                    <th className="border">Коригування</th>
-                  </React.Fragment>
-                ))}
-                <th className="border p-2">Годувати</th>
-              </tr>
-            </thead>
-            <tbody>
-              {line.pools.map((pool) =>
-                pool.locations.map((loc, index) => {
-                  const dataForPool = feedingsData.find(
-                    (row) => row.locId === loc.id
-                  );
-                  const feedings = dataForPool?.feedings;
-                  return (
-                    <React.Fragment key={index}>
-                      {feedings?.map((feeding, feedingIndex) => {
-                        return (
-                          <RowForFeeding
-                            key={feedingIndex}
-                            locInfo={{
-                              id: loc.id,
-                              name: loc.name,
-                            }}
-                            rowData={feeding}
-                            times={times}
-                            rowCount={
-                              feedingIndex === 0 && dataForPool
-                                ? getRowCount(dataForPool, loc.id)
-                                : 0
-                            }
-                            today={today}
-                            batch={dataForPool?.batch}
-                            allLocationFeedings={feedings}
-                            percentFeeding={percentFeedingMap[loc.id] ?? 0}
-                            onRowUpdate={handleRowUpdate}
-                            feedBatchAction={feedBatchAction}
-                          />
+                  <thead>
+                    <tr>
+                      <th
+                        colSpan={2 * times.length + 3}
+                        className="px-4 py-2 bg-blue-100"
+                      >
+                        {line.name}
+                      </th>
+                      <th className="px-4 py-2 bg-blue-100">
+                        {today.slice(5)}
+                      </th>
+                    </tr>
+                    <tr>
+                      <th className="border p-2 col-bassein sticky left-0 z-10 bg-white">
+                        Басейн
+                      </th>
+                      <th className="border p-2 col-feedtype">Вид корму</th>
+                      <th className="border p-2 col-feedname">Назва корму</th>
+                      {times.map((time, index) => (
+                        <React.Fragment key={index}>
+                          <th className="border p-2 col-time">{time.time}</th>
+                          <th className="border col-correction">Коригування</th>
+                        </React.Fragment>
+                      ))}
+                      <th className="border p-2 col-action">Годувати</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {line.pools.map((pool) =>
+                      pool.locations.map((loc, index) => {
+                        const dataForPool = feedingsData.find(
+                          (row) => row.locId === loc.id
                         );
-                      })}
+                        const feedings = dataForPool?.feedings;
+                        return (
+                          <React.Fragment key={index}>
+                            {feedings?.map((feeding, feedingIndex) => {
+                              return (
+                                <RowForFeeding
+                                  key={feedingIndex}
+                                  locInfo={{
+                                    id: loc.id,
+                                    name: loc.name,
+                                  }}
+                                  rowData={feeding}
+                                  times={times}
+                                  rowCount={
+                                    feedingIndex === 0 && dataForPool
+                                      ? getRowCount(dataForPool, loc.id)
+                                      : 0
+                                  }
+                                  today={today}
+                                  batch={dataForPool?.batch}
+                                  allLocationFeedings={feedings}
+                                  percentFeeding={
+                                    percentFeedingMap[loc.id] ?? 0
+                                  }
+                                  onRowUpdate={handleRowUpdate}
+                                  feedBatchAction={feedBatchAction}
+                                />
+                              );
+                            })}
 
-                      {feedings?.length && feedings.length > 0 ? (
-                        <tr>
-                          <td className="text-center text-md bg-gray-100">
-                            <Popover placement="bottom" showArrow offset={10}>
-                              <PopoverTrigger>
-                                <button className="py-0" color="primary">
-                                  Додати корм
-                                </button>
-                              </PopoverTrigger>
-                              <PopoverContent className="w-[240px]">
-                                <div className="my-2 flex flex-col gap-2 w-full">
-                                  {/* <div className="my-2 flex flex-col gap-2 w-full"> */}
-                                  <Select
-                                    label="Корм"
-                                    placeholder="Оберіть корм"
-                                    className="max-w-xs"
-                                    onChange={(e) =>
-                                      setAddedNewFeed(Number(e.target.value))
-                                    }
+                            {feedings?.length && feedings.length > 0 ? (
+                              <tr>
+                                <td className="text-center text-md bg-gray-100">
+                                  <Popover
+                                    placement="bottom"
+                                    showArrow
+                                    offset={10}
                                   >
-                                    {feeds
-                                      .filter((feed) => {
-                                        // Get current location's feedings
-                                        const locationFeedings = feedings || [];
-                                        // Check if this feed is already used
-                                        return !locationFeedings.some(
-                                          (feeding) =>
-                                            feeding.feedId === feed.id ||
-                                            (feeding.feedType ===
-                                              feed.feedtypes?.name &&
-                                              feeding.feedName === feed.name)
-                                        );
-                                      })
-                                      .map((feed) => (
-                                        <SelectItem
-                                          key={feed.id}
-                                          value={feed.id}
+                                    <PopoverTrigger>
+                                      <button className="py-0" color="primary">
+                                        Додати корм
+                                      </button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-[240px]">
+                                      <div className="my-2 flex flex-col gap-2 w-full">
+                                        <Select
+                                          label="Корм"
+                                          placeholder="Оберіть корм"
+                                          className="max-w-xs"
+                                          onChange={(e) =>
+                                            setAddedNewFeed(
+                                              Number(e.target.value)
+                                            )
+                                          }
                                         >
-                                          {feed.name}
-                                        </SelectItem>
-                                      ))}
-                                  </Select>
-                                  {/* </div> */}
-                                  {addedNewFeed ? (
-                                    <Button
-                                      onClick={() =>
-                                        handleAddFeedClick(loc.id, addedNewFeed)
-                                      }
-                                    >
-                                      Додати
-                                    </Button>
-                                  ) : null}
-                                </div>
-                              </PopoverContent>
-                            </Popover>
-                          </td>
-                        </tr>
-                      ) : null}
-                    </React.Fragment>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+                                          {feeds
+                                            .filter((feed) => {
+                                              // Get current location's feedings
+                                              const locationFeedings =
+                                                feedings || [];
+                                              // Check if this feed is already used
+                                              return !locationFeedings.some(
+                                                (feeding) =>
+                                                  feeding.feedId === feed.id ||
+                                                  (feeding.feedType ===
+                                                    feed.feedtypes?.name &&
+                                                    feeding.feedName ===
+                                                      feed.name)
+                                              );
+                                            })
+                                            .map((feed) => (
+                                              <SelectItem
+                                                key={feed.id}
+                                                value={feed.id}
+                                              >
+                                                {feed.name}
+                                              </SelectItem>
+                                            ))}
+                                        </Select>
+                                        {addedNewFeed ? (
+                                          <Button
+                                            onClick={() =>
+                                              handleAddFeedClick(
+                                                loc.id,
+                                                addedNewFeed
+                                              )
+                                            }
+                                          >
+                                            Додати
+                                          </Button>
+                                        ) : null}
+                                      </div>
+                                    </PopoverContent>
+                                  </Popover>
+                                </td>
+                              </tr>
+                            ) : null}
+                          </React.Fragment>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              ))}
+          </div>
         ))}
     </>
   );

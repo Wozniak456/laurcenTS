@@ -90,6 +90,19 @@ export default function RowForFeedingServer(props: RowForFeedingProps) {
     { message: "" }
   );
 
+  if (props.locInfo.id === 40) {
+    console.log(
+      "[DEBUG][RowForFeeding] Props for location 40:",
+      JSON.stringify(props, null, 2)
+    );
+    if (props.allLocationFeedings) {
+      console.log(
+        "[DEBUG][RowForFeeding] allLocationFeedings for location 40:",
+        JSON.stringify(props.allLocationFeedings, null, 2)
+      );
+    }
+  }
+
   const handleAction = async (formData: FormData) => {
     const result = await action(formData);
     return result;

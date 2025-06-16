@@ -24,3 +24,34 @@
 .no-spinners {
   -moz-appearance: textfield;
 }
+
+.col-bassein {
+  width: 110px;
+  min-width: 110px;
+  max-width: 110px;
+}
+.col-feedtype {
+  width: 90px;
+  min-width: 90px;
+  max-width: 90px;
+}
+.col-feedname {
+  width: 220px;
+  min-width: 220px;
+  max-width: 220px;
+}
+.col-time {
+  width: 110px;
+  min-width: 110px;
+  max-width: 110px;
+}
+.col-correction {
+  width: 110px;
+  min-width: 110px;
+  max-width: 110px;
+}
+.col-action {
+  width: 110px;
+  min-width: 110px;
+  max-width: 110px;
+}
