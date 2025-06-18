@@ -223,6 +223,7 @@ export default function RowForFeedingClient(props: RowForFeedingClientProps) {
           setShowFeedNewerTxModal(true);
           return;
         }
+
         // Gather planned quantities for all time slots
         const plannedQuantities: Record<string, number> = {};
         times.forEach((time) => {
@@ -242,6 +243,7 @@ export default function RowForFeedingClient(props: RowForFeedingClientProps) {
           }
           plannedQuantities[`time_${feedingTime}`] = parseFloat(value) || 0;
         });
+
         // Pre-submit stock check
         const result = await checkStockBeforeFeed({
           location_id: locInfo.id,
@@ -249,6 +251,7 @@ export default function RowForFeedingClient(props: RowForFeedingClientProps) {
           date: today,
           quantities: plannedQuantities,
         });
+
         if (result.ok) {
           formRef.current.requestSubmit();
         } else {

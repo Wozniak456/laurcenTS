@@ -502,6 +502,7 @@ export async function checkStockBeforeFeed({
   quantities: Record<string, number>;
 }) {
   const db = (await import("@/db")).db;
+
   // Sum all planned quantities (convert to kg if needed)
   const totalQuantity =
     Object.values(quantities).reduce(
@@ -516,11 +517,11 @@ export async function checkStockBeforeFeed({
   });
   const batchIds = batches.map((b) => b.id);
 
-  // Sum available stock for these batches at this location
+  // Sum available stock for these batches at WAREHOUSE location (87) - FIXED
   const stock = await db.itemtransactions.aggregate({
     _sum: { quantity: true },
     where: {
-      location_id,
+      location_id: 87, // WAREHOUSE location - not the pool location
       batch_id: { in: batchIds },
     },
   });
