@@ -160,35 +160,97 @@ export default function RowForFeedingClient(props: RowForFeedingClientProps) {
   // Handle form submit with modal/progress
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log("[DEBUG][handleSubmit] Starting form submission");
+
     setIsLoading(true);
     setShowModal(true);
     setButtonMode(true);
+
     let result = undefined;
     if (action) {
-      const form = e.currentTarget as HTMLFormElement;
-      const formData = new FormData(form);
-      result = await action(formData);
-      // Check for stock error immediately (handle both possible error messages)
-      if (
-        result?.message &&
-        (result.message.includes("Not enough stock") ||
-          result.message.includes("Not enough feed") ||
-          result.message.includes("Немає достатньо корму"))
-      ) {
-        setErrorMessage(result.message);
+      try {
+        const form = e.currentTarget as HTMLFormElement;
+        const formData = new FormData(form);
+
+        // Log form data for debugging
+        console.log("[DEBUG][handleSubmit] Form data contents:");
+        Array.from(formData.entries()).forEach(([key, value]) => {
+          console.log(`  ${key}: ${value}`);
+        });
+
+        console.log("[DEBUG][handleSubmit] Calling action with formData");
+        result = await action(formData);
+        console.log("[DEBUG][handleSubmit] Action result:", result);
+
+        // Check for stock error immediately (handle both possible error messages)
+        if (
+          result?.message &&
+          (result.message.includes("Not enough stock") ||
+            result.message.includes("Not enough feed") ||
+            result.message.includes("Немає достатньо корму"))
+        ) {
+          console.log(
+            "[DEBUG][handleSubmit] Stock error detected:",
+            result.message
+          );
+          setErrorMessage(result.message);
+          setIsLoading(false);
+          setShowModal(false);
+          setButtonMode(false);
+          return; // Do not proceed
+        }
+
+        // Check for other errors
+        if (result?.error) {
+          console.log("[DEBUG][handleSubmit] Error in result:", result.error);
+          setErrorMessage(result.error);
+          setIsLoading(false);
+          setShowModal(false);
+          setButtonMode(false);
+          return;
+        }
+
+        // Check if result indicates success but no actual changes
+        if (result && typeof result === "object") {
+          console.log("[DEBUG][handleSubmit] Result type:", typeof result);
+          console.log(
+            "[DEBUG][handleSubmit] Result keys:",
+            Object.keys(result)
+          );
+          console.log(
+            "[DEBUG][handleSubmit] Full result object:",
+            JSON.stringify(result, null, 2)
+          );
+        }
+      } catch (error) {
+        console.error(
+          "[DEBUG][handleSubmit] Exception during action execution:",
+          error
+        );
+        setErrorMessage(
+          `Execution error: ${
+            error instanceof Error ? error.message : String(error)
+          }`
+        );
         setIsLoading(false);
         setShowModal(false);
         setButtonMode(false);
-        return; // Do not proceed
+        return;
       }
+    } else {
+      console.warn("[DEBUG][handleSubmit] No action provided");
     }
+
+    console.log("[DEBUG][handleSubmit] Proceeding with UI updates");
     setIsLoading(false);
     setShowModal(false);
     setButtonMode(false);
     setFedState(true);
+
     if (setShowForm) {
       setShowForm(false);
     }
+
     // Build updated feedings object with editing values and hasDocument true
     const updatedFeedings = { ...rowData.feedings };
     times.forEach((time) => {
@@ -204,9 +266,19 @@ export default function RowForFeedingClient(props: RowForFeedingClientProps) {
         };
       }
     });
+
+    console.log("[DEBUG][handleSubmit] Updated feedings:", updatedFeedings);
+
     if (onRowUpdate && typeof rowData.feedId === "number") {
+      console.log("[DEBUG][handleSubmit] Calling onRowUpdate with:", {
+        locId: locInfo.id,
+        feedId: rowData.feedId,
+        updatedFeedings,
+      });
       onRowUpdate(locInfo.id, rowData.feedId, updatedFeedings);
     }
+
+    console.log("[DEBUG][handleSubmit] Form submission completed");
   };
 
   // When showForm becomes true, auto-submit the form, but only if there is no error and stock is sufficient
