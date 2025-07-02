@@ -11,6 +11,7 @@ import { Input, Select, SelectItem } from "@nextui-org/react";
 import { poolManagingType } from "@/types/app_types";
 
 type PoolInfoProps = {
+  areaId: number;
   location: {
     id: number;
     location_type_id: number;
@@ -31,6 +32,7 @@ type PoolInfoProps = {
 };
 
 export default function PoolInfoComponent({
+  areaId,
   location,
   poolInfo,
   batches,
@@ -119,7 +121,7 @@ export default function PoolInfoComponent({
           type="number"
           min={0.0001}
           step="any"
-          value={avMass.toFixed(1)}
+          value={avMass.toFixed(areaId < 3 ? 3 : 1)}
           onChange={handleAvMassChange}
           disabled={!editionAllowed}
           className={`w-full focus:outline-none focus:ring focus:border-blue-300 ${

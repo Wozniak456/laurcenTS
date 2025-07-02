@@ -26,6 +26,7 @@ import FetchingForm from "./fetching";
 import Link from "next/link";
 
 interface StockPoolProps {
+  areaId: number;
   locations: {
     id: number;
     name: string;
@@ -52,6 +53,7 @@ interface StockPoolProps {
 }
 
 export default function StockPoolPage({
+  areaId,
   location,
   locations,
   batches,
@@ -73,6 +75,7 @@ export default function StockPoolPage({
 
       {poolInfo?.qty && poolInfo.qty > 0 ? (
         <PoolInfo
+          areaId={areaId}
           location={location}
           poolInfo={poolInfo}
           batches={batches}

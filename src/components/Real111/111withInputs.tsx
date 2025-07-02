@@ -7,6 +7,7 @@ import SaveButton from "../../../public/icons/Save.svg";
 import FormButton from "../common/form-button";
 
 interface FilterableTableProps {
+  areaId: number;
   date: string;
   poolIndex: number;
   aggregatedData?: DataItem;
@@ -22,6 +23,7 @@ export type DataItem = {
 };
 
 export default function SelectDay({
+  areaId,
   date,
   poolIndex,
   aggregatedData,
@@ -61,7 +63,7 @@ export default function SelectDay({
       </td>
 
       <td className="px-4 py-2 border text-center border-gray-400">
-        {aggregatedData?.planWeight?.toFixed(1)}
+        {aggregatedData?.planWeight?.toFixed(areaId < 3 ? 3 : 1)}
       </td>
       <td
         className={`px-4 py-2 border text-center border-gray-400 ${
@@ -71,7 +73,11 @@ export default function SelectDay({
         <input
           type="number"
           step="0.001"
-          value={fishWeight !== undefined ? fishWeight.toString() : ""}
+          value={
+            fishWeight !== undefined
+              ? fishWeight.toFixed(areaId < 3 ? 3 : 1).toString()
+              : ""
+          }
           onChange={handleFishWeightChange}
           className="px-2 py-1 rounded-md text-center"
           disabled={!aggregatedData?.batchName || date != today}

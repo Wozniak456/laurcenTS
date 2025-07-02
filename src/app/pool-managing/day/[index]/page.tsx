@@ -124,6 +124,7 @@ export default async function StockingHome(props: StockingProps) {
             .map(({ key, poolInfo, loc, pool }) => (
               <div key={key} className="shadow-xl mb-4 px-4 py-0.5 bg-blue-100">
                 <StockingComponent
+                  areaId={area.id}
                   locations={locations}
                   location={loc}
                   batches={batches}

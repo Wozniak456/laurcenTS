@@ -176,6 +176,7 @@ export default async function LeftoversPerPeriod(
                             {pool.name}
                           </td>
                           <Component111
+                            areaId={area.id}
                             date={date}
                             poolIndex={pool.locations[0].id}
                             aggregatedData={data.find(
