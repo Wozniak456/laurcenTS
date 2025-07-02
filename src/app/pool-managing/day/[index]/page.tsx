@@ -72,6 +72,8 @@ export default async function StockingHome(props: StockingProps) {
                 },
                 loc,
                 pool,
+                line,
+                area,
               };
             })
           )
@@ -113,28 +115,44 @@ export default async function StockingHome(props: StockingProps) {
         <div key={area.id} className="w-full">
           <div className="text-3xl font-bold">{area.name}</div>
 
-          {poolsData
-            .filter((data) =>
-              area.productionlines.some((line) =>
-                line.pools.some((pool) =>
-                  pool.locations.some((loc) => loc.id === data.loc.id)
-                )
-              )
-            )
-            .map(({ key, poolInfo, loc, pool }) => (
-              <div key={key} className="shadow-xl mb-4 px-4 py-0.5 bg-blue-100">
-                <StockingComponent
-                  areaId={area.id}
-                  locations={locations}
-                  location={loc}
-                  batches={batches}
-                  poolInfo={poolInfo}
-                  disposal_reasons={disposal_reasons}
-                  weekNum={weekNum}
-                  today={today}
-                />
+          {area.productionlines.map((line) => {
+            // Filter out pools/locations with name "Б 0/ 0"
+            const filteredPoolsData = poolsData.filter(
+              (data) =>
+                data.area.id === area.id &&
+                data.line.id === line.id &&
+                data.loc.name !== "Б 0/ 0"
+            );
+
+            // If all locations are "Б 0/ 0", skip rendering this production line
+            if (filteredPoolsData.length === 0) return null;
+
+            return (
+              <div key={line.id} className="ml-4">
+                <div className="text-2xl font-semibold text-blue-700 mt-4 mb-2">
+                  {line.name}
+                </div>
+
+                {filteredPoolsData.map(({ key, poolInfo, loc, pool }) => (
+                  <div
+                    key={key}
+                    className="shadow-xl mb-4 px-4 py-0.5 bg-blue-100 ml-4"
+                  >
+                    <StockingComponent
+                      areaId={area.id}
+                      locations={locations}
+                      location={loc}
+                      batches={batches}
+                      poolInfo={poolInfo}
+                      disposal_reasons={disposal_reasons}
+                      weekNum={weekNum}
+                      today={today}
+                    />
+                  </div>
+                ))}
               </div>
-            ))}
+            );
+          })}
         </div>
       ))}
     </div>
