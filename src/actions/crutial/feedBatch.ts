@@ -356,7 +356,16 @@ export async function feedBatch(
   return { message: "Success" };
 }
 
-export async function getCostReport(): Promise<FeedingMetrics[]> {
+export async function getCostReport(
+  batchId?: number,
+  date?: string
+): Promise<FeedingMetrics[]> {
+  // Build WHERE clauses for filtering
+  const batchFilter = batchId ? `AND fs.fish_batch_id = ${batchId}` : "";
+  const dateFilter = date
+    ? `AND CAST(ft.feeding_date AS DATE) <= '${date}'`
+    : "";
+
   const result = await db.$queryRaw<FeedingMetrics[]>`
     WITH FeedTransactions AS (
       SELECT 
@@ -437,7 +446,7 @@ export async function getCostReport(): Promise<FeedingMetrics[]> {
     )
     SELECT 
         ft.feed_type_name,
-        ft.feed_batch_id,
+        MAX(ft.feed_batch_id) as feed_batch_id,
         ft.feeding_date,
         ft.location_id,
         fs.fish_batch_id,
@@ -470,9 +479,11 @@ export async function getCostReport(): Promise<FeedingMetrics[]> {
         ORDER BY fs.transaction_date DESC
         LIMIT 1
     ) fs ON true
+    WHERE 1=1
+        ${Prisma.raw(batchFilter)}
+        ${Prisma.raw(dateFilter)}
     GROUP BY
         ft.feed_type_name,
-        ft.feed_batch_id,
         ft.feeding_date,
         ft.location_id,
         fs.fish_batch_id,
@@ -481,8 +492,399 @@ export async function getCostReport(): Promise<FeedingMetrics[]> {
         fs.fish_batch_id,
         ft.location_id,
         ft.feeding_date,
-        ft.feed_batch_id
+        feed_batch_id
   `;
 
   return result;
+}
+
+export async function getCostReportPivot(batchId: number, date: string) {
+  // 1. Get all feed types for feed transactions up to the date
+  const feedTypes = await db.$queryRawUnsafe<any[]>(
+    `SELECT DISTINCT ft.name as feed_type_name
+     FROM itemtransactions it
+     JOIN itembatches ib ON it.batch_id = ib.id
+     JOIN items i ON ib.item_id = i.id
+     JOIN feedtypes ft ON i.feed_type_id = ft.id
+     JOIN documents d ON it.doc_id = d.id
+     WHERE d.doc_type_id = 9
+       AND i.item_type_id = 3
+       AND CAST(d.date_time AS DATE) <= CAST($2 AS date)
+    `,
+    batchId,
+    date
+  );
+  const feedTypeNames = feedTypes.map((ft) => ft.feed_type_name);
+
+  // If no feed types, return empty arrays
+  if (feedTypeNames.length === 0) {
+    return { feedSummary: [], efficiencySummary: [] };
+  }
+
+  // 2. Build dynamic SQL for feed type pivot columns
+  const feedTypeKgCols = feedTypeNames
+    .map(
+      (name) =>
+        `SUM(CASE WHEN ft.feed_type_name = '${name}' THEN ft.feed_quantity ELSE 0 END) AS "${name} (kg)"`
+    )
+    .join(", ");
+  const feedTypeUahCols = feedTypeNames
+    .map(
+      (name) =>
+        `SUM(CASE WHEN ft.feed_type_name = '${name}' THEN ft.feed_cost ELSE 0 END) AS "${name} (UAH)"`
+    )
+    .join(", ");
+
+  // 3. Feed summary (pivot) - using original query structure and join logic
+  const feedSummary = await db.$queryRawUnsafe<any[]>(
+    `WITH FeedTransactions AS (
+      SELECT 
+          it.id,
+          it.batch_id as feed_batch_id,
+          it.location_id,
+          CAST(d.date_time AS DATE) as feeding_date,
+          ft.name as feed_type_name,
+          it.quantity as feed_quantity,
+          it.quantity * ib.price as feed_cost
+      FROM itemtransactions it
+      JOIN documents d ON it.doc_id = d.id
+      JOIN itembatches ib ON it.batch_id = ib.id
+      JOIN items i ON ib.item_id = i.id
+      JOIN feedtypes ft ON i.feed_type_id = ft.id
+      JOIN locations l ON it.location_id = l.id
+      WHERE d.doc_type_id = 9
+      AND l.location_type_id = 2
+      AND i.item_type_id = 3
+      AND CAST(d.date_time AS DATE) <= CAST($2 AS date)
+    ),
+    FishState AS (
+      WITH DailyTransactions AS (
+          SELECT
+              itr.batch_id as fish_batch_id,
+              itr.location_id,
+              CAST(d.date_time AS DATE) AS transaction_date,
+              SUM(itr.quantity) AS quantity_change
+          FROM itemtransactions itr
+          INNER JOIN documents d ON d.id = itr.doc_id
+          INNER JOIN itembatches ib ON ib.id = itr.batch_id
+          INNER JOIN items it ON it.id = ib.item_id AND it.item_type_id = 1
+          INNER JOIN locations l ON l.id = itr.location_id
+          WHERE l.location_type_id = 2
+          GROUP BY
+              itr.batch_id,
+              itr.location_id,
+              CAST(d.date_time AS DATE)
+      ),
+      CumulativeQuantity AS (
+          SELECT
+              dt.*,
+              SUM(dt.quantity_change) OVER (
+                  PARTITION BY dt.fish_batch_id, dt.location_id
+                  ORDER BY dt.transaction_date
+                  ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+              ) AS cumulative_quantity
+          FROM DailyTransactions dt
+      ),
+      StockingWeights AS (
+          SELECT DISTINCT
+              itr.batch_id as fish_batch_id,
+              itr.location_id,
+              CAST(d.date_time AS DATE) AS stocking_date,
+              s.average_weight
+          FROM stocking s
+          INNER JOIN documents d ON s.doc_id = d.id
+          INNER JOIN itemtransactions itr ON itr.doc_id = d.id
+          WHERE s.average_weight IS NOT NULL
+      )
+      SELECT
+          cq.fish_batch_id,
+          cq.location_id,
+          cq.transaction_date,
+          cq.cumulative_quantity,
+          CASE
+              WHEN cq.cumulative_quantity > 0 THEN 
+                  (SELECT sw.average_weight
+                   FROM StockingWeights sw
+                   WHERE sw.fish_batch_id = cq.fish_batch_id
+                     AND sw.location_id = cq.location_id
+                     AND sw.stocking_date <= cq.transaction_date
+                   ORDER BY sw.stocking_date DESC
+                   LIMIT 1)
+              ELSE NULL
+          END as fish_weight
+      FROM CumulativeQuantity cq
+      WHERE cq.cumulative_quantity > 0
+    )
+    SELECT 
+        ft.feed_type_name,
+        ft.feed_batch_id,
+        ft.feeding_date,
+        ft.location_id,
+        fs.fish_batch_id,
+        fs.fish_weight,
+        CASE
+            WHEN fs.fish_weight <= 50 THEN '0-50g'
+            WHEN fs.fish_weight <= 100 THEN '50-100g'
+            WHEN fs.fish_weight <= 200 THEN '100-200g'
+            WHEN fs.fish_weight <= 300 THEN '200-300g'
+            WHEN fs.fish_weight <= 500 THEN '300-500g'
+            WHEN fs.fish_weight <= 1000 THEN '500-1000g'
+            ELSE '1000g+'
+        END as weight_category,
+        ${feedTypeKgCols},
+        ${feedTypeUahCols},
+        SUM(ft.feed_quantity) as total_feed_quantity,
+        SUM(ft.feed_cost) as total_feed_cost,
+        CASE 
+            WHEN MAX(fs.cumulative_quantity) > 0 THEN SUM(ft.feed_quantity) / MAX(fs.cumulative_quantity)
+            ELSE 0 
+        END as feed_per_fish,
+        CASE 
+            WHEN MAX(fs.cumulative_quantity) > 0 THEN SUM(ft.feed_cost) / MAX(fs.cumulative_quantity)
+            ELSE 0 
+        END as feed_cost_per_fish
+    FROM FeedTransactions ft
+    LEFT JOIN LATERAL (
+        SELECT *
+        FROM FishState fs
+        WHERE fs.location_id = ft.location_id
+        AND fs.transaction_date <= ft.feeding_date
+        ORDER BY fs.transaction_date DESC
+        LIMIT 1
+    ) fs ON true
+    GROUP BY
+        ft.feed_type_name,
+        ft.feed_batch_id,
+        ft.feeding_date,
+        ft.location_id,
+        fs.fish_batch_id,
+        fs.fish_weight,
+        weight_category
+    HAVING fs.fish_batch_id = $1
+    ORDER BY 
+        fs.fish_batch_id,
+        ft.location_id,
+        ft.feeding_date,
+        ft.feed_batch_id
+  `,
+    batchId,
+    date
+  );
+
+  // 4. Efficiency summary (grouped by weight category, using same join logic)
+  const efficiencySummary = await db.$queryRawUnsafe<any[]>(
+    `WITH FeedTransactions AS (
+      SELECT 
+          it.id,
+          it.batch_id as feed_batch_id,
+          it.location_id,
+          CAST(d.date_time AS DATE) as feeding_date,
+          ft.name as feed_type_name,
+          it.quantity as feed_quantity,
+          it.quantity * ib.price as feed_cost
+      FROM itemtransactions it
+      JOIN documents d ON it.doc_id = d.id
+      JOIN itembatches ib ON it.batch_id = ib.id
+      JOIN items i ON ib.item_id = i.id
+      JOIN feedtypes ft ON i.feed_type_id = ft.id
+      JOIN locations l ON it.location_id = l.id
+      WHERE d.doc_type_id = 9
+      AND l.location_type_id = 2
+      AND i.item_type_id = 3
+      AND CAST(d.date_time AS DATE) <= CAST($2 AS date)
+    ),
+    FishState AS (
+      WITH DailyTransactions AS (
+          SELECT
+              itr.batch_id as fish_batch_id,
+              itr.location_id,
+              CAST(d.date_time AS DATE) AS transaction_date,
+              SUM(itr.quantity) AS quantity_change
+          FROM itemtransactions itr
+          INNER JOIN documents d ON d.id = itr.doc_id
+          INNER JOIN itembatches ib ON ib.id = itr.batch_id
+          INNER JOIN items it ON it.id = ib.item_id AND it.item_type_id = 1
+          INNER JOIN locations l ON l.id = itr.location_id
+          WHERE l.location_type_id = 2
+          GROUP BY
+              itr.batch_id,
+              itr.location_id,
+              CAST(d.date_time AS DATE)
+      ),
+      CumulativeQuantity AS (
+          SELECT
+              dt.*,
+              SUM(dt.quantity_change) OVER (
+                  PARTITION BY dt.fish_batch_id, dt.location_id
+                  ORDER BY dt.transaction_date
+                  ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+              ) AS cumulative_quantity
+          FROM DailyTransactions dt
+      ),
+      StockingWeights AS (
+          SELECT DISTINCT
+              itr.batch_id as fish_batch_id,
+              itr.location_id,
+              CAST(d.date_time AS DATE) AS stocking_date,
+              s.average_weight
+          FROM stocking s
+          INNER JOIN documents d ON s.doc_id = d.id
+          INNER JOIN itemtransactions itr ON itr.doc_id = d.id
+          WHERE s.average_weight IS NOT NULL
+      )
+      SELECT
+          cq.fish_batch_id,
+          cq.location_id,
+          cq.transaction_date,
+          cq.cumulative_quantity,
+          CASE
+              WHEN cq.cumulative_quantity > 0 THEN 
+                  (SELECT sw.average_weight
+                   FROM StockingWeights sw
+                   WHERE sw.fish_batch_id = cq.fish_batch_id
+                     AND sw.location_id = cq.location_id
+                     AND sw.stocking_date <= cq.transaction_date
+                   ORDER BY sw.stocking_date DESC
+                   LIMIT 1)
+              ELSE NULL
+          END as fish_weight
+      FROM CumulativeQuantity cq
+      WHERE cq.cumulative_quantity > 0
+    )
+    SELECT 
+      CASE
+        WHEN fs.fish_weight <= 50 THEN '0-50g'
+        WHEN fs.fish_weight <= 100 THEN '50-100g'
+        WHEN fs.fish_weight <= 200 THEN '100-200g'
+        WHEN fs.fish_weight <= 300 THEN '200-300g'
+        WHEN fs.fish_weight <= 500 THEN '300-500g'
+        WHEN fs.fish_weight <= 1000 THEN '500-1000g'
+        ELSE '1000g+'
+      END as weight_category,
+      ${feedTypeKgCols},
+      ${feedTypeUahCols},
+      SUM(ft.feed_quantity) as total_feed_quantity,
+      SUM(ft.feed_cost) as total_feed_cost,
+      CASE 
+        WHEN fs.cumulative_quantity > 0 THEN SUM(ft.feed_quantity) / fs.cumulative_quantity
+        ELSE 0 
+      END as feed_per_fish,
+      CASE 
+        WHEN fs.cumulative_quantity > 0 THEN SUM(ft.feed_cost) / fs.cumulative_quantity
+        ELSE 0 
+      END as feed_cost_per_fish
+    FROM FeedTransactions ft
+    JOIN FishState fs
+      ON fs.fish_batch_id = $1
+      AND fs.location_id = ft.location_id
+      AND fs.transaction_date <= ft.feeding_date
+    WHERE fs.fish_batch_id = $1
+    GROUP BY
+      fs.fish_batch_id,
+      fs.fish_weight,
+      weight_category
+    ORDER BY 
+      fs.fish_batch_id,
+      fs.fish_weight
+  `,
+    batchId,
+    date
+  );
+
+  return { feedSummary, efficiencySummary };
+}
+
+// Returns the exact stock quantity for a batch up to a given date
+export async function getBatchStockQty(
+  batchId: number,
+  date: string
+): Promise<number> {
+  // Sum all itemtransactions.quantity for the batch up to and including the date
+  const result = await db.$queryRawUnsafe<any[]>(
+    `SELECT SUM(itr.quantity) as sum
+     FROM itemtransactions itr
+     JOIN documents d ON itr.doc_id = d.id
+     WHERE itr.batch_id = $1
+       AND CAST(d.date_time AS DATE) <= CAST($2 AS DATE)
+    `,
+    batchId,
+    date
+  );
+  return result[0]?.sum ?? 0;
+}
+
+// Returns the stocking history for a batch: for each stocking event, the date, quantity stocked, and cumulative quantity after stocking
+export async function getBatchStockingHistory(batchId: number): Promise<
+  Array<{
+    stocking_transaction_id: number;
+    stocking_date: string;
+    stocked_qty: number;
+    quantity_after_stocking: number;
+  }>
+> {
+  // You may need to adjust doc_type_id for stocking events if not 1
+  const result = await db.$queryRawUnsafe<any[]>(
+    `SELECT
+      s.id AS stocking_transaction_id,
+      d.date_time AS stocking_date,
+      s.quantity AS stocked_qty,
+      (
+        SELECT SUM(itr.quantity)
+        FROM itemtransactions itr
+        JOIN documents doc ON itr.doc_id = doc.id
+        WHERE itr.batch_id = s.batch_id
+          AND doc.date_time <= d.date_time
+      ) AS quantity_after_stocking
+    FROM itemtransactions s
+    JOIN documents d ON s.doc_id = d.id
+    WHERE s.batch_id = $1
+      AND d.doc_type_id = 1 -- adjust if needed for your stocking doc type
+    ORDER BY d.date_time;
+    `,
+    batchId
+  );
+  return result;
+}
+
+// Returns the total stock and total weight for a batch as of a given date
+export async function getBatchTotalStockAndWeight(
+  batchId: number,
+  date: string
+): Promise<{ tot_stock: number; tot_weight: number }> {
+  const result = await db.$queryRawUnsafe<any[]>(
+    `WITH loc_qty AS (
+      SELECT
+        itr.location_id,
+        SUM(itr.quantity) AS stock
+      FROM itemtransactions itr
+      INNER JOIN itembatches ib ON ib.id = $1 AND ib.id = itr.batch_id
+      INNER JOIN documents doc ON doc.id = itr.doc_id AND CAST(doc.date_time AS DATE) <= CAST($2 AS DATE)
+      GROUP BY itr.location_id
+      HAVING SUM(itr.quantity) > 0
+    ),
+    last_stocking AS (
+      SELECT
+        d.location_id,
+        s.average_weight,
+        s.id AS stocking_id,
+        CAST(d.date_time AS DATE) AS stocking_date,
+        ROW_NUMBER() OVER (PARTITION BY d.location_id ORDER BY d.date_time DESC) AS rn
+      FROM stocking s
+      INNER JOIN documents d ON d.id = s.doc_id
+      WHERE CAST(d.date_time AS DATE) <= CAST($2 AS DATE)
+    )
+    SELECT
+      SUM(lq.stock) AS tot_stock,
+      SUM(ls.average_weight / 1000 * lq.stock) AS tot_weight
+    FROM loc_qty lq
+    LEFT JOIN last_stocking ls
+      ON lq.location_id = ls.location_id AND ls.rn = 1
+    `,
+    batchId,
+    date
+  );
+  return {
+    tot_stock: result[0]?.tot_stock ?? 0,
+    tot_weight: result[0]?.tot_weight ?? 0,
+  };
 }

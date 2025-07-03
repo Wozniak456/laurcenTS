@@ -1,14 +1,28 @@
-import { getCostReport } from "@/actions/crutial/feedBatch";
+import React from "react";
 import CostReportClient from "./CostReportClient";
+import { db } from "@/db";
 
 export default async function CostReportPage() {
-  const reportData = await getCostReport();
+  // Fetch only fish batches (item_type_id: 1)
+  const batchesRaw = await db.itembatches.findMany({
+    select: {
+      id: true,
+      name: true,
+      items: {
+        select: {
+          item_type_id: true,
+        },
+      },
+    },
+    orderBy: { name: "asc" },
+  });
+  // Filter to only those where items.item_type_id === 1
+  const batches = batchesRaw
+    .filter((batch) => batch.items?.item_type_id === 1)
+    .map((batch) => ({
+      id: Number(batch.id),
+      name: batch.name,
+    }));
 
-  // Format dates to strings before passing to client component
-  const formattedData = reportData.map((item) => ({
-    ...item,
-    feeding_date: item.feeding_date.toISOString().split("T")[0], // Format as YYYY-MM-DD
-  }));
-
-  return <CostReportClient initialData={formattedData} />;
+  return <CostReportClient batches={batches} />;
 }
