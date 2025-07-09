@@ -2,6 +2,8 @@ import React from "react";
 import CostReportClient from "./CostReportClient";
 import { db } from "@/db";
 
+export const dynamic = "force-dynamic";
+
 export default async function CostReportPage() {
   // Fetch only fish batches (item_type_id: 1)
   const batchesRaw = await db.itembatches.findMany({

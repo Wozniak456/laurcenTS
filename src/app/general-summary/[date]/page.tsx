@@ -7,6 +7,8 @@ import ExportButton from "@/components/111tableToPrint";
 
 import * as actions from "@/actions";
 
+export const dynamic = "force-dynamic";
+
 interface LeftoversPerPeriodProps {
   params: {
     date: string;

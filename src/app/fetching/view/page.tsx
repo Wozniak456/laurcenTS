@@ -12,6 +12,8 @@ import {
   fetching,
 } from "@prisma/client";
 
+export const dynamic = "force-dynamic";
+
 type FetchingInfo = {
   locationName: string;
   locationId: number;

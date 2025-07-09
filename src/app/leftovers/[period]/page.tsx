@@ -4,6 +4,8 @@ import * as actions from "@/actions";
 import LeftoversTable from "@/components/leftovers-table";
 import ExportButton from "@/components/leftoversTableToPrint";
 
+export const dynamic = "force-dynamic";
+
 interface LeftoversPerPeriodProps {
   params: {
     period: string;

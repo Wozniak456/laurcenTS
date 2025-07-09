@@ -19,6 +19,8 @@ import {
 } from "@/utils/periodic";
 import { getAreas } from "@/actions/crutial/getAreas";
 
+export const dynamic = "force-dynamic";
+
 interface DayFeedingProps {
   params: {
     index: string;

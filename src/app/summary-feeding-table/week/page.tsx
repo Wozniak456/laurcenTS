@@ -1,8 +1,9 @@
 import { db } from "@/db";
-import * as stockingActions from '@/actions/stocking'
+import * as stockingActions from "@/actions/stocking";
+
+export const dynamic = "force-dynamic";
 
 export default async function WeekSummary() {
-
   const lines = await db.productionlines.findMany({
     include: {
       pools: {
@@ -16,15 +17,15 @@ export default async function WeekSummary() {
                     include: {
                       stocking: true,
                     },
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  })
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
 
   const now = new Date();
   const datesArray: Date[] = [];
@@ -34,7 +35,6 @@ export default async function WeekSummary() {
     currentDate.setDate(now.getDate() + i);
     datesArray.push(currentDate);
   }
-
 
   return (
     <div className="p-4">
@@ -104,11 +104,14 @@ export default async function WeekSummary() {
                       datesArray.map(async (date, dateIndex) => {
                         const calcData = await Promise.all(
                           line.pools.map(async (pool) => {
-                            const calc = await stockingActions.calculationForLocation(
-                              pool.locations[0].id,
-                              date.toISOString().split("T")[0]
+                            const calc =
+                              await stockingActions.calculationForLocation(
+                                pool.locations[0].id,
+                                date.toISOString().split("T")[0]
+                              );
+                            return (
+                              calc?.calc?.feed_per_feeding?.toFixed(0) || ""
                             );
-                            return calc?.calc?.feed_per_feeding?.toFixed(0) || "";
                           })
                         );
 
