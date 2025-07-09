@@ -2,6 +2,7 @@ export { createItemBatch } from "./CRUD/itemBatch/createItemBatch";
 export { deleteItemBatch } from "./CRUD/itemBatch/deleteItemBatch";
 export { editItemBatch } from "./CRUD/itemBatch/editItemBatch";
 export { updateBatches } from "./CRUD/itemBatch/updateBatches";
+export { addExtraQuantity } from "./CRUD/itemBatch/addExtraQuantity";
 
 export { createPool } from "./CRUD/pool/createPool";
 export { editPool } from "./CRUD/pool/editPool";

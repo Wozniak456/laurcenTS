@@ -80,16 +80,15 @@ export async function getCatfishBatches() {
     const processedBatches = batches.map((batch) => {
       const transactions = batch.itemtransactions;
 
-      // Find initial quantity (first positive transaction for location 87 with doc_type_id=8)
-      const initialTransaction = transactions.find(
-        (t) =>
-          t.quantity > 0 &&
-          t.location_id === 87 &&
-          t.documents.doc_type_id === 8
-      );
-      const initialQuantity = initialTransaction
-        ? initialTransaction.quantity
-        : 0;
+      // Calculate total initial quantity (sum of ALL positive transactions for location 87 with doc_type_id=8)
+      const initialQuantity = transactions
+        .filter(
+          (t) =>
+            t.quantity > 0 &&
+            t.location_id === 87 &&
+            t.documents.doc_type_id === 8
+        )
+        .reduce((sum, t) => sum + t.quantity, 0);
 
       // Calculate quantity sent to other locations (sum of negative quantities for location 87)
       const sentQuantity = transactions

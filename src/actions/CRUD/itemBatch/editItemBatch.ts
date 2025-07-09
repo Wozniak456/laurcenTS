@@ -17,10 +17,7 @@ export async function editItemBatch(
     const doc_id: number = parseInt(formData.get("doc_id") as string);
     const tran_id: number = parseInt(formData.get("tran_id") as string);
 
-    let date_to_insert = new Date(dateStr);
-    let item_id_to_insert = item_id;
-
-    // якщо треба змінити кількість
+    // Update transaction quantity if provided
     if (qty) {
       await db.itemtransactions.update({
         where: {
@@ -31,8 +28,8 @@ export async function editItemBatch(
         },
       });
     }
-    // якщо треба змінити item_id чи дату реєстрації
-    else if (item_id || dateStr) {
+    // Update batch date and/or name if date or item_id is provided
+    if (item_id || dateStr) {
       const itemBatch = await db.itembatches.findFirst({
         where: {
           id: batch_id,
@@ -40,18 +37,14 @@ export async function editItemBatch(
       });
 
       if (itemBatch) {
-        if (!item_id) {
-          item_id_to_insert = itemBatch?.item_id;
-        }
-        if (!dateStr) {
-          date_to_insert = itemBatch.created as Date;
-        }
+        let item_id_to_insert = item_id || itemBatch.item_id;
+        let date_to_insert = dateStr ? new Date(dateStr) : itemBatch.created;
 
-        //якщо треба змінити дату
-        if (dateStr) {
+        // If date or item_id changed, update both created and name
+        if (dateStr || item_id) {
           const name = await getBatchName(
             item_id_to_insert as number,
-            date_to_insert
+            date_to_insert as Date
           );
 
           await db.itembatches.update({
@@ -60,30 +53,12 @@ export async function editItemBatch(
             },
             data: {
               created: date_to_insert,
-              name: name,
-            },
-          });
-        }
-
-        if (item_id) {
-          const name = await getBatchName(
-            item_id_to_insert as number,
-            date_to_insert
-          );
-
-          await db.itembatches.update({
-            where: {
-              id: batch_id,
-            },
-            data: {
               item_id: item_id_to_insert,
               name: name,
             },
           });
         }
       }
-    } else {
-      throw new Error("Ви нічого не змінили!");
     }
     // return{message :'Оновлено!'}
   } catch (err: unknown) {
