@@ -45,6 +45,7 @@ interface StockPoolProps {
       id: number;
       name: string;
     };
+    remainingQuantity?: number;
   }[];
   poolInfo: poolManagingType | undefined;
   disposal_reasons: disposalItem[];
@@ -96,14 +97,26 @@ export default function StockPoolPage({
                 <Select
                   label="Партія"
                   name="batch_id"
-                  // isInvalid={!!formState.errors?.unit_id}
-                  // errorMessage={formState.errors?.unit_id}
                   isRequired
-                  // placeholder="Партія"
+                  selectedKeys={
+                    poolInfo?.batch && poolInfo.qty && poolInfo.qty > 0
+                      ? [String(poolInfo.batch.id)]
+                      : undefined
+                  }
+                  isDisabled={
+                    !!(poolInfo?.batch && poolInfo.qty && poolInfo.qty > 0)
+                  }
                 >
-                  {batches.map((batch) => (
+                  {(poolInfo?.batch && poolInfo.qty && poolInfo.qty > 0
+                    ? batches
+                    : batches.filter(
+                        (b) => b.remainingQuantity && b.remainingQuantity > 0
+                      )
+                  ).map((batch) => (
                     <SelectItem key={Number(batch.id)} value={Number(batch.id)}>
-                      {batch.name}
+                      {poolInfo?.batch && poolInfo.qty && poolInfo.qty > 0
+                        ? batch.name
+                        : `${batch.name} (Залишок: ${batch.remainingQuantity})`}
                     </SelectItem>
                   ))}
                 </Select>
