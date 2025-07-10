@@ -70,6 +70,28 @@ type locationForFeedWeight = {
   }[];
 }[];
 
+// Helper to get the periodic value of 'Тип розрахунку годування' for a location and date
+export async function getFeedCalculationType(date: Date) {
+  const param = await db.parameters.findFirst({
+    where: { name: "Тип розрахунку годування" },
+  });
+  if (!param) {
+    return "0";
+  }
+  const dateStr = date.toISOString().slice(0, 10);
+  const valueRecord = await db.parametersvalues.findFirst({
+    where: {
+      parameter_id: param.id,
+      date: {
+        gte: new Date(dateStr),
+        lt: new Date(new Date(dateStr).getTime() + 24 * 60 * 60 * 1000),
+      },
+    },
+  });
+  const value = valueRecord?.value ?? "0";
+  return value;
+}
+
 export const getAllSummary = async (
   lines: locationForFeedWeight,
   today: Date
@@ -102,10 +124,26 @@ export const getAllSummary = async (
 
                   // let feedingEdited
 
+                  const feedTypeValue = await getFeedCalculationType(today);
+
                   if (todayCalc.calc.transition_day) {
-                    feedPerFeeding =
-                      feedPerFeeding *
-                      (1 - todayCalc.calc.transition_day * 0.2);
+                    if (feedTypeValue === "0") {
+                      feedPerFeeding =
+                        feedPerFeeding *
+                        (1 - todayCalc.calc.transition_day * 0.2);
+                    } else if (feedTypeValue === "1") {
+                      feedPerFeeding = feedPerFeeding * 0.5;
+                    }
+                    console.log(
+                      `[DEBUG] FeedCalculationType for location_id=${
+                        loc.id
+                      }, date=${today
+                        .toISOString()
+                        .slice(
+                          0,
+                          10
+                        )}: value=${feedTypeValue} and feedPerFeeding=${feedPerFeeding}`
+                    );
                   }
 
                   if (!locationSummary[itemId]) {
@@ -133,9 +171,25 @@ export const getAllSummary = async (
                   const itemId = prevCalc.feed.item_id;
                   let feedPerFeeding = todayCalc.calc.feed_per_feeding;
 
+                  const feedTypeValue = await getFeedCalculationType(today);
+
                   if (todayCalc.calc.transition_day) {
-                    feedPerFeeding =
-                      feedPerFeeding * (todayCalc.calc.transition_day * 0.2);
+                    if (feedTypeValue === "0") {
+                      feedPerFeeding =
+                        feedPerFeeding * (todayCalc.calc.transition_day * 0.2);
+                    } else if (feedTypeValue === "1") {
+                      feedPerFeeding = feedPerFeeding * 0.5;
+                    }
+                    console.log(
+                      `[DEBUG] FeedCalculationType for location_id=${
+                        loc.id
+                      }, date=${today
+                        .toISOString()
+                        .slice(
+                          0,
+                          10
+                        )}: value=${feedTypeValue} and feedPerFeeding=${feedPerFeeding}`
+                    );
                   }
 
                   if (todayCalc.calc.transition_day) {

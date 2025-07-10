@@ -75,6 +75,7 @@ interface Feeding {
   feedName?: string;
   feedId?: number;
   feedings?: { [time: string]: { feeding?: string; editing?: string } };
+  feedCalcType?: string; // Added for frontend display
 }
 
 type extraData = {
@@ -846,15 +847,27 @@ const setData = async (
 
               const transition = todayCalc?.calc?.transition_day;
 
-              const feedingAmountForPrev =
-                transition && todayCalc?.calc?.feed_per_feeding
-                  ? todayCalc.calc.feed_per_feeding * (1 - transition * 0.2)
-                  : undefined;
+              // Get the feed calculation type for branching logic
+              const feedTypeValue = await feedingActions.getFeedCalculationType(
+                currentDate
+              );
 
-              const feedingAmountForToday =
-                transition && todayCalc?.calc?.feed_per_feeding
-                  ? todayCalc.calc.feed_per_feeding * (transition * 0.2)
-                  : undefined;
+              let feedingAmountForPrev: number | undefined;
+              let feedingAmountForToday: number | undefined;
+
+              if (transition && todayCalc?.calc?.feed_per_feeding) {
+                if (feedTypeValue === "0") {
+                  // Original formula: transition-based calculation
+                  feedingAmountForPrev =
+                    todayCalc.calc.feed_per_feeding * (1 - transition * 0.2);
+                  feedingAmountForToday =
+                    todayCalc.calc.feed_per_feeding * (transition * 0.2);
+                } else if (feedTypeValue === "1") {
+                  // New formula: 50/50 split
+                  feedingAmountForPrev = todayCalc.calc.feed_per_feeding * 0.5;
+                  feedingAmountForToday = todayCalc.calc.feed_per_feeding * 0.5;
+                }
+              }
 
               // Створення загального об'єкта для басейна
               const feedings: Feeding[] = [];
@@ -863,6 +876,9 @@ const setData = async (
 
               //якщо є перехід на новий корм і є попередній обрахунок
               if (transition && prevFeedTypeInfo && todayCalc?.feed) {
+                // Before constructing the Feeding objects, fetch the type value used for calculation
+                const feedTypeValue =
+                  await feedingActions.getFeedCalculationType(currentDate);
                 // First line - previous feed type with decreasing amount
                 feedings.push({
                   feedType: prevFeedTypeInfo!.name || "",
@@ -893,6 +909,7 @@ const setData = async (
                       ];
                     })
                   ),
+                  feedCalcType: feedTypeValue,
                 });
 
                 // Second line - current feed type with increasing amount
@@ -925,6 +942,7 @@ const setData = async (
                       ];
                     })
                   ),
+                  feedCalcType: feedTypeValue,
                 });
                 feedingsCount += 2;
               }
@@ -1151,15 +1169,27 @@ const setData = async (
 
           const transition = todayCalc?.calc?.transition_day;
 
-          const feedingAmountForPrev =
-            transition && todayCalc?.calc?.feed_per_feeding
-              ? todayCalc.calc.feed_per_feeding * (1 - transition * 0.2)
-              : undefined;
+          // Get the feed calculation type for branching logic
+          const feedTypeValue = await feedingActions.getFeedCalculationType(
+            currentDate
+          );
 
-          const feedingAmountForToday =
-            transition && todayCalc?.calc?.feed_per_feeding
-              ? todayCalc.calc.feed_per_feeding * (transition * 0.2)
-              : undefined;
+          let feedingAmountForPrev: number | undefined;
+          let feedingAmountForToday: number | undefined;
+
+          if (transition && todayCalc?.calc?.feed_per_feeding) {
+            if (feedTypeValue === "0") {
+              // Original formula: transition-based calculation
+              feedingAmountForPrev =
+                todayCalc.calc.feed_per_feeding * (1 - transition * 0.2);
+              feedingAmountForToday =
+                todayCalc.calc.feed_per_feeding * (transition * 0.2);
+            } else if (feedTypeValue === "1") {
+              // New formula: 50/50 split
+              feedingAmountForPrev = todayCalc.calc.feed_per_feeding * 0.5;
+              feedingAmountForToday = todayCalc.calc.feed_per_feeding * 0.5;
+            }
+          }
 
           // Створення загального об'єкта для басейна
           const feedings: Feeding[] = [];
@@ -1168,6 +1198,10 @@ const setData = async (
 
           //якщо є перехід на новий корм і є попередній обрахунок
           if (transition && prevFeedTypeInfo && todayCalc?.feed) {
+            // Before constructing the Feeding objects, fetch the type value used for calculation
+            const feedTypeValue = await feedingActions.getFeedCalculationType(
+              currentDate
+            );
             // First line - previous feed type with decreasing amount
             feedings.push({
               feedType: prevFeedTypeInfo!.name || "",
@@ -1197,6 +1231,7 @@ const setData = async (
                   ];
                 })
               ),
+              feedCalcType: feedTypeValue,
             });
 
             // Second line - current feed type with increasing amount
@@ -1228,6 +1263,7 @@ const setData = async (
                   ];
                 })
               ),
+              feedCalcType: feedTypeValue,
             });
             feedingsCount += 2;
           }

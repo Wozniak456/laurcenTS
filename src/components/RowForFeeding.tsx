@@ -90,7 +90,7 @@ export default function RowForFeedingServer(props: RowForFeedingProps) {
     { message: "" }
   );
 
-  if (props.locInfo.id === 40) {
+  if (props.locInfo.id === 5) {
     console.log(
       "[DEBUG][RowForFeeding] Props for location 40:",
       JSON.stringify(props, null, 2)

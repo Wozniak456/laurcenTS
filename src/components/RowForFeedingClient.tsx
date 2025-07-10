@@ -414,6 +414,12 @@ export default function RowForFeedingClient(props: RowForFeedingClientProps) {
         const key = `${locInfo.id}-${feedingTime}`;
         const feedingData = rowData.feedings?.[feedingTime];
         const baseQuantity = feedingData?.feeding;
+        console.log(
+          `[DEBUG] feedingData for time=${time.time}:`,
+          feedingData,
+          "baseQuantity:",
+          baseQuantity
+        );
         const editingValueFromFeedings =
           feedingData?.editing || localFeedings[feedingTime]?.editing;
         const calculatedQuantity = baseQuantity
