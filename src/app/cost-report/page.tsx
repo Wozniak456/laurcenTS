@@ -1,6 +1,11 @@
 import React from "react";
 import CostReportClient from "./CostReportClient";
 import { db } from "@/db";
+import { getPageTitle } from "@/utils/pageTitle";
+
+export const metadata = {
+  title: getPageTitle("Звіт по витратам"),
+};
 
 export const dynamic = "force-dynamic";
 

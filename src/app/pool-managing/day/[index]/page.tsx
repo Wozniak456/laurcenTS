@@ -6,6 +6,18 @@ import * as actions from "@/actions";
 import { addDays, format } from "date-fns";
 import { uk } from "date-fns/locale"; // If you need specific Ukrainian locale formatting
 import { calculation_table, itemtransactions, Prisma } from "@prisma/client";
+import { getPageTitle } from "@/utils/pageTitle";
+import { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { index: string };
+}): Promise<Metadata> {
+  return {
+    title: getPageTitle(`Керування басейнами (${params.index})`),
+  };
+}
 
 export const dynamic = "force-dynamic";
 

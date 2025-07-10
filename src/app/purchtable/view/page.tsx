@@ -1,6 +1,11 @@
 import { db } from "@/db";
 
 import PurchTableComponent from "@/components/PurchHeaders/purchtable-table";
+import { getPageTitle } from "@/utils/pageTitle";
+
+export const metadata = {
+  title: getPageTitle("Реєстрація приходу"),
+};
 
 export const dynamic = "force-dynamic";
 

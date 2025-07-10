@@ -4,6 +4,11 @@ import * as feeding_actions from "@/actions/feeding";
 import React from "react";
 import StockingTable from "@/components/accu-table";
 import { Item, PoolType, vendorType } from "@/components/accu-table";
+import { getPageTitle } from "@/utils/pageTitle";
+
+export const metadata = {
+  title: getPageTitle("Собівартість"),
+};
 
 export const dynamic = "force-dynamic";
 

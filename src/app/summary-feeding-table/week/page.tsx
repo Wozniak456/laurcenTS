@@ -1,5 +1,10 @@
 import { db } from "@/db";
 import * as stockingActions from "@/actions/stocking";
+import { getPageTitle } from "@/utils/pageTitle";
+
+export const metadata = {
+  title: getPageTitle("Тижневий звіт"),
+};
 
 export const dynamic = "force-dynamic";
 

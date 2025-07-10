@@ -2,6 +2,11 @@ import React from "react";
 import { db } from "@/db";
 import VendorsTable from "@/components/Vendors/vendors-table";
 import NewVendorForm from "@/components/Vendors/new-vendor-form";
+import { getPageTitle } from "@/utils/pageTitle";
+
+export const metadata = {
+  title: getPageTitle("Постачальники та корми"),
+};
 
 export const dynamic = "force-dynamic";
 

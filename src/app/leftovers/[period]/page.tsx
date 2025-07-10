@@ -3,6 +3,18 @@ import Link from "next/link";
 import * as actions from "@/actions";
 import LeftoversTable from "@/components/leftovers-table";
 import ExportButton from "@/components/leftoversTableToPrint";
+import { getPageTitle } from "@/utils/pageTitle";
+import { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { period: string };
+}): Promise<Metadata> {
+  return {
+    title: getPageTitle(`Склад (${params.period})`),
+  };
+}
 
 export const dynamic = "force-dynamic";
 

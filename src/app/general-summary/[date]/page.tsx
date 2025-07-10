@@ -6,6 +6,18 @@ import { poolManagingType } from "@/types/app_types";
 import ExportButton from "@/components/111tableToPrint";
 
 import * as actions from "@/actions";
+import { getPageTitle } from "@/utils/pageTitle";
+import { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { date: string };
+}): Promise<Metadata> {
+  return {
+    title: getPageTitle(`Загальний звіт (${params.date})`),
+  };
+}
 
 export const dynamic = "force-dynamic";
 

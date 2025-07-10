@@ -1,6 +1,11 @@
 import BatchesComponent from "@/components/filter-batch";
 import { db } from "@/db";
 import * as actions from "@/actions";
+import { getPageTitle } from "@/utils/pageTitle";
+
+export const metadata = {
+  title: getPageTitle("Партії риби"),
+};
 
 export const dynamic = "force-dynamic";
 

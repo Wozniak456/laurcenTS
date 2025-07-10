@@ -11,6 +11,11 @@ import {
   itemtransactions,
   fetching,
 } from "@prisma/client";
+import { getPageTitle } from "@/utils/pageTitle";
+
+export const metadata = {
+  title: getPageTitle("Вилов"),
+};
 
 export const dynamic = "force-dynamic";
 

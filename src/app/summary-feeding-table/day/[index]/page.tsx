@@ -18,6 +18,18 @@ import {
   getActivePrioritiesForDate,
 } from "@/utils/periodic";
 import { getAreas } from "@/actions/crutial/getAreas";
+import { getPageTitle } from "@/utils/pageTitle";
+import { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { index: string };
+}): Promise<Metadata> {
+  return {
+    title: getPageTitle(`Годування (день ${params.index})`),
+  };
+}
 
 export const dynamic = "force-dynamic";
 

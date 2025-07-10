@@ -3,6 +3,11 @@ import { db } from "@/db";
 import moment from "moment";
 import { useSearchParams } from "next/navigation";
 import { redirect } from "next/navigation";
+import { getPageTitle } from "@/utils/pageTitle";
+
+export const metadata = {
+  title: getPageTitle("Дії над басейнами"),
+};
 
 // Local type for PoolActionRow to fix type error
 type PoolActionRow = {
