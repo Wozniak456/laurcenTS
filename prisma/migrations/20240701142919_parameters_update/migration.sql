@@ -1,14 +1,7 @@
-/*
-  Warnings:
+-- Add enum type for parameter kind
+CREATE TYPE "ParameterKind" AS ENUM ('constant', 'variable');
 
-  - You are about to drop the column `batch_id` on the `parametersvalues` table. All the data in the column will be lost.
-  - You are about to drop the column `comments` on the `parametersvalues` table. All the data in the column will be lost.
+-- Add 'kind' column to parameters table, defaulting to 'variable' for backward compatibility
+ALTER TABLE "parameters" ADD COLUMN "kind" "ParameterKind" NOT NULL DEFAULT 'variable';
 
-*/
--- DropForeignKey
-ALTER TABLE "parametersvalues" DROP CONSTRAINT "parametersvalues_batch_id_fkey";
-
--- AlterTable
-ALTER TABLE "parametersvalues" DROP COLUMN "batch_id",
-DROP COLUMN "comments",
-ALTER COLUMN "date" SET DEFAULT CURRENT_TIMESTAMP;
+-- For existing parameters, you may want to update the kind as needed after migration.

@@ -84,7 +84,6 @@ model documents {
   generation_feed_amount generation_feed_amount[]
   itemtransactions       itemtransactions[]
   stocking               stocking[]
-  locations              locations[]              @relation("documentsTolocations")
 
   @@index([date_time, doc_type_id], map: "idx_documents_date_doc_type")
   @@index([doc_type_id, date_time], map: "idx_documents_doc_type_date")
@@ -222,7 +221,6 @@ model locations {
   locationtypes    locationtypes      @relation(fields: [location_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   pools            pools?             @relation(fields: [pool_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   priority_history priority_history[]
-  documents        documents[]        @relation("documentsTolocations")
 }
 
 model locationtypes {
@@ -236,6 +234,8 @@ model parameters {
   id               Int                @id @default(autoincrement())
   name             String             @unique @db.VarChar
   description      String?
+  kind             ParameterKind      @default(variable)
+  parameterModules parameter_module[]
   parametersvalues parametersvalues[]
 }
 
@@ -245,6 +245,23 @@ model parametersvalues {
   value        String
   date         DateTime   @default(now()) @db.Timestamp(6)
   parameters   parameters @relation(fields: [parameter_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model modules {
+  id               Int                @id @default(autoincrement())
+  name             String             @unique @db.VarChar
+  description      String?
+  parameterModules parameter_module[]
+}
+
+model parameter_module {
+  id           Int        @id @default(autoincrement())
+  parameter_id Int
+  module_id    Int
+  modules      modules    @relation(fields: [module_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  parameters   parameters @relation(fields: [parameter_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([parameter_id, module_id], map: "parameter_module_unique")
 }
 
 model pools {
@@ -460,16 +477,16 @@ model User {
 model percent_feeding_history {
   id                                                      Int        @id @default(autoincrement())
   pool_id                                                 Int
-  percent_feeding                                         Decimal
-  valid_from                                              DateTime
-  valid_to                                                DateTime?
+  percent_feeding                                         Decimal    @db.Decimal
+  valid_from                                              DateTime   @db.Timestamp(6)
+  valid_to                                                DateTime?  @db.Timestamp(6)
   created_by                                              Int
-  created_at                                              DateTime   @default(now())
+  created_at                                              DateTime   @default(now()) @db.Timestamp(6)
   updated_by                                              Int?
-  updated_at                                              DateTime?
-  employees_percent_feeding_history_created_byToemployees employees  @relation("percent_feeding_history_created_byToemployees", fields: [created_by], references: [id])
-  pools                                                   pools      @relation(fields: [pool_id], references: [id])
-  employees_percent_feeding_history_updated_byToemployees employees? @relation("percent_feeding_history_updated_byToemployees", fields: [updated_by], references: [id])
+  updated_at                                              DateTime?  @db.Timestamp(6)
+  employees_percent_feeding_history_created_byToemployees employees  @relation("percent_feeding_history_created_byToemployees", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  pools                                                   pools      @relation(fields: [pool_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  employees_percent_feeding_history_updated_byToemployees employees? @relation("percent_feeding_history_updated_byToemployees", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model priority_history {
@@ -477,14 +494,19 @@ model priority_history {
   location_id                                      Int
   item_id                                          Int
   priority                                         Int
-  valid_from                                       DateTime
-  valid_to                                         DateTime?
+  valid_from                                       DateTime   @db.Timestamp(6)
+  valid_to                                         DateTime?  @db.Timestamp(6)
   created_by                                       Int
-  created_at                                       DateTime   @default(now())
+  created_at                                       DateTime   @default(now()) @db.Timestamp(6)
   updated_by                                       Int?
-  updated_at                                       DateTime?
-  employees_priority_history_created_byToemployees employees  @relation("priority_history_created_byToemployees", fields: [created_by], references: [id])
-  items                                            items      @relation(fields: [item_id], references: [id])
-  locations                                        locations  @relation(fields: [location_id], references: [id])
-  employees_priority_history_updated_byToemployees employees? @relation("priority_history_updated_byToemployees", fields: [updated_by], references: [id])
+  updated_at                                       DateTime?  @db.Timestamp(6)
+  employees_priority_history_created_byToemployees employees  @relation("priority_history_created_byToemployees", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  items                                            items      @relation(fields: [item_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  locations                                        locations  @relation(fields: [location_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  employees_priority_history_updated_byToemployees employees? @relation("priority_history_updated_byToemployees", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+enum ParameterKind {
+  constant
+  variable
 }

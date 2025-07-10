@@ -106,6 +106,21 @@ const menuCategories = [
       },
     ],
   },
+  {
+    title: "Система",
+    items: [
+      {
+        label: "Параметри",
+        href: "/system/parameters",
+        icon: <></>, // You can add a settings icon if you have one
+      },
+      {
+        label: "Модулі",
+        href: "/system/modules",
+        icon: <></>,
+      },
+    ],
+  },
 ];
 
 export default function Header() {
