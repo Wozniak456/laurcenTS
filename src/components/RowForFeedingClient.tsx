@@ -16,6 +16,7 @@ import {
 } from "@nextui-org/react";
 import { fetchFeedingRow, checkStockBeforeFeed } from "@/actions/feeding";
 import { checkLaterTransactions } from "@/actions/crutial/cancelFeeding";
+import { parseDecimal } from "@/utils/numberParsing";
 
 interface Feeding {
   feedType: string;

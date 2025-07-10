@@ -4,6 +4,7 @@ import { getFeedBatchByItemId } from "./getFeedBatchByItemId";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { Prisma } from "@prisma/client";
+import { parseDecimal } from "@/utils/numberParsing";
 
 interface BatchQuantities {
   total_produced: number;
@@ -111,7 +112,7 @@ export async function feedBatch(
 
     times.forEach((time) => {
       const hours = parseInt(time.time.split(":")[0]);
-      const qty = parseFloat(formData.get(`time_${hours}`) as string);
+      const qty = parseDecimal(formData.get(`time_${hours}`) as string);
       timeQtyDebug[`time_${hours}`] = qty;
       if (!isNaN(qty)) {
         totalQtyNeeded += qty;
@@ -154,7 +155,7 @@ export async function feedBatch(
       try {
         for (const time of times) {
           const hours = parseInt(time.time.split(":")[0]);
-          const qty: number = parseFloat(
+          const qty: number = parseDecimal(
             formData.get(`time_${hours}`) as string
           );
           process.stdout.write(
@@ -201,7 +202,7 @@ export async function feedBatch(
           if (index === 0) {
             qtyForWholeDay = 0;
             times.forEach((time) => {
-              const howMuchToAdd = parseFloat(
+              const howMuchToAdd = parseDecimal(
                 formData.get(
                   `time_${parseInt(time.time.split(":")[0])}`
                 ) as string

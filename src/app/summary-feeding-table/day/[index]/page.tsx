@@ -185,20 +185,12 @@ export default async function DayFeeding(props: DayFeedingProps) {
   //console.log("[DEBUG] feedTypeInfo:", JSON.stringify(feedTypeInfo, null, 2));
 
   const prioritiesMap = await getActivePrioritiesForDate(today);
-  console.log(
-    "[DEBUG] prioritiesMap[41]:",
-    JSON.stringify(prioritiesMap[41], null, 2)
-  );
 
   const summary = await feedingActions.getAllSummary(lines, currentDate);
 
   const data = await setData(today, times, prioritiesMap);
   // Add logging for location id 40
   const dataForLoc40 = data.filter((row) => row.locId === 40);
-  console.log(
-    "[DEBUG] Data for location id 40:",
-    JSON.stringify(dataForLoc40, null, 2)
-  );
 
   // Collect all unique location IDs
   const locationIds = Array.from(
@@ -214,16 +206,6 @@ export default async function DayFeeding(props: DayFeedingProps) {
     locationIds,
     today
   );
-
-  /* data.map((data1) => {
-    if (data1.locId == 65) {
-      console.log("data1. loc: ", data1.locId);
-      data1.feedings?.map((feeding) => {
-        console.log(feeding);
-      });
-    }
-  } 
-);*/
 
   return (
     <div className="flex flex-col justify-center ">
@@ -843,18 +825,6 @@ const setData = async (
                   })
               );
 
-              if (loc.id === 50) {
-                //console.log(
-                //"editings for 22:00:",
-                //JSON.stringify(
-                //editings[loc.id],
-                //(key, value) =>
-                //typeof value === "bigint" ? value.toString() : value,
-                //2
-                //)
-                //);
-              }
-
               extraFilledRows = await getExtraData(
                 loc.id,
                 today,
@@ -881,20 +851,6 @@ const setData = async (
 
               //якщо є перехід на новий корм і є попередній обрахунок
               if (transition && prevFeedTypeInfo && todayCalc?.feed) {
-                if (loc.id === 50) {
-                  //console.log("--- DEBUG for location 50 ---");
-                  //console.log(
-                  //"todayCalc:",
-                  //JSON.stringify(todayCalc, (k, v) =>
-                  //typeof v === "bigint" ? v.toString() : v
-                  //)
-                  //);
-                  //console.log("prevFeedTypeInfo:", prevFeedTypeInfo);
-                  //console.log(
-                  //"transition:",
-                  //todayCalc?.calc?.transition_day
-                  //);
-                }
                 // First line - previous feed type with decreasing amount
                 feedings.push({
                   feedType: prevFeedTypeInfo!.name || "",
@@ -1062,16 +1018,6 @@ const setData = async (
                 feedingsCount++;
               }
 
-              // console.log('feedings: ', feedings)
-              if (loc.id === 50) {
-                //console.log(
-                //"Final feedings array for location 50:",
-                //JSON.stringify(feedings, (k, v) =>
-                //typeof v === "bigint" ? v.toString() : v
-                //)
-                //);
-              }
-
               // Group editing values for each feeding row (by feedId) and time slot
               if (feedings.length > 0) {
                 // Build a map: { [feedId]: { [hour]: totalEditing } }
@@ -1119,17 +1065,6 @@ const setData = async (
                 rowCount: feedingsCount,
                 feedings,
               };
-              if (loc.id === 50) {
-                //console.log(
-                //`locId: ${loc.id}`,
-                //JSON.stringify(pushResult, (key, value) => {
-                //if (typeof value === "bigint") {
-                //return value.toString();
-                //}
-                //return value;
-                //})
-                //);
-              }
               // Додати до загального масиву
               data.push(pushResult);
             }
@@ -1162,50 +1097,22 @@ const setData = async (
 
                 for (const itemId of itemIds) {
                   if (!itemId) {
-                    if (loc.id === 50) {
-                      //console.log(
-                      //`[DEBUG] Skipping because !itemId: hours=${hours}, itemId=${itemId}, locId=${loc.id}`
-                      //);
-                    }
                     continue; // Skip if itemId is undefined
                   }
 
                   // Get the current feed type info
                   const currentFeedTypeInfo = feedTypeInfo[itemId];
                   if (!currentFeedTypeInfo) {
-                    if (loc.id === 50) {
-                      //console.log(
-                      //`[DEBUG] Skipping because !currentFeedTypeInfo: hours=${hours}, itemId=${itemId}, locId=${loc.id}`
-                      //);
-                    }
                     continue; // Skip if no feed type info
                   }
 
                   // Get the previous feed type info
                   const prevFeedTypeInfo = feedTypeInfo[itemId];
                   if (!prevFeedTypeInfo) {
-                    if (loc.id === 50) {
-                      //console.log(
-                      //`[DEBUG] Skipping because !prevFeedTypeInfo: hours=${hours}, itemId=${itemId}, locId=${loc.id}`
-                      //);
-                    }
                     continue; // Skip if no previous feed type info
                   }
 
-                  if (loc.id === 50 && hours === 22) {
-                    //console.log(
-                    //`Checking hours: ${hours} location_id: ${loc.id} itemid: ${itemId}`
-                    //);
-                  }
                   const editing = await getEdited(hours, loc.id, itemId);
-                  if (loc.id === 50) {
-                    //console.log(
-                    //`hours: ${hours} location_id: ${loc.id} itemid: ${itemId}`
-                    //);
-                    editing.map((editing1) => {
-                      //console.log(editing1.itemtransactions);
-                    });
-                  }
                   // Ініціалізуємо вкладені об'єкти, якщо їх немає
                   if (!editings[loc.id]) {
                     editings[loc.id] = {};
@@ -1222,18 +1129,6 @@ const setData = async (
                 }
               })
           );
-
-          if (loc.id === 50) {
-            //console.log(
-            //"editings for 22:00:",
-            //JSON.stringify(
-            //editings[loc.id],
-            //(key, value) =>
-            //typeof value === "bigint" ? value.toString() : value,
-            //2
-            //)
-            //);
-          }
 
           extraFilledRows = await getExtraData(
             loc.id,
@@ -1261,14 +1156,6 @@ const setData = async (
 
           //якщо є перехід на новий корм і є попередній обрахунок
           if (transition && prevFeedTypeInfo && todayCalc?.feed) {
-            if (loc.id === 50) {
-              //console.log("Feedings to render for transition:", {
-              //prevFeedTypeInfo,
-              //todayFeed: todayCalc.feed,
-              //feedingAmountForPrev,
-              //feedingAmountForToday,
-              //});
-            }
             // First line - previous feed type with decreasing amount
             feedings.push({
               feedType: prevFeedTypeInfo!.name || "",
@@ -1430,19 +1317,6 @@ const setData = async (
             feedingsCount++;
           }
 
-          // console.log('feedings: ', feedings)
-          if (loc.id === 50) {
-            //console.log(
-            //`locId: ${loc.id}`,
-            //JSON.stringify(feedings, (key, value) => {
-            //if (typeof value === "bigint") {
-            //return value.toString();
-            //}
-            //return value;
-            //})
-            //);
-          }
-
           // Group editing values for each feeding row (by feedId) and time slot
           if (feedings.length > 0) {
             // Build a map: { [feedId]: { [hour]: totalEditing } }
@@ -1480,17 +1354,6 @@ const setData = async (
             rowCount: feedingsCount,
             feedings,
           };
-          if (loc.id === 50) {
-            //console.log(
-            //`locId: ${loc.id}`,
-            //JSON.stringify(pushResult, (key, value) => {
-            //if (typeof value === "bigint") {
-            //return value.toString();
-            //}
-            //return value;
-            //})
-            //);
-          }
           // Додати до загального масиву
           data.push(pushResult);
         }
@@ -1546,15 +1409,6 @@ async function getExtraData(
     },
   });
 
-  // if (locId === 40) {
-  //     console.log('hello')
-  //     query.map(qu => {
-  //         qu.itemtransactions.map(tran => {
-  //             console.log(tran)
-  //         })
-  //     })
-  // }
-
   // Фільтруємо записи, де є транзакції
   const filteredQuery = query.filter((doc) => doc.itemtransactions.length > 0);
 
@@ -1596,14 +1450,6 @@ async function getExtraData(
       }
     });
   });
-
-  // // Виведення результату
-  // console.log("Групування по item_id:");
-  // for (const [itemId, records] of Object.entries(groupedByItemId)) {
-  //     console.log(`для item_id = ${itemId}:`, records);
-  // }
-
-  // console.log(groupedByItemId)
 
   return groupedByItemId;
 }
