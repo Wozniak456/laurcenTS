@@ -12,8 +12,9 @@ interface BatchesShowPageProps {
 
 export default async function BatchesShowPage(props: BatchesShowPageProps) {
   try {
-    let batch: BatchWithCreationInfo | undefined | null =
-      await actions.getFishBatch(parseInt(props.params.id));
+    let batch: BatchWithCreationInfo | null = await actions.getFishBatch(
+      parseInt(props.params.id)
+    );
 
     if (!batch) {
       notFound();

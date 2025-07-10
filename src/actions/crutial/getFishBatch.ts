@@ -1,7 +1,10 @@
 "use server";
 import { db } from "@/db";
+import { BatchWithCreationInfo } from "@/types/app_types";
 
-export async function getFishBatch(batch_id: number) {
+export async function getFishBatch(
+  batch_id: number
+): Promise<BatchWithCreationInfo | null> {
   try {
     const batch = await db.itembatches.findFirst({
       select: {
@@ -31,9 +34,13 @@ export async function getFishBatch(batch_id: number) {
       },
     });
 
+    if (!batch) {
+      return null;
+    }
+
     // Calculate total quantity on stock (sum of all positive transactions with location_id=87 and doc_type_id=8)
     let totalQuantity = 0;
-    if (batch && batch.itemtransactions) {
+    if (batch.itemtransactions) {
       totalQuantity = batch.itemtransactions
         .filter(
           (t) =>
@@ -44,8 +51,13 @@ export async function getFishBatch(batch_id: number) {
         .reduce((sum, t) => sum + t.quantity, 0);
     }
 
-    return { ...batch, totalQuantity };
+    return {
+      ...batch,
+      totalQuantity,
+      id: batch.id, // Ensure id is explicitly included and typed as bigint
+    };
   } catch (err) {
     //console.log(`error: ${err}`)
+    return null;
   }
 }
