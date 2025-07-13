@@ -316,6 +316,7 @@ export default function DaySummaryContent({
                                   }
                                   onRowUpdate={handleRowUpdate}
                                   feedBatchAction={feedBatchAction}
+                                  areaId={area.id}
                                 />
                               );
                             })}

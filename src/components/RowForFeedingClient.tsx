@@ -61,6 +61,7 @@ interface RowForFeedingClientProps {
   formState?: { message?: string };
   action?: (formData: FormData) => Promise<any>;
   cancelAction?: (locId: number, date: string, feedId: number) => Promise<any>;
+  areaId: number;
 }
 
 export default function RowForFeedingClient(props: RowForFeedingClientProps) {
@@ -79,6 +80,7 @@ export default function RowForFeedingClient(props: RowForFeedingClientProps) {
     formState,
     action,
     cancelAction,
+    areaId,
   } = props;
 
   const [localFeedings, setLocalFeedings] = useState(rowData.feedings || {});
@@ -454,7 +456,13 @@ export default function RowForFeedingClient(props: RowForFeedingClientProps) {
                   {editingValueFromFeedings !== undefined &&
                   editingValueFromFeedings !== null &&
                   editingValueFromFeedings !== ""
-                    ? editingValueFromFeedings
+                    ? areaId < 3
+                      ? Number(
+                          String(editingValueFromFeedings).replace(",", ".")
+                        ).toFixed(2)
+                      : Number(
+                          String(editingValueFromFeedings).replace(",", ".")
+                        ).toFixed(1)
                     : "-"}
                 </span>
               ) : (

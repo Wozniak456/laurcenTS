@@ -902,7 +902,9 @@ const setData = async (
                           feeding: feedingAmountForPrev?.toFixed(1),
                           editing:
                             totalEditing !== 0
-                              ? (totalEditing * 1000).toFixed(1)
+                              ? (totalEditing * 1000).toFixed(
+                                  area.id < 3 ? 2 : 1
+                                )
                               : "",
                           hasDocument: editing[0]?.hasDocument || false,
                         },
@@ -935,7 +937,9 @@ const setData = async (
                           feeding: feedingAmountForToday?.toFixed(1),
                           editing:
                             totalEditing !== 0
-                              ? (totalEditing * 1000).toFixed(1)
+                              ? (totalEditing * 1000).toFixed(
+                                  area.id < 3 ? 2 : 1
+                                )
                               : "",
                           hasDocument: editing[0]?.hasDocument || false,
                         },
@@ -967,7 +971,9 @@ const setData = async (
                           feeding: todayCalc.calc?.feed_per_feeding?.toFixed(1),
                           editing:
                             totalEditing !== 0
-                              ? (totalEditing * 1000).toFixed(1)
+                              ? (totalEditing * 1000).toFixed(
+                                  area.id < 3 ? 2 : 1
+                                )
                               : "",
                           hasDocument: editing[0]?.hasDocument || false,
                         },
@@ -1015,7 +1021,7 @@ const setData = async (
                     }
 
                     const editingValue = row.quantity
-                      ? (row.quantity * 1000).toFixed(1)
+                      ? (row.quantity * 1000).toFixed(area.id < 3 ? 2 : 1)
                       : "0";
                     feedingsForFeedId[hours].editing = editingValue;
                     feedingsForFeedId[hours].hasDocument = true; // Встановлюємо флаг для існуючих записів
@@ -1077,7 +1083,9 @@ const setData = async (
                   Object.entries(feeding.feedings || {}).forEach(
                     ([hour, val]) => {
                       val.editing =
-                        groupedEditing[feedId][hour]?.toFixed(1) || "0.0";
+                        groupedEditing[feedId][hour]?.toFixed(
+                          area.id < 3 ? 2 : 1
+                        ) || "0.0";
                     }
                   );
                 });
@@ -1224,7 +1232,7 @@ const setData = async (
                       feeding: feedingAmountForPrev?.toFixed(1),
                       editing:
                         totalEditing !== 0
-                          ? (totalEditing * 1000).toFixed(1)
+                          ? (totalEditing * 1000).toFixed(area.id < 3 ? 2 : 1)
                           : "",
                       hasDocument: editing[0]?.hasDocument || false,
                     },
@@ -1256,7 +1264,7 @@ const setData = async (
                       feeding: feedingAmountForToday?.toFixed(1),
                       editing:
                         totalEditing !== 0
-                          ? (totalEditing * 1000).toFixed(1)
+                          ? (totalEditing * 1000).toFixed(area.id < 3 ? 2 : 1)
                           : "",
                       hasDocument: editing[0]?.hasDocument || false,
                     },
@@ -1288,7 +1296,7 @@ const setData = async (
                       feeding: todayCalc.calc?.feed_per_feeding?.toFixed(1),
                       editing:
                         totalEditing !== 0
-                          ? (totalEditing * 1000).toFixed(1)
+                          ? (totalEditing * 1000).toFixed(area.id < 3 ? 2 : 1)
                           : "",
                       hasDocument: editing[0]?.hasDocument || false,
                     },
@@ -1332,7 +1340,7 @@ const setData = async (
                 }
 
                 const editingValue = row.quantity
-                  ? (row.quantity * 1000).toFixed(1)
+                  ? (row.quantity * 1000).toFixed(area.id < 3 ? 2 : 1)
                   : "0";
                 feedingsForFeedId[hours].editing = editingValue;
                 feedingsForFeedId[hours].hasDocument = true; // Встановлюємо флаг для існуючих записів
@@ -1385,7 +1393,9 @@ const setData = async (
               const feedId = feeding.feedId;
               if (!feedId) return;
               Object.entries(feeding.feedings || {}).forEach(([hour, val]) => {
-                val.editing = groupedEditing[feedId][hour]?.toFixed(1) || "0.0";
+                val.editing =
+                  groupedEditing[feedId][hour]?.toFixed(area.id < 3 ? 2 : 1) ||
+                  (area.id < 3 ? "0.00" : "0.0");
               });
             });
           }

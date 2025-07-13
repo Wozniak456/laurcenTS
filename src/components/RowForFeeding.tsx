@@ -64,6 +64,7 @@ interface RowForFeedingProps {
   allLocationFeedings?: Feeding[];
   percentFeeding: number;
   feedBatchAction: typeof feedBatch;
+  areaId: number;
 }
 
 type itemAndTime = {
@@ -120,6 +121,7 @@ export default function RowForFeedingServer(props: RowForFeedingProps) {
         const result = await cancelFeeding(locId, date, feedId);
         return result;
       }}
+      areaId={props.areaId}
     />
   );
 }
