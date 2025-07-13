@@ -257,8 +257,16 @@ export default function RowForFeedingClient(props: RowForFeedingClientProps) {
     times.forEach((time) => {
       const feedingTime = parseInt(time.time.split(":")[0]);
       const key = `${locInfo.id}-${feedingTime}`;
-      const value =
-        editingValue[key] ?? (updatedFeedings[feedingTime]?.feeding || "");
+      // Always use the value that was actually fed (manual or calculated)
+      let value = editingValue[key];
+      if (value === undefined || value === null || value === "") {
+        // fallback to calculatedQuantity
+        const feedingData = rowData.feedings?.[feedingTime];
+        const baseQuantity = feedingData?.feeding;
+        value = baseQuantity
+          ? (parseFloat(baseQuantity) * (1 + percentFeeding / 100)).toFixed(2)
+          : "";
+      }
       if (updatedFeedings[feedingTime]) {
         updatedFeedings[feedingTime] = {
           ...updatedFeedings[feedingTime],
