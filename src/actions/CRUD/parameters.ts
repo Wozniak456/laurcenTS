@@ -30,14 +30,22 @@ export async function getAllParameters() {
         // For constant, show the only value (if any)
         todaysValue = param.parametersvalues[0]?.value ?? null;
       } else {
-        // For variable, show today's value (if any)
-        const found = param.parametersvalues.find((v: any) => {
-          if (!v.date) return false;
-          const valueDate = new Date(v.date).toISOString().slice(0, 10);
-          return valueDate === todayStr;
-        });
-        if (found) {
-          todaysValue = found.value;
+        // For variable, show the value with the latest date <= today
+        // Filter values with a valid date <= today
+        const today = new Date();
+        const filtered = param.parametersvalues
+          .filter((v: any) => {
+            if (!v.date) return false;
+            const valueDate = new Date(v.date);
+            // Only include values with date <= today
+            return valueDate <= today;
+          })
+          .sort(
+            (a: any, b: any) =>
+              new Date(b.date).getTime() - new Date(a.date).getTime()
+          ); // Descending by date
+        if (filtered.length > 0) {
+          todaysValue = filtered[0].value;
         }
       }
     }
