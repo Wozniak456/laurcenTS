@@ -4,6 +4,8 @@ import ItemBatchComponent from "@/components/FishBatch/batch-element";
 import { BatchWithCreationInfo } from "@/types/app_types";
 import * as actions from "@/actions";
 
+export const dynamic = "force-dynamic";
+
 interface BatchesShowPageProps {
   params: {
     id: string;

@@ -2,6 +2,8 @@ import React from "react";
 import { getAllModules, deleteModule } from "@/actions/CRUD/modules";
 import ModulesClient from "./ModulesClient";
 
+export const dynamic = "force-dynamic";
+
 export default async function ModulesPage() {
   const modules = await getAllModules();
 

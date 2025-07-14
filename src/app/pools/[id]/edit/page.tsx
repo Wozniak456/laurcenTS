@@ -2,25 +2,27 @@ import { db } from "@/db";
 import { notFound } from "next/navigation";
 import PoolEditForm from "@/components/Pools/pool-edit-form";
 
+export const dynamic = "force-dynamic";
+
 interface PoolEditPageProps {
-    params: {
-        id: string
-    }
+  params: {
+    id: string;
+  };
 }
 
-export default async function PoolEditPage(props: PoolEditPageProps){
-    const id = parseInt(props.params.id);
-    const pool = await db.pools.findFirst({
-        where: { id }
-    });
+export default async function PoolEditPage(props: PoolEditPageProps) {
+  const id = parseInt(props.params.id);
+  const pool = await db.pools.findFirst({
+    where: { id },
+  });
 
-    if(!pool){
-        notFound();
-    }
+  if (!pool) {
+    notFound();
+  }
 
-    return(
-        <div>
-            <PoolEditForm pool={pool} />    
-        </div>
-    )
+  return (
+    <div>
+      <PoolEditForm pool={pool} />
+    </div>
+  );
 }

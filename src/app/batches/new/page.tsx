@@ -1,17 +1,17 @@
-import { db } from '@/db';
-import ItemBatchCreateForm from '@/components/FishBatch/create-batch-form'
+import { db } from "@/db";
+import ItemBatchCreateForm from "@/components/FishBatch/create-batch-form";
 
-export default async function BatchCreatePage(){
-    const items = await db.items.findMany({
-        where:{
-            item_type_id: {
-                not: 3
-            }
-        }
-    })
-    const units = await db.units.findMany()
+export const dynamic = "force-dynamic";
 
-    return( 
-        <ItemBatchCreateForm items={items} units={units}/>
-    )
+export default async function BatchCreatePage() {
+  const items = await db.items.findMany({
+    where: {
+      item_type_id: {
+        not: 3,
+      },
+    },
+  });
+  const units = await db.units.findMany();
+
+  return <ItemBatchCreateForm items={items} units={units} />;
 }

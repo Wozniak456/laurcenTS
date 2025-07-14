@@ -5,6 +5,8 @@ import { useSearchParams } from "next/navigation";
 import { redirect } from "next/navigation";
 import { getPageTitle } from "@/utils/pageTitle";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: getPageTitle("Дії над басейнами"),
 };

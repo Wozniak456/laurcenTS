@@ -34,8 +34,17 @@ export default function ModulesClient({ initialModules }: ModulesClientProps) {
     const description = formData.get("description") as string;
 
     try {
-      const newModule = await createModule({ name, description });
-      setModules([...modules, newModule]);
+      const response = await fetch("/api/system/modules", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, description }),
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        console.error("API error:", result);
+        throw new Error(result?.error || "Failed to create module");
+      }
+      setModules([...modules, result]);
       setShowAddForm(false);
       e.currentTarget.reset();
     } catch (error) {

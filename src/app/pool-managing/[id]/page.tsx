@@ -5,6 +5,8 @@ import * as stockingActions from "@/actions/stocking";
 import { poolManagingTypeExtended } from "@/types/app_types";
 import * as actions from "@/actions";
 
+export const dynamic = "force-dynamic";
+
 interface PoolManagingShowPageProps {
   params: {
     day: string;

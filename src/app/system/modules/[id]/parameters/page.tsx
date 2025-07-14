@@ -6,6 +6,8 @@ import {
 import { notFound } from "next/navigation";
 import ModuleParametersClient from "./ModuleParametersClient";
 
+export const dynamic = "force-dynamic";
+
 interface PageProps {
   params: { id: string };
 }
