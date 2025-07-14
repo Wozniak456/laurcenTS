@@ -347,6 +347,7 @@ export default function RowForFeedingClient(props: RowForFeedingClientProps) {
     showForm,
     errorMessage,
     rowData.feedId,
+    rowData.feedings,
     locInfo.id,
     today,
     times,
