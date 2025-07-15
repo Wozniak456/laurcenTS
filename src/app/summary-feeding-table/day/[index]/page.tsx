@@ -160,6 +160,9 @@ export default async function DayFeeding(props: DayFeedingProps) {
 
   const dates = datesArray(currentDate);
 
+  // Ensure the feeding calculation parameter exists
+  await feedingActions.ensureFeedingCalculationParameter();
+
   const areas = await getAreas();
   const lines = areas.flatMap((area) => area.productionlines);
 

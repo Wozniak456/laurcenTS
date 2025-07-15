@@ -4,6 +4,7 @@ import {
   deleteParameter,
   createParameter,
 } from "@/actions/CRUD/parameters";
+import { db } from "@/db";
 
 function replacer(key: string, value: any) {
   return typeof value === "bigint" ? value.toString() : value;
@@ -29,9 +30,31 @@ export async function DELETE(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const data = await request.json();
+  const body = await request.json();
+
+  // Check if this is a debug request
+  if (body.action === "debug-feeding-param") {
+    const param = await db.parameters.findFirst({
+      where: { name: "Тип розрахунку годування" },
+      include: {
+        parametersvalues: {
+          orderBy: { date: "desc" },
+        },
+      },
+    });
+
+    return NextResponse.json({
+      exists: !!param,
+      parameter: param,
+      allParams: await db.parameters.findMany({
+        select: { id: true, name: true },
+      }),
+    });
+  }
+
+  // Regular parameter creation
   try {
-    const param = await createParameter(data);
+    const param = await createParameter(body);
     return NextResponse.json(param);
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });

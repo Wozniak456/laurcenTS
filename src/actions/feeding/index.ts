@@ -75,21 +75,142 @@ export async function getFeedCalculationType(date: Date) {
   const param = await db.parameters.findFirst({
     where: { name: "Тип розрахунку годування" },
   });
+
   if (!param) {
+    console.log(
+      "[DEBUG] Parameter 'Тип розрахунку годування' not found, returning '0'"
+    );
     return "0";
   }
+
   const dateStr = date.toISOString().slice(0, 10);
+
+  // Try to find the most recent value on or before the given date
   const valueRecord = await db.parametersvalues.findFirst({
     where: {
       parameter_id: param.id,
       date: {
-        gte: new Date(dateStr),
-        lt: new Date(new Date(dateStr).getTime() + 24 * 60 * 60 * 1000),
+        lte: new Date(dateStr + "T23:59:59.999Z"), // End of the given date
+      },
+    },
+    orderBy: {
+      date: "desc",
+    },
+  });
+
+  const value = valueRecord?.value ?? "0";
+  console.log(`[DEBUG] Feed calculation type for ${dateStr}: ${value}`);
+
+  return value;
+}
+
+// Debug function to check all parameters
+export async function debugAllParameters() {
+  console.log("[DEBUG] Checking all parameters...");
+  const allParams = await db.parameters.findMany({
+    include: {
+      parametersvalues: {
+        orderBy: { date: "desc" },
+        take: 3,
       },
     },
   });
-  const value = valueRecord?.value ?? "0";
-  return value;
+
+  allParams.forEach((param) => {
+    console.log(`[DEBUG] Parameter: ${param.name} (ID: ${param.id})`);
+    param.parametersvalues.forEach((val) => {
+      console.log(`  - Date: ${val.date}, Value: ${val.value}`);
+    });
+  });
+}
+
+// Test function to check if the feeding calculation parameter exists
+export async function testFeedingCalculationParameter() {
+  console.log("[DEBUG] Testing feeding calculation parameter...");
+
+  // Check if parameter exists
+  const param = await db.parameters.findFirst({
+    where: { name: "Тип розрахунку годування" },
+  });
+
+  if (!param) {
+    console.log("[DEBUG] Parameter 'Тип розрахунку годування' does not exist!");
+    return false;
+  }
+
+  console.log(`[DEBUG] Parameter exists with ID: ${param.id}`);
+
+  // Check all values
+  const values = await db.parametersvalues.findMany({
+    where: { parameter_id: param.id },
+    orderBy: { date: "desc" },
+  });
+
+  console.log(`[DEBUG] Parameter has ${values.length} values:`);
+  values.forEach((val) => {
+    console.log(`  - Date: ${val.date}, Value: ${val.value}`);
+  });
+
+  return true;
+}
+
+// Function to create the feeding calculation parameter if it doesn't exist
+export async function ensureFeedingCalculationParameter() {
+  console.log("[DEBUG] Ensuring feeding calculation parameter exists...");
+
+  // Check if parameter exists
+  let param = await db.parameters.findFirst({
+    where: { name: "Тип розрахунку годування" },
+  });
+
+  if (!param) {
+    console.log("[DEBUG] Creating parameter 'Тип розрахунку годування'...");
+    param = await db.parameters.create({
+      data: {
+        name: "Тип розрахунку годування",
+        description:
+          "Тип розрахунку годування: 0 - старий (20/80, 40/60, 60/40, 80/20), 1 - новий (50/50)",
+        kind: "variable",
+      },
+    });
+    console.log(`[DEBUG] Created parameter with ID: ${param.id}`);
+  } else {
+    console.log(`[DEBUG] Parameter already exists with ID: ${param.id}`);
+  }
+
+  // Check if parameter has a value for today
+  const today = new Date();
+  const todayStr = today.toISOString().slice(0, 10);
+
+  const todayValue = await db.parametersvalues.findFirst({
+    where: {
+      parameter_id: param.id,
+      date: {
+        lte: new Date(todayStr + "T23:59:59.999Z"),
+      },
+    },
+    orderBy: {
+      date: "desc",
+    },
+  });
+
+  if (!todayValue) {
+    console.log(
+      "[DEBUG] No value found for today, creating default value '1'..."
+    );
+    await db.parametersvalues.create({
+      data: {
+        parameter_id: param.id,
+        value: "1", // Default to new 50/50 calculation
+        date: new Date(),
+      },
+    });
+    console.log("[DEBUG] Created default value '1'");
+  } else {
+    console.log(`[DEBUG] Found value for today: ${todayValue.value}`);
+  }
+
+  return param;
 }
 
 export const getAllSummary = async (
