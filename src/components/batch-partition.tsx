@@ -2,12 +2,14 @@
 
 import * as actions from "@/actions";
 import { useFormState } from "react-dom";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import deleteImg from "../../public/icons/delete.svg";
 import Image from "next/image";
 import FormButton from "./common/form-button";
 import { Button, Input, Select, SelectItem } from "@nextui-org/react";
 import { poolManagingType } from "@/types/app_types";
+
 interface PartitionFormPageProps {
   location: {
     id: number;
@@ -32,11 +34,22 @@ export default function PartitionFormPage({
   locations,
   today,
 }: PartitionFormPageProps) {
+  const router = useRouter();
   const [selectedPools, setSelectedPools] = useState<(number | null)[]>([]);
   const [lineWeights, setLineWeights] = useState<{ [key: number]: number }>({});
   const [formState, action] = useFormState(actions.batchDivision, {
     message: "",
   });
+
+  // Handle successful split operation
+  useEffect(() => {
+    if (formState?.message && formState.message.includes("успішно")) {
+      // Use Next.js router for a clean redirect
+      setTimeout(() => {
+        router.push(`/pool-managing/day/${today}`);
+      }, 100);
+    }
+  }, [formState, today, router]);
 
   const handleDeleteButton = (index: number) => {
     setSelectedPools(selectedPools.filter((item) => item !== index));
@@ -52,11 +65,7 @@ export default function PartitionFormPage({
       setSelectedPools((prevSelectedPools) => {
         const updatedSelectedPools = [...prevSelectedPools];
         updatedSelectedPools[index] = selectedPoolId;
-        const uniqueSelectedPools = Array.from(
-          new Set(updatedSelectedPools.filter((pool) => pool !== null))
-        );
-
-        return uniqueSelectedPools;
+        return updatedSelectedPools;
       });
     };
   };
@@ -64,21 +73,21 @@ export default function PartitionFormPage({
   const handleWeightChange = (index: number) => {
     return (e: React.ChangeEvent<HTMLInputElement>) => {
       const weight = parseFloat(e.target.value);
-      setLineWeights((prev) => ({
-        ...prev,
-        [index]: weight,
-      }));
+      if (!isNaN(weight)) {
+        setLineWeights((prev) => ({
+          ...prev,
+          [index]: weight,
+        }));
+      }
     };
   };
 
+  const handleAddPool = () => {
+    setSelectedPools([...selectedPools, null]);
+  };
+
   return (
-    <form
-      className=""
-      action={action}
-      onSubmit={() => {
-        actions.updatePoolManaging;
-      }}
-    >
+    <form className="" action={action}>
       <div className="mb-4">
         <input type="hidden" name="location_id_from" value={location.id} />
         <input type="hidden" name="today" value={today} />
@@ -96,7 +105,6 @@ export default function PartitionFormPage({
             name="fish_qty_in_location_from"
             value={poolInfo?.qty}
           />
-          {/* яка попередня сер вага */}
           <input
             type="hidden"
             name="old_average_fish_mass"
@@ -144,9 +152,14 @@ export default function PartitionFormPage({
                   placeholder="Сер. вага:"
                   name={`average_fish_mass_${index}`}
                   type="number"
-                  min={1}
+                  min="0.1"
+                  step="0.1"
                   isRequired
-                  value={lineWeights[index]?.toString() || ""}
+                  value={
+                    lineWeights[index] && !isNaN(lineWeights[index])
+                      ? lineWeights[index].toString()
+                      : ""
+                  }
                   onChange={handleWeightChange(index)}
                   className="w-1/4"
                 />
@@ -156,14 +169,13 @@ export default function PartitionFormPage({
         </div>
 
         <div className="flex justify-around m-4 w-full">
-          <Button
-            color="primary"
-            onClick={() => setSelectedPools([...selectedPools, null])}
-          >
+          <Button color="primary" onClick={handleAddPool} type="button">
             Додати басейн
           </Button>
-          {selectedPools.length > 0 && selectedPools[0] !== null && (
-            <FormButton color="primary">Розділити</FormButton>
+          {selectedPools.length > 0 && (
+            <>
+              <FormButton color="primary">Розділити</FormButton>
+            </>
           )}
         </div>
       </div>

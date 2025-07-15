@@ -235,5 +235,6 @@ export async function batchDivision(
   revalidatePath("/summary-feeding-table/week");
   revalidatePath(`/accumulation/view`);
   // revalidatePath('/leftovers/view')
-  redirect(`/pool-managing/day/${today}`);
+
+  return { message: "Розділення успішно виконано!" };
 }

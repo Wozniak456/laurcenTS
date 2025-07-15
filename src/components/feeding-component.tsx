@@ -3,7 +3,7 @@
 import { useFormState } from "react-dom";
 import * as actions from "@/actions";
 import PartitionForm from "@/components/batch-partition";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { itembatches } from "@prisma/client";
 import PoolInfo from "@/components/Pools/pool-info";
 import { disposalItem, poolManagingType } from "@/types/app_types";
@@ -67,6 +67,11 @@ export default function StockPoolPage({
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [formState, action] = useFormState(actions.stockPool, { message: "" });
+
+  // Reset the partition form when the component mounts or when pool data changes
+  useEffect(() => {
+    setShowPartitionForm(false);
+  }, [poolInfo?.qty, poolInfo?.batch?.id, today]);
 
   return (
     <div>
