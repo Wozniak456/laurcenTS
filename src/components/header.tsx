@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   Navbar,
   Button,
@@ -11,7 +11,7 @@ import {
   NavbarContent,
   NavbarItem,
 } from "@nextui-org/react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   PoolIcon,
   BatchIcon,
@@ -23,6 +23,7 @@ import {
   StockIcon,
   SummaryIcon,
   FishingIcon,
+  HomeIcon,
 } from "@/components/icons";
 
 const menuCategories = [
@@ -84,11 +85,7 @@ const menuCategories = [
         href: "/summary-feeding-table/week",
         icon: <ReportIcon />,
       },
-      {
-        label: "Собівартість",
-        href: "/accumulation/view",
-        icon: <CostIcon />,
-      },
+
       {
         label: "Загальний звіт",
         href: "/general-summary/day-selection",
@@ -100,7 +97,7 @@ const menuCategories = [
         icon: <FishingIcon />,
       },
       {
-        label: "Звіт по витратам",
+        label: "Собівартість",
         href: "/cost-report",
         icon: <CostIcon />,
       },
@@ -125,17 +122,37 @@ const menuCategories = [
 
 export default function Header() {
   const pathname = usePathname();
+  const router = useRouter();
   const today = new Date().toISOString().split("T")[0];
 
   return (
     <Navbar className="shadow mb-6 bg-white">
       <NavbarContent>
         <NavbarItem>
-          <div className="font-bold text-xl">LaursenAC</div>
+          <Button
+            variant="light"
+            className="font-bold text-xl p-0 h-auto"
+            onPress={() => router.push("/")}
+          >
+            LaursenAC
+          </Button>
         </NavbarItem>
       </NavbarContent>
 
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
+        {/* Home Button */}
+        <NavbarItem>
+          <Button
+            variant="light"
+            className="text-medium"
+            startContent={<HomeIcon />}
+            onPress={() => router.push("/")}
+            isDisabled={pathname === "/"}
+          >
+            Головна
+          </Button>
+        </NavbarItem>
+
         {menuCategories.map((category) => (
           <Dropdown key={category.title}>
             <DropdownTrigger>
@@ -174,7 +191,8 @@ export default function Header() {
         ))}
       </NavbarContent>
 
-      <NavbarContent className="sm:hidden" justify="end">
+      {/* Temporarily disabled mobile menu due to TypeScript issues */}
+      {/* <NavbarContent className="sm:hidden" justify="end">
         <Dropdown>
           <DropdownTrigger>
             <Button variant="light">Меню</Button>
@@ -186,37 +204,16 @@ export default function Header() {
               base: "gap-4",
             }}
           >
-            {menuCategories.flatMap((category) => [
-              <DropdownItem
-                key={category.title}
-                className="font-bold"
-                isReadOnly
-              >
-                {category.title}
-              </DropdownItem>,
-              ...category.items.map((item) => {
-                const href =
-                  item.href.includes("day") &&
-                  !item.href.includes("general-summary")
-                    ? `${item.href}/${today}`
-                    : item.href;
-                const isActive = pathname.startsWith(item.href);
-
-                return (
-                  <DropdownItem
-                    key={item.label}
-                    startContent={item.icon}
-                    href={href}
-                    className={isActive ? "bg-blue-50" : ""}
-                  >
-                    {item.label}
-                  </DropdownItem>
-                );
-              }),
-            ])}
+            <DropdownItem
+              startContent={<HomeIcon />}
+              onPress={() => router.push("/")}
+              isDisabled={pathname === "/"}
+            >
+              Головна
+            </DropdownItem>
           </DropdownMenu>
         </Dropdown>
-      </NavbarContent>
+      </NavbarContent> */}
     </Navbar>
   );
 }
