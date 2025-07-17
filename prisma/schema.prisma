@@ -82,6 +82,7 @@ model documents {
   doctype                doctype                  @relation(fields: [doc_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   employees              employees                @relation(fields: [executed_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
   generation_feed_amount generation_feed_amount[]
+  inventory_counting     inventory_counting[]
   itemtransactions       itemtransactions[]
   stocking               stocking[]
 
@@ -132,60 +133,63 @@ model individuals {
 }
 
 model itembatches {
-  id                     BigInt                   @id @default(autoincrement())
-  name                   String                   @unique @db.VarChar
-  description            String?
-  item_id                Int
-  created                DateTime?                @default(now()) @db.Timestamp(6)
-  created_by             Int
-  expiration_date        DateTime?
-  packing                Float?
-  price                  Float?
-  batch_generation       batch_generation[]
-  disposal_table         disposal_table[]
-  generation_feed_amount generation_feed_amount[]
-  employees              employees                @relation(fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  items                  items                    @relation(fields: [item_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  itemtransactions       itemtransactions[]
+  id                       BigInt                     @id @default(autoincrement())
+  name                     String                     @unique @db.VarChar
+  description              String?
+  item_id                  Int
+  created                  DateTime?                  @default(now()) @db.Timestamp(6)
+  created_by               Int
+  expiration_date          DateTime?
+  packing                  Float?
+  price                    Float?
+  batch_generation         batch_generation[]
+  disposal_table           disposal_table[]
+  generation_feed_amount   generation_feed_amount[]
+  inventory_counting_lines inventory_counting_lines[]
+  employees                employees                  @relation(fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  items                    items                      @relation(fields: [item_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  itemtransactions         itemtransactions[]
 }
 
 model items {
-  id               Int                @id @default(autoincrement())
-  name             String             @unique @db.VarChar
-  description      String?
-  item_type_id     Int?
-  default_unit_id  Int?
-  parent_item      Int?
-  feed_type_id     Int?
-  vendor_id        Int?
-  itembatches      itembatches[]
-  units            units?             @relation(fields: [default_unit_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  feedtypes        feedtypes?         @relation(fields: [feed_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  itemtypes        itemtypes?         @relation(fields: [item_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  vendors          vendors?           @relation(fields: [vendor_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  priority_history priority_history[]
-  purchaselines    purchaselines[]
-  saleslines       saleslines[]
+  id                       Int                        @id @default(autoincrement())
+  name                     String                     @unique @db.VarChar
+  description              String?
+  item_type_id             Int?
+  default_unit_id          Int?
+  parent_item              Int?
+  feed_type_id             Int?
+  vendor_id                Int?
+  inventory_counting_lines inventory_counting_lines[]
+  itembatches              itembatches[]
+  units                    units?                     @relation(fields: [default_unit_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  feedtypes                feedtypes?                 @relation(fields: [feed_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  itemtypes                itemtypes?                 @relation(fields: [item_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  vendors                  vendors?                   @relation(fields: [vendor_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  priority_history         priority_history[]
+  purchaselines            purchaselines[]
+  saleslines               saleslines[]
 }
 
 model itemtransactions {
-  id                 BigInt             @id @default(autoincrement())
-  doc_id             BigInt
-  location_id        Int
-  batch_id           BigInt
-  quantity           Float
-  unit_id            Int
-  parent_transaction BigInt?
-  status_id          Int                @default(3)
-  batch_generation   batch_generation[]
-  fetching           fetching[]
-  itembatches        itembatches        @relation(fields: [batch_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  documents          documents          @relation(fields: [doc_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  locations          locations          @relation(fields: [location_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  transactionsstate  transactionsstate  @relation(fields: [status_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  units              units              @relation(fields: [unit_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  purchaselines      purchaselines[]
-  saleslines         saleslines[]
+  id                       BigInt                     @id @default(autoincrement())
+  doc_id                   BigInt
+  location_id              Int
+  batch_id                 BigInt
+  quantity                 Float
+  unit_id                  Int
+  parent_transaction       BigInt?
+  status_id                Int                        @default(3)
+  batch_generation         batch_generation[]
+  fetching                 fetching[]
+  inventory_counting_lines inventory_counting_lines[]
+  itembatches              itembatches                @relation(fields: [batch_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  documents                documents                  @relation(fields: [doc_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  locations                locations                  @relation(fields: [location_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  transactionsstate        transactionsstate          @relation(fields: [status_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  units                    units                      @relation(fields: [unit_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  purchaselines            purchaselines[]
+  saleslines               saleslines[]
 
   @@index([location_id], map: "idx_itemtransactions_location")
 }
@@ -203,11 +207,12 @@ model itemtypes {
 }
 
 model feedtypes {
-  id                Int              @id @default(autoincrement())
-  name              String           @unique @db.VarChar
-  feedconnection_id Int?
-  feedconnections   feedconnections? @relation(fields: [feedconnection_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  items             items[]
+  id                       Int                        @id @default(autoincrement())
+  name                     String                     @unique @db.VarChar
+  feedconnection_id        Int?
+  feedconnections          feedconnections?           @relation(fields: [feedconnection_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  inventory_counting_lines inventory_counting_lines[]
+  items                    items[]
 }
 
 model locations {
@@ -351,12 +356,13 @@ model stocking {
 }
 
 model units {
-  id               Int                @id @default(autoincrement())
-  name             String             @unique @db.VarChar
-  items            items[]
-  itemtransactions itemtransactions[]
-  purchaselines    purchaselines[]
-  saleslines       saleslines[]
+  id                       Int                        @id @default(autoincrement())
+  name                     String                     @unique @db.VarChar
+  inventory_counting_lines inventory_counting_lines[]
+  items                    items[]
+  itemtransactions         itemtransactions[]
+  purchaselines            purchaselines[]
+  saleslines               saleslines[]
 }
 
 model vendors {
@@ -504,6 +510,46 @@ model priority_history {
   items                                            items      @relation(fields: [item_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   locations                                        locations  @relation(fields: [location_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   employees_priority_history_updated_byToemployees employees? @relation("priority_history_updated_byToemployees", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model inventory_counting {
+  id                       BigInt                     @id @default(autoincrement())
+  doc_id                   BigInt
+  posting_date_time        DateTime                   @db.Timestamp(6)
+  created_at               DateTime?                  @default(now()) @db.Timestamp(6)
+  updated_at               DateTime?                  @default(now()) @db.Timestamp(6)
+  documents                documents                  @relation(fields: [doc_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  inventory_counting_lines inventory_counting_lines[]
+
+  @@index([doc_id], map: "idx_inventory_counting_doc_id")
+}
+
+model inventory_counting_lines {
+  id                    BigInt             @id @default(autoincrement())
+  inventory_counting_id BigInt
+  feed_type_id          Int
+  item_id               Int
+  system_quantity       Float              @default(0)
+  actual_quantity       Float              @default(0)
+  difference            Float?             @default(dbgenerated("(actual_quantity - system_quantity)"))
+  unit_id               Int
+  created_at            DateTime?          @default(now()) @db.Timestamp(6)
+  updated_at            DateTime?          @default(now()) @db.Timestamp(6)
+  batch_id              BigInt
+  itemtransaction_id    BigInt?
+  itemtransactions      itemtransactions?  @relation(fields: [itemtransaction_id], references: [id], onUpdate: NoAction, map: "fk_inventory_counting_lines_itemtransaction")
+  itembatches           itembatches        @relation(fields: [batch_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  feedtypes             feedtypes          @relation(fields: [feed_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  inventory_counting    inventory_counting @relation(fields: [inventory_counting_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  items                 items              @relation(fields: [item_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  units                 units              @relation(fields: [unit_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([inventory_counting_id, item_id, batch_id], map: "idx_inventory_counting_lines_unique")
+  @@index([feed_type_id], map: "idx_inventory_counting_lines_feed_type")
+  @@index([inventory_counting_id], map: "idx_inventory_counting_lines_inventory_id")
+  @@index([item_id], map: "idx_inventory_counting_lines_item")
+  @@index([batch_id], map: "idx_inventory_counting_lines_batch")
+  @@index([itemtransaction_id], map: "idx_inventory_counting_lines_itemtransaction")
 }
 
 enum ParameterKind {

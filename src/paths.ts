@@ -32,6 +32,9 @@ const paths = {
   determinedLeftovers(startDateSlug: string, endDateSlug: string) {
     return `/leftovers/${startDateSlug}_${endDateSlug}`;
   },
+  inventoryCounting() {
+    return "/inventory-counting/view";
+  },
   generalSummary() {
     return "/general-summary/day-selection";
   },

@@ -75,6 +75,11 @@ const menuCategories = [
         href: "/leftovers/view",
         icon: <StockIcon />,
       },
+      {
+        label: "Інвентаризація",
+        href: "/inventory-counting/view",
+        icon: <StockIcon />,
+      },
     ],
   },
   {
