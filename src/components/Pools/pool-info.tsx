@@ -314,8 +314,8 @@ export default function PoolInfoComponent({
               {location.name}?
             </p>
             <p className="text-sm text-gray-600 mt-2">
-              Це призведе до видалення всіх транзакцій зариблення та пов'язаних
-              документів.
+              Це призведе до видалення всіх транзакцій зариблення та
+              пов&apos;язаних документів.
             </p>
           </ModalBody>
           <ModalFooter>
