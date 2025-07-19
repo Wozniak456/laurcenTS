@@ -9,6 +9,7 @@ import {
   getPriorityForDate,
   getActivePriorityItemForDate,
 } from "@/utils/periodic";
+import { isPoolOperationsAllowed } from "@/utils/poolUtils";
 
 interface TimeSlot {
   time: string;
@@ -372,6 +373,18 @@ export async function feedBatch(
 
     const item_id = parseInt(formData.get("item_id") as string);
     const location_id = parseInt(formData.get("location_id") as string);
+    const date_time = formData.get("date_time") as string;
+
+    // Check if pool operations are allowed (no posted operations after this date)
+    const operationsCheck = await isPoolOperationsAllowed(
+      location_id,
+      date_time
+    );
+    if (!operationsCheck.allowed) {
+      return {
+        message: `Операція заблокована: ${operationsCheck.reason}`,
+      };
+    }
 
     // Calculate total quantity from time slots
     let totalQtyNeeded = 0;

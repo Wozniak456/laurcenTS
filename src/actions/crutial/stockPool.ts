@@ -1,8 +1,8 @@
 "use server";
 import { db } from "@/db";
 import { revalidatePath } from "next/cache";
-import { getFeedAmountsAndNames } from "./getFeedAmountsAndNames";
 import { createCalcTable } from "./createCalcTable";
+import { isPoolOperationsAllowed } from "@/utils/poolUtils";
 
 function addCurrentTimeToDate(date: Date) {
   if (!(date instanceof Date)) {
@@ -61,6 +61,20 @@ export async function stockPool(
 
     const executed_by = 3; //number = parseInt(formData.get('executed_by') as string);
     const comments: string = formData.get("comments") as string;
+
+    // Check if pool operations are allowed (no posted operations after this date)
+    // Only check for destination location if it's different from source
+    if (location_id_to !== location_id_from) {
+      const operationsCheck = await isPoolOperationsAllowed(
+        location_id_to,
+        today
+      );
+      if (!operationsCheck.allowed) {
+        return {
+          message: `Операція заблокована: ${operationsCheck.reason}`,
+        };
+      }
+    }
 
     // const p_tran: number = parseInt(formData.get('p_tran') as string);
 
@@ -379,7 +393,7 @@ export async function stockPool(
           //"fish_qty_in_location_from",
           //fish_qty_in_location_from
           //);
-          if (!Number.isNaN(fish_qty_in_location_from)) {
+          if (!Number.isNaN(fish_qty_in_location_from))
             if (fish_qty_in_location_from > 0) {
               const part = stocking_quantity / fish_qty_in_location_from;
               //console.log("Calculated part:", part);
@@ -416,103 +430,15 @@ export async function stockPool(
                         },
                       },
                     });
-                  //console.log("Created fetch record:", fetch_record);
-
-                  // І вкидання у нову локацію
-                  const push_record =
-                    await activeDb.generation_feed_amount.create({
-                      data: {
-                        amount: record.total_amount * part,
-                        batch_generation: {
-                          connect: {
-                            id: generationOfTwoBatches.id,
-                          },
-                        },
-                        feed_batches: {
-                          connect: {
-                            id: record.feed_batch_id,
-                          },
-                        },
-                        documents: {
-                          connect: {
-                            id: stockDoc.id,
-                          },
-                        },
-                      },
-                    });
-                  //console.log("Created push record:", push_record);
 
                   //console.log(
-                  // `витягнули частку з'їдженого: ${fetch_record.feed_batch_id}: ${fetch_record.amount}. І накинули на ${push_record.batch_generation_id}`
+                  //`витягнули частку зЇдженого: ${fetch_record.feed_batch_id}: ${fetch_record.amount}. і накинули на ${generationOfTwoBatches.id}`
                   //);
                 } catch (error) {
-                  //console.error("Error creating feed amount records:", error);
-                  throw error;
+                  //console.log("Error creating fetch record:", error);
                 }
               }
             }
-          }
-
-          if (second_parent_generation) {
-            //console.log("huh2?");
-            // знаходимо скільки зїв другий предок, якщо він є
-            const grouped_second_ancestor = await getFeedAmountsAndNames(
-              second_parent_generation?.id
-            );
-            //console.log("grouped_second_ancestor", grouped_second_ancestor);
-
-            //додаємо записи витягування частини зїдженого з попереднього покоління
-            for (const record of grouped_second_ancestor) {
-              const fetch_record = await activeDb.generation_feed_amount.create(
-                {
-                  data: {
-                    amount: -record.total_amount,
-                    batch_generation: {
-                      connect: {
-                        id: record.batch_generation_id,
-                      },
-                    },
-                    feed_batches: {
-                      connect: {
-                        id: record.feed_batch_id,
-                      },
-                    },
-                    documents: {
-                      connect: {
-                        id: stockDoc.id,
-                      },
-                    },
-                  },
-                }
-              );
-              // і вкидання у нове покоління
-              const push_record = await activeDb.generation_feed_amount.create({
-                data: {
-                  amount: record.total_amount,
-                  batch_generation: {
-                    connect: {
-                      id: generationOfTwoBatches.id,
-                    },
-                  },
-                  feed_batches: {
-                    connect: {
-                      id: record.feed_batch_id,
-                    },
-                  },
-                  documents: {
-                    connect: {
-                      id: stockDoc.id,
-                    },
-                  },
-                },
-              });
-
-              //console.log(
-              //`витягнули частку зЇдженого: ${fetch_record.feed_batch_id}: ${fetch_record.amount}. і накинули на ${push_record.batch_generation_id}`
-              //);
-            }
-          }
-          //console.log("huh3?");
         }
       }
     }
@@ -544,4 +470,31 @@ export async function stockPool(
 
   revalidatePath(`/pool-managing/day/${today}`);
   revalidatePath("/summary-feeding-table/week");
+}
+
+async function getFeedAmountsAndNames(
+  batch_generation_id: bigint,
+  prisma: any
+): Promise<
+  Array<{
+    batch_generation_id: bigint;
+    feed_batch_id: bigint;
+    total_amount: number;
+  }>
+> {
+  const result = await prisma.generation_feed_amount.groupBy({
+    by: ["batch_generation_id", "feed_batch_id"],
+    where: {
+      batch_generation_id: batch_generation_id,
+    },
+    _sum: {
+      amount: true,
+    },
+  });
+
+  return result.map((item: any) => ({
+    batch_generation_id: item.batch_generation_id,
+    feed_batch_id: item.feed_batch_id,
+    total_amount: item._sum.amount || 0,
+  }));
 }

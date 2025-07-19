@@ -24,6 +24,7 @@ import {
   cancelStocking,
 } from "@/actions/crutial/cancelStocking";
 import { useTransition } from "react";
+import { usePoolValidation } from "@/utils/poolValidation";
 
 type PoolInfoProps = {
   areaId: number;
@@ -54,6 +55,7 @@ export default function PoolInfoComponent({
   today,
 }: PoolInfoProps) {
   const [editionAllowed, setEditionAllowed] = useState<boolean>(false);
+  const { validateAndShowPopup } = usePoolValidation();
 
   const initialBatchId = Number(poolInfo.batch?.id);
   const initialCount = Number(poolInfo.qty);
@@ -101,6 +103,18 @@ export default function PoolInfoComponent({
     setCancelState({ loading: true, message: null });
 
     try {
+      // First check if pool operations are allowed
+      const isAllowed = await validateAndShowPopup(
+        location.id,
+        today,
+        "cancel"
+      );
+      if (!isAllowed) {
+        setCancelState({ loading: false, message: null });
+        return;
+      }
+
+      // Then check the existing cancellation logic
       const checkResult = await canCancelStocking(location.id, today);
 
       if (checkResult.canCancel) {
@@ -143,191 +157,161 @@ export default function PoolInfoComponent({
   const hasFish = poolInfo.qty && poolInfo.qty > 0;
 
   return (
-    <>
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="w-full sm:w-1/3">
-          <Select
-            label="Партія"
-            name="batch_id"
-            className={`w-full focus:outline-none focus:ring focus:border-blue-300 ${
-              !editionAllowed
-                ? "text-gray-800 opacity-90 cursor-not-allowed"
-                : "border-gray-900"
-            }`}
-            isRequired
-            value={batchId}
-            onChange={handleBatchIdChange}
-            defaultSelectedKeys={[
-              batches
-                .filter((batch) => batch.name === poolInfo.batch?.name)
-                .map((batch) => String(batch.id))[0],
-            ]}
-            isDisabled={!editionAllowed}
-          >
-            {batches.map((batch) => (
-              <SelectItem key={Number(batch.id)} value={String(batch.id)}>
-                {batch.name}
-              </SelectItem>
-            ))}
-          </Select>
-        </div>
-        <div className="w-full sm:w-1/4">
-          <Input
-            label="Кількість:"
-            name="quantity"
-            value={count.toString()}
-            type="number"
-            onChange={handleCountChange}
-            disabled={!editionAllowed}
-            isRequired
-            className={`w-full focus:outline-none focus:ring focus:border-blue-300 ${
-              !editionAllowed
-                ? "text-gray-800 opacity-90 cursor-not-allowed"
-                : "border-gray-900"
-            }`}
-          />
-        </div>
-        <div className="w-full sm:w-1/4">
-          <Input
-            label="Сер. вага, г"
-            name="fishWeight"
-            type="number"
-            min={0.0001}
-            step="any"
-            value={avMass.toFixed(areaId < 3 ? 3 : 1)}
-            onChange={handleAvMassChange}
-            disabled={!editionAllowed}
-            className={`w-full focus:outline-none focus:ring focus:border-blue-300 ${
-              !editionAllowed
-                ? "text-gray-800 opacity-90 cursor-not-allowed"
-                : "border-gray-900"
-            }`}
-            isRequired
-          />
-        </div>
+    <div className="container mx-auto m-4">
+      <form action={updatePoolInfoAction}>
+        <input type="hidden" name="today" value={today} />
+        <input type="hidden" name="location_id_to" value={location.id} />
+        <input type="hidden" name="batch_id" value={batchId} />
+        <input type="hidden" name="fish_amount" value={count} />
+        <input type="hidden" name="average_fish_mass" value={avMass} />
+        <input type="hidden" name="batch_id_before" value={initialBatchId} />
+        <input type="hidden" name="fish_amount_before" value={initialCount} />
+        <input
+          type="hidden"
+          name="average_fish_mass_before"
+          value={initialAvMass}
+        />
 
-        {hasFish && (
-          <div className="w-full mt-2">
-            <button
-              className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
-              type="button"
-              disabled={cancelState.loading || pending}
-              onClick={() => startTransition(handleCancelStockingClick)}
+        <div className="flex flex-wrap items-center gap-4 justify-between">
+          <div className="w-full sm:w-1/3">
+            <Select
+              label="Партія *"
+              name="batch_id"
+              isRequired
+              selectedKeys={[String(batchId)]}
+              onChange={handleBatchIdChange}
+              disabled={!editionAllowed}
+              className={`w-full focus:outline-none focus:ring focus:border-blue-300 ${
+                !editionAllowed
+                  ? "text-gray-800 opacity-90 cursor-not-allowed"
+                  : "border-gray-900"
+              }`}
             >
-              {cancelState.loading || pending
-                ? "Перевірка..."
-                : "Відмінити зариблення"}
-            </button>
-            {cancelState.message && (
-              <div className="mt-2 text-sm text-red-700">
-                {cancelState.message}
-              </div>
-            )}
+              {batches.map((batch) => (
+                <SelectItem key={Number(batch.id)} value={Number(batch.id)}>
+                  {batch.name}
+                </SelectItem>
+              ))}
+            </Select>
           </div>
-        )}
-
-        {poolInfo.allowedToEdit && (
-          <div className="w-full mt-4">
-            <button
-              className="hover:bg-blue-100 font-bold rounded transition duration-100 ease-in-out transform active:scale-75 active:shadow-none hover:shadow-lg"
-              type="button"
-              onClick={() => {
-                setEditionAllowed(!editionAllowed);
-              }}
-            >
-              <Image src={EditButton} alt="Edit" height={30} width={30} />
-            </button>
+          <div className="w-full sm:w-1/4">
+            <Input
+              label="Кількість: *"
+              name="fish_amount"
+              type="number"
+              min={1}
+              value={count.toString()}
+              onChange={handleCountChange}
+              disabled={!editionAllowed}
+              className={`w-full focus:outline-none focus:ring focus:border-blue-300 ${
+                !editionAllowed
+                  ? "text-gray-800 opacity-90 cursor-not-allowed"
+                  : "border-gray-900"
+              }`}
+              isRequired
+            />
           </div>
-        )}
+          <div className="w-full sm:w-1/4">
+            <Input
+              label="Сер. вага, г"
+              name="fishWeight"
+              type="number"
+              min={0.0001}
+              step="any"
+              value={avMass.toFixed(areaId < 3 ? 3 : 1)}
+              onChange={handleAvMassChange}
+              disabled={!editionAllowed}
+              className={`w-full focus:outline-none focus:ring focus:border-blue-300 ${
+                !editionAllowed
+                  ? "text-gray-800 opacity-90 cursor-not-allowed"
+                  : "border-gray-900"
+              }`}
+              isRequired
+            />
+          </div>
 
-        {editionAllowed && (
-          <div className="w-full mt-4">
-            <form
-              className="flex content-center gap-4"
-              action={updatePoolInfoAction}
-              onSubmit={() => {
-                setEditionAllowed(false);
-              }}
-            >
-              <input type="hidden" name="location_id_to" value={location.id} />
-
-              {batchId != initialBatchId && (
-                <input
-                  type="hidden"
-                  name="batch_id_before"
-                  value={initialBatchId}
-                />
+          {hasFish && (
+            <div className="w-full mt-2">
+              <button
+                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
+                type="button"
+                disabled={cancelState.loading || pending}
+                onClick={() => startTransition(handleCancelStockingClick)}
+              >
+                {cancelState.loading || pending
+                  ? "Перевірка..."
+                  : "Відмінити зариблення"}
+              </button>
+              {cancelState.message && (
+                <div className="mt-2 text-sm text-red-700">
+                  {cancelState.message}
+                </div>
               )}
-              {count != initialCount && (
-                <input
-                  type="hidden"
-                  name="fish_amount_before"
-                  value={initialCount}
-                />
-              )}
-              {avMass != initialAvMass && (
-                <input
-                  type="hidden"
-                  name="average_fish_mass_before"
-                  value={initialAvMass}
-                />
-              )}
+            </div>
+          )}
 
-              <input type="hidden" name="fish_amount" value={count} />
-              <input type="hidden" name="batch_id" value={batchId} />
-              <input type="hidden" name="average_fish_mass" value={avMass} />
-              <input type="hidden" name="today" value={today} />
-
+          {poolInfo.allowedToEdit && (
+            <div className="w-full mt-4">
               <button
                 className="hover:bg-blue-100 font-bold rounded transition duration-100 ease-in-out transform active:scale-75 active:shadow-none hover:shadow-lg"
+                type="button"
+                onClick={() => {
+                  setEditionAllowed(!editionAllowed);
+                }}
+              >
+                <Image src={EditButton} alt="Edit" height={30} width={30} />
+              </button>
+            </div>
+          )}
+
+          {editionAllowed && (
+            <div className="w-full mt-4">
+              <button
+                className="hover:bg-green-100 font-bold rounded transition duration-100 ease-in-out transform active:scale-75 active:shadow-none hover:shadow-lg"
                 type="submit"
               >
                 <Image src={SaveButton} alt="Save" height={30} width={30} />
               </button>
-            </form>
-          </div>
-        )}
+            </div>
+          )}
+        </div>
 
         {formState && formState.message && (
-          <div
-            className={`w-full my-2 p-2 border rounded ${
-              formState.message.includes("успішно")
-                ? "bg-green-200 border-green-400"
-                : "bg-red-200 border-red-400"
-            }`}
-          >
+          <div className="my-2 p-2 bg-red-200 border rounded border-red-400">
             {formState.message}
           </div>
         )}
-      </div>
+      </form>
 
       {/* Confirmation Modal */}
       <Modal
         isOpen={showConfirmationModal}
         onClose={() => setShowConfirmationModal(false)}
+        placement="top-center"
       >
         <ModalContent>
           <ModalHeader>Підтвердження</ModalHeader>
           <ModalBody>
-            <p>
-              Ви впевнені, що хочете відмінити зариблення для локації{" "}
-              {location.name}?
-            </p>
-            <p className="text-sm text-gray-600 mt-2">
-              Це призведе до видалення всіх транзакцій зариблення та
-              пов&apos;язаних документів.
-            </p>
+            <div className="w-full flex flex-col items-center">
+              <span className="mt-2 text-red-600 font-semibold">
+                Ви дійсно хочете відмінити зариблення?
+              </span>
+            </div>
           </ModalBody>
           <ModalFooter>
             <Button
+              color="danger"
+              variant="solid"
+              onClick={handleConfirmCancel}
+            >
+              Так
+            </Button>
+            <Button
               color="default"
               variant="light"
-              onPress={() => setShowConfirmationModal(false)}
+              onClick={() => setShowConfirmationModal(false)}
             >
-              Скасувати
-            </Button>
-            <Button color="danger" onPress={handleConfirmCancel}>
-              Відмінити зариблення
+              Ні
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -337,19 +321,28 @@ export default function PoolInfoComponent({
       <Modal
         isOpen={showWarningModal}
         onClose={() => setShowWarningModal(false)}
+        placement="top-center"
       >
         <ModalContent>
-          <ModalHeader>Неможливо відмінити зариблення</ModalHeader>
+          <ModalHeader>Попередження</ModalHeader>
           <ModalBody>
-            <p className="text-red-600">{warningMessage}</p>
+            <div className="w-full flex flex-col items-center">
+              <span className="mt-2 text-red-600 font-semibold">
+                {warningMessage}
+              </span>
+            </div>
           </ModalBody>
           <ModalFooter>
-            <Button color="primary" onPress={() => setShowWarningModal(false)}>
-              Зрозуміло
+            <Button
+              color="default"
+              variant="light"
+              onClick={() => setShowWarningModal(false)}
+            >
+              Закрити
             </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
-    </>
+    </div>
   );
 }

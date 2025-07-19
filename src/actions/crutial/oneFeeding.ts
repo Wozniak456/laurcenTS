@@ -3,6 +3,7 @@ import { db } from "@/db";
 import { getFeedBatchByItemId } from "./getFeedBatchByItemId";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { isPoolOperationsAllowed } from "@/utils/poolUtils";
 
 export async function onefeeding(
   formState: { message: string },
@@ -17,6 +18,17 @@ export async function onefeeding(
     const location_id: number = parseInt(formData.get("location_id") as string);
     const today_item_id: number = parseInt(formData.get("item_0") as string); // попереднє, існує завжди
     const qty: number = parseFloat(formData.get("qty") as string);
+
+    // Check if pool operations are allowed (no posted operations after this date)
+    const operationsCheck = await isPoolOperationsAllowed(
+      location_id,
+      date_time
+    );
+    if (!operationsCheck.allowed) {
+      return {
+        message: `Операція заблокована: ${operationsCheck.reason}`,
+      };
+    }
 
     const date = new Date(date_time);
 

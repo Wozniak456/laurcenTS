@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { stockPool } from "./stockPool";
 import { updatePrevPool } from "./updatePrevPool";
+import { checkMultipleLocationsForPostedOperations } from "@/utils/poolUtils";
 
 type updatePrevPoolProps = {
   formData: FormData;
@@ -49,7 +50,8 @@ export async function batchDivision(
     );
     // const average_fish_mass : number = parseFloat(formData.get('average_fish_mass') as string);
 
-    let sum = 0;
+    // Collect all destination locations for validation
+    const destinationLocations: number[] = [];
     let index1 = 0;
     while (true) {
       const location_id_to: number = parseInt(
@@ -63,9 +65,42 @@ export async function batchDivision(
         break;
       }
 
+      destinationLocations.push(location_id_to);
+      index1++;
+    }
+
+    // Check if all destination locations allow operations
+    const validationResult = await checkMultipleLocationsForPostedOperations(
+      destinationLocations,
+      today
+    );
+
+    if (!validationResult.allAllowed) {
+      const blockedLocations = validationResult.blockedLocations
+        .map((loc) => `${loc.locationName}: ${loc.reason}`)
+        .join("; ");
+      return {
+        message: `Операція заблокована: ${blockedLocations}`,
+      };
+    }
+
+    let sum = 0;
+    let index2 = 0;
+    while (true) {
+      const location_id_to: number = parseInt(
+        formData.get(`location_id_to_${index2}`) as string
+      );
+      const stocking_fish_amount: number = parseInt(
+        formData.get(`stocking_fish_amount_${index2}`) as string
+      );
+
+      if (!location_id_to) {
+        break;
+      }
+
       sum += stocking_fish_amount;
 
-      index1++;
+      index2++;
     }
 
     //console.log(

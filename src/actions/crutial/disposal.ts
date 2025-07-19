@@ -3,6 +3,7 @@ import { db } from "@/db";
 import { revalidatePath } from "next/cache";
 import { stockPool } from "./stockPool";
 import { redirect } from "next/navigation";
+import { isPoolOperationsAllowed } from "@/utils/poolUtils";
 
 function addCurrentTimeToDate(date: Date) {
   if (!(date instanceof Date)) {
@@ -39,6 +40,17 @@ export async function disposal(
     const reason_id: number = parseInt(formData.get("reason") as string);
     const qty: number = parseInt(formData.get("qty") as string);
     const average_weight_str = formData.get("average_fish_mass") as string;
+
+    // Check if pool operations are allowed (no posted operations after this date)
+    const operationsCheck = await isPoolOperationsAllowed(
+      location_id_from,
+      today
+    );
+    if (!operationsCheck.allowed) {
+      return {
+        message: `Операція заблокована: ${operationsCheck.reason}`,
+      };
+    }
 
     //створення документа списання
     const disposalDoc = await db.documents.create({

@@ -22,6 +22,7 @@ import {
 } from "@nextui-org/react";
 import FormButton from "./common/form-button";
 import FetchingForm from "./fetching";
+import { usePoolValidation } from "@/utils/poolValidation";
 
 import Link from "next/link";
 
@@ -65,6 +66,7 @@ export default function StockPoolPage({
 }: StockPoolProps) {
   const [showPartitionForm, setShowPartitionForm] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { validateAndShowPopup } = usePoolValidation();
 
   const [formState, action] = useFormState(actions.stockPool, { message: "" });
 
@@ -72,6 +74,54 @@ export default function StockPoolPage({
   useEffect(() => {
     setShowPartitionForm(false);
   }, [poolInfo?.qty, poolInfo?.batch?.id, today]);
+
+  // Handle Stock from Warehouse button click with validation
+  const handleStockFromWarehouseClick = async () => {
+    const isAllowed = await validateAndShowPopup(
+      location.id,
+      today,
+      "stocking"
+    );
+    if (isAllowed) {
+      // The form will submit normally since validation passed
+      return true;
+    }
+    return false;
+  };
+
+  // Handle Split button click with validation
+  const handleSplitClick = async () => {
+    if (poolInfo?.qty && poolInfo.qty > 0) {
+      const isAllowed = await validateAndShowPopup(location.id, today, "split");
+      if (isAllowed) {
+        setShowPartitionForm(!showPartitionForm);
+      }
+    }
+  };
+
+  // Handle Disposal button click with validation
+  const handleDisposalClick = async () => {
+    if (poolInfo?.qty && poolInfo.qty > 0) {
+      const isAllowed = await validateAndShowPopup(
+        location.id,
+        today,
+        "disposal"
+      );
+      if (isAllowed) {
+        onOpen();
+      }
+    }
+  };
+
+  // Handle Update Pool State link click with validation
+  const handleUpdatePoolStateClick = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    const isAllowed = await validateAndShowPopup(location.id, today, "update");
+    if (isAllowed) {
+      // Navigate to the update page
+      window.location.href = `/pool-managing/day/${today}/${location.id}`;
+    }
+  };
 
   return (
     <div>
@@ -91,131 +141,74 @@ export default function StockPoolPage({
         ""
       )}
 
-      <form className="container mx-auto m-4 " action={action}>
-        <div className="flex justify-center flex-col gap-4 ">
-          <input type="hidden" name="location_id_from" value={87} />
-          <input type="hidden" name="location_id_to" value={location.id} />
-          <input type="hidden" name="today" value={today} />
+      <form action={action} onSubmit={handleStockFromWarehouseClick}>
+        <input type="hidden" name="today" value={today} />
+        <input type="hidden" name="location_id_from" value={87} />
+        <input type="hidden" name="location_id_to" value={location.id} />
+
+        <div className="flex flex-wrap gap-4 justify-end">
           {(!poolInfo?.batch || poolInfo.qty == 0) && (
-            <div className="flex flex-wrap items-center gap-4 justify-between">
-              <div className="w-full sm:w-1/3">
-                <Select
-                  label="Партія"
-                  name="batch_id"
-                  isRequired
-                  selectedKeys={
-                    poolInfo?.batch && poolInfo.qty && poolInfo.qty > 0
-                      ? [String(poolInfo.batch.id)]
-                      : undefined
-                  }
-                  isDisabled={
-                    !!(poolInfo?.batch && poolInfo.qty && poolInfo.qty > 0)
-                  }
-                >
-                  {(poolInfo?.batch && poolInfo.qty && poolInfo.qty > 0
-                    ? batches
-                    : batches.filter(
-                        (b) => b.remainingQuantity && b.remainingQuantity > 0
-                      )
-                  ).map((batch) => (
-                    <SelectItem key={Number(batch.id)} value={Number(batch.id)}>
-                      {poolInfo?.batch && poolInfo.qty && poolInfo.qty > 0
-                        ? batch.name
-                        : `${batch.name} (Залишок: ${batch.remainingQuantity})`}
-                    </SelectItem>
-                  ))}
-                </Select>
-              </div>
-              <div className="w-full sm:w-1/4">
-                <Input
-                  label="Кількість:"
-                  name="fish_amount"
-                  type="number"
-                  min={1}
-                  // isInvalid={!!formState.errors?.quantity}
-                  // errorMessage={formState.errors?.quantity}
-                  isRequired
-                />
-              </div>
-              <div className="w-full sm:w-1/4">
-                <Input
-                  label="Сер. вага, г"
-                  name="average_fish_mass"
-                  type="number"
-                  min={0.0001}
-                  step="any"
-                  // isInvalid={!!formState.errors?.quantity}
-                  // errorMessage={formState.errors?.quantity}
-                  isRequired
-                />
-              </div>
-            </div>
+            <FormButton color="primary">Зарибити зі складу</FormButton>
           )}
-          <div className="flex flex-wrap gap-4 justify-end">
-            {(!poolInfo?.batch || poolInfo.qty == 0) && (
-              <FormButton color="primary">Зарибити зі складу</FormButton>
-            )}
 
-            {poolInfo?.qty && poolInfo.qty > 0 ? (
-              <>
-                <Button
-                  color="primary"
-                  onClick={() => setShowPartitionForm(!showPartitionForm)}
-                >
-                  Розділити
-                </Button>
+          {poolInfo?.qty && poolInfo.qty > 0 ? (
+            <>
+              <Button color="primary" onClick={handleSplitClick}>
+                Розділити
+              </Button>
 
-                <Button onPress={onOpen} color="default">
-                  Списати
-                </Button>
-                <Modal
-                  isOpen={isOpen}
-                  // onOpenChange={onOpenChange}
-                  onClose={onClose}
-                  placement="top-center"
-                >
-                  <ModalContent>
-                    {(onClose) => (
-                      <>
-                        <ModalHeader className="flex flex-col gap-1">
-                          Списання
-                        </ModalHeader>
-                        <ModalBody>
-                          <DisposalForm
-                            location={location}
-                            poolInfo={poolInfo}
-                            reasons={disposal_reasons}
-                            today={today}
-                          />
-                        </ModalBody>
-                        <ModalFooter></ModalFooter>
-                      </>
-                    )}
-                  </ModalContent>
-                </Modal>
-              </>
-            ) : (
-              ""
-            )}
+              <Button onPress={handleDisposalClick} color="default">
+                Списати
+              </Button>
+              <Modal
+                isOpen={isOpen}
+                // onOpenChange={onOpenChange}
+                onClose={onClose}
+                placement="top-center"
+              >
+                <ModalContent>
+                  {(onClose) => (
+                    <>
+                      <ModalHeader className="flex flex-col gap-1">
+                        Списання
+                      </ModalHeader>
+                      <ModalBody>
+                        <DisposalForm
+                          location={location}
+                          poolInfo={poolInfo}
+                          reasons={disposal_reasons}
+                          today={today}
+                        />
+                      </ModalBody>
+                      <ModalFooter></ModalFooter>
+                    </>
+                  )}
+                </ModalContent>
+              </Modal>
+            </>
+          ) : (
+            ""
+          )}
+        </div>
+
+        {formState && formState.message && (
+          <div className="my-2 p-2 bg-red-200 border rounded border-red-400">
+            {formState.message}
           </div>
-
-          {formState && formState.message && (
-            <div className="my-2 p-2 bg-red-200 border rounded border-red-400">
-              {formState.message}
-            </div>
-          )}
-        </div>
+        )}
       </form>
-      {/* {!poolInfo?.batch &&
+
+      {poolInfo?.qty && poolInfo.qty > 0 && (
         <div className="flex justify-end mb-4">
-            <Link href={`/pool-managing/${location.id}`}>Актуалізація стану басейна</Link>            
+          <a
+            href={`/pool-managing/day/${today}/${location.id}`}
+            onClick={handleUpdatePoolStateClick}
+            className="text-blue-600 hover:text-blue-800 underline cursor-pointer"
+          >
+            Актуалізація стану басейна
+          </a>
         </div>
-        } */}
-      <div className="flex justify-end mb-4">
-        <Link href={`/pool-managing/day/${today}/${location.id}`}>
-          Актуалізація стану басейна
-        </Link>
-      </div>
+      )}
 
       {poolInfo?.qty && poolInfo.qty > 0 && (
         <div className="flex justify-end mb-4">

@@ -4,6 +4,7 @@ import { db } from "@/db";
 import { revalidatePath } from "next/cache";
 import { stockPool } from "../crutial/stockPool";
 import { getFeedBatchByItemId } from "../crutial/getFeedBatchByItemId";
+import { isPoolOperationsAllowed } from "@/utils/poolUtils";
 
 export async function initialStocking(
   formState: { message: string } | undefined,
@@ -28,6 +29,17 @@ export async function initialStocking(
     );
 
     const executed_by = 3;
+
+    // Check if pool operations are allowed (no posted operations after this date)
+    const operationsCheck = await isPoolOperationsAllowed(
+      location_id_to,
+      today
+    );
+    if (!operationsCheck.allowed) {
+      return {
+        message: `Операція заблокована: ${operationsCheck.reason}`,
+      };
+    }
 
     if (!batch_id) {
       await stockPool(formState, formData);
@@ -84,6 +96,15 @@ type feedingProps = {
 
 async function oneFeeding(props: feedingProps) {
   const date = new Date(props.today);
+
+  // Check if pool operations are allowed for feeding
+  const operationsCheck = await isPoolOperationsAllowed(
+    props.location_id,
+    props.today
+  );
+  if (!operationsCheck.allowed) {
+    throw new Error(`Feeding blocked: ${operationsCheck.reason}`);
+  }
 
   const feedDoc = await db.documents.create({
     data: {

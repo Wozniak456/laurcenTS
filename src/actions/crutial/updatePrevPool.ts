@@ -1,6 +1,7 @@
 "use server";
 import { db } from "@/db";
 import { createCalcTable } from "./createCalcTable";
+import { isPoolOperationsAllowed } from "@/utils/poolUtils";
 
 type updatePrevPoolProps = {
   formData: FormData;
@@ -44,6 +45,12 @@ export async function updatePrevPool({
     formData.get("old_average_fish_mass") as string
   );
   const today: string = formData.get("today") as string;
+
+  // Check if pool operations are allowed (no posted operations after this date)
+  const operationsCheck = await isPoolOperationsAllowed(location_id, today);
+  if (!operationsCheck.allowed) {
+    throw new Error(`Операція заблокована: ${operationsCheck.reason}`);
+  }
 
   //створити документ зариблення залишком
   const stockDoc = await activeDb.documents.create({

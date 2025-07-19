@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { Prisma } from "@prisma/client";
 import { parseDecimal } from "@/utils/numberParsing";
+import { isPoolOperationsAllowed } from "@/utils/poolUtils";
 
 interface BatchQuantities {
   total_produced: number;
@@ -83,6 +84,17 @@ export async function feedBatch(
     const date_time = formData.get("date_time") as string;
     const location_id: number = parseInt(formData.get("location_id") as string);
     const item_id: number = parseInt(formData.get("item_id") as string);
+
+    // Check if pool operations are allowed (no posted operations after this date)
+    const operationsCheck = await isPoolOperationsAllowed(
+      location_id,
+      date_time
+    );
+    if (!operationsCheck.allowed) {
+      return {
+        message: `Операція заблокована: ${operationsCheck.reason}`,
+      };
+    }
 
     process.stdout.write(
       `Input parameters: ${JSON.stringify(

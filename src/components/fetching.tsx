@@ -19,6 +19,7 @@ import { useState, useEffect } from "react";
 import { FetchingReasons } from "@/types/fetching-reasons";
 import { poolManagingType } from "@/types/app_types";
 import { toast } from "sonner";
+import { usePoolValidation } from "@/utils/poolValidation";
 
 interface FetchingFormProps {
   location: {
@@ -45,6 +46,8 @@ export default function FetchingForm({
   today,
 }: FetchingFormProps) {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { validateAndShowPopup } = usePoolValidation();
+
   const [formState, action] = useFormState(actions.fishFetching, {
     message: "",
   });
@@ -180,6 +183,14 @@ export default function FetchingForm({
     }
   };
 
+  // Handle Catch button click with validation
+  const handleCatchClick = async () => {
+    const isAllowed = await validateAndShowPopup(location.id, today, "update");
+    if (isAllowed) {
+      onOpen();
+    }
+  };
+
   // Add the animation style to the component
   useEffect(() => {
     const style = document.createElement("style");
@@ -197,7 +208,7 @@ export default function FetchingForm({
 
   return (
     <div>
-      <Button onPress={onOpen} color="default">
+      <Button onPress={handleCatchClick} color="default">
         Вилов
       </Button>
       <Modal

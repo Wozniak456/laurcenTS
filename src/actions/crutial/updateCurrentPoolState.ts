@@ -2,6 +2,7 @@
 import { db } from "@/db";
 import { revalidatePath } from "next/cache";
 import { stockPool } from "./stockPool";
+import { isPoolOperationsAllowed } from "@/utils/poolUtils";
 
 function addCurrentTimeToDate(date: Date) {
   if (!(date instanceof Date)) {
@@ -47,6 +48,17 @@ export async function updateCurrentPoolState(
       throw new Error("");
     }
 
+    // Check if pool operations are allowed (no posted operations after this date)
+    const operationsCheck = await isPoolOperationsAllowed(
+      location_id_to,
+      today
+    );
+    if (!operationsCheck.allowed) {
+      return {
+        message: `Операція заблокована: ${operationsCheck.reason}`,
+      };
+    }
+
     //перевірка чи вистачає потрібного корму на складі
     const fish_amount_on_warehouse = await db.itemtransactions.groupBy({
       by: ["batch_id"],
@@ -69,7 +81,7 @@ export async function updateCurrentPoolState(
       //console.log(
       //"fish_amount_before: ",
       //fish_amount_before,
-      //"fishQuantityOnWarehouse: ",
+      //fishQuantityOnWarehouse: ",
       //fishQuantityOnWarehouse
       //);
       newFishQuantityOnWarehouse = fish_amount_before + fishQuantityOnWarehouse; //300
