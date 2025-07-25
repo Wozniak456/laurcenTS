@@ -23,10 +23,12 @@ export async function initialStocking(
     );
 
     const batch_id = formData.get("batch_id") as string;
-    const fish_amount: number = parseInt(formData.get("fish_amount") as string);
-    const average_fish_mass: number = parseInt(
-      formData.get("average_fish_mass") as string
-    );
+    const fish_amount_str = formData.get("fish_amount") as string;
+    const fish_amount: number = fish_amount_str ? parseInt(fish_amount_str) : 0;
+    const average_fish_mass_str = formData.get("average_fish_mass") as string;
+    const average_fish_mass: number = average_fish_mass_str
+      ? parseInt(average_fish_mass_str)
+      : 0;
 
     const executed_by = 3;
 
@@ -52,7 +54,8 @@ export async function initialStocking(
     });
 
     feeds.forEach(async (item) => {
-      const feedAmount = parseFloat(formData.get(`feed_${item.id}`) as string);
+      const feedAmountStr = formData.get(`feed_${item.id}`) as string;
+      const feedAmount = feedAmountStr ? parseFloat(feedAmountStr) : 0;
 
       const props = {
         location_id: location_id_to,

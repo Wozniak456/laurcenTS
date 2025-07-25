@@ -39,9 +39,11 @@ export async function createCalcTable(
 
     const pool = await poolInfo(location_id_to, today);
     const fish_amount: number = pool?.qty || 0;
-    const average_fish_mass: number = parseFloat(
-      formData.get("average_fish_mass") as string
-    );
+    const average_fish_mass_str = formData.get("average_fish_mass") as string;
+    const average_fish_mass: number =
+      average_fish_mass_str && !isNaN(parseFloat(average_fish_mass_str))
+        ? parseFloat(average_fish_mass_str)
+        : 0;
     const percentage = 0; //number = parseFloat(formData.get('percentage') as string);
 
     //console.log("до звернення до бд");

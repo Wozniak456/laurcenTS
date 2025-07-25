@@ -131,7 +131,12 @@ export const poolInfo = async (
           id: "desc",
         },
       },
-      stocking: true,
+      stocking: {
+        select: {
+          average_weight: true,
+          form_average_weight: true,
+        },
+      },
     },
     where: {
       location_id: location_id,
@@ -155,11 +160,15 @@ export const poolInfo = async (
   });
 
   let feedType;
-  if (lastStocking) {
+  if (
+    lastStocking &&
+    lastStocking.stocking &&
+    lastStocking.stocking.length > 0
+  ) {
     feedType = await getFeedType(lastStocking.stocking[0]?.average_weight);
   }
   const batch = lastStocking?.itemtransactions[0]?.itembatches;
-  const fishWeight = lastStocking?.stocking[0]?.average_weight;
+  const fishWeight = lastStocking?.stocking?.[0]?.average_weight;
   const updateDate = lastStocking?.date_time.toISOString().split("T")[0];
 
   let allowedToEdit = false;

@@ -39,19 +39,30 @@ export async function stockPool(
     const location_id_to: number = parseInt(
       formData.get("location_id_to") as string
     );
-    const batch_id_from: number = parseInt(formData.get("batch_id") as string);
-    let batch_id_to: number = parseInt(formData.get("batch_id_to") as string);
-    const stocking_quantity: number = parseInt(
-      formData.get("fish_amount") as string
-    );
-    let quantity_in_location_to: number = parseInt(
-      formData.get("fish_amount_in_location_to") as string
-    );
-    const fish_qty_in_location_from: number = parseInt(
-      formData.get("fish_qty_in_location_from") as string
-    );
+    const batch_id_str = formData.get("batch_id") as string;
+    const batch_id_from: number = batch_id_str ? parseInt(batch_id_str) : 0;
+    const batch_id_to_str = formData.get("batch_id_to") as string;
+    let batch_id_to: number = batch_id_to_str ? parseInt(batch_id_to_str) : 0;
+    const stocking_quantity_str = formData.get("fish_amount") as string;
+    const stocking_quantity: number = stocking_quantity_str
+      ? parseInt(stocking_quantity_str)
+      : 0;
+    const quantity_in_location_to_str = formData.get(
+      "fish_amount_in_location_to"
+    ) as string;
+    let quantity_in_location_to: number = quantity_in_location_to_str
+      ? parseInt(quantity_in_location_to_str)
+      : 0;
+    const fish_qty_in_location_from_str = formData.get(
+      "fish_qty_in_location_from"
+    ) as string;
+    const fish_qty_in_location_from: number = fish_qty_in_location_from_str
+      ? parseInt(fish_qty_in_location_from_str)
+      : 0;
     const average_weight_str = formData.get("average_fish_mass") as string;
-    const average_weight = parseFloat(average_weight_str.replace(",", "."));
+    const average_weight = average_weight_str
+      ? parseFloat(average_weight_str.replace(",", "."))
+      : 0;
     const form_average_weight_str = formData.get(
       "form_average_weight"
     ) as string;
@@ -80,7 +91,7 @@ export async function stockPool(
 
     // перевірка, щоб зі складу не взяли більше, ніж є
 
-    if (location_id_from == 87) {
+    if (location_id_from == 87 && batch_id_from && stocking_quantity > 0) {
       const fish_amount_on_warehouse = await activeDb.itemtransactions.groupBy({
         by: ["batch_id"],
         where: {
@@ -378,10 +389,10 @@ export async function stockPool(
 
       // Handle feed amounts only if locations are different
       if (location_id_from !== location_id_to) {
-        if (first_parent_generation) {
+        if (first_parent_generation && first_parent_generation.id) {
           // знаходимо скільки зїв перший предок
           const grouped_first_ancestor = await getFeedAmountsAndNames(
-            first_parent_generation?.id,
+            first_parent_generation.id,
             prisma
           );
           //console.log("grouped_first_ancestor", grouped_first_ancestor);
@@ -482,19 +493,30 @@ async function getFeedAmountsAndNames(
     total_amount: number;
   }>
 > {
-  const result = await prisma.generation_feed_amount.groupBy({
-    by: ["batch_generation_id", "feed_batch_id"],
-    where: {
-      batch_generation_id: batch_generation_id,
-    },
-    _sum: {
-      amount: true,
-    },
-  });
+  const activeDb = prisma || db;
 
-  return result.map((item: any) => ({
-    batch_generation_id: item.batch_generation_id,
-    feed_batch_id: item.feed_batch_id,
-    total_amount: item._sum.amount || 0,
-  }));
+  try {
+    const result = await activeDb.generation_feed_amount.groupBy({
+      by: ["batch_generation_id", "feed_batch_id"],
+      where: {
+        batch_generation_id: batch_generation_id,
+      },
+      _sum: {
+        amount: true,
+      },
+    });
+
+    if (!result || !Array.isArray(result)) {
+      return [];
+    }
+
+    return result.map((item: any) => ({
+      batch_generation_id: item.batch_generation_id,
+      feed_batch_id: item.feed_batch_id,
+      total_amount: item._sum?.amount || 0,
+    }));
+  } catch (error) {
+    console.error("Error in getFeedAmountsAndNames:", error);
+    return [];
+  }
 }

@@ -154,7 +154,7 @@ export default function PoolInfoComponent({
   };
 
   // Show cancel button if location has fish (qty > 0)
-  const hasFish = poolInfo.qty && poolInfo.qty > 0;
+  const hasFish = !!(poolInfo.qty && poolInfo.qty > 0);
 
   return (
     <div className="container mx-auto m-4">
@@ -180,9 +180,9 @@ export default function PoolInfoComponent({
               isRequired
               selectedKeys={[String(batchId)]}
               onChange={handleBatchIdChange}
-              disabled={!editionAllowed}
+              isDisabled={!editionAllowed || hasFish}
               className={`w-full focus:outline-none focus:ring focus:border-blue-300 ${
-                !editionAllowed
+                !editionAllowed || hasFish
                   ? "text-gray-800 opacity-90 cursor-not-allowed"
                   : "border-gray-900"
               }`}
@@ -202,9 +202,9 @@ export default function PoolInfoComponent({
               min={1}
               value={count.toString()}
               onChange={handleCountChange}
-              disabled={!editionAllowed}
+              isDisabled={!editionAllowed || hasFish}
               className={`w-full focus:outline-none focus:ring focus:border-blue-300 ${
-                !editionAllowed
+                !editionAllowed || hasFish
                   ? "text-gray-800 opacity-90 cursor-not-allowed"
                   : "border-gray-900"
               }`}
@@ -220,9 +220,9 @@ export default function PoolInfoComponent({
               step="any"
               value={avMass.toFixed(areaId < 3 ? 3 : 1)}
               onChange={handleAvMassChange}
-              disabled={!editionAllowed}
+              isDisabled={!editionAllowed || hasFish}
               className={`w-full focus:outline-none focus:ring focus:border-blue-300 ${
-                !editionAllowed
+                !editionAllowed || hasFish
                   ? "text-gray-800 opacity-90 cursor-not-allowed"
                   : "border-gray-900"
               }`}
@@ -250,7 +250,7 @@ export default function PoolInfoComponent({
             </div>
           )}
 
-          {poolInfo.allowedToEdit && (
+          {poolInfo.allowedToEdit && !hasFish && (
             <div className="w-full mt-4">
               <button
                 className="hover:bg-blue-100 font-bold rounded transition duration-100 ease-in-out transform active:scale-75 active:shadow-none hover:shadow-lg"
@@ -264,7 +264,7 @@ export default function PoolInfoComponent({
             </div>
           )}
 
-          {editionAllowed && (
+          {editionAllowed && !hasFish && (
             <div className="w-full mt-4">
               <button
                 className="hover:bg-green-100 font-bold rounded transition duration-100 ease-in-out transform active:scale-75 active:shadow-none hover:shadow-lg"
