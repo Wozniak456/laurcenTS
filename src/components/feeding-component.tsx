@@ -513,8 +513,8 @@ export default function StockPoolPage({
                       label="Середня вага (г) *"
                       placeholder="Введіть середню вагу"
                       type="number"
-                      min={0.1}
-                      step="0.1"
+                      min={0.001}
+                      step="0.001"
                       isRequired
                       onChange={(e) => setAverageWeight(Number(e.target.value))}
                     />
