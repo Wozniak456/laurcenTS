@@ -32,7 +32,7 @@ export default async function InventoryCountingViewPage() {
       },
     },
     orderBy: {
-      created_at: "desc",
+      posting_date_time: "desc",
     },
   });
 

@@ -56,12 +56,8 @@ export async function postInventoryCounting(
       };
     }
 
-    // 3. Check if already posted (date_time_posted matches posting_date_time)
-    if (
-      inventoryCounting.documents.date_time_posted &&
-      inventoryCounting.documents.date_time_posted.getTime() ===
-        inventoryCounting.posting_date_time.getTime()
-    ) {
+    // 3. Check if already posted (date_time_posted exists)
+    if (inventoryCounting.documents.date_time_posted) {
       return {
         errors: {
           _form: ["Інвентаризація вже проведена"],
@@ -77,32 +73,27 @@ export async function postInventoryCounting(
 
       // Only create transactions if there's a difference (tolerance 0.001)
       if (difference !== null && Math.abs(difference) > 0.001) {
-        // Get the first available batch for this item
-        const batch = line.items.itembatches[0];
-
-        if (batch && line.unit_id) {
+        // Use the batch_id from the inventory counting line directly
+        if (line.batch_id && line.unit_id) {
           // Create adjustment transaction for the difference
           // The transaction is linked to the same document (doc_type_id = 15)
           const transaction = await db.itemtransactions.create({
             data: {
               doc_id: inventoryCounting.documents.id, // Document with doc_type_id = 15
               location_id: 87, // Warehouse location
-              batch_id: batch.id,
+              batch_id: line.batch_id, // Use the selected batch from inventory counting line
               quantity: difference, // Positive for additions, negative for reductions
               unit_id: line.unit_id,
             },
           });
 
           // Update the inventory counting line with the transaction reference
-          // TODO: Uncomment after regenerating Prisma client
-          /*
           await db.inventory_counting_lines.update({
             where: { id: line.id },
             data: {
               itemtransaction_id: transaction.id,
             },
           });
-          */
 
           transactionsCreated++;
         }
@@ -113,7 +104,8 @@ export async function postInventoryCounting(
     await db.documents.update({
       where: { id: inventoryCounting.documents.id },
       data: {
-        date_time_posted: inventoryCounting.posting_date_time,
+        date_time: inventoryCounting.posting_date_time, // Use the planned posting date from form
+        date_time_posted: new Date(), // Current time when posted in system
       },
     });
 

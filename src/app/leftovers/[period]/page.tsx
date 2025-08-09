@@ -5,16 +5,7 @@ import Link from "next/link";
 import * as actions from "@/actions";
 import LeftoversTable from "@/components/leftovers-table";
 import ExportButton from "@/components/leftoversTableToPrint";
-import { Button } from "@nextui-org/button";
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  useDisclosure,
-} from "@nextui-org/modal";
-import { cleanupLeftovers } from "@/actions/crutial/cleanupLeftovers";
+// Removed Modal and Button imports - cleanup functionality moved to Inventory Counting
 
 export const dynamic = "force-dynamic";
 
@@ -36,12 +27,11 @@ interface DataItem {
 }
 
 export default function LeftoversPerPeriod(props: LeftoversPerPeriodProps) {
-  const [selectedItem, setSelectedItem] = useState<DataItem | null>(null);
-  const [isCleaning, setIsCleaning] = useState(false);
+  // Removed selectedItem and isCleaning state - cleanup functionality moved to Inventory Counting
   const [data, setData] = useState<DataItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [refetchTrigger, setRefetchTrigger] = useState(0);
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  // Removed modal disclosure - cleanup functionality moved to Inventory Counting
 
   // Memoize parts to prevent unnecessary re-renders
   const parts = useMemo(
@@ -182,80 +172,17 @@ export default function LeftoversPerPeriod(props: LeftoversPerPeriodProps) {
         <div className="flex justify-between p-2 text-lg font-bold">
           <h1>Початок: {startDate}</h1>
           <div className="flex-1 flex justify-center">
-            {selectedItem && (
-              <div className="flex flex-col items-center">
-                <div className="text-sm text-gray-600">
-                  Вибрано рядок: {selectedItem.batch_name} -{" "}
-                  {selectedItem.item_name} (ID: {selectedItem.batch_id})
-                </div>
-                <Button
-                  color="danger"
-                  variant="flat"
-                  size="sm"
-                  onPress={onOpen}
-                  className="mt-1"
-                >
-                  Очистити залишки
-                </Button>
-              </div>
-            )}
+            {/* Clear leftovers functionality removed - use Inventory Counting instead */}
           </div>
           <h1>Кінець: {endDate}</h1>
         </div>
 
-        <LeftoversTable
-          data={data}
-          periodEndDate={endDate}
-          onSelectionChange={handleSelectionChange}
-        />
+        <LeftoversTable data={data} periodEndDate={endDate} />
 
         <ExportButton />
       </div>
 
-      {/* Confirmation Modal */}
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalContent>
-          <ModalHeader>Підтвердження очищення</ModalHeader>
-          <ModalBody>
-            {selectedItem && (
-              <div>
-                <p>Ви дійсно хочете очистити залишки для:</p>
-                <ul className="mt-2 space-y-1">
-                  <li>
-                    <strong>Партія:</strong> {selectedItem.batch_name}
-                  </li>
-                  <li>
-                    <strong>Корм:</strong> {selectedItem.item_name}
-                  </li>
-                  <li>
-                    <strong>Кількість для очищення:</strong> Фактична кількість
-                    на складі (location 87)
-                  </li>
-                  <li>
-                    <strong>Дата очищення:</strong> {endDate}
-                  </li>
-                </ul>
-                <p className="mt-4 text-sm text-gray-600">
-                  Ця операція створить документ списання та зменшить кількість
-                  на складі до нуля.
-                </p>
-              </div>
-            )}
-          </ModalBody>
-          <ModalFooter>
-            <Button color="default" variant="light" onPress={onClose}>
-              Скасувати
-            </Button>
-            <Button
-              color="danger"
-              onPress={handleCleanup}
-              isLoading={isCleaning}
-            >
-              Очистити
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+      {/* Clear leftovers functionality removed - use Inventory Counting instead */}
     </div>
   );
 }

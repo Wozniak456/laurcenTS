@@ -76,7 +76,7 @@ model documents {
   executed_by            Int
   comments               String?
   parent_document        BigInt?
-  date_time_posted       DateTime                 @default(now()) @db.Timestamp(6)
+  date_time_posted       DateTime?                @db.Timestamp(6)
   calculation_table      calculation_table[]
   disposal_table         disposal_table[]
   doctype                doctype                  @relation(fields: [doc_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)

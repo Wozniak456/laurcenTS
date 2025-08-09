@@ -60,11 +60,7 @@ export async function updateInventoryLine(
 
     // Check if the document is in draft status
     const document = currentLine.inventory_counting.documents;
-    if (
-      document.date_time_posted &&
-      document.date_time_posted.getTime() ===
-        currentLine.inventory_counting.posting_date_time.getTime()
-    ) {
+    if (document.date_time_posted) {
       return {
         errors: {
           _form: ["Не можна редагувати позиції проведеного документа"],

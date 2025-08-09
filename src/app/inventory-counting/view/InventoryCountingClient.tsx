@@ -52,7 +52,7 @@ export default function InventoryCountingClient({
   const [selectedFeedType, setSelectedFeedType] = useState<string>("");
   const [selectedItem, setSelectedItem] = useState<string>("");
   const [selectedBatch, setSelectedBatch] = useState<string>("");
-  const [actualQuantity, setActualQuantity] = useState<string>("");
+  const [actualQuantity, setActualQuantity] = useState<string>("0");
   const [inventoryToDelete, setInventoryToDelete] = useState<any>(null);
   const [editingLine, setEditingLine] = useState<any>(null);
   const [editingQuantity, setEditingQuantity] = useState<string>("");
@@ -103,11 +103,13 @@ export default function InventoryCountingClient({
   // Preserve selections after form submission
   React.useEffect(() => {
     if (addLineFormState.message) {
-      // Form was successful, reset selections
-      setSelectedFeedType("");
-      setSelectedItem("");
-      setSelectedBatch("");
-      setActualQuantity("");
+      // Form was successful, reset selections with a small delay
+      setTimeout(() => {
+        setSelectedFeedType("");
+        setSelectedItem("");
+        setSelectedBatch("");
+        setActualQuantity("0"); // Reset to 0 for next entry
+      }, 100);
 
       // Refresh the selected inventory to show the new line
       if (selectedInventoryId && inventoryCountings.length > 0) {
@@ -159,7 +161,7 @@ export default function InventoryCountingClient({
     setSelectedFeedType("");
     setSelectedItem("");
     setSelectedBatch("");
-    setActualQuantity("");
+    setActualQuantity("0"); // Default to 0 for easy write-offs
     onAddLineOpen();
   };
 
@@ -315,27 +317,15 @@ export default function InventoryCountingClient({
   };
 
   const getStatusColor = (inventory: any) => {
-    return inventory.documents.date_time_posted &&
-      inventory.documents.date_time_posted.getTime() ===
-        inventory.posting_date_time.getTime()
-      ? "success"
-      : "warning";
+    return inventory.documents.date_time_posted ? "success" : "warning";
   };
 
   const getStatusText = (inventory: any) => {
-    return inventory.documents.date_time_posted &&
-      inventory.documents.date_time_posted.getTime() ===
-        inventory.posting_date_time.getTime()
-      ? "Проведено"
-      : "Чернетка";
+    return inventory.documents.date_time_posted ? "Проведено" : "Чернетка";
   };
 
   const isDraftStatus = (inventory: any) => {
-    return !(
-      inventory.documents.date_time_posted &&
-      inventory.documents.date_time_posted.getTime() ===
-        inventory.posting_date_time.getTime()
-    );
+    return !inventory.documents.date_time_posted;
   };
 
   return (
@@ -380,9 +370,7 @@ export default function InventoryCountingClient({
                   }}
                 >
                   <TableCell>{inventory.id}</TableCell>
-                  <TableCell>
-                    {formatDate(inventory.documents.date_time)}
-                  </TableCell>
+                  <TableCell>{formatDate(inventory.created_at)}</TableCell>
                   <TableCell>
                     {formatDate(inventory.posting_date_time)}
                   </TableCell>
@@ -518,11 +506,24 @@ export default function InventoryCountingClient({
                     );
                     console.log("selectedInventory:", selectedInventory);
                     console.log("selectedInventory.id:", selectedInventory?.id);
+                    console.log("actualQuantity state:", actualQuantity);
                     console.log("Form data entries:");
                     Array.from(formData.entries()).forEach(([key, value]) => {
                       console.log(`${key}: ${value}`);
                     });
                     console.log("All form data:", formData);
+
+                    // Check if actual_quantity is empty and prevent submission if so
+                    const actualQuantityFromForm =
+                      formData.get("actual_quantity");
+                    if (
+                      !actualQuantityFromForm ||
+                      actualQuantityFromForm === ""
+                    ) {
+                      console.error(
+                        "actual_quantity is empty, this will cause server validation error"
+                      );
+                    }
                   }}
                 >
                   <input
@@ -628,19 +629,31 @@ export default function InventoryCountingClient({
                         )
                       : []}
                   </Select>
-                  <Input
-                    type="number"
-                    name="actual_quantity"
-                    label="Фактична кількість"
-                    placeholder="0.00"
-                    step="0.01"
-                    min="0"
-                    value={actualQuantity}
-                    onChange={(e) => setActualQuantity(e.target.value)}
-                    isRequired
-                    isInvalid={!!addLineFormState.errors?.actual_quantity}
-                    errorMessage={addLineFormState.errors?.actual_quantity?.[0]}
-                  />
+                  <div className="flex flex-col gap-1">
+                    <label className="text-sm font-medium text-foreground">
+                      Фактична кількість *
+                    </label>
+                    <input
+                      type="number"
+                      name="actual_quantity"
+                      placeholder="0.000"
+                      step="0.001"
+                      min="0"
+                      value={actualQuantity}
+                      onChange={(e) => setActualQuantity(e.target.value)}
+                      required
+                      className={`px-3 py-2 border rounded-lg text-sm ${
+                        addLineFormState.errors?.actual_quantity
+                          ? "border-red-500 bg-red-50"
+                          : "border-gray-300 bg-white"
+                      } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                    />
+                    {addLineFormState.errors?.actual_quantity && (
+                      <p className="text-xs text-red-500">
+                        {addLineFormState.errors.actual_quantity[0]}
+                      </p>
+                    )}
+                  </div>
                   <input
                     type="hidden"
                     name="feed_type_id"
@@ -730,7 +743,7 @@ export default function InventoryCountingClient({
                         </div>
                       )}
                     </TableCell>
-                    <TableCell>{line.system_quantity.toFixed(2)}</TableCell>
+                    <TableCell>{line.system_quantity.toFixed(3)}</TableCell>
                     <TableCell>
                       {editingLine?.id === line.id ? (
                         <form
@@ -765,7 +778,7 @@ export default function InventoryCountingClient({
                             }}
                             size="sm"
                             className="w-20"
-                            step="0.01"
+                            step="0.001"
                             min="0"
                             autoFocus
                             spellCheck={false}
@@ -795,7 +808,7 @@ export default function InventoryCountingClient({
                         </form>
                       ) : (
                         <div className="flex items-center gap-2">
-                          <span>{line.actual_quantity.toFixed(2)}</span>
+                          <span>{line.actual_quantity.toFixed(3)}</span>
                           {isDraftStatus(selectedInventory) && (
                             <Button
                               size="sm"
@@ -820,7 +833,7 @@ export default function InventoryCountingClient({
                         variant="flat"
                       >
                         {line.difference > 0 ? "+" : ""}
-                        {line.difference.toFixed(2)}
+                        {line.difference.toFixed(3)}
                       </Chip>
                     </TableCell>
                     <TableCell>{line.units.name}</TableCell>
