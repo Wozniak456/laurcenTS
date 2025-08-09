@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { useFormState } from "react-dom";
 import * as actions from "@/actions";
 import PartitionForm from "@/components/batch-partition";
@@ -23,6 +24,7 @@ import {
 import FormButton from "./common/form-button";
 import FetchingForm from "./fetching";
 import { usePoolValidation } from "@/utils/poolValidation";
+import { additionalStocking } from "@/actions/stocking/additionalStocking";
 
 import Link from "next/link";
 
@@ -71,9 +73,18 @@ export default function StockPoolPage({
     onOpen: onStockingOpen,
     onClose: onStockingClose,
   } = useDisclosure();
+  const {
+    isOpen: isAdditionalStockingOpen,
+    onOpen: onAdditionalStockingOpen,
+    onClose: onAdditionalStockingClose,
+  } = useDisclosure();
   const { validateAndShowPopup } = usePoolValidation();
 
   const [formState, action] = useFormState(actions.stockPool, { message: "" });
+  const [additionalStockingFormState, additionalStockingAction] = useFormState(
+    additionalStocking,
+    { message: "" }
+  );
 
   // Stocking form state
   const [selectedBatch, setSelectedBatch] = useState<string | undefined>(
@@ -85,11 +96,25 @@ export default function StockPoolPage({
   );
   const [stockingError, setStockingError] = useState<string>("");
   const [selectKey, setSelectKey] = useState<number>(0);
+  const [additionalQuantity, setAdditionalQuantity] = useState<string>("");
+  const [isAdditionalStockingLoading, setIsAdditionalStockingLoading] =
+    useState<boolean>(false);
 
   // Reset the partition form when the component mounts or when pool data changes
   useEffect(() => {
     setShowPartitionForm(false);
   }, [poolInfo?.qty, poolInfo?.batch?.id, today]);
+
+  // Handle additional stocking form response
+  useEffect(() => {
+    if (additionalStockingFormState?.message) {
+      if (additionalStockingFormState.message.includes("Успішно")) {
+        setAdditionalQuantity("");
+        onAdditionalStockingClose();
+      }
+      // The message will be shown by the FormButton component
+    }
+  }, [additionalStockingFormState?.message, onAdditionalStockingClose]);
 
   // Handle Stock from Warehouse button click with validation
   const handleStockFromWarehouseClick = async () => {
@@ -154,6 +179,21 @@ export default function StockPoolPage({
     }
   };
 
+  // Handle Additional Stocking button click with validation
+  const handleAdditionalStockingClick = async () => {
+    if (poolInfo?.qty && poolInfo.qty > 0) {
+      const isAllowed = await validateAndShowPopup(
+        location.id,
+        today,
+        "stocking"
+      );
+      if (isAllowed) {
+        setAdditionalQuantity("");
+        onAdditionalStockingOpen();
+      }
+    }
+  };
+
   return (
     <div>
       <div className="my-4">
@@ -181,6 +221,10 @@ export default function StockPoolPage({
 
         {poolInfo?.qty && poolInfo.qty > 0 ? (
           <>
+            <Button color="success" onPress={handleAdditionalStockingClick}>
+              Дозарибити
+            </Button>
+
             <Button color="primary" onClick={handleSplitClick}>
               Розділити
             </Button>
@@ -549,6 +593,153 @@ export default function StockPoolPage({
                   </div>
                 </form>
               </ModalBody>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
+      {/* Additional Stocking Modal */}
+      <Modal
+        isOpen={isAdditionalStockingOpen}
+        onClose={onAdditionalStockingClose}
+        placement="top-center"
+        size="2xl"
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                <h1>Дозарибити</h1>
+                <p>Локація: {location.name}</p>
+              </ModalHeader>
+              <ModalBody>
+                <div className="space-y-4">
+                  {/* Existing stocking info - all disabled */}
+                  <Input
+                    label="Поточна партія"
+                    value={poolInfo?.batch?.name || "Н/Д"}
+                    isDisabled
+                    variant="bordered"
+                  />
+
+                  <Input
+                    label="Поточний товар"
+                    value={poolInfo?.batch?.items?.name || "Н/Д"}
+                    isDisabled
+                    variant="bordered"
+                  />
+
+                  <Input
+                    label="Поточна кількість (риб)"
+                    value={poolInfo?.qty?.toString() || "0"}
+                    isDisabled
+                    variant="bordered"
+                  />
+
+                  <Input
+                    label="Середня вага (г)"
+                    value={
+                      poolInfo?.fishWeight
+                        ? poolInfo.fishWeight.toFixed(areaId < 3 ? 3 : 1)
+                        : "0"
+                    }
+                    isDisabled
+                    variant="bordered"
+                  />
+
+                  {/* Only editable field */}
+                  <Input
+                    label="Додаткова кількість (риб) *"
+                    placeholder="Введіть кількість риби для додання"
+                    type="number"
+                    min={1}
+                    step="1"
+                    value={additionalQuantity}
+                    onChange={(e) => setAdditionalQuantity(e.target.value)}
+                    isRequired
+                    variant="bordered"
+                    color="primary"
+                  />
+                </div>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="default" variant="light" onPress={onClose}>
+                  Відмінити
+                </Button>
+                <Button
+                  color="success"
+                  isLoading={isAdditionalStockingLoading}
+                  onPress={async () => {
+                    console.log("Дозарибити button clicked!");
+                    console.log("additionalQuantity:", additionalQuantity);
+                    console.log("poolInfo:", poolInfo);
+
+                    if (
+                      !additionalQuantity ||
+                      parseInt(additionalQuantity) <= 0
+                    ) {
+                      console.log(
+                        "Validation failed - empty or invalid quantity"
+                      );
+                      alert(
+                        "Будь ласка, введіть коректну кількість (більше 0)"
+                      );
+                      return;
+                    }
+
+                    const formData = new FormData();
+                    formData.append("today", today);
+                    formData.append("location_id", location.id.toString());
+                    formData.append(
+                      "batch_id",
+                      poolInfo?.batch?.id?.toString() || ""
+                    );
+                    formData.append(
+                      "current_average_weight",
+                      poolInfo?.fishWeight?.toString() || ""
+                    );
+                    formData.append("additional_quantity", additionalQuantity);
+
+                    console.log("FormData being sent:");
+                    for (const [key, value] of Array.from(formData.entries())) {
+                      console.log(`${key}: ${value}`);
+                    }
+
+                    try {
+                      setIsAdditionalStockingLoading(true);
+                      console.log("Calling additionalStockingAction...");
+                      const result = await additionalStocking(
+                        undefined, // Pass undefined for formState when calling manually
+                        formData
+                      );
+                      console.log(
+                        "additionalStockingAction completed:",
+                        result
+                      );
+
+                      if (result?.message) {
+                        if (result.message.includes("Успішно")) {
+                          alert("Операція виконана успішно: " + result.message);
+                          setAdditionalQuantity("");
+                          onAdditionalStockingClose();
+                        } else {
+                          alert("Помилка: " + result.message);
+                        }
+                      }
+                    } catch (error) {
+                      console.error(
+                        "Error calling additionalStockingAction:",
+                        error
+                      );
+                      alert("Помилка при виконанні операції: " + error);
+                    } finally {
+                      setIsAdditionalStockingLoading(false);
+                    }
+                  }}
+                >
+                  Дозарибити
+                </Button>
+              </ModalFooter>
             </>
           )}
         </ModalContent>

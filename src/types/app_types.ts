@@ -103,6 +103,10 @@ export type poolManagingType = {
     | {
         id: bigint;
         name: string;
+        items?: {
+          id: number;
+          name: string;
+        };
       }
     | undefined;
   qty?: number | undefined;

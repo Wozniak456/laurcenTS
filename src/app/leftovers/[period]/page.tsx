@@ -122,37 +122,7 @@ export default function LeftoversPerPeriod(props: LeftoversPerPeriodProps) {
     }
   }, [startDate, endDate, refetchTrigger, fetchData]);
 
-  const handleSelectionChange = (item: DataItem | null) => {
-    setSelectedItem(item);
-  };
-
-  const handleCleanup = async () => {
-    if (!selectedItem || !endDate) return;
-
-    setIsCleaning(true);
-    try {
-      const formData = new FormData();
-      formData.append("batch_id", selectedItem.batch_id);
-      formData.append("cleanup_date", endDate);
-
-      const result = await cleanupLeftovers(undefined, formData);
-
-      if (result?.message) {
-        alert(result.message);
-        setSelectedItem(null);
-        onClose();
-        // Add a small delay before refetching to ensure transaction is processed
-        setTimeout(() => {
-          setRefetchTrigger((prev) => prev + 1);
-        }, 500);
-      }
-    } catch (error) {
-      console.error("Cleanup error:", error);
-      alert("Помилка при очищенні залишків");
-    } finally {
-      setIsCleaning(false);
-    }
-  };
+  // Cleanup functionality moved to Inventory Counting module
 
   if (loading) {
     return <div>Loading...</div>;

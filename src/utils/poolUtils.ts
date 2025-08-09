@@ -108,7 +108,7 @@ export async function checkPostedOperationsForPool(
     id: bigint;
     doc_type_id: number;
     date_time: Date;
-    date_time_posted: Date;
+    date_time_posted: Date | null;
   }>;
 }> {
   try {
@@ -182,7 +182,7 @@ export async function isPoolOperationsAllowed(
     id: bigint;
     doc_type_id: number;
     date_time: Date;
-    date_time_posted: Date;
+    date_time_posted: Date | null;
   }>;
 }> {
   const checkResult = await checkPostedOperationsForPool(locationId, date);
@@ -214,7 +214,7 @@ export async function checkMultipleLocationsForPostedOperations(
       id: bigint;
       doc_type_id: number;
       date_time: Date;
-      date_time_posted: Date;
+      date_time_posted: Date | null;
     }>;
   }>;
 }> {

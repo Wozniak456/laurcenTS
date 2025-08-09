@@ -117,7 +117,11 @@ export const poolInfo = async (
         select: {
           id: true,
           parent_transaction: true,
-          itembatches: true,
+          itembatches: {
+            include: {
+              items: true,
+            },
+          },
           quantity: true,
           location_id: true,
         },
