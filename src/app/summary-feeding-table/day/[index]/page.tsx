@@ -228,20 +228,25 @@ export default async function DayFeeding(props: DayFeedingProps) {
       <div className="flex justify-between">
         {dates.map((date) => (
           <div key={date} className="flex-shrink-0 p-2">
-            <div
-              className={` rounded-lg shadow p-1 hover:bg-blue-100 transition duration-200 ${
-                date == today && "bg-blue-200"
-              }`}
-            >
-              <Link href={`/summary-feeding-table/day/${date}`}>
-                <span className={`text-center cursor-pointer `}>{date}</span>
-              </Link>
-            </div>
+            <Link href={`/summary-feeding-table/day/${date}`}>
+              <div
+                className={` rounded-lg shadow p-1 hover:bg-blue-100 transition duration-200 cursor-pointer ${
+                  date == today && "bg-blue-200"
+                }`}
+              >
+                <span className={`text-center`}>{date}</span>
+              </div>
+            </Link>
           </div>
         ))}
       </div>
       <div className="flex justify-end my-2">
-        <ExportButton times={times} lines={lines} data={data} />
+        <ExportButton
+          times={times}
+          lines={lines}
+          data={data}
+          percentFeedingMap={percentFeedingMap}
+        />
       </div>
       <div>*Кількість вказана у грамах</div>
       <DaySummaryContent

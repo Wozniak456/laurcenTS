@@ -1,10 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useFormState } from "react-dom";
 import * as actions from "@/actions";
 import PartitionForm from "@/components/batch-partition";
-import { useState, useEffect, useRef } from "react";
 import { itembatches } from "@prisma/client";
 import PoolInfo from "@/components/Pools/pool-info";
 import { disposalItem, poolManagingType } from "@/types/app_types";
@@ -25,8 +24,6 @@ import FormButton from "./common/form-button";
 import FetchingForm from "./fetching";
 import { usePoolValidation } from "@/utils/poolValidation";
 import { additionalStocking } from "@/actions/stocking/additionalStocking";
-
-import Link from "next/link";
 
 interface StockPoolProps {
   areaId: number;

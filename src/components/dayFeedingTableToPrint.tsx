@@ -45,12 +45,24 @@ type ExportButtonProps = {
     }[];
   }[];
   data: FeedingInfo[];
+  percentFeedingMap?: Record<number, number>;
 };
 
 const sectionColor = "c7c7c7";
 const lineColor = "e0e0e0";
 const cellColor = "ffffff";
 const summaryColor = "d9e1f2";
+
+// Helper function to calculate feeding quantity with percentage adjustment
+const calculateAdjustedQuantity = (
+  baseQuantity: string | undefined,
+  percentFeeding: number
+): string => {
+  if (!baseQuantity || baseQuantity === "") return "";
+  const base = parseFloat(baseQuantity);
+  if (isNaN(base)) return "";
+  return (base * (1 + percentFeeding / 100)).toFixed(2);
+};
 
 export default function ExportButton(props: ExportButtonProps) {
   const handleExport = async () => {
@@ -140,19 +152,37 @@ export default function ExportButton(props: ExportButtonProps) {
           if (poolItem && poolItem.feedings) {
             count = poolItem.feedings.length;
             poolItem.feedings.forEach((feeding) => {
+              // Get the percentage feeding adjustment for this location
+              const percentFeeding = props.percentFeedingMap?.[loc.id] ?? 0;
+
               const rowValues = [
                 pool.name,
                 feeding?.feedType,
                 feeding?.feedName,
-                feeding?.feedings?.["6"]?.feeding,
+                calculateAdjustedQuantity(
+                  feeding?.feedings?.["6"]?.feeding,
+                  percentFeeding
+                ),
                 feeding?.feedings?.["6"]?.editing ?? "",
-                feeding?.feedings?.["10"]?.feeding,
+                calculateAdjustedQuantity(
+                  feeding?.feedings?.["10"]?.feeding,
+                  percentFeeding
+                ),
                 feeding?.feedings?.["10"]?.editing ?? "",
-                feeding?.feedings?.["14"]?.feeding,
+                calculateAdjustedQuantity(
+                  feeding?.feedings?.["14"]?.feeding,
+                  percentFeeding
+                ),
                 feeding?.feedings?.["14"]?.editing ?? "",
-                feeding?.feedings?.["18"]?.feeding,
+                calculateAdjustedQuantity(
+                  feeding?.feedings?.["18"]?.feeding,
+                  percentFeeding
+                ),
                 feeding?.feedings?.["18"]?.editing ?? "",
-                feeding?.feedings?.["22"]?.feeding,
+                calculateAdjustedQuantity(
+                  feeding?.feedings?.["22"]?.feeding,
+                  percentFeeding
+                ),
                 feeding?.feedings?.["22"]?.editing ?? "",
               ];
 

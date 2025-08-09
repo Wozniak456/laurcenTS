@@ -110,15 +110,15 @@ export default async function StockingHome(props: StockingProps) {
       <div className="flex justify-between">
         {dates.map((date) => (
           <div key={date} className="flex-shrink-0 p-2">
-            <div
-              className={` rounded-lg shadow p-1 hover:bg-blue-100 transition duration-200 ${
-                date == today && "bg-blue-200"
-              }`}
-            >
-              <Link href={`/pool-managing/day/${date}`}>
-                <span className={`text-center cursor-pointer `}>{date}</span>
-              </Link>
-            </div>
+            <Link href={`/pool-managing/day/${date}`}>
+              <div
+                className={` rounded-lg shadow p-1 hover:bg-blue-100 transition duration-200 cursor-pointer ${
+                  date == today && "bg-blue-200"
+                }`}
+              >
+                <span className={`text-center`}>{date}</span>
+              </div>
+            </Link>
           </div>
         ))}
       </div>
