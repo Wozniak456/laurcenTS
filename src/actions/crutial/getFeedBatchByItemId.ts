@@ -87,6 +87,7 @@ export async function getFeedBatchByItemId(
   });
 
   while (totalQuantity < quantity && batches_quantity_with_price.length > 0) {
+    // FIXED: Find the batch with the smallest ID (oldest batch first)
     const minBatch = batches_quantity_with_price.reduce((min, current) =>
       min.batch_id < current.batch_id ? min : current
     );

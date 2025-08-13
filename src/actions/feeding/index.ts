@@ -362,18 +362,20 @@ export async function feedBatch(
   formState: { message: string },
   formData: FormData
 ): Promise<{ message: string }> {
-  //console.log("================== FEED BATCH STARTED ==================");
+  console.log("================== FEED BATCH STARTED ==================");
   try {
     // Debug: Log all form data keys and values
     const formDataDebug: Record<string, any> = {};
     formData.forEach((value, key) => {
       formDataDebug[key] = value;
     });
-    //console.log("DEBUG - Form Data:", formDataDebug);
+    console.log("DEBUG - Form Data:", formDataDebug);
 
     const item_id = parseInt(formData.get("item_id") as string);
     const location_id = parseInt(formData.get("location_id") as string);
     const date_time = formData.get("date_time") as string;
+
+    console.log("DEBUG - Parsed values:", { item_id, location_id, date_time });
 
     // Check if pool operations are allowed (no posted operations after this date)
     const operationsCheck = await isPoolOperationsAllowed(
@@ -381,10 +383,13 @@ export async function feedBatch(
       date_time
     );
     if (!operationsCheck.allowed) {
+      console.log("DEBUG - Operations blocked:", operationsCheck.reason);
       return {
         message: `Операція заблокована: ${operationsCheck.reason}`,
       };
     }
+
+    console.log("DEBUG - Operations allowed, proceeding...");
 
     // Calculate total quantity from time slots
     let totalQtyNeeded = 0;
@@ -399,14 +404,15 @@ export async function feedBatch(
       }
     }
 
-    //console.log("DEBUG - Feed Check:", {
-    // item_id,
-    //location_id,
-    //times: timeDebug,
-    //totalQtyNeeded,
-    //});
+    console.log("DEBUG - Feed Check:", {
+      item_id,
+      location_id,
+      times: timeDebug,
+      totalQtyNeeded,
+    });
 
     // Calculate total available stock for the item
+    console.log("DEBUG - Getting available batches...");
     const availableBatches = await getFeedBatchByItemId(item_id, 0, db);
     const totalAvailable = availableBatches
       ? availableBatches.reduce(
@@ -415,13 +421,16 @@ export async function feedBatch(
         )
       : 0;
 
+    console.log("DEBUG - Available stock:", totalAvailable);
+
     // If requested > available, return error
     if (totalQtyNeeded > totalAvailable * 1000) {
-      // *1000 if available is in kg and needed is in grams
+      console.log("DEBUG - Not enough feed available");
       return { message: "Not enough feed available: Немає достатньо корму" };
     }
 
     // Now get batches for the actual needed amount (as before)
+    console.log("DEBUG - Getting batches for feeding...");
     const batchesForFeeding = await getFeedBatchByItemId(
       item_id,
       totalQtyNeeded,
@@ -429,9 +438,11 @@ export async function feedBatch(
     );
 
     if (!batchesForFeeding || batchesForFeeding.length === 0) {
-      //console.log("DEBUG - No batches found for item:", item_id);
+      console.log("DEBUG - No batches found for item:", item_id);
       return { message: "Not enough feed available: Немає достатньо корму" };
     }
+
+    console.log("DEBUG - Batches for feeding:", batchesForFeeding);
 
     // Create feeding document
     const date = new Date();
@@ -442,6 +453,10 @@ export async function feedBatch(
       const qty = parseFloat(formData.get(timeKey) as string);
 
       if (!isNaN(qty) && qty > 0) {
+        console.log(
+          `DEBUG - Processing time slot ${time.hours}:00 with quantity ${qty}`
+        );
+
         // Create ONE document for this specific time slot
         const feedTime = new Date(
           date.getFullYear(),
@@ -462,10 +477,10 @@ export async function feedBatch(
         };
 
         // Log the data we're about to send
-        //console.error(
-        //"Creating document with data:",
-        //JSON.stringify(docData, null, 2)
-        //);
+        console.log(
+          "DEBUG - Creating document with data:",
+          JSON.stringify(docData, null, 2)
+        );
 
         const feedDoc = await db.documents.create({
           data: docData,
@@ -481,14 +496,19 @@ export async function feedBatch(
         });
 
         // Log the result immediately after creation
-        //console.error("Document created:", JSON.stringify(feedDoc, null, 2));
+        console.log(
+          "DEBUG - Document created:",
+          JSON.stringify(feedDoc, null, 2)
+        );
 
         if (!feedDoc) {
           throw new Error("Failed to create document - no document returned");
         }
 
         if (!feedDoc.comments) {
-          //console.error("Warning: Document created but comments field is null");
+          console.warn(
+            "DEBUG - Warning: Document created but comments field is null"
+          );
         }
 
         // Process all batch transactions under this single document
@@ -497,6 +517,11 @@ export async function feedBatch(
           if (leftToFeed <= 0) break;
           const available = batch._sum.quantity ?? 0;
           const consume = Math.min(available, leftToFeed);
+
+          console.log(
+            `DEBUG - Creating transactions for batch ${batch.batch_id}, consume: ${consume}`
+          );
+
           // Negative transaction for warehouse
           await db.itemtransactions.create({
             data: {
@@ -520,17 +545,18 @@ export async function feedBatch(
           leftToFeed -= consume;
         }
 
-        //console.log("DEBUG - Created feed transactions:", {
-        //docId: feedDoc.id,
-        //timeSlot: time.hours,
-        //transactionCount: leftToFeed,
-        //});
+        console.log("DEBUG - Created feed transactions for time slot:", {
+          docId: feedDoc.id,
+          timeSlot: time.hours,
+          quantityFed: qty,
+        });
       }
     }
 
+    console.log("DEBUG - Feed batch completed successfully");
     return { message: "Feed batch processed successfully" };
   } catch (error) {
-    //console.log("DEBUG - Main error:", error);
+    console.error("DEBUG - Main error:", error);
     return {
       message: `Error: ${
         error instanceof Error ? error.message : String(error)

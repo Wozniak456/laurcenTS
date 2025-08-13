@@ -109,6 +109,7 @@ export async function checkPostedOperationsForPool(
     doc_type_id: number;
     date_time: Date;
     date_time_posted: Date | null;
+    parent_document?: bigint | null;
   }>;
 }> {
   try {
@@ -124,6 +125,11 @@ export async function checkPostedOperationsForPool(
     const locationName = location?.name || `Location ${locationId}`;
 
     // Find any documents for this location that were posted after the given date
+    // EXCLUDE:
+    // 1. Feeding calculation documents (doc_type_id = 7) - these are recalculations, not new operations
+    // 2. Child documents (parent_document is not null) - these are derived from parent operations
+    // 3. Stocking documents (doc_type_id = 1) that only have transactions with the same location_id
+    //    - these are just reorganizing existing fish, not adding new fish
     const postedDocuments = await db.documents.findMany({
       where: {
         location_id: locationId,
@@ -133,12 +139,34 @@ export async function checkPostedOperationsForPool(
         date_time_posted: {
           not: undefined, // Document has been posted
         },
+        // Exclude feeding calculation documents (recalculations)
+        doc_type_id: {
+          not: 7,
+        },
+        // Exclude child documents (derived operations)
+        parent_document: null,
+        // Exclude stocking documents that only reorganize existing fish
+        OR: [
+          { doc_type_id: { not: 1 } }, // Not a stocking document
+          {
+            doc_type_id: 1, // Is a stocking document
+            AND: {
+              // But has transactions with different location_id (meaning new fish added)
+              itemtransactions: {
+                some: {
+                  location_id: { not: locationId },
+                },
+              },
+            },
+          },
+        ],
       },
       select: {
         id: true,
         doc_type_id: true,
         date_time: true,
         date_time_posted: true,
+        parent_document: true,
       },
       orderBy: {
         date_time: "desc",
@@ -148,7 +176,7 @@ export async function checkPostedOperationsForPool(
     if (postedDocuments.length > 0) {
       return {
         hasPostedOperations: true,
-        reason: `Found ${postedDocuments.length} posted document(s) after ${date}`,
+        reason: `Found ${postedDocuments.length} posted document(s) after ${date} (excluding recalculations, child documents, and same-location stockings)`,
         locationName,
         postedDocuments,
       };
@@ -183,6 +211,7 @@ export async function isPoolOperationsAllowed(
     doc_type_id: number;
     date_time: Date;
     date_time_posted: Date | null;
+    parent_document?: bigint | null;
   }>;
 }> {
   const checkResult = await checkPostedOperationsForPool(locationId, date);
@@ -215,6 +244,7 @@ export async function checkMultipleLocationsForPostedOperations(
       doc_type_id: number;
       date_time: Date;
       date_time_posted: Date | null;
+      parent_document?: bigint | null;
     }>;
   }>;
 }> {
