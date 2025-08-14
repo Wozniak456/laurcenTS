@@ -372,12 +372,7 @@ export default function InventoryCountingClient({
                   <TableCell>{inventory.id}</TableCell>
                   <TableCell>{formatDate(inventory.created_at)}</TableCell>
                   <TableCell>
-                    {inventory.doc_id
-                      ? formatDate(
-                          inventory.documents?.date_time_posted ||
-                            inventory.posting_date_time
-                        )
-                      : "Не проведено"}
+                    {formatDate(inventory.posting_date_time)}
                   </TableCell>
                   <TableCell>
                     {inventory.doc_id
