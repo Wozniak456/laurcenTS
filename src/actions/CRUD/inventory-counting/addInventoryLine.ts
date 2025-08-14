@@ -70,12 +70,32 @@ export async function addInventoryLine(
       };
     }
 
-    // Calculate system quantity from current stock for the specific batch
+    // Get the inventory counting to find the posting date
+    const inventoryCounting = await db.inventory_counting.findUnique({
+      where: { id: inventory_counting_id },
+      select: { posting_date_time: true },
+    });
+
+    if (!inventoryCounting) {
+      return {
+        errors: {
+          _form: ["Інвентаризацію не знайдено"],
+        },
+      };
+    }
+
+    // Calculate system quantity from stock as of the inventory counting posting date
+    // This gives us the "point-in-time" stock for accurate inventory counting
     const systemStock = await db.itemtransactions.groupBy({
       by: ["batch_id"],
       where: {
         batch_id: batch_id,
         location_id: 87, // Warehouse location
+        documents: {
+          date_time: {
+            lte: inventoryCounting.posting_date_time, // Only transactions up to posting date
+          },
+        },
       },
       _sum: {
         quantity: true,
