@@ -1,5 +1,7 @@
 import { getActivePoolsCount, getPoolsComparison } from "@/utils/poolUtils";
 
+export const dynamic = "force-dynamic";
+
 export default async function TestActivePoolsPage() {
   const today = new Date().toISOString().split("T")[0];
   const { totalPools, activePools } = await getPoolsComparison(today);

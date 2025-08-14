@@ -1,6 +1,8 @@
 import { db } from "@/db";
 import InventoryCountingClient from "./InventoryCountingClient";
 
+export const dynamic = "force-dynamic";
+
 export default async function InventoryCountingViewPage() {
   // Fetch all inventory counting documents
   const inventoryCountings = await db.inventory_counting.findMany({

@@ -25,6 +25,8 @@ import Link from "next/link";
 import { format } from "date-fns";
 import { uk } from "date-fns/locale";
 
+export const dynamic = "force-dynamic";
+
 // Dashboard KPI Cards Component
 function KPICard({
   title,
