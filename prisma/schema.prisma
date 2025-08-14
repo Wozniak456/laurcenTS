@@ -76,7 +76,7 @@ model documents {
   executed_by            Int
   comments               String?
   parent_document        BigInt?
-  date_time_posted       DateTime?                @db.Timestamp(6)
+  date_time_posted       DateTime                 @default(now()) @db.Timestamp(6)
   calculation_table      calculation_table[]
   disposal_table         disposal_table[]
   doctype                doctype                  @relation(fields: [doc_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -514,11 +514,11 @@ model priority_history {
 
 model inventory_counting {
   id                       BigInt                     @id @default(autoincrement())
-  doc_id                   BigInt
+  doc_id                   BigInt?
   posting_date_time        DateTime                   @db.Timestamp(6)
   created_at               DateTime?                  @default(now()) @db.Timestamp(6)
   updated_at               DateTime?                  @default(now()) @db.Timestamp(6)
-  documents                documents                  @relation(fields: [doc_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  documents                documents?                 @relation(fields: [doc_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   inventory_counting_lines inventory_counting_lines[]
 
   @@index([doc_id], map: "idx_inventory_counting_doc_id")

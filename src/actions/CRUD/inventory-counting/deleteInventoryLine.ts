@@ -51,13 +51,8 @@ export async function deleteInventoryLine(
       };
     }
 
-    // Check if the document is in draft status
-    const document = existingLine.inventory_counting.documents;
-    if (
-      document.date_time_posted &&
-      document.date_time_posted.getTime() ===
-        existingLine.inventory_counting.posting_date_time.getTime()
-    ) {
+    // Check if the inventory counting is in draft status (no doc_id)
+    if (existingLine.inventory_counting.doc_id) {
       return {
         errors: {
           _form: ["Не можна видаляти позиції проведеного документа"],

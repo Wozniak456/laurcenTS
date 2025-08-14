@@ -30,11 +30,9 @@ export async function postInventoryCounting(
     }
 
     // 2. Fetch the inventory counting document and its lines
-    //    The related document (documents) is created with doc_type_id = 15 (see createInventoryCounting.ts)
     const inventoryCounting = await db.inventory_counting.findUnique({
       where: { id: inventory_counting_id },
       include: {
-        documents: true, // This is the document with doc_type_id = 15
         inventory_counting_lines: {
           include: {
             items: {
@@ -56,8 +54,8 @@ export async function postInventoryCounting(
       };
     }
 
-    // 3. Check if already posted (date_time_posted exists)
-    if (inventoryCounting.documents.date_time_posted) {
+    // 3. Check if already posted (doc_id exists)
+    if (inventoryCounting.doc_id) {
       return {
         errors: {
           _form: ["Інвентаризація вже проведена"],
@@ -65,7 +63,27 @@ export async function postInventoryCounting(
       };
     }
 
-    // 4. For each line, create an itemtransaction if there is a difference
+    // 4. Create the document first
+    const document = await db.documents.create({
+      data: {
+        location_id: 87, // Warehouse location
+        doc_type_id: 15, // Inventory counting document type
+        date_time: inventoryCounting.posting_date_time, // Use the planned posting date
+        executed_by: 3, // Default executor
+        comments: "Інвентаризація кормів",
+        date_time_posted: new Date(), // Current time when posted in system
+      },
+    });
+
+    // 5. Update the inventory counting to link to the document
+    await db.inventory_counting.update({
+      where: { id: inventory_counting_id },
+      data: {
+        doc_id: document.id,
+      },
+    });
+
+    // 6. For each line, create an itemtransaction if there is a difference
     let transactionsCreated = 0;
 
     for (const line of inventoryCounting.inventory_counting_lines) {
@@ -79,7 +97,7 @@ export async function postInventoryCounting(
           // The transaction is linked to the same document (doc_type_id = 15)
           const transaction = await db.itemtransactions.create({
             data: {
-              doc_id: inventoryCounting.documents.id, // Document with doc_type_id = 15
+              doc_id: document.id, // Document with doc_type_id = 15
               location_id: 87, // Warehouse location
               batch_id: line.batch_id, // Use the selected batch from inventory counting line
               quantity: difference, // Positive for additions, negative for reductions
@@ -100,22 +118,13 @@ export async function postInventoryCounting(
       }
     }
 
-    // 5. Update the document's posting time to mark as posted
-    await db.documents.update({
-      where: { id: inventoryCounting.documents.id },
-      data: {
-        date_time: inventoryCounting.posting_date_time, // Use the planned posting date from form
-        date_time_posted: new Date(), // Current time when posted in system
-      },
-    });
-
-    // 6. Revalidate the inventory counting view
+    // 7. Revalidate the inventory counting view
     revalidatePath("/inventory-counting/view");
     return {
       message: `Інвентаризацію проведено. Створено ${transactionsCreated} транзакцій для коригування залишків.`,
     };
   } catch (error: any) {
-    // 7. Handle errors
+    // 8. Handle errors
     return {
       errors: {
         _form: [error.message || "Помилка при проведенні інвентаризації"],

@@ -27,21 +27,11 @@ export async function createInventoryCounting(
       };
     }
 
-    // Create the document first
-    const document = await db.documents.create({
-      data: {
-        location_id: 87, // Warehouse location
-        doc_type_id: 15, // Inventory counting document type
-        date_time: new Date(),
-        executed_by: executed_by,
-        comments: "Інвентаризація кормів",
-      },
-    });
-
-    // Create the inventory counting header
+    // Create the inventory counting header WITHOUT a document initially
+    // Document will be created only when posting
     const inventoryCounting = await db.inventory_counting.create({
       data: {
-        doc_id: document.id,
+        doc_id: null, // No document until posted
         posting_date_time: new Date(posting_date_time),
       },
     });

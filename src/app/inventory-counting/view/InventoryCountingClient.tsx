@@ -317,15 +317,15 @@ export default function InventoryCountingClient({
   };
 
   const getStatusColor = (inventory: any) => {
-    return inventory.documents.date_time_posted ? "success" : "warning";
+    return inventory.doc_id ? "success" : "warning";
   };
 
   const getStatusText = (inventory: any) => {
-    return inventory.documents.date_time_posted ? "Проведено" : "Чернетка";
+    return inventory.doc_id ? "Проведено" : "Чернетка";
   };
 
   const isDraftStatus = (inventory: any) => {
-    return !inventory.documents.date_time_posted;
+    return !inventory.doc_id;
   };
 
   return (
@@ -372,11 +372,22 @@ export default function InventoryCountingClient({
                   <TableCell>{inventory.id}</TableCell>
                   <TableCell>{formatDate(inventory.created_at)}</TableCell>
                   <TableCell>
-                    {formatDate(inventory.posting_date_time)}
+                    {inventory.doc_id
+                      ? formatDate(
+                          inventory.documents?.date_time_posted ||
+                            inventory.posting_date_time
+                        )
+                      : "Не проведено"}
                   </TableCell>
                   <TableCell>
-                    {inventory.documents.employees?.individual?.name}{" "}
-                    {inventory.documents.employees?.individual?.surname}
+                    {inventory.doc_id
+                      ? `${
+                          inventory.documents?.employees?.individual?.name || ""
+                        } ${
+                          inventory.documents?.employees?.individual?.surname ||
+                          ""
+                        }`
+                      : "Не призначено"}
                   </TableCell>
                   <TableCell>
                     <Chip color={getStatusColor(inventory)} variant="flat">

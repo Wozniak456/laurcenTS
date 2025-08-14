@@ -33,9 +33,14 @@ export default async function InventoryCountingViewPage() {
         },
       },
     },
-    orderBy: {
-      posting_date_time: "desc",
-    },
+    orderBy: [
+      {
+        doc_id: "asc", // Drafts first (null values)
+      },
+      {
+        posting_date_time: "desc", // Then by posting date
+      },
+    ],
   });
 
   // Fetch feed types for the form

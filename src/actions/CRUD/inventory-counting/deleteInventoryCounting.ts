@@ -44,12 +44,8 @@ export async function deleteInventoryCounting(
       };
     }
 
-    // Check if already posted
-    if (
-      inventoryCounting.documents.date_time_posted &&
-      inventoryCounting.documents.date_time_posted.getTime() ===
-        inventoryCounting.posting_date_time.getTime()
-    ) {
+    // Check if already posted (has doc_id)
+    if (inventoryCounting.doc_id) {
       return {
         errors: {
           _form: ["Не можна видалити проведену інвентаризацію"],
@@ -57,28 +53,11 @@ export async function deleteInventoryCounting(
       };
     }
 
-    // Allow deletion of documents with 0 lines (no validation needed)
-
-    // Get the document ID before deletion
-    const documentId = inventoryCounting.documents.id;
+    // Allow deletion of draft documents (no validation needed)
 
     // Delete the inventory counting (this will cascade delete lines)
     await db.inventory_counting.delete({
       where: { id: inventory_counting_id },
-    });
-
-    // Manually delete the document if no other tables reference it
-    // This is needed because other tables with NoAction prevent automatic cascade
-    await db.documents.deleteMany({
-      where: {
-        id: documentId,
-        // Only delete if no other tables reference this document
-        itemtransactions: { none: {} },
-        calculation_table: { none: {} },
-        disposal_table: { none: {} },
-        generation_feed_amount: { none: {} },
-        stocking: { none: {} },
-      },
     });
 
     revalidatePath("/inventory-counting/view");

@@ -58,9 +58,8 @@ export async function updateInventoryLine(
       };
     }
 
-    // Check if the document is in draft status
-    const document = currentLine.inventory_counting.documents;
-    if (document.date_time_posted) {
+    // Check if the inventory counting is in draft status (no doc_id)
+    if (currentLine.inventory_counting.doc_id) {
       return {
         errors: {
           _form: ["Не можна редагувати позиції проведеного документа"],
