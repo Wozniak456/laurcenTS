@@ -13,13 +13,23 @@ interface FormButtonProps {
     | "danger"
     | undefined;
   children: React.ReactNode;
+  disabled?: boolean;
 }
 
-export default function FormButton({ color, children }: FormButtonProps) {
+export default function FormButton({
+  color,
+  children,
+  disabled,
+}: FormButtonProps) {
   const { pending } = useFormStatus();
 
   return (
-    <Button type="submit" color={color} isLoading={pending}>
+    <Button
+      type="submit"
+      color={color}
+      isLoading={pending}
+      isDisabled={disabled}
+    >
       {children}
     </Button>
   );

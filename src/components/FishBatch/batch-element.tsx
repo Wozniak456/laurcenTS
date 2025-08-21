@@ -7,6 +7,7 @@ import { BatchWithCreationInfo } from "@/types/app_types";
 import { ChangeEvent, useState } from "react";
 import BatchDeleteForm from "@/components/FishBatch/delete-message";
 import AddExtraQuantityForm from "./add-extra-quantity-form";
+import { useEffect } from "react";
 
 import {
   Modal,
@@ -81,6 +82,31 @@ export default function ItemBatchComponent({
   const handleInputQtyChange = (event: ChangeEvent<HTMLInputElement>) => {
     setQty(Number(event.target.value));
   };
+
+  // Debug logging for form values
+  useEffect(() => {
+    if (allowToEdit && batch.tranId) {
+      console.log("Form values:", {
+        batch_id: batch.id,
+        item_id: itemId || (batch.items ? batch.items.id : ""),
+        date: date || batch.created,
+        qty: qty || batch.quantity,
+        doc_id: batch.docId,
+        tran_id: batch.tranId,
+      });
+    }
+  }, [
+    allowToEdit,
+    batch.tranId,
+    batch.id,
+    itemId,
+    batch.items,
+    date,
+    batch.created,
+    qty,
+    batch.quantity,
+    batch.docId,
+  ]);
 
   return (
     <div className="fixed top-0 left-0 w-full h-full bg-gray-400 bg-opacity-75 flex justify-center items-center">
@@ -162,7 +188,15 @@ export default function ItemBatchComponent({
                 label="Кількість:"
                 name="quantity"
                 defaultValue={batch.quantity?.toString()}
-                onChange={handleInputQtyChange}
+                onChange={(e) => {
+                  const value = Number(e.target.value);
+                  if (value <= 0) {
+                    e.target.value = "1"; // Reset to minimum valid value
+                    setQty(1);
+                  } else {
+                    setQty(value);
+                  }
+                }}
                 disabled={!allowToEdit}
                 type="number"
                 min={1}
@@ -214,8 +248,21 @@ export default function ItemBatchComponent({
                 </Button>
               )}
 
-              {allowToEdit && (
-                <form action={updateBatchAction}>
+              {allowToEdit && batch.tranId && (
+                <form
+                  action={updateBatchAction}
+                  onSubmit={(e) => {
+                    const formData = new FormData(e.currentTarget);
+                    console.log("Form submission values:", {
+                      batch_id: formData.get("batch_id"),
+                      item_id: formData.get("item_id"),
+                      date: formData.get("date"),
+                      qty: formData.get("qty"),
+                      doc_id: formData.get("doc_id"),
+                      tran_id: formData.get("tran_id"),
+                    });
+                  }}
+                >
                   <input
                     type="hidden"
                     name="batch_id"
@@ -244,7 +291,13 @@ export default function ItemBatchComponent({
                   <input
                     type="hidden"
                     name="qty"
-                    value={qty || batch.quantity || ""}
+                    value={
+                      qty !== undefined && qty !== ""
+                        ? qty
+                        : batch.quantity !== undefined
+                        ? batch.quantity
+                        : ""
+                    }
                   />
                   <input
                     type="hidden"
@@ -257,15 +310,42 @@ export default function ItemBatchComponent({
                     value={String(batch.tranId)}
                   />
 
+                  {/* Validation check */}
+                  {(qty === undefined || qty === "" || qty === 0) &&
+                    (batch.quantity === undefined ||
+                      batch.quantity === null ||
+                      batch.quantity === 0) && (
+                      <div className="text-red-500 text-sm mb-2">
+                        Error: Quantity must be greater than 0. Cannot submit
+                        with zero or empty quantity.
+                      </div>
+                    )}
+
                   {/* <button 
-                                className="p-2 border rounded bg-blue-500 text-white hover:bg-blue-600 transition-colors duration-200  min-w-64"
+                                className="p-2 border rounded bg-blue-500 text-white hover:bg-blue-600 transition-colors duration-200 min-w-64"
                                 type='submit'
                             >
                                 <p>Зберегти</p>
                             </button> */}
 
-                  <FormButton color="primary">Зберегти</FormButton>
+                  <FormButton
+                    color="primary"
+                    disabled={
+                      (qty === undefined || qty === "" || qty === 0) &&
+                      (batch.quantity === undefined ||
+                        batch.quantity === null ||
+                        batch.quantity === 0)
+                    }
+                  >
+                    Зберегти
+                  </FormButton>
                 </form>
+              )}
+
+              {allowToEdit && !batch.tranId && (
+                <div className="text-red-500 text-sm mb-2">
+                  Error: Transaction ID is missing. Cannot edit this batch.
+                </div>
               )}
               {/* <button 
                             type="submit" 

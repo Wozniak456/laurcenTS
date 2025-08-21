@@ -171,6 +171,14 @@ export async function caviarRegistering(
         let transaction = null;
 
         if (unitId && unitId.default_unit_id !== null) {
+          // Additional validation to ensure quantity is positive
+          if (purchaseLine.quantity <= 0) {
+            console.warn(
+              `Skipping transaction creation for batch ${batchId} with invalid quantity: ${purchaseLine.quantity}`
+            );
+            continue;
+          }
+
           transaction = await db.itemtransactions.create({
             data: {
               doc_id: insertedId,

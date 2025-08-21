@@ -3,6 +3,7 @@ import { db } from "@/db";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { validateBatchQuantity } from "@/utils/validation";
 // import { auth } from '@/auth'
 import { itembatches } from "@prisma/client";
 import paths from "@/paths";
@@ -118,6 +119,12 @@ export async function addingFishBatch(
   created_by: number
 ) {
   try {
+    // Validate quantity is positive
+    const quantityValidation = validateBatchQuantity(quantity);
+    if (!quantityValidation.isValid) {
+      throw new Error(quantityValidation.error || "Invalid quantity");
+    }
+
     const location_id = 87; // склад
     const document = await db.documents.create({
       data: {

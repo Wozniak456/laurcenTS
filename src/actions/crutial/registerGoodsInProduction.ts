@@ -83,6 +83,14 @@ export async function registerGoodsInProduction(
         });
 
         for (const line of lines) {
+          // Validate quantity is positive
+          if (line.quantity <= 0) {
+            console.warn(
+              `Skipping purchase line ${line.id} with invalid quantity: ${line.quantity}`
+            );
+            continue; // Skip this line and continue with the next one
+          }
+
           const batch_name_key = `batch_name_${line.id}`;
           const expire_date_key = `expire_date_${line.id}`;
           const packing_key = `packing_${line.id}`;

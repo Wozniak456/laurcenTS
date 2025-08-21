@@ -42,12 +42,32 @@ export default async function BatchesShowPage(props: BatchesShowPageProps) {
       },
     });
 
+    if (!transactionOfCreation) {
+      throw new Error(
+        `No creation transaction found for batch ${props.params.id}`
+      );
+    }
+
+    // Additional validation
+    if (!transactionOfCreation.id) {
+      throw new Error(`Transaction ID is missing for batch ${props.params.id}`);
+    }
+
+    if (
+      transactionOfCreation.quantity === null ||
+      transactionOfCreation.quantity === undefined
+    ) {
+      throw new Error(
+        `Transaction quantity is missing for batch ${props.params.id}`
+      );
+    }
+
     batch = {
       ...batch,
-      docId: transactionOfCreation?.documents.id,
-      tranId: transactionOfCreation?.id,
-      quantity: transactionOfCreation?.quantity,
-      unitId: transactionOfCreation?.unit_id,
+      docId: transactionOfCreation.documents.id,
+      tranId: transactionOfCreation.id,
+      quantity: transactionOfCreation.quantity,
+      unitId: transactionOfCreation.unit_id,
       isNew: true,
     };
 
