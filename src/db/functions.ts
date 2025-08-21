@@ -127,7 +127,7 @@ export async function caviarRegistering(
         },
       });
 
-      purchaseLines.forEach(async (purchaseLine) => {
+      for (const purchaseLine of purchaseLines) {
         const itemId = purchaseLine.item_id;
 
         await db.purchtable.update({
@@ -200,7 +200,7 @@ export async function caviarRegistering(
             },
           });
         }
-      });
+      }
     }
   } catch (error) {
     console.error("An unexpected error occurred:", error);

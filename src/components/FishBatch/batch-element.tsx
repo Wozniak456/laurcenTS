@@ -4,7 +4,7 @@ import { useFormState } from "react-dom";
 import Image from "next/image";
 import CloseButton from "../../../public/icons/close-square-light.svg";
 import { BatchWithCreationInfo } from "@/types/app_types";
-import { ChangeEvent, useState } from "react";
+import { useState } from "react";
 import BatchDeleteForm from "@/components/FishBatch/delete-message";
 import AddExtraQuantityForm from "./add-extra-quantity-form";
 import { useEffect } from "react";
@@ -16,17 +16,9 @@ import {
   ModalBody,
   ModalFooter,
   useDisclosure,
-  Checkbox,
-  Link,
 } from "@nextui-org/react";
 
-import {
-  Button,
-  Input,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@nextui-org/react";
+import { Button, Input } from "@nextui-org/react";
 import FormButton from "../common/form-button";
 
 type ItemBatchComponentProps = {
@@ -70,17 +62,11 @@ export default function ItemBatchComponent({
   const [date, setDate] = useState<Date | null | undefined | "">("");
   const [qty, setQty] = useState<number | undefined | "">("");
 
-  const handleInputItemIdChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    setItemId(Number(event.target.value));
-  };
-
-  const handleInputDateChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleInputDateChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const date = new Date(event.target.value);
     setDate(date);
-  };
-
-  const handleInputQtyChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setQty(Number(event.target.value));
   };
 
   // Debug logging for form values
