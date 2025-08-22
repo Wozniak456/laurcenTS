@@ -556,6 +556,8 @@ export async function getBatchesInfo(location_id: number, date: string) {
   const dateValue = new Date(date);
 
   dateValue.setUTCHours(23, 59, 59, 999);
+
+  // Get the latest stocking document for batch info
   const batch = await db.documents.findFirst({
     select: {
       itemtransactions: {
@@ -578,17 +580,40 @@ export async function getBatchesInfo(location_id: number, date: string) {
       date_time: {
         lte: dateValue,
       },
-      itemtransactions: { some: { location_id: location_id } }, // фільтрація транзакцій
+      itemtransactions: { some: { location_id: location_id } },
     },
     orderBy: {
       date_time: "desc",
     },
   });
 
+  // Calculate total fish quantity for the location up to the given date
+  // This is the correct approach that sums ALL transactions, not just the last document
+  const sumResult = await db.itemtransactions.aggregate({
+    _sum: {
+      quantity: true,
+    },
+    where: {
+      location_id: location_id,
+      documents: {
+        date_time: {
+          lte: dateValue,
+        },
+      },
+      itembatches: {
+        items: {
+          item_type_id: 1, // Fish only
+        },
+      },
+    },
+  });
+
+  const totalFishQuantity = sumResult._sum.quantity || 0;
+
   const result = {
-    batch_name: batch?.itemtransactions[0].itembatches.name,
-    batch_id: batch?.itemtransactions[0].itembatches.id,
-    qty: batch?.itemtransactions[0].quantity,
+    batch_name: batch?.itemtransactions[0]?.itembatches?.name,
+    batch_id: batch?.itemtransactions[0]?.itembatches?.id,
+    qty: totalFishQuantity, // Use total quantity instead of just last document quantity
   };
 
   return result;

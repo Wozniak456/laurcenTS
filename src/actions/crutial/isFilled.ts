@@ -1,37 +1,35 @@
-'use server'
+"use server";
 import { db } from "@/db";
 
-export const isFilled = async (location_id : number, date: string)  => {
-    const lastStock = await db.documents.findFirst({
-        select:{
-            itemtransactions:{
-                select: {
-                    quantity: true
-                },
-                where:{
-                    location_id: location_id
-                }
-            }
-        },
-        where:{
-            doc_type_id: 1,
-            date_time:{
-                lte: new Date (date)
-            },
-            itemtransactions: { 
-                some: { location_id: location_id}
-            }
-        },
-        orderBy: {
-            date_time: 'desc'
-        }
-    })
-    const stock = lastStock?.itemtransactions.filter(tran => tran.quantity > 0)
-    // console.log(location_id, stock)
+export const isFilled = async (location_id: number, date: string) => {
+  const dateValue = new Date(date);
+  dateValue.setUTCHours(23, 59, 59, 999);
 
-    if (stock?.length && stock?.length > 0){
-        return true
-    }else{
-        return false
-    }
-}
+  // Calculate total fish quantity for the location up to the given date
+  // This is the correct approach that sums ALL transactions, not just the last document
+  const sumResult = await db.itemtransactions.aggregate({
+    _sum: {
+      quantity: true,
+    },
+    where: {
+      location_id: location_id,
+      documents: {
+        date_time: {
+          lte: dateValue,
+        },
+      },
+      itembatches: {
+        items: {
+          item_type_id: 1, // Fish only
+        },
+      },
+    },
+  });
+
+  const totalFishQuantity = sumResult._sum.quantity || 0;
+
+  // console.log(location_id, totalFishQuantity)
+
+  // Return true if there are fish in the location (total quantity > 0)
+  return totalFishQuantity > 0;
+};
