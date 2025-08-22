@@ -24,6 +24,7 @@ interface DataItem {
   incoming: number;
   outcoming: number;
   end_saldo: number;
+  inventory_counting_qty: number; // New field for inventory counting
 }
 
 export default function LeftoversPerPeriod(props: LeftoversPerPeriodProps) {
@@ -77,6 +78,27 @@ export default function LeftoversPerPeriod(props: LeftoversPerPeriodProps) {
 
       for (const batch_id in end_saldo) {
         if (Object.prototype.hasOwnProperty.call(end_saldo, batch_id)) {
+          const inventoryCountingQty =
+            end_saldo[batch_id]?.inventory_counting_qty || 0;
+          const originalIncoming = incoming[batch_id]?.qty
+            ? incoming[batch_id].qty
+            : 0;
+          const originalOutcoming = outcoming[batch_id]?.qty
+            ? outcoming[batch_id].qty
+            : 0;
+
+          // Adjust income and outcome based on inventory counting
+          let adjustedIncoming = originalIncoming;
+          let adjustedOutcoming = originalOutcoming;
+
+          if (inventoryCountingQty > 0) {
+            // Positive inventory counting: subtract from income
+            adjustedIncoming = originalIncoming - inventoryCountingQty;
+          } else if (inventoryCountingQty < 0) {
+            // Negative inventory counting: subtract from outcome (make outcome less negative)
+            adjustedOutcoming = originalOutcoming - inventoryCountingQty;
+          }
+
           newData.push({
             batch_id: batch_id,
             batch_name: end_saldo[batch_id].batchName,
@@ -85,9 +107,10 @@ export default function LeftoversPerPeriod(props: LeftoversPerPeriodProps) {
             start_saldo: start_saldo[batch_id]?.qty
               ? start_saldo[batch_id].qty
               : 0,
-            incoming: incoming[batch_id]?.qty ? incoming[batch_id].qty : 0,
-            outcoming: outcoming[batch_id]?.qty ? outcoming[batch_id].qty : 0,
+            incoming: adjustedIncoming,
+            outcoming: adjustedOutcoming,
             end_saldo: end_saldo[batch_id]?.qty,
+            inventory_counting_qty: inventoryCountingQty,
           });
         }
       }

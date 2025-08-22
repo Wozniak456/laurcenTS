@@ -808,17 +808,20 @@ export async function getCostReportPivot(batchId: number, date: string) {
 }
 
 // Returns the exact stock quantity for a batch up to a given date
+// EXCLUDING main warehouse (location_id = 87) - only production locations
 export async function getBatchStockQty(
   batchId: number,
   date: string
 ): Promise<number> {
   // Sum all itemtransactions.quantity for the batch up to and including the date
+  // EXCLUDING main warehouse (location_id = 87) - only production locations
   const result = await db.$queryRawUnsafe<any[]>(
     `SELECT SUM(itr.quantity) as sum
      FROM itemtransactions itr
      JOIN documents d ON itr.doc_id = d.id
      WHERE itr.batch_id = $1
        AND CAST(d.date_time AS DATE) <= CAST($2 AS DATE)
+       AND itr.location_id != 87  -- Exclude main warehouse
     `,
     batchId,
     date
@@ -860,6 +863,7 @@ export async function getBatchStockingHistory(batchId: number): Promise<
 }
 
 // Returns the total stock and total weight for a batch as of a given date
+// EXCLUDING main warehouse (location_id = 87) - only production locations
 export async function getBatchTotalStockAndWeight(
   batchId: number,
   date: string
@@ -872,6 +876,7 @@ export async function getBatchTotalStockAndWeight(
       FROM itemtransactions itr
       INNER JOIN itembatches ib ON ib.id = $1 AND ib.id = itr.batch_id
       INNER JOIN documents doc ON doc.id = itr.doc_id AND CAST(doc.date_time AS DATE) <= CAST($2 AS DATE)
+      WHERE itr.location_id != 87  -- Exclude main warehouse
       GROUP BY itr.location_id
       HAVING SUM(itr.quantity) > 0
     ),

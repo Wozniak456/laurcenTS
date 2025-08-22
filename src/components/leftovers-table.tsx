@@ -20,6 +20,7 @@ interface LeftoversTableProps {
     incoming: number;
     outcoming: number;
     end_saldo: number;
+    inventory_counting_qty: number; // New field for inventory counting
   }[];
   periodEndDate?: string; // End date of the period for cleanup
   onSelectionChange?: (selectedItem: any) => void; // Callback for selection changes
@@ -86,6 +87,7 @@ export default function LeftoversTable({
         <TableColumn className="text-center">Start</TableColumn>
         <TableColumn className="text-center">Income</TableColumn>
         <TableColumn className="text-center">Outcome</TableColumn>
+        <TableColumn className="text-center">Inventory Counting</TableColumn>
         <TableColumn className="text-center">Actual</TableColumn>
       </TableHeader>
       <TableBody>
@@ -124,6 +126,11 @@ export default function LeftoversTable({
                     : item.outcoming.toFixed(3)}
                 </TableCell>
                 <TableCell className="text-center">
+                  {Math.abs(item.inventory_counting_qty) < 0.0001
+                    ? "0.000"
+                    : item.inventory_counting_qty.toFixed(3)}
+                </TableCell>
+                <TableCell className="text-center">
                   {Math.abs(item.end_saldo) < 0.0001
                     ? "0.000"
                     : item.end_saldo.toFixed(3)}
@@ -132,6 +139,7 @@ export default function LeftoversTable({
             ))
         ) : (
           <TableRow>
+            <TableCell className="text-center">2</TableCell>
             <TableCell className="text-center">2</TableCell>
             <TableCell className="text-center">2</TableCell>
             <TableCell className="text-center">2</TableCell>
